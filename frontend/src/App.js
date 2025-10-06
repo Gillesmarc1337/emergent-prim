@@ -211,7 +211,18 @@ function Dashboard() {
     setError(null);
     
     try {
-      const response = await axios.get(`${API}/analytics/weekly?week_offset=${weekOffset}`);
+      let response;
+      
+      if (useCustomDate && dateRange?.from && dateRange?.to) {
+        // Use custom date range
+        const startDate = format(dateRange.from, 'yyyy-MM-dd');
+        const endDate = format(dateRange.to, 'yyyy-MM-dd');
+        response = await axios.get(`${API}/analytics/custom?start_date=${startDate}&end_date=${endDate}`);
+      } else {
+        // Use weekly offset
+        response = await axios.get(`${API}/analytics/weekly?week_offset=${weekOffset}`);
+      }
+      
       setAnalytics(response.data);
     } catch (error) {
       setError(error.response?.data?.detail || 'Erreur lors du chargement des analytics');
