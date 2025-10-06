@@ -327,25 +327,54 @@ function Dashboard() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold">Rapport Hebdomadaire</h1>
+          <h1 className="text-3xl font-bold">{useCustomDate ? 'Rapport Personnalisé' : 'Rapport Hebdomadaire'}</h1>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Button
-                variant="outline"
+                variant={useCustomDate ? 'outline' : 'default'}
                 size="sm"
-                onClick={() => setWeekOffset(weekOffset + 1)}
+                onClick={() => setUseCustomDate(false)}
+                className="flex items-center gap-1"
               >
-                ← Semaine précédente
+                <Calendar className="h-4 w-4" />
+                Hebdomadaire
               </Button>
               <Button
-                variant="outline"
+                variant={useCustomDate ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setWeekOffset(weekOffset - 1)}
-                disabled={weekOffset <= 0}
+                onClick={() => setUseCustomDate(true)}
+                className="flex items-center gap-1"
               >
-                Semaine suivante →
+                <CalendarDays className="h-4 w-4" />
+                Période personnalisée
               </Button>
             </div>
+            {!useCustomDate && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setWeekOffset(weekOffset + 1)}
+                >
+                  ← Semaine précédente
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setWeekOffset(weekOffset - 1)}
+                  disabled={weekOffset <= 0}
+                >
+                  Semaine suivante →
+                </Button>
+              </div>
+            )}
+            {useCustomDate && (
+              <DateRangePicker 
+                dateRange={dateRange}
+                onDateChange={(range) => setDateRange(range)}
+                className="w-auto"
+              />
+            )}
             <Button onClick={loadAnalytics} size="sm">
               Actualiser
             </Button>
