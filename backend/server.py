@@ -73,6 +73,25 @@ class UploadResponse(BaseModel):
     analytics_id: Optional[str] = None
 
 # Utility functions
+def clean_records(records):
+    """Clean records to ensure all values are JSON serializable"""
+    cleaned = []
+    for record in records:
+        cleaned_record = {}
+        for key, value in record.items():
+            if pd.isna(value):
+                cleaned_record[key] = None
+            elif isinstance(value, (np.integer, np.int64, np.int32)):
+                cleaned_record[key] = int(value)
+            elif isinstance(value, (np.floating, np.float64, np.float32)):
+                cleaned_record[key] = float(value)
+            elif isinstance(value, np.bool_):
+                cleaned_record[key] = bool(value)
+            else:
+                cleaned_record[key] = value
+        cleaned.append(cleaned_record)
+    return cleaned
+
 def clean_monetary_value(value):
     """Clean and convert monetary values"""
     if pd.isna(value) or value == '' or value is None:
