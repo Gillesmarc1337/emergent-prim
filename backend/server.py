@@ -345,7 +345,7 @@ def calculate_closing_projections(df):
             'weighted_value': float(projections_month['weighted_value'].sum())
         },
         'next_quarter': {
-            'deals': projections_quarter[['client', 'pipeline', 'probability', 'owner', 'stage']].to_dict('records'),
+            'deals': clean_records(projections_quarter[['client', 'pipeline', 'probability', 'owner', 'stage']].to_dict('records')),
             'total_value': float(projections_quarter['pipeline'].sum()),
             'weighted_value': float(projections_quarter['weighted_value'].sum())
         },
