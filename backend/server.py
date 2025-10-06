@@ -212,14 +212,20 @@ def calculate_deals_closed(df, week_start, week_end):
         (df['stage'].isin(['Closed Won', 'Won', 'Signed']))
     ]
     
+    # Convert numpy types to Python native types
+    deals_count = int(len(closed_deals))
+    arr_sum = float(closed_deals['expected_arr'].sum())
+    mrr_sum = float(closed_deals['expected_mrr'].sum())
+    avg_deal = float(closed_deals['expected_arr'].mean() if len(closed_deals) > 0 else 0)
+    
     return {
-        'deals_closed': len(closed_deals),
+        'deals_closed': deals_count,
         'target_deals': 5,
-        'arr_closed': closed_deals['expected_arr'].sum(),
+        'arr_closed': arr_sum,
         'target_arr': 300000,
-        'mrr_closed': closed_deals['expected_mrr'].sum(),
-        'avg_deal_size': closed_deals['expected_arr'].mean() if len(closed_deals) > 0 else 0,
-        'on_track': len(closed_deals) >= 5 and closed_deals['expected_arr'].sum() >= 300000,
+        'mrr_closed': mrr_sum,
+        'avg_deal_size': avg_deal,
+        'on_track': bool(deals_count >= 5 and arr_sum >= 300000),
         'deals_detail': closed_deals[['client', 'expected_arr', 'owner', 'type_of_deal']].to_dict('records')
     }
 
