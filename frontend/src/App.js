@@ -202,6 +202,9 @@ function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [weekOffset, setWeekOffset] = useState(0);
+  const [dateRange, setDateRange] = useState(null);
+  const [useCustomDate, setUseCustomDate] = useState(false);
+  const [importMethod, setImportMethod] = useState('csv'); // 'csv' or 'sheets'
 
   const loadAnalytics = async () => {
     setLoading(true);
