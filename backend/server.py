@@ -439,30 +439,32 @@ async def get_weekly_analytics(week_offset: int = 0):
         pipe_metrics = calculate_pipe_metrics(df, week_start, week_end)
         closing_projections = calculate_closing_projections(df)
         
-        # Attribution analysis
+        # Attribution analysis - convert numpy types to Python native types
         attribution = {
-            'intro_attribution': df.groupby('type_of_source')['id'].count().to_dict(),
-            'disco_attribution': df[~df['discovery_date'].isna()].groupby('type_of_source')['id'].count().to_dict(),
-            'bdr_attribution': df.groupby('bdr')['id'].count().to_dict()
+            'intro_attribution': {k: int(v) for k, v in df.groupby('type_of_source')['id'].count().to_dict().items()},
+            'disco_attribution': {k: int(v) for k, v in df[~df['discovery_date'].isna()].groupby('type_of_source')['id'].count().to_dict().items()},
+            'bdr_attribution': {k: int(v) for k, v in df.groupby('bdr')['id'].count().to_dict().items()}
         }
         
         # Old pipe (reviving deals)
         old_pipe_data = df[df['stage'].isin(['G Stalled', 'H Lost - can be revived'])]
         old_pipe = {
-            'total_stalled_deals': len(old_pipe_data),
-            'total_stalled_value': old_pipe_data['pipeline'].sum(),
-            'companies_to_recontact': old_pipe_data['client'].nunique(),
+            'total_stalled_deals': int(len(old_pipe_data)),
+            'total_stalled_value': float(old_pipe_data['pipeline'].sum()),
+            'companies_to_recontact': int(old_pipe_data['client'].nunique()),
             'revival_opportunities': old_pipe_data[['client', 'pipeline', 'stage', 'owner']].to_dict('records')
         }
         
         # Big numbers recap
         ytd_closed = df[df['stage'].isin(['Closed Won', 'Won', 'Signed'])]
+        ytd_revenue = float(ytd_closed['expected_arr'].sum())
+        ytd_target = 3600000  # Should be configurable
         big_numbers_recap = {
-            'ytd_revenue': ytd_closed['expected_arr'].sum(),
-            'ytd_target': 3600000,  # Should be configurable
-            'remaining_target': 3600000 - ytd_closed['expected_arr'].sum(),
-            'monthly_breakdown': df.groupby(df['discovery_date'].dt.to_period('M'))['pipeline'].sum().to_dict(),
-            'forecast_gap': True if ytd_closed['expected_arr'].sum() < 3600000 * 0.75 else False
+            'ytd_revenue': ytd_revenue,
+            'ytd_target': ytd_target,
+            'remaining_target': float(ytd_target - ytd_revenue),
+            'monthly_breakdown': {str(k): float(v) for k, v in df.groupby(df['discovery_date'].dt.to_period('M'))['pipeline'].sum().to_dict().items()},
+            'forecast_gap': bool(ytd_revenue < ytd_target * 0.75)
         }
         
         analytics = WeeklyAnalytics(
