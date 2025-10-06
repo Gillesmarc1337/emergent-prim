@@ -255,24 +255,29 @@ def calculate_pipe_metrics(df, week_start, week_end):
     # Total aggregate pipe
     active_pipe = df[~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost'])]
     
+    # Convert numpy types to Python native types
+    new_pipe_value = float(new_pipe['pipeline'].sum())
+    hot_pipe_value = float(hot_pipe['pipeline'].sum())
+    active_pipe_value = float(active_pipe['pipeline'].sum())
+    
     return {
         'new_pipe_created': {
-            'value': new_pipe['pipeline'].sum(),
-            'count': len(new_pipe),
+            'value': new_pipe_value,
+            'count': int(len(new_pipe)),
             'target': 500000,
-            'on_track': new_pipe['pipeline'].sum() >= 500000
+            'on_track': bool(new_pipe_value >= 500000)
         },
         'hot_pipe': {
-            'value': hot_pipe['pipeline'].sum(),
-            'count': len(hot_pipe),
+            'value': hot_pipe_value,
+            'count': int(len(hot_pipe)),
             'target': 1000000,
             'deals': hot_pipe[['client', 'pipeline', 'stage', 'owner']].to_dict('records')
         },
         'total_aggregate_pipe': {
-            'value': active_pipe['pipeline'].sum(),
-            'count': len(active_pipe),
+            'value': active_pipe_value,
+            'count': int(len(active_pipe)),
             'target': 2000000,
-            'on_track': active_pipe['pipeline'].sum() >= 2000000
+            'on_track': bool(active_pipe_value >= 2000000)
         }
     }
 
