@@ -308,26 +308,32 @@ def calculate_closing_projections(df):
     projections_month = active_deals[active_deals['probability'] >= 50]
     projections_quarter = active_deals[active_deals['probability'] >= 30]
     
+    # Convert numpy types to Python native types
+    ae_projections = active_deals.groupby('owner').agg({
+        'weighted_value': 'sum',
+        'pipeline': 'sum'
+    })
+    
     return {
         'next_7_days': {
             'deals': projections_7_days[['client', 'pipeline', 'probability', 'owner', 'stage']].to_dict('records'),
-            'total_value': projections_7_days['pipeline'].sum(),
-            'weighted_value': projections_7_days['weighted_value'].sum()
+            'total_value': float(projections_7_days['pipeline'].sum()),
+            'weighted_value': float(projections_7_days['weighted_value'].sum())
         },
         'current_month': {
             'deals': projections_month[['client', 'pipeline', 'probability', 'owner', 'stage']].to_dict('records'),
-            'total_value': projections_month['pipeline'].sum(),
-            'weighted_value': projections_month['weighted_value'].sum()
+            'total_value': float(projections_month['pipeline'].sum()),
+            'weighted_value': float(projections_month['weighted_value'].sum())
         },
         'next_quarter': {
             'deals': projections_quarter[['client', 'pipeline', 'probability', 'owner', 'stage']].to_dict('records'),
-            'total_value': projections_quarter['pipeline'].sum(),
-            'weighted_value': projections_quarter['weighted_value'].sum()
+            'total_value': float(projections_quarter['pipeline'].sum()),
+            'weighted_value': float(projections_quarter['weighted_value'].sum())
         },
-        'ae_projections': active_deals.groupby('owner').agg({
-            'weighted_value': 'sum',
-            'pipeline': 'sum'
-        }).to_dict('index')
+        'ae_projections': {k: {
+            'weighted_value': float(v['weighted_value']),
+            'pipeline': float(v['pipeline'])
+        } for k, v in ae_projections.to_dict('index').items()} if not ae_projections.empty else {}
     }
 
 # API Endpoints
