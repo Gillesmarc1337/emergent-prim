@@ -146,6 +146,71 @@ def get_week_range(date=None):
     return monday.replace(hour=0, minute=0, second=0, microsecond=0), \
            sunday.replace(hour=23, minute=59, second=59, microsecond=999999)
 
+def extract_sheet_id_from_url(url):
+    """Extract Google Sheet ID from URL"""
+    # Pattern to match Google Sheets URLs
+    patterns = [
+        r'/spreadsheets/d/([a-zA-Z0-9-_]+)',
+        r'key=([a-zA-Z0-9-_]+)',
+        r'spreadsheets/d/([a-zA-Z0-9-_]+)'
+    ]
+    
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            return match.group(1)
+    
+    # If no pattern matches, assume the URL is the sheet ID itself
+    if len(url) > 20 and '/' not in url:
+        return url
+        
+    raise HTTPException(status_code=400, detail="Invalid Google Sheets URL format")
+
+def read_google_sheet(sheet_url: str, sheet_name: str = None):
+    """Read data from Google Sheets using public access"""
+    try:
+        # Extract sheet ID from URL
+        sheet_id = extract_sheet_id_from_url(sheet_url)
+        
+        # Try to access the sheet publicly first
+        if sheet_name:
+            # If sheet name is provided, use it
+            csv_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
+        else:
+            # Use the first sheet (gid=0)
+            csv_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid=0"
+        
+        # Try to download the CSV
+        response = requests.get(csv_url)
+        
+        if response.status_code == 200:
+            # Read CSV data
+            csv_data = io.StringIO(response.text)
+            df = pd.read_csv(csv_data)
+            return df
+        else:
+            # If public access fails, try alternative URL format
+            alt_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
+            alt_response = requests.get(alt_url)
+            
+            if alt_response.status_code == 200:
+                csv_data = io.StringIO(alt_response.text)
+                df = pd.read_csv(csv_data)
+                return df
+            else:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Cannot access Google Sheet. Make sure the sheet is public or shared. Status: {response.status_code}"
+                )
+                
+    except Exception as e:
+        if "Invalid Google Sheets URL format" in str(e):
+            raise e
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error reading Google Sheet: {str(e)}. Make sure the sheet is publicly accessible."
+        )
+
 def calculate_meeting_generation(df, week_start, week_end):
     """Calculate meeting generation metrics for last 7 days"""
     week_data = df[
