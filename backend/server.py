@@ -471,7 +471,7 @@ async def get_weekly_analytics(week_offset: int = 0):
             'total_stalled_deals': int(len(old_pipe_data)),
             'total_stalled_value': float(old_pipe_data['pipeline'].sum()),
             'companies_to_recontact': int(old_pipe_data['client'].nunique()),
-            'revival_opportunities': old_pipe_data[['client', 'pipeline', 'stage', 'owner']].to_dict('records')
+            'revival_opportunities': clean_records(old_pipe_data[['client', 'pipeline', 'stage', 'owner']].to_dict('records'))
         }
         
         # Big numbers recap
