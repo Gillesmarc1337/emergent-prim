@@ -183,25 +183,35 @@ def calculate_meetings_attended(df, week_start, week_end):
         'poa_date': 'poa_generated'
     })
     
+    # Convert numpy types to Python native types
+    attended_count = int(len(attended))
+    scheduled_count = int(len(week_data))
+    discoveries_count = int(len(discoveries))
+    poa_count = int(len(poa_meetings))
+    
     return {
         'intro_metrics': {
             'target': 40,
-            'attended': len(attended),
-            'scheduled': len(week_data),
-            'attendance_rate': len(attended) / len(week_data) * 100 if len(week_data) > 0 else 0
+            'attended': attended_count,
+            'scheduled': scheduled_count,
+            'attendance_rate': float(attended_count / scheduled_count * 100 if scheduled_count > 0 else 0)
         },
         'discovery_metrics': {
             'target': 30,
-            'completed': len(discoveries),
-            'conversion_rate': len(discoveries) / len(attended) * 100 if len(attended) > 0 else 0
+            'completed': discoveries_count,
+            'conversion_rate': float(discoveries_count / attended_count * 100 if attended_count > 0 else 0)
         },
         'poa_metrics': {
             'target': 15,
-            'generated': len(poa_meetings),
-            'conversion_rate': len(poa_meetings) / len(discoveries) * 100 if len(discoveries) > 0 else 0
+            'generated': poa_count,
+            'conversion_rate': float(poa_count / discoveries_count * 100 if discoveries_count > 0 else 0)
         },
-        'ae_performance': ae_stats.to_dict('index') if not ae_stats.empty else {},
-        'on_track': len(attended) >= 40 and len(poa_meetings) >= 15
+        'ae_performance': {k: {
+            'total_scheduled': int(v['total_scheduled']),
+            'attended': int(v['attended']),
+            'poa_generated': int(v['poa_generated'])
+        } for k, v in ae_stats.to_dict('index').items()} if not ae_stats.empty else {},
+        'on_track': bool(attended_count >= 40 and poa_count >= 15)
     }
 
 def calculate_deals_closed(df, week_start, week_end):
