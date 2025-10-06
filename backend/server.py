@@ -593,6 +593,75 @@ async def clear_data():
     result = await db.sales_records.delete_many({})
     return {"message": f"Deleted {result.deleted_count} records"}
 
+@api_router.post("/upload-google-sheets", response_model=UploadResponse)
+async def upload_google_sheets_data(request: GoogleSheetsRequest):
+    """Upload and process sales data from Google Sheets"""
+    try:
+        # Read data from Google Sheets
+        df = read_google_sheet(request.sheet_url, request.sheet_name)
+        
+        if df.empty:
+            raise HTTPException(status_code=400, detail="Google Sheet is empty or could not be read")
+        
+        # Clean column names
+        df.columns = df.columns.str.lower().str.replace(' ', '_').str.replace('/', '_')
+        
+        # Process and clean data (same logic as CSV upload)
+        records = []
+        valid_records = 0
+        
+        for _, row in df.iterrows():
+            # Skip empty or summary rows
+            if pd.isna(row.get('client')) or str(row.get('client')).strip() == '':
+                continue
+                
+            try:
+                record = SalesRecord(
+                    month=str(row.get('month', '')) if not pd.isna(row.get('month')) else None,
+                    discovery_date=clean_date(row.get('discovery_date')),
+                    client=str(row.get('client', '')).strip(),
+                    hubspot_link=str(row.get('hubspot_link', '')) if not pd.isna(row.get('hubspot_link')) else None,
+                    stage=str(row.get('stage', '')) if not pd.isna(row.get('stage')) else None,
+                    relevance=str(row.get('relevance', '')) if not pd.isna(row.get('relevance')) else None,
+                    show_noshow=str(row.get('show_noshow', '')) if not pd.isna(row.get('show_noshow')) else None,
+                    poa_date=clean_date(row.get('poa_date')),
+                    expected_mrr=clean_monetary_value(row.get('expected_mrr')),
+                    expected_arr=clean_monetary_value(row.get('expected_arr')),
+                    pipeline=clean_monetary_value(row.get('pipeline')),
+                    type_of_deal=str(row.get('type_of_deal', '')) if not pd.isna(row.get('type_of_deal')) else None,
+                    bdr=str(row.get('bdr', '')) if not pd.isna(row.get('bdr')) else None,
+                    type_of_source=str(row.get('type_of_source', '')) if not pd.isna(row.get('type_of_source')) else None,
+                    product=str(row.get('product', '')) if not pd.isna(row.get('product')) else None,
+                    owner=str(row.get('owner', '')) if not pd.isna(row.get('owner')) else None,
+                    supporters=str(row.get('supporters', '')) if not pd.isna(row.get('supporters')) else None,
+                    billing_start=clean_date(row.get('billing_start'))
+                )
+                records.append(record.dict())
+                valid_records += 1
+                
+            except Exception as e:
+                print(f"Error processing row: {str(e)}")
+                continue
+        
+        # Store in MongoDB
+        if records:
+            # Clear existing data
+            await db.sales_records.delete_many({})
+            # Insert new data
+            await db.sales_records.insert_many(records)
+        
+        return UploadResponse(
+            message=f"Successfully processed {len(records)} sales records from Google Sheets",
+            records_processed=len(df),
+            records_valid=valid_records
+        )
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing Google Sheets data: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
