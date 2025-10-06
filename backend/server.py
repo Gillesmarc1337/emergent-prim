@@ -138,20 +138,27 @@ def calculate_meeting_generation(df, week_start, week_end):
         'relevance': lambda x: (x == 'Relevant').sum()
     }).rename(columns={'id': 'total_meetings', 'relevance': 'relevant_meetings'})
     
+    # Convert numpy types to Python native types
+    total_intros = int(len(week_data))
+    target = 50
+    
     return {
-        'total_new_intros': len(week_data),
-        'inbound': len(inbound),
-        'outbound': len(outbound),
-        'referrals': len(referrals),
+        'total_new_intros': total_intros,
+        'inbound': int(len(inbound)),
+        'outbound': int(len(outbound)),
+        'referrals': int(len(referrals)),
         'relevance_analysis': {
-            'relevant': len(relevant),
-            'question_mark': len(question_mark),
-            'not_relevant': len(not_relevant),
-            'relevance_rate': len(relevant) / len(week_data) * 100 if len(week_data) > 0 else 0
+            'relevant': int(len(relevant)),
+            'question_mark': int(len(question_mark)),
+            'not_relevant': int(len(not_relevant)),
+            'relevance_rate': float(len(relevant) / len(week_data) * 100 if len(week_data) > 0 else 0)
         },
-        'bdr_performance': bdr_stats.to_dict('index') if not bdr_stats.empty else {},
-        'target': 50,  # Example target - should be configurable
-        'on_track': len(week_data) >= 50
+        'bdr_performance': {k: {
+            'total_meetings': int(v['total_meetings']),
+            'relevant_meetings': int(v['relevant_meetings'])
+        } for k, v in bdr_stats.to_dict('index').items()} if not bdr_stats.empty else {},
+        'target': target,
+        'on_track': bool(total_intros >= target)
     }
 
 def calculate_meetings_attended(df, week_start, week_end):
