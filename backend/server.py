@@ -290,7 +290,7 @@ def calculate_pipe_metrics(df, week_start, week_end):
             'value': hot_pipe_value,
             'count': int(len(hot_pipe)),
             'target': 1000000,
-            'deals': hot_pipe[['client', 'pipeline', 'stage', 'owner']].to_dict('records')
+            'deals': clean_records(hot_pipe[['client', 'pipeline', 'stage', 'owner']].to_dict('records'))
         },
         'total_aggregate_pipe': {
             'value': active_pipe_value,
