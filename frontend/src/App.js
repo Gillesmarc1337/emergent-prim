@@ -272,9 +272,36 @@ function Dashboard() {
       <div className="container mx-auto p-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">Tableau de Bord Analytics Ventes</h1>
-          <p className="text-gray-600">Analysez vos performances commerciales avec des rapports hebdomadaires détaillés</p>
+          <p className="text-gray-600">Analysez vos performances commerciales avec des rapports détaillés</p>
         </div>
-        <FileUpload onUploadSuccess={handleUploadSuccess} />
+        
+        {/* Import Method Selector */}
+        <div className="mb-6">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <Button
+              variant={importMethod === 'csv' ? 'default' : 'outline'}
+              onClick={() => setImportMethod('csv')}
+              className="flex items-center gap-2"
+            >
+              <Upload className="h-4 w-4" />
+              Upload CSV/Excel
+            </Button>
+            <Button
+              variant={importMethod === 'sheets' ? 'default' : 'outline'}
+              onClick={() => setImportMethod('sheets')}
+              className="flex items-center gap-2"
+            >
+              <Sheet className="h-4 w-4" />
+              Google Sheets
+            </Button>
+          </div>
+          
+          {importMethod === 'csv' ? (
+            <FileUpload onUploadSuccess={handleUploadSuccess} />
+          ) : (
+            <GoogleSheetsUpload onUploadSuccess={handleUploadSuccess} />
+          )}
+        </div>
       </div>
     );
   }
