@@ -232,8 +232,10 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    loadAnalytics();
-  }, [weekOffset]);
+    if (analytics) {
+      loadAnalytics();
+    }
+  }, [weekOffset, dateRange, useCustomDate]);
 
   const handleUploadSuccess = () => {
     loadAnalytics();
