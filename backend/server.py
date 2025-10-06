@@ -76,6 +76,14 @@ class UploadResponse(BaseModel):
     records_valid: int
     analytics_id: Optional[str] = None
 
+class GoogleSheetsRequest(BaseModel):
+    sheet_url: str
+    sheet_name: Optional[str] = None
+
+class DateRangeRequest(BaseModel):
+    start_date: datetime
+    end_date: datetime
+
 # Utility functions
 def clean_records(records):
     """Clean records to ensure all values are JSON serializable"""
