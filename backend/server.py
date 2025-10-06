@@ -664,11 +664,6 @@ async def get_custom_analytics(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating custom analytics: {str(e)}")
-
-        # Get data from MongoDB
-        records = await db.sales_records.find().to_list(10000)
-        if not records:
-            raise HTTPException(status_code=404, detail="No sales data found. Please upload data first.")
         
         # Get data from MongoDB
         records = await db.sales_records.find().to_list(10000)
