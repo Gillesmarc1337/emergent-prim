@@ -636,13 +636,13 @@ function MainDashboard() {
               <div className="space-y-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">
-                    {dashboardData.dashboard_blocks.block_2_discovery_poa.discovery_count}
+                    {dashboardData.dashboard_blocks.block_2_discovery_poa.discovery_actual}/{dashboardData.dashboard_blocks.block_2_discovery_poa.discovery_target}
                   </div>
                   <div className="text-sm text-gray-600">Discovery</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-orange-600">
-                    {dashboardData.dashboard_blocks.block_2_discovery_poa.poa_count}
+                    {dashboardData.dashboard_blocks.block_2_discovery_poa.poa_actual}/{dashboardData.dashboard_blocks.block_2_discovery_poa.poa_target}
                   </div>
                   <div className="text-sm text-gray-600">POA</div>
                 </div>
