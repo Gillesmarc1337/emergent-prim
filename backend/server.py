@@ -380,12 +380,12 @@ def calculate_deals_closed(df, start_date, end_date):
         'monthly_closed': monthly_closed
     }
 
-def calculate_pipe_metrics(df, week_start, week_end):
+def calculate_pipe_metrics(df, start_date, end_date):
     """Calculate pipeline metrics"""
-    # New pipe created last 7 days
+    # New pipe created in period
     new_pipe = df[
-        (df['discovery_date'] >= week_start) & 
-        (df['discovery_date'] <= week_end) &
+        (df['discovery_date'] >= start_date) & 
+        (df['discovery_date'] <= end_date) &
         (df['relevance'] == 'Relevant')
     ]
     
