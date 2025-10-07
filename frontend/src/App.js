@@ -685,7 +685,9 @@ function MainDashboard() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-center">Revenue Objective</CardTitle>
-              <CardDescription className="text-center">Current Month</CardDescription>
+              <CardDescription className="text-center font-medium text-gray-600">
+                {dashboardData.dashboard_blocks.block_4_revenue.period}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
