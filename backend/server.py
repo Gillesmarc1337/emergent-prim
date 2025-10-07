@@ -235,7 +235,7 @@ def calculate_meeting_generation(df, start_date, end_date):
     }).rename(columns={'id': 'total_meetings', 'relevance': 'relevant_meetings'})
     
     # Convert numpy types to Python native types
-    total_intros = int(len(week_data))
+    total_intros = int(len(period_data))
     target = 50
     
     return {
