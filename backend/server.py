@@ -334,6 +334,80 @@ def calculate_meetings_attended(df, start_date, end_date):
         'on_track': bool(attended_count >= 40 and poa_count >= 15)
     }
 
+def calculate_ae_performance(df, start_date, end_date):
+    """Calculate AE performance metrics"""
+    period_data = df[
+        (df['discovery_date'] >= start_date) & 
+        (df['discovery_date'] <= end_date)
+    ]
+    
+    # Intros = tout sauf inbox et noshow
+    intros_data = period_data[
+        (~period_data['stage'].isin(['F Inbox'])) &
+        (~period_data['show_noshow'].isin(['No Show']))
+    ].copy()
+    
+    # POA = closed / lost / legals / POA booked 
+    poa_stages = ['Closed Won', 'Won', 'Signed', 'Closed Lost', 'Lost', 'I Lost', 
+                  'B Legals', 'D POA Booked', 'Legal', 'POA Booked']
+    poa_data = period_data[period_data['stage'].isin(poa_stages)]
+    
+    # AE Performance calculation
+    ae_performance = []
+    for ae in intros_data['owner'].dropna().unique():
+        ae_intros = intros_data[intros_data['owner'] == ae]
+        ae_poas = poa_data[poa_data['owner'] == ae]
+        
+        # Relevant intros (assuming relevant means they progressed)
+        relevant_intros = ae_intros[ae_intros['relevance'] == 'Relevant']
+        
+        # Closing value calculation (sum of expected_arr for closed won deals)
+        closed_won = ae_poas[ae_poas['stage'].isin(['Closed Won', 'Won', 'Signed'])]
+        closing_value = float(closed_won['expected_arr'].fillna(0).sum())
+        
+        ae_performance.append({
+            'ae': str(ae),
+            'intros_attended': len(ae_intros),
+            'relevant_intro': len(relevant_intros),
+            'poa_fait': len(ae_poas),
+            'closing': len(closed_won),
+            'valeur_closing': closing_value
+        })
+    
+    # Sort by intros attended descending
+    ae_performance.sort(key=lambda x: x['intros_attended'], reverse=True)
+    
+    # Total metrics
+    total_intros = len(intros_data)
+    total_relevant = len(intros_data[intros_data['relevance'] == 'Relevant'])
+    total_poa = len(poa_data)
+    total_closing = len(poa_data[poa_data['stage'].isin(['Closed Won', 'Won', 'Signed'])])
+    total_value = float(poa_data[poa_data['stage'].isin(['Closed Won', 'Won', 'Signed'])]['expected_arr'].fillna(0).sum())
+    
+    # Detailed intros list
+    intros_list = []
+    for _, row in intros_data.iterrows():
+        intros_list.append({
+            'date': row['discovery_date'].strftime('%b %d') if pd.notna(row['discovery_date']) else 'N/A',
+            'client': str(row.get('client', 'N/A')),
+            'ae': str(row.get('owner', 'N/A')),
+            'stage': str(row.get('stage', 'N/A')),
+            'relevance': str(row.get('relevance', 'N/A')),
+            'expected_arr': float(row.get('expected_arr', 0)) if pd.notna(row.get('expected_arr', 0)) else 0
+        })
+    
+    return {
+        'ae_performance': ae_performance,
+        'total_metrics': {
+            'total_intros': total_intros,
+            'total_relevant': total_relevant,
+            'total_poa': total_poa,
+            'total_closing': total_closing,
+            'total_value': total_value
+        },
+        'intros_details': intros_list
+    }
+
 def calculate_deals_closed(df, start_date, end_date):
     """Calculate deals closed metrics"""
     # Improved logic to detect closed deals from your actual data structure
