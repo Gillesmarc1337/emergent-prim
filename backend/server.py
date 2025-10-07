@@ -316,6 +316,7 @@ def calculate_meetings_attended(df, start_date, end_date):
             'attended': int(v['attended']),
             'poa_generated': int(v['poa_generated'])
         } for k, v in ae_stats.to_dict('index').items()} if not ae_stats.empty else {},
+        'meetings_detail': clean_records(meetings_detail[['client', 'meeting_date', 'status', 'closed_status', 'owner', 'stage']].to_dict('records')),
         'on_track': bool(attended_count >= 40 and poa_count >= 15)
     }
 
