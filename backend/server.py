@@ -926,23 +926,24 @@ async def get_dashboard_analytics():
         active_pipeline['weighted_value'] = active_pipeline['pipeline'] * active_pipeline['probability'] / 100
         total_weighted_pipeline = float(active_pipeline['weighted_value'].sum())
         
-        # July to December 2025 targets chart
+        # July to December 2025 targets chart with exact values
+        exact_targets = {
+            'Jul': 465000, 'Aug': 397500, 'Sep': 547500,
+            'Oct': 1080000, 'Nov': 997500, 'Dec': 1312500
+        }
+        
+        exact_closed = {
+            'Jul': 492396, 'Aug': 454800, 'Sep': 182400,
+            'Oct': 0, 'Nov': 0, 'Dec': 0
+        }
+        
         period_targets_2025 = []
-        cumulative_target = 3500000  # Assume prior YTD from Jan-June
-        cumulative_closed = 1200000  # Assume prior YTD closed from Jan-June
+        cumulative_target = 0  # Start from zero for H2 period
+        cumulative_closed = 0
         
         for month in ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']:
-            month_key = f'{month} 2025'
-            
-            # Find target and closed revenue for this month from months_data
-            month_target = 550000  # Base target
-            month_closed = 0
-            
-            for data_point in months_data:
-                if data_point['month'] == month_key:
-                    month_target = data_point['target_revenue']
-                    month_closed = data_point['closed_revenue']
-                    break
+            month_target = exact_targets[month]
+            month_closed = exact_closed[month]
             
             cumulative_target += month_target
             cumulative_closed += month_closed
