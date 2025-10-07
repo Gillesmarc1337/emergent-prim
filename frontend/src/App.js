@@ -466,7 +466,7 @@ function MainDashboard() {
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <MetricCard
-          title="YTD Revenue"
+          title="YTD Revenue 2025"
           value={dashboardData.key_metrics.ytd_revenue}
           target={dashboardData.key_metrics.ytd_target}
           unit="$"
@@ -474,11 +474,11 @@ function MainDashboard() {
           color="green"
         />
         <MetricCard
-          title="Total Pipeline"
-          value={dashboardData.key_metrics.total_pipeline}
+          title="YTD Remaining 2025"
+          value={dashboardData.key_metrics.ytd_remaining}
           unit="$"
-          icon={BarChart3}
-          color="blue"
+          icon={AlertCircle}
+          color="orange"
         />
         <MetricCard
           title="Weighted Pipeline"
@@ -491,7 +491,7 @@ function MainDashboard() {
           title="Active Deals"
           value={dashboardData.key_metrics.deals_count}
           icon={Target}
-          color="orange"
+          color="blue"
         />
       </div>
 
