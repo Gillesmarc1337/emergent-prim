@@ -598,6 +598,7 @@ function Dashboard() {
   const [dateRange, setDateRange] = useState(null);
   const [useCustomDate, setUseCustomDate] = useState(false);
   const [importMethod, setImportMethod] = useState('csv'); // 'csv' or 'sheets'
+  const [viewMode, setViewMode] = useState('monthly'); // 'monthly' or 'yearly'
 
   const loadAnalytics = async () => {
     setLoading(true);
