@@ -300,7 +300,6 @@ function DataManagementSection({ onDataUpdated }) {
   const [dataStatus, setDataStatus] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
-  const [refreshStatus, setRefreshStatus] = useState(null);
 
   const loadDataStatus = async () => {
     try {
@@ -313,27 +312,12 @@ function DataManagementSection({ onDataUpdated }) {
 
   const handleRefreshGoogleSheet = async () => {
     setIsRefreshing(true);
-    setRefreshStatus(null);
-    
     try {
-      const response = await axios.post(`${API}/data/refresh-google-sheet`);
-      setRefreshStatus({
-        type: 'success',
-        message: response.data.message,
-        details: `Last updated: ${new Date(response.data.last_update).toLocaleString()}`
-      });
-      
-      // Reload data status and trigger dashboard refresh
+      await axios.post(`${API}/data/refresh-google-sheet`);
       await loadDataStatus();
-      if (onDataUpdated) {
-        onDataUpdated();
-      }
+      if (onDataUpdated) onDataUpdated();
     } catch (error) {
-      setRefreshStatus({
-        type: 'error',
-        message: 'Refresh failed',
-        details: error.response?.data?.detail || error.message
-      });
+      console.error('Refresh failed:', error);
     } finally {
       setIsRefreshing(false);
     }
@@ -342,9 +326,7 @@ function DataManagementSection({ onDataUpdated }) {
   const handleUploadSuccess = async () => {
     await loadDataStatus();
     setShowUpload(false);
-    if (onDataUpdated) {
-      onDataUpdated();
-    }
+    if (onDataUpdated) onDataUpdated();
   };
 
   useEffect(() => {
@@ -354,114 +336,68 @@ function DataManagementSection({ onDataUpdated }) {
   if (!dataStatus) return null;
 
   return (
-    <Card className=\"mb-6\">
+    <Card className="mb-6">
       <CardHeader>
-        <div className=\"flex items-center justify-between\">
-          <CardTitle className=\"flex items-center gap-2\">
-            <Sheet className=\"h-5 w-5\" />
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Sheet className="h-5 w-5" />
             Data Management
           </CardTitle>
-          <div className=\"flex items-center gap-2\">
+          <div className="flex items-center gap-2">
             {dataStatus.source_type === 'google_sheets' && (
-              <Button 
-                onClick={handleRefreshGoogleSheet}
-                disabled={isRefreshing}
-                size=\"sm\"
-                className=\"flex items-center gap-2\"
-              >
-                {isRefreshing ? (
-                  <div className=\"animate-spin rounded-full h-4 w-4 border-b-2 border-white\"></div>
-                ) : (
-                  <Download className=\"h-4 w-4\" />
-                )}
+              <Button onClick={handleRefreshGoogleSheet} disabled={isRefreshing} size="sm">
+                <Download className="h-4 w-4 mr-2" />
                 {isRefreshing ? 'Refreshing...' : 'Refresh Sheet'}
               </Button>
             )}
-            <Button 
-              onClick={() => setShowUpload(!showUpload)}
-              variant=\"outline\"
-              size=\"sm\"
-            >
-              <Upload className=\"h-4 w-4 mr-2\" />
+            <Button onClick={() => setShowUpload(!showUpload)} variant="outline" size="sm">
+              <Upload className="h-4 w-4 mr-2" />
               {showUpload ? 'Hide Upload' : 'Upload New Data'}
             </Button>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        {/* Current Data Status */}
-        <div className=\"grid grid-cols-1 md:grid-cols-4 gap-4 mb-4\">
-          <div className=\"flex items-center gap-3 p-3 bg-gray-50 rounded-lg\">
-            <BarChart3 className=\"h-8 w-8 text-blue-500\" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <BarChart3 className="h-8 w-8 text-blue-500" />
             <div>
-              <div className=\"text-sm text-gray-600\">Total Records</div>
-              <div className=\"text-lg font-bold\">{dataStatus.total_records.toLocaleString()}</div>
+              <div className="text-sm text-gray-600">Total Records</div>
+              <div className="text-lg font-bold">{dataStatus.total_records}</div>
             </div>
           </div>
-          
-          <div className=\"flex items-center gap-3 p-3 bg-gray-50 rounded-lg\">
-            <Calendar className=\"h-8 w-8 text-green-500\" />
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <Calendar className="h-8 w-8 text-green-500" />
             <div>
-              <div className=\"text-sm text-gray-600\">Last Updated</div>
-              <div className=\"text-sm font-medium\">
+              <div className="text-sm text-gray-600">Last Updated</div>
+              <div className="text-sm font-medium">
                 {dataStatus.last_update ? new Date(dataStatus.last_update).toLocaleDateString() : 'Never'}
               </div>
             </div>
           </div>
-          
-          <div className=\"flex items-center gap-3 p-3 bg-gray-50 rounded-lg\">
-            <div className=\"h-8 w-8 rounded bg-orange-100 flex items-center justify-center\">
-              {dataStatus.source_type === 'google_sheets' ? <Sheet className=\"h-5 w-5 text-orange-600\" /> : <Upload className=\"h-5 w-5 text-orange-600\" />}
-            </div>
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <Sheet className="h-8 w-8 text-orange-500" />
             <div>
-              <div className=\"text-sm text-gray-600\">Source Type</div>
-              <div className=\"text-sm font-medium capitalize\">
-                {dataStatus.source_type ? dataStatus.source_type.replace('_', ' ') : 'Unknown'}
+              <div className="text-sm text-gray-600">Source Type</div>
+              <div className="text-sm font-medium">
+                {dataStatus.source_type || 'Unknown'}
               </div>
             </div>
           </div>
-          
-          <div className=\"flex items-center gap-3 p-3 bg-gray-50 rounded-lg\">
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
             <div className={`h-3 w-3 rounded-full ${dataStatus.has_data ? 'bg-green-500' : 'bg-red-500'}`}></div>
             <div>
-              <div className=\"text-sm text-gray-600\">Status</div>
-              <div className=\"text-sm font-medium\">
+              <div className="text-sm text-gray-600">Status</div>
+              <div className="text-sm font-medium">
                 {dataStatus.has_data ? 'Data Loaded' : 'No Data'}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Google Sheets Info */}
-        {dataStatus.source_type === 'google_sheets' && dataStatus.source_url && (
-          <div className=\"bg-blue-50 p-3 rounded-lg mb-4\">
-            <div className=\"text-sm font-medium text-blue-900 mb-1\">Connected Google Sheet</div>
-            <div className=\"text-xs text-blue-700 break-all\">{dataStatus.source_url}</div>
-            <div className=\"text-xs text-blue-600 mt-1\">
-              Click \"Refresh Sheet\" to get the latest data from your Google Sheet
-            </div>
-          </div>
-        )}
-
-        {/* Refresh Status */}
-        {refreshStatus && (
-          <Alert className={`mb-4 ${refreshStatus.type === 'success' ? 'border-green-500' : 'border-red-500'}`}>
-            {refreshStatus.type === 'success' ? (
-              <CheckCircle2 className=\"h-4 w-4\" />
-            ) : (
-              <AlertCircle className=\"h-4 w-4\" />
-            )}
-            <AlertDescription>
-              <div className=\"font-medium\">{refreshStatus.message}</div>
-              <div className=\"text-sm mt-1\">{refreshStatus.details}</div>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Upload Section */}
         {showUpload && (
-          <div className=\"border-t pt-4\">
-            <div className=\"grid grid-cols-1 lg:grid-cols-2 gap-6\">
+          <div className="border-t pt-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <FileUpload onUploadSuccess={handleUploadSuccess} />
               <GoogleSheetsUpload onUploadSuccess={handleUploadSuccess} />
             </div>
