@@ -404,6 +404,68 @@ function MainDashboard() {
           </ResponsiveContainer>
         </CardContent>
       </Card>
+
+      {/* 2025 Annual Targets Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>2025 Annual Revenue Targets</CardTitle>
+          <CardDescription>
+            Monthly and Cumulative Progress vs Targets for Year 2025
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <MetricCard
+              title="Annual Target 2025"
+              value={dashboardData.key_metrics.annual_target_2025}
+              unit="$"
+              icon={Target}
+              color="blue"
+            />
+            <MetricCard
+              title="YTD Closed 2025"
+              value={dashboardData.key_metrics.ytd_closed_2025}
+              target={dashboardData.key_metrics.annual_target_2025}
+              unit="$"
+              icon={CheckCircle2}
+              color="green"
+            />
+            <MetricCard
+              title="Remaining Target"
+              value={dashboardData.key_metrics.annual_target_2025 - dashboardData.key_metrics.ytd_closed_2025}
+              unit="$"
+              icon={AlertCircle}
+              color="orange"
+            />
+          </div>
+          
+          <ResponsiveContainer width="100%" height={400}>
+            <ComposedChart data={dashboardData.annual_targets_2025}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
+              <Legend />
+              <Bar dataKey="monthly_target" fill="#E5E7EB" name="Monthly Target" />
+              <Bar dataKey="monthly_closed" fill="#10B981" name="Monthly Closed" />
+              <Line 
+                type="monotone" 
+                dataKey="cumulative_target" 
+                stroke="#6B7280" 
+                strokeWidth={3}
+                name="Cumulative Target" 
+              />
+              <Line 
+                type="monotone" 
+                dataKey="cumulative_closed" 
+                stroke="#059669" 
+                strokeWidth={3}
+                name="Cumulative Closed" 
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
     </div>
   );
 }
