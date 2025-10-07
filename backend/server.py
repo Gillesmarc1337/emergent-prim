@@ -63,6 +63,7 @@ class WeeklyAnalytics(BaseModel):
     week_end: datetime
     meeting_generation: Dict[str, Any]
     meetings_attended: Dict[str, Any]
+    ae_performance: Dict[str, Any]
     attribution: Dict[str, Any]
     deals_closed: Dict[str, Any]
     pipe_metrics: Dict[str, Any]
