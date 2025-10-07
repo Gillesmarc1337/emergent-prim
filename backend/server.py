@@ -257,12 +257,21 @@ def calculate_meeting_generation(df, start_date, end_date):
         'on_track': bool(total_intros >= target)
     }
 
-def calculate_meetings_attended(df, week_start, week_end):
+def calculate_meetings_attended(df, start_date, end_date):
     """Calculate meetings attended metrics"""
-    week_data = df[
-        (df['discovery_date'] >= week_start) & 
-        (df['discovery_date'] <= week_end)
+    period_data = df[
+        (df['discovery_date'] >= start_date) & 
+        (df['discovery_date'] <= end_date)
     ]
+    
+    # All meetings with details for table
+    meetings_detail = period_data[~period_data['client'].isna()].copy()
+    meetings_detail['meeting_date'] = meetings_detail['discovery_date']
+    meetings_detail['status'] = meetings_detail['show_noshow'].fillna('Scheduled')
+    meetings_detail['closed_status'] = meetings_detail['stage'].apply(
+        lambda x: 'Closed Won' if x in ['Closed Won', 'Won', 'Signed'] else 
+                 ('Closed Lost' if x in ['Closed Lost', 'Lost', 'I Lost'] else 'Open')
+    )
     
     attended = week_data[week_data['show_noshow'] == 'Show']
     discoveries = week_data[~week_data['discovery_date'].isna()]
