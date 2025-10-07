@@ -101,3 +101,85 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Utilisateur a demandé de rendre les 4 blocs du dashboard dynamiques en fonction du mois sélectionné avec des targets spécifiques:
+  
+  1. Meeting Generation: 20 inbound, 15 outbound, 10 referral par mois (targets fixes)
+     - Afficher ratios actuel/target (ex: 25/20 inbound, 3/10 referral)
+  
+  2. Discovery & POA: 45 discovery, 18 POA par mois (targets)
+     - Discovery: tous les deals sauf inbox et intro no show
+  
+  3. New Pipe Created: garder calculs par mois avec weighted pipe
+  
+  4. Revenue Objective: semble déjà correct
+
+backend:
+  - task: "Meeting Generation block with dynamic ratios"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Implemented fixed targets (20 inbound, 15 outbound, 10 referral) and dynamic calculation based on month_offset. API correctly returns different periods for different month_offset values."
+
+  - task: "Discovery & POA block with targets"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Implemented targets (45 discovery, 18 POA) with correct filtering (excluding inbox and intro no show). Returns actual/target ratios."
+
+frontend:
+  - task: "Dashboard blocks displaying actual/target ratios"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Modified frontend to display ratios (actual/target) instead of just targets. Shows format like '30/20' for inbound, '40/45' for discovery."
+
+  - task: "Dynamic month navigation for blocks"
+    implemented: true
+    working: "partial"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "partial"
+          agent: "main"
+          comment: "Monthly API works correctly with month_offset, but frontend may have cache issues. Yearly mode shows July 2025 always. Need to test if Previous/Next month navigation correctly updates the blocks."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "Dynamic month navigation for blocks"
+    - "Dashboard blocks displaying actual/target ratios"
+  stuck_tasks:
+    - "Dynamic month navigation for blocks"
+  test_all: false
+  test_priority: "stuck_first"
+
+agent_communication:
+    - agent: "main"
+      message: "Implemented dynamic dashboard blocks with targets as requested. Backend API works correctly with month_offset parameter. Frontend displays ratios correctly. Need to test month navigation functionality and verify blocks update when changing months using Previous/Next Month buttons."
