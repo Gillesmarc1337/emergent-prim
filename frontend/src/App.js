@@ -8,9 +8,10 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
 import { useDropzone } from 'react-dropzone';
-import { Upload, Download, TrendingUp, TrendingDown, Users, Target, Calendar, DollarSign, BarChart3, PieChart, AlertCircle, CheckCircle2, Sheet, CalendarDays } from 'lucide-react';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { Upload, Download, TrendingUp, TrendingDown, Users, Target, Calendar, DollarSign, BarChart3, PieChart, AlertCircle, CheckCircle2, Sheet, CalendarDays, Filter, Search } from 'lucide-react';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, ComposedChart, Area, AreaChart } from 'recharts';
 import { DateRangePicker } from '@/components/DateRangePicker';
 import { GoogleSheetsUpload } from '@/components/GoogleSheetsUpload';
 import { format } from 'date-fns';
@@ -21,6 +22,11 @@ const API = `${BACKEND_URL}/api`;
 
 // Colors for charts
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+const REVENUE_COLORS = {
+  target: '#E5E7EB',
+  closed: '#10B981', 
+  weighted: '#3B82F6'
+};
 
 function FileUpload({ onUploadSuccess }) {
   const [isUploading, setIsUploading] = useState(false);
@@ -43,7 +49,8 @@ function FileUpload({ onUploadSuccess }) {
       formData.append('file', acceptedFiles[0]);
       
       try {
-        const response = await axios.post(`${API}/upload-data`, formData, {
+        const response = await axios.get(`${API}/`);
+        const uploadResponse = await axios.post(`${API}/upload-data`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -51,8 +58,8 @@ function FileUpload({ onUploadSuccess }) {
         
         setUploadStatus({ 
           type: 'success', 
-          message: response.data.message,
-          details: `${response.data.records_valid} enregistrements valides traités sur ${response.data.records_processed}` 
+          message: uploadResponse.data.message,
+          details: `${uploadResponse.data.records_valid} valid records processed out of ${uploadResponse.data.records_processed}` 
         });
         
         if (onUploadSuccess) {
@@ -61,7 +68,7 @@ function FileUpload({ onUploadSuccess }) {
       } catch (error) {
         setUploadStatus({ 
           type: 'error', 
-          message: 'Erreur lors du téléchargement', 
+          message: 'Upload error', 
           details: error.response?.data?.detail || error.message 
         });
       } finally {
@@ -75,10 +82,10 @@ function FileUpload({ onUploadSuccess }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Upload className="h-5 w-5" />
-          Import de Données
+          Data Import
         </CardTitle>
         <CardDescription>
-          Téléchargez votre fichier CSV avec les données de vente pour générer les analyses.
+          Upload your CSV file with sales data to generate analytics.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -94,14 +101,14 @@ function FileUpload({ onUploadSuccess }) {
           <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
           <p className="text-lg font-medium mb-2">
             {isDragActive
-              ? 'Déposez le fichier ici...'
-              : 'Glissez-déposez votre fichier CSV ici'}
+              ? 'Drop the file here...'
+              : 'Drag and drop your CSV file here'}
           </p>
           <p className="text-sm text-gray-500 mb-4">
-            ou cliquez pour sélectionner un fichier (.csv, .xls, .xlsx)
+            or click to select a file (.csv, .xls, .xlsx)
           </p>
           <Button variant="outline" disabled={isUploading}>
-            {isUploading ? 'Téléchargement...' : 'Sélectionner un fichier'}
+            {isUploading ? 'Uploading...' : 'Select File'}
           </Button>
         </div>
         
@@ -149,15 +156,15 @@ function MetricCard({ title, value, target, unit = '', trend, icon: Icon, color 
           {target && (
             <>
               <div className="text-sm text-gray-500">
-                Objectif: {target.toLocaleString()} {unit}
+                Target: {target.toLocaleString()} {unit}
               </div>
               <Progress value={percentage} className="h-2" />
               <div className="flex justify-between text-xs">
                 <span className={isOnTrack ? 'text-green-600' : 'text-orange-600'}>
-                  {percentage.toFixed(1)}% de l'objectif
+                  {percentage.toFixed(1)}% of target
                 </span>
                 <Badge variant={isOnTrack ? 'default' : 'secondary'}>
-                  {isOnTrack ? 'Sur la bonne voie' : 'À surveiller'}
+                  {isOnTrack ? 'On Track' : 'Needs Attention'}
                 </Badge>
               </div>
             </>
@@ -175,7 +182,7 @@ function AnalyticsSection({ title, children, conclusion, isOnTrack }) {
         <CardTitle className="flex items-center gap-2">
           {title}
           <Badge variant={isOnTrack ? 'default' : 'secondary'}>
-            {isOnTrack ? 'Sur la bonne voie' : 'À améliorer'}
+            {isOnTrack ? 'On Track' : 'Needs Improvement'}
           </Badge>
         </CardTitle>
       </CardHeader>
@@ -197,11 +204,215 @@ function AnalyticsSection({ title, children, conclusion, isOnTrack }) {
   );
 }
 
+function MeetingsTable({ meetings, title }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  
+  const filteredMeetings = meetings.filter(meeting => {
+    const matchesSearch = meeting.client?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         meeting.owner?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterStatus === 'all' || meeting.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <div className="flex items-center gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search by client or owner..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+          >
+            <option value="all">All Statuses</option>
+            <option value="Show">Attended</option>
+            <option value="Scheduled">Scheduled</option>
+            <option value="No Show">No Show</option>
+          </select>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left p-2">Client</th>
+                <th className="text-left p-2">Meeting Date</th>
+                <th className="text-left p-2">Status</th>
+                <th className="text-left p-2">AE Owner</th>
+                <th className="text-left p-2">Stage</th>
+                <th className="text-left p-2">Closed Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredMeetings.map((meeting, index) => (
+                <tr key={index} className="border-b hover:bg-gray-50">
+                  <td className="p-2 font-medium">{meeting.client}</td>
+                  <td className="p-2">
+                    {meeting.meeting_date ? new Date(meeting.meeting_date).toLocaleDateString() : '-'}
+                  </td>
+                  <td className="p-2">
+                    <Badge 
+                      variant={meeting.status === 'Show' ? 'default' : 
+                              meeting.status === 'Scheduled' ? 'secondary' : 'destructive'}
+                    >
+                      {meeting.status}
+                    </Badge>
+                  </td>
+                  <td className="p-2">{meeting.owner || '-'}</td>
+                  <td className="p-2">
+                    <Badge variant="outline">{meeting.stage}</Badge>
+                  </td>
+                  <td className="p-2">
+                    <Badge 
+                      variant={meeting.closed_status === 'Closed Won' ? 'default' : 
+                              meeting.closed_status === 'Closed Lost' ? 'destructive' : 'secondary'}
+                    >
+                      {meeting.closed_status}
+                    </Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {filteredMeetings.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              No meetings found matching the current filters.
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function MainDashboard() {
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const loadDashboard = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API}/analytics/dashboard`);
+      setDashboardData(response.data);
+      setError(null);
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Error loading dashboard');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-lg font-medium">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert className="border-red-500">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          <div className="font-medium">Error</div>
+          <div className="text-sm mt-1">{error}</div>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <MetricCard
+          title="YTD Revenue"
+          value={dashboardData.key_metrics.ytd_revenue}
+          target={dashboardData.key_metrics.ytd_target}
+          unit="$"
+          icon={DollarSign}
+          color="green"
+        />
+        <MetricCard
+          title="Total Pipeline"
+          value={dashboardData.key_metrics.total_pipeline}
+          unit="$"
+          icon={BarChart3}
+          color="blue"
+        />
+        <MetricCard
+          title="Weighted Pipeline"
+          value={dashboardData.key_metrics.weighted_pipeline}
+          unit="$"
+          icon={TrendingUp}
+          color="purple"
+        />
+        <MetricCard
+          title="Active Deals"
+          value={dashboardData.key_metrics.deals_count}
+          icon={Target}
+          color="orange"
+        />
+      </div>
+
+      {/* Revenue Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Monthly Revenue Performance</CardTitle>
+          <CardDescription>
+            Target vs Closed Revenue with Weighted Pipeline Forecast
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={400}>
+            <ComposedChart data={dashboardData.monthly_revenue_chart}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
+              <Legend />
+              <Bar dataKey="target_revenue" fill={REVENUE_COLORS.target} name="Target Revenue" />
+              <Bar dataKey="closed_revenue" fill={REVENUE_COLORS.closed} name="Closed Revenue" />
+              <Line 
+                type="monotone" 
+                dataKey="weighted_pipe" 
+                stroke={REVENUE_COLORS.weighted} 
+                strokeWidth={3}
+                name="Weighted Pipeline" 
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 function Dashboard() {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [weekOffset, setWeekOffset] = useState(0);
+  const [monthOffset, setMonthOffset] = useState(0);
   const [dateRange, setDateRange] = useState(null);
   const [useCustomDate, setUseCustomDate] = useState(false);
   const [importMethod, setImportMethod] = useState('csv'); // 'csv' or 'sheets'
@@ -219,13 +430,13 @@ function Dashboard() {
         const endDate = format(dateRange.to, 'yyyy-MM-dd');
         response = await axios.get(`${API}/analytics/custom?start_date=${startDate}&end_date=${endDate}`);
       } else {
-        // Use weekly offset
-        response = await axios.get(`${API}/analytics/weekly?week_offset=${weekOffset}`);
+        // Use monthly offset
+        response = await axios.get(`${API}/analytics/monthly?month_offset=${monthOffset}`);
       }
       
       setAnalytics(response.data);
     } catch (error) {
-      setError(error.response?.data?.detail || 'Erreur lors du chargement des analytics');
+      setError(error.response?.data?.detail || 'Error loading analytics');
     } finally {
       setLoading(false);
     }
@@ -233,7 +444,7 @@ function Dashboard() {
 
   useEffect(() => {
     loadAnalytics();
-  }, [weekOffset, dateRange, useCustomDate]);
+  }, [monthOffset, dateRange, useCustomDate]);
 
   const handleUploadSuccess = () => {
     loadAnalytics();
@@ -244,7 +455,7 @@ function Dashboard() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-lg font-medium">Chargement des analyses...</p>
+          <p className="text-lg font-medium">Loading analytics...</p>
         </div>
       </div>
     );
@@ -253,11 +464,43 @@ function Dashboard() {
   if (error) {
     return (
       <div className="container mx-auto p-6">
-        <FileUpload onUploadSuccess={handleUploadSuccess} />
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-2">Sales Analytics Dashboard</h1>
+          <p className="text-gray-600">Analyze your sales performance with detailed reports</p>
+        </div>
+        
+        {/* Import Method Selector */}
+        <div className="mb-6">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <Button
+              variant={importMethod === 'csv' ? 'default' : 'outline'}
+              onClick={() => setImportMethod('csv')}
+              className="flex items-center gap-2"
+            >
+              <Upload className="h-4 w-4" />
+              Upload CSV/Excel
+            </Button>
+            <Button
+              variant={importMethod === 'sheets' ? 'default' : 'outline'}
+              onClick={() => setImportMethod('sheets')}
+              className="flex items-center gap-2"
+            >
+              <Sheet className="h-4 w-4" />
+              Google Sheets
+            </Button>
+          </div>
+          
+          {importMethod === 'csv' ? (
+            <FileUpload onUploadSuccess={handleUploadSuccess} />
+          ) : (
+            <GoogleSheetsUpload onUploadSuccess={handleUploadSuccess} />
+          )}
+        </div>
+        
         <Alert className="border-red-500">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <div className="font-medium">Erreur</div>
+            <div className="font-medium">Error</div>
             <div className="text-sm mt-1">{error}</div>
           </AlertDescription>
         </Alert>
@@ -269,8 +512,8 @@ function Dashboard() {
     return (
       <div className="container mx-auto p-6">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Tableau de Bord Analytics Ventes</h1>
-          <p className="text-gray-600">Analysez vos performances commerciales avec des rapports détaillés</p>
+          <h1 className="text-3xl font-bold mb-2">Sales Analytics Dashboard</h1>
+          <p className="text-gray-600">Analyze your sales performance with detailed reports</p>
         </div>
         
         {/* Import Method Selector */}
@@ -304,8 +547,8 @@ function Dashboard() {
     );
   }
 
-  const weekStart = new Date(analytics.week_start);
-  const weekEnd = new Date(analytics.week_end);
+  const periodStart = new Date(analytics.week_start);
+  const periodEnd = new Date(analytics.week_end);
   
   // Prepare chart data
   const sourceData = [
@@ -315,9 +558,9 @@ function Dashboard() {
   ];
 
   const relevanceData = [
-    { name: 'Pertinent', value: analytics.meeting_generation.relevance_analysis.relevant, color: '#00C49F' },
-    { name: 'À vérifier', value: analytics.meeting_generation.relevance_analysis.question_mark, color: '#FFBB28' },
-    { name: 'Non pertinent', value: analytics.meeting_generation.relevance_analysis.not_relevant, color: '#FF8042' }
+    { name: 'Relevant', value: analytics.meeting_generation.relevance_analysis.relevant, color: '#00C49F' },
+    { name: 'Questionable', value: analytics.meeting_generation.relevance_analysis.question_mark, color: '#FFBB28' },
+    { name: 'Not Relevant', value: analytics.meeting_generation.relevance_analysis.not_relevant, color: '#FF8042' }
   ];
 
   return (
@@ -325,7 +568,7 @@ function Dashboard() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold">{useCustomDate ? 'Rapport Personnalisé' : 'Rapport Hebdomadaire'}</h1>
+          <h1 className="text-3xl font-bold">{useCustomDate ? 'Custom Report' : 'Monthly Report'}</h1>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Button
@@ -335,7 +578,7 @@ function Dashboard() {
                 className="flex items-center gap-1"
               >
                 <Calendar className="h-4 w-4" />
-                Hebdomadaire
+                Monthly
               </Button>
               <Button
                 variant={useCustomDate ? 'default' : 'outline'}
@@ -344,7 +587,7 @@ function Dashboard() {
                 className="flex items-center gap-1"
               >
                 <CalendarDays className="h-4 w-4" />
-                Période personnalisée
+                Custom Period
               </Button>
             </div>
             {!useCustomDate && (
@@ -352,17 +595,17 @@ function Dashboard() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setWeekOffset(weekOffset + 1)}
+                  onClick={() => setMonthOffset(monthOffset + 1)}
                 >
-                  ← Semaine précédente
+                  ← Previous Month
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setWeekOffset(weekOffset - 1)}
-                  disabled={weekOffset <= 0}
+                  onClick={() => setMonthOffset(monthOffset - 1)}
+                  disabled={monthOffset <= 0}
                 >
-                  Semaine suivante →
+                  Next Month →
                 </Button>
               </div>
             )}
@@ -374,35 +617,41 @@ function Dashboard() {
               />
             )}
             <Button onClick={loadAnalytics} size="sm">
-              Actualiser
+              Refresh
             </Button>
           </div>
         </div>
         <p className="text-gray-600">
-          Période: {weekStart.toLocaleDateString('fr-FR')} - {weekEnd.toLocaleDateString('fr-FR')}
+          Period: {periodStart.toLocaleDateString('en-US')} - {periodEnd.toLocaleDateString('en-US')}
         </p>
       </div>
 
-      <Tabs defaultValue="meeting-generation" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="meeting-generation">Génération Meetings</TabsTrigger>
-          <TabsTrigger value="meetings-attended">Meetings Réalisés</TabsTrigger>
-          <TabsTrigger value="deals-pipeline">Deals & Pipeline</TabsTrigger>
+      <Tabs defaultValue="dashboard" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="meetings">Meeting Generation</TabsTrigger>
+          <TabsTrigger value="attended">Meetings Attended</TabsTrigger>
+          <TabsTrigger value="deals">Deals & Pipeline</TabsTrigger>
           <TabsTrigger value="projections">Projections</TabsTrigger>
         </TabsList>
 
+        {/* Main Dashboard */}
+        <TabsContent value="dashboard">
+          <MainDashboard />
+        </TabsContent>
+
         {/* Meeting Generation */}
-        <TabsContent value="meeting-generation">
+        <TabsContent value="meetings">
           <AnalyticsSection 
-            title="Génération de Meetings (7 derniers jours)"
+            title="Meeting Generation (Current Period)"
             isOnTrack={analytics.meeting_generation.on_track}
             conclusion={analytics.meeting_generation.on_track 
-              ? "Vous êtes sur la bonne voie pour atteindre vos objectifs de génération de meetings." 
-              : "Il faut intensifier la prospection pour atteindre les objectifs."}
+              ? "You are on track to meet your meeting generation targets." 
+              : "Need to increase prospecting efforts to reach targets."}
           >
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <MetricCard
-                title="Total Nouveaux Intros"
+                title="Total New Intros"
                 value={analytics.meeting_generation.total_new_intros}
                 target={analytics.meeting_generation.target}
                 icon={Users}
@@ -431,7 +680,7 @@ function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Répartition par Source</CardTitle>
+                  <CardTitle>Source Distribution</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -458,9 +707,9 @@ function Dashboard() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Analyse de Pertinence</CardTitle>
+                  <CardTitle>Relevance Analysis</CardTitle>
                   <CardDescription>
-                    Taux de pertinence: {analytics.meeting_generation.relevance_analysis.relevance_rate.toFixed(1)}%
+                    Relevance Rate: {analytics.meeting_generation.relevance_analysis.relevance_rate.toFixed(1)}%
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -486,7 +735,7 @@ function Dashboard() {
             {Object.keys(analytics.meeting_generation.bdr_performance).length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Performance par BDR</CardTitle>
+                  <CardTitle>BDR Performance</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="overflow-x-auto">
@@ -495,8 +744,8 @@ function Dashboard() {
                         <tr className="border-b">
                           <th className="text-left p-2">BDR</th>
                           <th className="text-right p-2">Total Meetings</th>
-                          <th className="text-right p-2">Meetings Pertinents</th>
-                          <th className="text-right p-2">Taux de Pertinence</th>
+                          <th className="text-right p-2">Relevant Meetings</th>
+                          <th className="text-right p-2">Relevance Rate</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -520,30 +769,30 @@ function Dashboard() {
         </TabsContent>
 
         {/* Meetings Attended */}
-        <TabsContent value="meetings-attended">
+        <TabsContent value="attended">
           <AnalyticsSection 
-            title="Meetings Réalisés (7 derniers jours)"
+            title="Meetings Attended (Current Period)"
             isOnTrack={analytics.meetings_attended.on_track}
             conclusion={analytics.meetings_attended.on_track 
-              ? "Bonne performance sur les meetings réalisés et conversions." 
-              : "Il faut améliorer le taux de présence et les conversions."}
+              ? "Good performance on meeting attendance and conversions." 
+              : "Need to improve attendance rates and conversions."}
           >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <MetricCard
-                title="Meetings Programmés"
+                title="Meetings Scheduled"
                 value={analytics.meetings_attended.intro_metrics.scheduled}
                 target={analytics.meetings_attended.intro_metrics.target}
                 icon={Calendar}
                 color="blue"
               />
               <MetricCard
-                title="Meetings Réalisés"
+                title="Meetings Attended"
                 value={analytics.meetings_attended.intro_metrics.attended}
                 icon={CheckCircle2}
                 color="green"
               />
               <MetricCard
-                title="Taux de Présence"
+                title="Attendance Rate"
                 value={analytics.meetings_attended.intro_metrics.attendance_rate.toFixed(1)}
                 unit="%"
                 icon={BarChart3}
@@ -553,14 +802,14 @@ function Dashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <MetricCard
-                title="Discoveries Réalisées"
+                title="Discoveries Completed"
                 value={analytics.meetings_attended.discovery_metrics.completed}
                 target={analytics.meetings_attended.discovery_metrics.target}
                 icon={Target}
                 color="purple"
               />
               <MetricCard
-                title="POA Générées"
+                title="POAs Generated"
                 value={analytics.meetings_attended.poa_metrics.generated}
                 target={analytics.meetings_attended.poa_metrics.target}
                 icon={DollarSign}
@@ -568,11 +817,19 @@ function Dashboard() {
               />
             </div>
 
+            {/* Meetings Detail Table */}
+            {analytics.meetings_attended.meetings_detail && analytics.meetings_attended.meetings_detail.length > 0 && (
+              <MeetingsTable 
+                meetings={analytics.meetings_attended.meetings_detail}
+                title="All Meetings Detail"
+              />
+            )}
+
             {/* AE Performance */}
             {Object.keys(analytics.meetings_attended.ae_performance).length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Performance par AE</CardTitle>
+                  <CardTitle>AE Performance</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="overflow-x-auto">
@@ -580,10 +837,10 @@ function Dashboard() {
                       <thead>
                         <tr className="border-b">
                           <th className="text-left p-2">AE</th>
-                          <th className="text-right p-2">Programmés</th>
-                          <th className="text-right p-2">Réalisés</th>
-                          <th className="text-right p-2">POA Générées</th>
-                          <th className="text-right p-2">Taux Conversion</th>
+                          <th className="text-right p-2">Scheduled</th>
+                          <th className="text-right p-2">Attended</th>
+                          <th className="text-right p-2">POAs Generated</th>
+                          <th className="text-right p-2">Conversion Rate</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -608,52 +865,74 @@ function Dashboard() {
         </TabsContent>
 
         {/* Deals & Pipeline */}
-        <TabsContent value="deals-pipeline">
+        <TabsContent value="deals">
           <div className="space-y-6">
             {/* Deals Closed */}
             <AnalyticsSection 
-              title="Deals Fermés (7 derniers jours)"
+              title="Deals Closed (Current Period)"
               isOnTrack={analytics.deals_closed.on_track}
               conclusion={analytics.deals_closed.on_track 
-                ? "Excellente performance sur la fermeture de deals cette semaine." 
-                : "Il faut accélérer la fermeture des deals en cours."}
+                ? "Excellent performance on deal closing this period." 
+                : "Need to accelerate deal closing efforts."}
             >
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <MetricCard
-                  title="Deals Fermés"
+                  title="Deals Closed"
                   value={analytics.deals_closed.deals_closed}
                   target={analytics.deals_closed.target_deals}
                   icon={CheckCircle2}
                   color="green"
                 />
                 <MetricCard
-                  title="ARR Fermé"
+                  title="ARR Closed"
                   value={analytics.deals_closed.arr_closed}
                   target={analytics.deals_closed.target_arr}
-                  unit="€"
+                  unit="$"
                   icon={DollarSign}
                   color="green"
                 />
                 <MetricCard
-                  title="MRR Fermé"
+                  title="MRR Closed"
                   value={analytics.deals_closed.mrr_closed}
-                  unit="€"
+                  unit="$"
                   icon={TrendingUp}
                   color="blue"
                 />
                 <MetricCard
-                  title="Taille Moyenne Deal"
+                  title="Average Deal Size"
                   value={analytics.deals_closed.avg_deal_size}
-                  unit="€"
+                  unit="$"
                   icon={BarChart3}
                   color="purple"
                 />
               </div>
 
+              {/* Monthly Closed Chart */}
+              {analytics.deals_closed.monthly_closed && analytics.deals_closed.monthly_closed.length > 0 && (
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle>Monthly Deals Closed Trend</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <ComposedChart data={analytics.deals_closed.monthly_closed}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip formatter={(value) => typeof value === 'number' && value > 1000 ? `$${value.toLocaleString()}` : value} />
+                        <Legend />
+                        <Bar dataKey="deals_count" fill="#8884d8" name="Deals Count" />
+                        <Line type="monotone" dataKey="arr_closed" stroke="#82ca9d" strokeWidth={3} name="ARR Closed" />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              )}
+
               {analytics.deals_closed.deals_detail.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Détail des Deals Fermés</CardTitle>
+                    <CardTitle>Closed Deals Detail</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
@@ -663,14 +942,14 @@ function Dashboard() {
                             <th className="text-left p-2">Client</th>
                             <th className="text-right p-2">ARR</th>
                             <th className="text-left p-2">Owner</th>
-                            <th className="text-left p-2">Type</th>
+                            <th className="text-left p-2">Deal Type</th>
                           </tr>
                         </thead>
                         <tbody>
                           {analytics.deals_closed.deals_detail.map((deal, index) => (
                             <tr key={index} className="border-b">
                               <td className="p-2 font-medium">{deal.client}</td>
-                              <td className="text-right p-2">{deal.expected_arr?.toLocaleString()}€</td>
+                              <td className="text-right p-2">${deal.expected_arr?.toLocaleString()}</td>
                               <td className="p-2">{deal.owner}</td>
                               <td className="p-2">
                                 <Badge variant="outline">{deal.type_of_deal}</Badge>
@@ -687,34 +966,34 @@ function Dashboard() {
 
             {/* Pipeline Metrics */}
             <AnalyticsSection 
-              title="Métriques du Pipeline"
+              title="Pipeline Metrics"
               isOnTrack={analytics.pipe_metrics.total_aggregate_pipe.on_track}
               conclusion={analytics.pipe_metrics.total_aggregate_pipe.on_track 
-                ? "Le pipeline total est en bonne santé et sur les objectifs." 
-                : "Il faut renforcer la génération de pipeline pour atteindre les objectifs."}
+                ? "Total pipeline is healthy and meeting targets." 
+                : "Need to strengthen pipeline generation to meet targets."}
             >
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <MetricCard
-                  title="Nouveau Pipeline Créé"
+                  title="New Pipeline Created"
                   value={analytics.pipe_metrics.new_pipe_created.value}
                   target={analytics.pipe_metrics.new_pipe_created.target}
-                  unit="€"
+                  unit="$"
                   icon={TrendingUp}
                   color="green"
                 />
                 <MetricCard
-                  title="Pipeline Chaud"
+                  title="Hot Pipeline"
                   value={analytics.pipe_metrics.hot_pipe.value}
                   target={analytics.pipe_metrics.hot_pipe.target}
-                  unit="€"
+                  unit="$"
                   icon={DollarSign}
                   color="orange"
                 />
                 <MetricCard
-                  title="Pipeline Total"
+                  title="Total Pipeline"
                   value={analytics.pipe_metrics.total_aggregate_pipe.value}
                   target={analytics.pipe_metrics.total_aggregate_pipe.target}
-                  unit="€"
+                  unit="$"
                   icon={BarChart3}
                   color="blue"
                 />
@@ -723,7 +1002,7 @@ function Dashboard() {
               {analytics.pipe_metrics.hot_pipe.deals.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Deals Chauds en Pipeline</CardTitle>
+                    <CardTitle>Hot Pipeline Deals</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
@@ -731,7 +1010,7 @@ function Dashboard() {
                         <thead>
                           <tr className="border-b">
                             <th className="text-left p-2">Client</th>
-                            <th className="text-right p-2">Valeur</th>
+                            <th className="text-right p-2">Value</th>
                             <th className="text-left p-2">Stage</th>
                             <th className="text-left p-2">Owner</th>
                           </tr>
@@ -740,7 +1019,7 @@ function Dashboard() {
                           {analytics.pipe_metrics.hot_pipe.deals.map((deal, index) => (
                             <tr key={index} className="border-b">
                               <td className="p-2 font-medium">{deal.client}</td>
-                              <td className="text-right p-2">{deal.pipeline?.toLocaleString()}€</td>
+                              <td className="text-right p-2">${deal.pipeline?.toLocaleString()}</td>
                               <td className="p-2">
                                 <Badge variant="outline">{deal.stage}</Badge>
                               </td>
@@ -758,25 +1037,25 @@ function Dashboard() {
             {/* Old Pipeline */}
             <Card>
               <CardHeader>
-                <CardTitle>Pipeline Ancien (Réactivation)</CardTitle>
+                <CardTitle>Old Pipeline (Reactivation Opportunities)</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <MetricCard
-                    title="Deals en Attente"
+                    title="Stalled Deals"
                     value={analytics.old_pipe.total_stalled_deals}
                     icon={AlertCircle}
                     color="orange"
                   />
                   <MetricCard
-                    title="Valeur Totale"
+                    title="Total Value"
                     value={analytics.old_pipe.total_stalled_value}
-                    unit="€"
+                    unit="$"
                     icon={DollarSign}
                     color="red"
                   />
                   <MetricCard
-                    title="Entreprises à Recontacter"
+                    title="Companies to Recontact"
                     value={analytics.old_pipe.companies_to_recontact}
                     icon={Users}
                     color="blue"
@@ -793,57 +1072,57 @@ function Dashboard() {
             {/* Closing Projections */}
             <Card>
               <CardHeader>
-                <CardTitle>Projections de Fermeture</CardTitle>
+                <CardTitle>Closing Projections</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <Card>
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-lg">7 Prochains Jours</CardTitle>
+                      <CardTitle className="text-lg">Next 7 Days</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold mb-2">
-                        {analytics.closing_projections.next_7_days.total_value.toLocaleString()}€
+                        ${analytics.closing_projections.next_7_days.total_value.toLocaleString()}
                       </div>
                       <div className="text-sm text-gray-500 mb-2">
-                        Valeur pondérée: {analytics.closing_projections.next_7_days.weighted_value.toLocaleString()}€
+                        Weighted Value: ${analytics.closing_projections.next_7_days.weighted_value.toLocaleString()}
                       </div>
                       <div className="text-sm">
-                        {analytics.closing_projections.next_7_days.deals.length} deals potentiels
+                        {analytics.closing_projections.next_7_days.deals.length} potential deals
                       </div>
                     </CardContent>
                   </Card>
 
                   <Card>
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-lg">Ce Mois</CardTitle>
+                      <CardTitle className="text-lg">This Month</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold mb-2">
-                        {analytics.closing_projections.current_month.total_value.toLocaleString()}€
+                        ${analytics.closing_projections.current_month.total_value.toLocaleString()}
                       </div>
                       <div className="text-sm text-gray-500 mb-2">
-                        Valeur pondérée: {analytics.closing_projections.current_month.weighted_value.toLocaleString()}€
+                        Weighted Value: ${analytics.closing_projections.current_month.weighted_value.toLocaleString()}
                       </div>
                       <div className="text-sm">
-                        {analytics.closing_projections.current_month.deals.length} deals potentiels
+                        {analytics.closing_projections.current_month.deals.length} potential deals
                       </div>
                     </CardContent>
                   </Card>
 
                   <Card>
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-lg">Ce Trimestre</CardTitle>
+                      <CardTitle className="text-lg">This Quarter</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold mb-2">
-                        {analytics.closing_projections.next_quarter.total_value.toLocaleString()}€
+                        ${analytics.closing_projections.next_quarter.total_value.toLocaleString()}
                       </div>
                       <div className="text-sm text-gray-500 mb-2">
-                        Valeur pondérée: {analytics.closing_projections.next_quarter.weighted_value.toLocaleString()}€
+                        Weighted Value: ${analytics.closing_projections.next_quarter.weighted_value.toLocaleString()}
                       </div>
                       <div className="text-sm">
-                        {analytics.closing_projections.next_quarter.deals.length} deals potentiels
+                        {analytics.closing_projections.next_quarter.deals.length} potential deals
                       </div>
                     </CardContent>
                   </Card>
@@ -853,7 +1132,7 @@ function Dashboard() {
                 {Object.keys(analytics.closing_projections.ae_projections).length > 0 && (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Projections par AE</CardTitle>
+                      <CardTitle>Projections by AE</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="overflow-x-auto">
@@ -861,16 +1140,16 @@ function Dashboard() {
                           <thead>
                             <tr className="border-b">
                               <th className="text-left p-2">AE</th>
-                              <th className="text-right p-2">Pipeline Total</th>
-                              <th className="text-right p-2">Valeur Pondérée</th>
+                              <th className="text-right p-2">Total Pipeline</th>
+                              <th className="text-right p-2">Weighted Value</th>
                             </tr>
                           </thead>
                           <tbody>
                             {Object.entries(analytics.closing_projections.ae_projections).map(([ae, stats]) => (
                               <tr key={ae} className="border-b">
                                 <td className="p-2 font-medium">{ae}</td>
-                                <td className="text-right p-2">{stats.pipeline?.toLocaleString()}€</td>
-                                <td className="text-right p-2">{stats.weighted_value?.toLocaleString()}€</td>
+                                <td className="text-right p-2">${stats.pipeline?.toLocaleString()}</td>
+                                <td className="text-right p-2">${stats.weighted_value?.toLocaleString()}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -885,22 +1164,22 @@ function Dashboard() {
             {/* Big Numbers Recap */}
             <Card>
               <CardHeader>
-                <CardTitle>Récapitulatif Général</CardTitle>
+                <CardTitle>Performance Summary</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <MetricCard
-                    title="Revenus YTD"
+                    title="YTD Revenue"
                     value={analytics.big_numbers_recap.ytd_revenue}
                     target={analytics.big_numbers_recap.ytd_target}
-                    unit="€"
+                    unit="$"
                     icon={DollarSign}
                     color="green"
                   />
                   <MetricCard
-                    title="Objectif Restant"
+                    title="Remaining Target"
                     value={analytics.big_numbers_recap.remaining_target}
-                    unit="€"
+                    unit="$"
                     icon={Target}
                     color="orange"
                   />
@@ -908,15 +1187,15 @@ function Dashboard() {
                     <CardContent className="p-6">
                       <div className="flex items-center gap-2 mb-2">
                         <AlertCircle className="h-5 w-5 text-blue-500" />
-                        <span className="text-sm font-medium text-gray-600">Statut Objectifs</span>
+                        <span className="text-sm font-medium text-gray-600">Target Status</span>
                       </div>
                       <Badge 
                         variant={analytics.big_numbers_recap.forecast_gap ? 'destructive' : 'default'}
                         className="text-sm"
                       >
                         {analytics.big_numbers_recap.forecast_gap 
-                          ? 'Écart de prévision détecté' 
-                          : 'Sur la bonne voie'}
+                          ? 'Forecast Gap Detected' 
+                          : 'On Track'}
                       </Badge>
                     </CardContent>
                   </Card>
@@ -926,8 +1205,8 @@ function Dashboard() {
                   <Alert className="border-orange-500">
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Action Requise:</strong> Il est nécessaire d'intensifier les efforts pour combler l'écart 
-                      de {analytics.big_numbers_recap.remaining_target.toLocaleString()}€ et atteindre les objectifs annuels.
+                      <strong>Action Required:</strong> Need to intensify efforts to close the gap of 
+                      ${analytics.big_numbers_recap.remaining_target.toLocaleString()} and achieve annual targets.
                     </AlertDescription>
                   </Alert>
                 )}

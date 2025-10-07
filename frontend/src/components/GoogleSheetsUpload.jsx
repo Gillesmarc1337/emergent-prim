@@ -22,8 +22,8 @@ function GoogleSheetsUpload({ onUploadSuccess }) {
     if (!sheetUrl.trim()) {
       setUploadStatus({ 
         type: 'error', 
-        message: 'URL requise', 
-        details: 'Veuillez saisir l\'URL de votre Google Sheet' 
+        message: 'URL required', 
+        details: 'Please enter your Google Sheet URL' 
       });
       return;
     }
@@ -40,7 +40,7 @@ function GoogleSheetsUpload({ onUploadSuccess }) {
       setUploadStatus({ 
         type: 'success', 
         message: response.data.message,
-        details: `${response.data.records_valid} enregistrements valides traités sur ${response.data.records_processed}` 
+        details: `${response.data.records_valid} valid records processed out of ${response.data.records_processed}` 
       });
 
       if (onUploadSuccess) {
@@ -53,7 +53,7 @@ function GoogleSheetsUpload({ onUploadSuccess }) {
     } catch (error) {
       setUploadStatus({ 
         type: 'error', 
-        message: 'Erreur lors de l\'import', 
+        message: 'Import error', 
         details: error.response?.data?.detail || error.message 
       });
     } finally {
@@ -70,17 +70,17 @@ function GoogleSheetsUpload({ onUploadSuccess }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sheet className="h-5 w-5 text-green-500" />
-          Import Google Sheets
+          Google Sheets Import
         </CardTitle>
         <CardDescription>
-          Connectez directement votre Google Sheet pour importer les données.
+          Connect your Google Sheet directly to import data.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="sheet-url" className="text-sm font-medium">
-              URL du Google Sheet *
+              Google Sheet URL *
             </label>
             <div className="relative">
               <LinkIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -96,34 +96,34 @@ function GoogleSheetsUpload({ onUploadSuccess }) {
             </div>
             {sheetUrl && !isValidGoogleSheetsUrl(sheetUrl) && (
               <p className="text-sm text-orange-600">
-                ⚠️ Assurez-vous que l'URL est bien celle d'un Google Sheet
+                ⚠️ Make sure the URL is from a Google Sheet
               </p>
             )}
           </div>
 
           <div className="space-y-2">
             <label htmlFor="sheet-name" className="text-sm font-medium">
-              Nom de l'onglet (optionnel)
+              Sheet Tab Name (optional)
             </label>
             <Input
               id="sheet-name"
               type="text"
-              placeholder="Feuille1, Data, etc..."
+              placeholder="Sheet1, Data, etc..."
               value={sheetName}
               onChange={(e) => setSheetName(e.target.value)}
               disabled={isUploading}
             />
             <p className="text-xs text-gray-500">
-              Laissez vide pour utiliser le premier onglet
+              Leave empty to use the first tab
             </p>
           </div>
 
           <div className="bg-blue-50 p-3 rounded-md">
-            <h4 className="text-sm font-medium mb-2 text-blue-900">📋 Instructions :</h4>
+            <h4 className="text-sm font-medium mb-2 text-blue-900">📋 Instructions:</h4>
             <ul className="text-xs text-blue-800 space-y-1">
-              <li>• Assurez-vous que votre Google Sheet est <strong>public</strong> ou partagé en lecture</li>
-              <li>• Copiez l'URL complète depuis votre navigateur</li>
-              <li>• Le sheet doit contenir les colonnes : Client, Discovery date, Stage, etc.</li>
+              <li>• Make sure your Google Sheet is <strong>public</strong> or shared with read access</li>
+              <li>• Copy the full URL from your browser</li>
+              <li>• The sheet should contain columns: Client, Discovery date, Stage, etc.</li>
             </ul>
           </div>
 
@@ -133,11 +133,11 @@ function GoogleSheetsUpload({ onUploadSuccess }) {
               disabled={isUploading || !sheetUrl.trim()}
               className="flex-1"
             >
-              {isUploading ? 'Import en cours...' : 'Importer les données'}
+              {isUploading ? 'Importing...' : 'Import Data'}
             </Button>
             {sheetUrl && isValidGoogleSheetsUrl(sheetUrl) && (
               <Badge variant="outline" className="text-green-600 border-green-600">
-                ✓ URL valide
+                ✓ Valid URL
               </Badge>
             )}
           </div>
