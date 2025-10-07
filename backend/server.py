@@ -673,7 +673,7 @@ async def get_yearly_analytics(year: int = 2025):
             'ytd_revenue': float(ytd_closed['expected_arr'].sum()),
             'ytd_target': 4500000.0,  # Annual target
             'remaining_target': 4500000.0 - float(ytd_closed['expected_arr'].sum()),
-            'monthly_breakdown': df.groupby(df['discovery_date'].dt.to_period('M'))['pipeline'].sum().to_dict() if len(df) > 0 else {},
+            'monthly_breakdown': {str(k): float(v) for k, v in df.groupby(df['discovery_date'].dt.to_period('M'))['pipeline'].sum().to_dict().items()} if len(df) > 0 else {},
             'forecast_gap': float(ytd_closed['expected_arr'].sum()) < 4500000.0 * 0.75
         }
         
