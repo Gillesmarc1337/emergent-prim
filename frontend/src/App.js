@@ -595,29 +595,29 @@ function MainDashboard({ analytics }) {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-center">Meeting Generation</CardTitle>
               <CardDescription className="text-center font-medium text-blue-600">
-                {dashboardData.dashboard_blocks.block_1_meetings.period}
+                {analytics.dashboard_blocks.block_1_meetings.period}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-blue-600">
-                    {dashboardData.dashboard_blocks.block_1_meetings.total_actual}/{dashboardData.dashboard_blocks.block_1_meetings.total_target}
+                    {analytics.dashboard_blocks.block_1_meetings.total_actual}/{analytics.dashboard_blocks.block_1_meetings.total_target}
                   </div>
                   <div className="text-sm text-gray-600">Total Target</div>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Inbound:</span>
-                    <span className="font-medium">{dashboardData.dashboard_blocks.block_1_meetings.inbound_actual}/{dashboardData.dashboard_blocks.block_1_meetings.inbound_target}</span>
+                    <span className="font-medium">{analytics.dashboard_blocks.block_1_meetings.inbound_actual}/{analytics.dashboard_blocks.block_1_meetings.inbound_target}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Outbound:</span>
-                    <span className="font-medium">{dashboardData.dashboard_blocks.block_1_meetings.outbound_actual}/{dashboardData.dashboard_blocks.block_1_meetings.outbound_target}</span>
+                    <span className="font-medium">{analytics.dashboard_blocks.block_1_meetings.outbound_actual}/{analytics.dashboard_blocks.block_1_meetings.outbound_target}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Referral:</span>
-                    <span className="font-medium">{dashboardData.dashboard_blocks.block_1_meetings.referral_actual}/{dashboardData.dashboard_blocks.block_1_meetings.referral_target}</span>
+                    <span className="font-medium">{analytics.dashboard_blocks.block_1_meetings.referral_actual}/{analytics.dashboard_blocks.block_1_meetings.referral_target}</span>
                   </div>
                 </div>
               </div>
