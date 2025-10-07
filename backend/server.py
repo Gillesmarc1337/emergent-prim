@@ -661,9 +661,9 @@ async def get_yearly_analytics(year: int = 2025):
         # Old pipe (reviving deals)
         old_pipe_data = df[df['stage'].isin(['G Stalled', 'H Lost - can be revived'])]
         old_pipe = {
-            'total_stalled_deals': len(old_pipe_data),
-            'total_stalled_value': old_pipe_data['pipeline'].sum(),
-            'companies_to_recontact': old_pipe_data['client'].nunique(),
+            'total_stalled_deals': int(len(old_pipe_data)),
+            'total_stalled_value': float(old_pipe_data['pipeline'].sum()),
+            'companies_to_recontact': int(old_pipe_data['client'].nunique()),
             'revival_opportunities': clean_records(old_pipe_data[['client', 'pipeline', 'stage', 'owner']].to_dict('records'))
         }
         
