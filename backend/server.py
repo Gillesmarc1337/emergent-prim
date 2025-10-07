@@ -1023,6 +1023,7 @@ async def get_custom_analytics(
         # Generate all analytics sections using custom date range
         meeting_generation = calculate_meeting_generation(df, custom_start, custom_end)
         meetings_attended = calculate_meetings_attended(df, custom_start, custom_end)
+        ae_performance = calculate_ae_performance(df, custom_start, custom_end)
         deals_closed = calculate_deals_closed(df, custom_start, custom_end)
         pipe_metrics = calculate_pipe_metrics(df, custom_start, custom_end)
         closing_projections = calculate_closing_projections(df)
