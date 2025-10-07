@@ -547,10 +547,10 @@ async def get_monthly_analytics(month_offset: int = 0):
                 df[col] = pd.to_datetime(df[col], errors='coerce')
         
         # Generate all analytics sections
-        meeting_generation = calculate_meeting_generation(df, week_start, week_end)
-        meetings_attended = calculate_meetings_attended(df, week_start, week_end)
-        deals_closed = calculate_deals_closed(df, week_start, week_end)
-        pipe_metrics = calculate_pipe_metrics(df, week_start, week_end)
+        meeting_generation = calculate_meeting_generation(df, month_start, month_end)
+        meetings_attended = calculate_meetings_attended(df, month_start, month_end)
+        deals_closed = calculate_deals_closed(df, month_start, month_end)
+        pipe_metrics = calculate_pipe_metrics(df, month_start, month_end)
         closing_projections = calculate_closing_projections(df)
         
         # Attribution analysis - convert numpy types to Python native types
