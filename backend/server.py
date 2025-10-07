@@ -320,11 +320,45 @@ def calculate_meetings_attended(df, start_date, end_date):
         'on_track': bool(attended_count >= 40 and poa_count >= 15)
     }
 
-def calculate_deals_closed(df, week_start, week_end):
+def calculate_deals_closed(df, start_date, end_date):
     """Calculate deals closed metrics"""
     closed_deals = df[
-        (df['billing_start'] >= week_start) & 
-        (df['billing_start'] <= week_end) &
+        (df['billing_start'] >= start_date) & 
+        (df['billing_start'] <= end_date) &
+        (df['stage'].isin(['Closed Won', 'Won', 'Signed']))
+    ]
+    
+    # Monthly breakdown for chart
+    monthly_closed = []
+    current_date = start_date
+    while current_date <= end_date:
+        month_start = current_date.replace(day=1)
+        if current_date.month == 12:
+            month_end = current_date.replace(year=current_date.year + 1, month=1, day=1) - timedelta(seconds=1)
+        else:
+            month_end = current_date.replace(month=current_date.month + 1, day=1) - timedelta(seconds=1)
+        
+        month_deals = closed_deals[
+            (closed_deals['billing_start'] >= month_start) &
+            (closed_deals['billing_start'] <= month_end)
+        ]
+        
+        monthly_closed.append({
+            'month': current_date.strftime('%b %Y'),
+            'deals_count': int(len(month_deals)),
+            'arr_closed': float(month_deals['expected_arr'].sum()),
+            'mrr_closed': float(month_deals['expected_mrr'].sum())
+        })
+        
+        # Move to next month
+        if current_date.month == 12:
+            current_date = current_date.replace(year=current_date.year + 1, month=1)
+        else:
+            current_date = current_date.replace(month=current_date.month + 1)
+    
+    closed_deals = df[
+        (df['billing_start'] >= start_date) & 
+        (df['billing_start'] <= end_date) &
         (df['stage'].isin(['Closed Won', 'Won', 'Signed']))
     ]
     
