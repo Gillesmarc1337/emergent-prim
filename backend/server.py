@@ -626,12 +626,9 @@ async def get_monthly_analytics(month_offset: int = 0):
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors='coerce')
         
-        # Generate all analytics sections
-        meeting_generation = calculate_meeting_generation(df, month_start, month_end)
-        meetings_attended = calculate_meetings_attended(df, month_start, month_end)
-        deals_closed = calculate_deals_closed(df, month_start, month_end)
-        pipe_metrics = calculate_pipe_metrics(df, month_start, month_end)
-        closing_projections = calculate_closing_projections(df)
+        # Debug: Print data info
+        print(f\"Processing {len(df)} total records for period {month_start} to {month_end}\")
+        print(f\"Records with ARR data: {len(df[df['expected_arr'].notna()])}\")\n        print(f\"Records in date range: {len(df[(df['discovery_date'] >= month_start) & (df['discovery_date'] <= month_end)])}\")\n        \n        # Generate all analytics sections\n        meeting_generation = calculate_meeting_generation(df, month_start, month_end)\n        meetings_attended = calculate_meetings_attended(df, month_start, month_end)\n        deals_closed = calculate_deals_closed(df, month_start, month_end)\n        pipe_metrics = calculate_pipe_metrics(df, month_start, month_end)\n        closing_projections = calculate_closing_projections(df)\n        \n        # Debug: Print results\n        print(f\"Deals closed found: {deals_closed['deals_closed']}, ARR: {deals_closed['arr_closed']}\")
         
         # Attribution analysis - convert numpy types to Python native types
         attribution = {
