@@ -506,13 +506,31 @@ async def upload_sales_data(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing file: {str(e)}")
 
-@api_router.get("/analytics/weekly")
-async def get_weekly_analytics(week_offset: int = 0):
-    """Generate weekly analytics report"""
+def get_month_range(date=None, month_offset=0):
+    """Get start and end date for the month"""
+    if date is None:
+        date = datetime.now()
+    
+    # Apply month offset
+    target_date = date - timedelta(days=30 * month_offset)
+    
+    # Get first day of the month
+    month_start = target_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    
+    # Get last day of the month
+    if target_date.month == 12:
+        month_end = target_date.replace(year=target_date.year + 1, month=1, day=1) - timedelta(seconds=1)
+    else:
+        month_end = target_date.replace(month=target_date.month + 1, day=1) - timedelta(seconds=1)
+    
+    return month_start, month_end
+
+@api_router.get("/analytics/monthly")
+async def get_monthly_analytics(month_offset: int = 0):
+    """Generate monthly analytics report"""
     try:
-        # Calculate week range
-        target_date = datetime.now() - timedelta(weeks=week_offset)
-        week_start, week_end = get_week_range(target_date)
+        # Calculate month range
+        month_start, month_end = get_month_range(month_offset=month_offset)
         
         # Get data from MongoDB
         records = await db.sales_records.find().to_list(10000)
