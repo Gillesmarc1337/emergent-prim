@@ -619,6 +619,82 @@ def get_month_range(date=None, month_offset=0):
     
     return month_start, month_end
 
+@api_router.get("/analytics/yearly")
+async def get_yearly_analytics(year: int = 2025):
+    """Generate yearly analytics report"""
+    try:
+        # Calculate year range (January 1 to December 31)
+        year_start = datetime(year, 1, 1, 0, 0, 0, 0)
+        year_end = datetime(year, 12, 31, 23, 59, 59, 999999)
+        
+        # Get data from MongoDB
+        records = await db.sales_records.find().to_list(10000)
+        if not records:
+            raise HTTPException(status_code=404, detail="No sales data found. Please upload data first.")
+        
+        # Convert to DataFrame for analysis
+        df = pd.DataFrame(records)
+        
+        # Convert date strings back to datetime
+        date_columns = ['discovery_date', 'poa_date', 'billing_start', 'created_at']
+        for col in date_columns:
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors='coerce')
+        
+        # Debug: Print data info
+        print(f"Processing {len(df)} total records for year {year}")
+        
+        # Generate all analytics sections for the full year
+        meeting_generation = calculate_meeting_generation(df, year_start, year_end)
+        meetings_attended = calculate_meetings_attended(df, year_start, year_end)
+        deals_closed = calculate_deals_closed(df, year_start, year_end)
+        pipe_metrics = calculate_pipe_metrics(df, year_start, year_end)
+        closing_projections = calculate_closing_projections(df)
+        
+        # Attribution analysis
+        attribution = {
+            'intro_attribution': df.groupby('type_of_source')['id'].count().to_dict(),
+            'disco_attribution': df[~df['discovery_date'].isna()].groupby('type_of_source')['id'].count().to_dict(),
+            'bdr_attribution': df.groupby('bdr')['id'].count().to_dict()
+        }
+        
+        # Old pipe (reviving deals)
+        old_pipe_data = df[df['stage'].isin(['G Stalled', 'H Lost - can be revived'])]
+        old_pipe = {
+            'total_stalled_deals': len(old_pipe_data),
+            'total_stalled_value': old_pipe_data['pipeline'].sum(),
+            'companies_to_recontact': old_pipe_data['client'].nunique(),
+            'revival_opportunities': clean_records(old_pipe_data[['client', 'pipeline', 'stage', 'owner']].to_dict('records'))
+        }
+        
+        # Big numbers recap for the year
+        ytd_closed = df[df['stage'].isin(['Closed Won', 'Won', 'Signed'])]
+        big_numbers_recap = {
+            'ytd_revenue': float(ytd_closed['expected_arr'].sum()),
+            'ytd_target': 4500000.0,  # Annual target
+            'remaining_target': 4500000.0 - float(ytd_closed['expected_arr'].sum()),
+            'monthly_breakdown': df.groupby(df['discovery_date'].dt.to_period('M'))['pipeline'].sum().to_dict() if len(df) > 0 else {},
+            'forecast_gap': float(ytd_closed['expected_arr'].sum()) < 4500000.0 * 0.75
+        }
+        
+        analytics = {
+            'week_start': year_start,  # Use year_start for compatibility
+            'week_end': year_end,      # Use year_end for compatibility
+            'meeting_generation': meeting_generation,
+            'meetings_attended': meetings_attended,
+            'attribution': attribution,
+            'deals_closed': deals_closed,
+            'pipe_metrics': pipe_metrics,
+            'old_pipe': old_pipe,
+            'closing_projections': closing_projections,
+            'big_numbers_recap': big_numbers_recap
+        }
+        
+        return analytics
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating yearly analytics: {str(e)}")
+
 @api_router.get("/analytics/monthly")
 async def get_monthly_analytics(month_offset: int = 0):
     """Generate monthly analytics report"""
