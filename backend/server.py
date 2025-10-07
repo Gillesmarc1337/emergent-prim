@@ -699,8 +699,21 @@ async def get_yearly_analytics(year: int = 2025):
 async def get_monthly_analytics(month_offset: int = 0):
     """Generate monthly analytics report"""
     try:
-        # Calculate month range
-        month_start, month_end = get_month_range(month_offset=month_offset)
+        # Calculate month range based on offset
+        if month_offset == 0:
+            # Current month (October 2025)
+            target_date = datetime(2025, 10, 1)
+        else:
+            # Navigate from October 2025 base
+            base_date = datetime(2025, 10, 1)
+            if month_offset > 0:
+                # Previous months (September, August, July...)
+                target_date = base_date.replace(month=max(1, base_date.month - month_offset))
+            else:
+                # Future months (November, December...)
+                target_date = base_date.replace(month=min(12, base_date.month - month_offset))
+        
+        month_start, month_end = get_month_range(target_date, 0)
         
         # Get data from MongoDB
         records = await db.sales_records.find().to_list(10000)
