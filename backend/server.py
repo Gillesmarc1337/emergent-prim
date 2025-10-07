@@ -848,18 +848,24 @@ async def get_monthly_analytics(month_offset: int = 0):
         
         dashboard_blocks = {
             'block_1_meetings': {
-                'title': 'Meeting Generation Target',
-                'total_target': current_target['total'],
-                'inbound_target': current_target['inbound'],
-                'outbound_target': current_target['outbound'],
-                'referral_target': current_target['referral'],
-                'period': focus_month_str
+                'title': 'Meeting Generation',
+                'period': focus_month_str,
+                'total_actual': actual_total,
+                'total_target': target_total,
+                'inbound_actual': actual_inbound,
+                'inbound_target': target_inbound,
+                'outbound_actual': actual_outbound,
+                'outbound_target': target_outbound,
+                'referral_actual': actual_referral,
+                'referral_target': target_referral
             },
             'block_2_discovery_poa': {
                 'title': 'Discovery & POA',
-                'discovery_count': discovery_count,
-                'poa_count': poa_count,
-                'period': focus_month_str
+                'period': focus_month_str,
+                'discovery_actual': actual_discovery,
+                'discovery_target': target_discovery,
+                'poa_actual': actual_poa,
+                'poa_target': target_poa
             },
             'block_3_pipe_creation': {
                 'title': 'New Pipe Created',
