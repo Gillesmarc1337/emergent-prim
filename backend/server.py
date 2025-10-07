@@ -1042,10 +1042,19 @@ async def get_dashboard_analytics():
                 'gap': cumulative_target - cumulative_closed
             })
         
-        # Calculate the 4 additional dashboard blocks
+        # Calculate the 4 additional dashboard blocks (dynamic by selected period)
         
-        # Block 1: Meetings to generate (dynamic by year/month)
-        current_month = datetime.now().month
+        # Determine the focus period (July-December for H2 view)
+        if target_months and len(target_months) > 0:
+            # Use the first month in our target_months as the focus
+            focus_month = target_months[0]  # This will be July 2025 by default
+        else:
+            focus_month = datetime(2025, 10, 1)  # Fallback to October
+        
+        focus_month_num = focus_month.month
+        focus_month_str = focus_month.strftime('%b %Y')
+        
+        # Block 1: Meetings to generate (dynamic by selected month)
         monthly_meeting_targets = {
             7: {'total': 50, 'inbound': 15, 'outbound': 25, 'referral': 10},
             8: {'total': 52, 'inbound': 16, 'outbound': 26, 'referral': 10},
@@ -1054,54 +1063,59 @@ async def get_dashboard_analytics():
             11: {'total': 58, 'inbound': 18, 'outbound': 30, 'referral': 10},
             12: {'total': 65, 'inbound': 20, 'outbound': 35, 'referral': 10}
         }
-        current_target = monthly_meeting_targets.get(current_month, {'total': 55, 'inbound': 17, 'outbound': 28, 'referral': 10})
+        current_target = monthly_meeting_targets.get(focus_month_num, {'total': 55, 'inbound': 17, 'outbound': 28, 'referral': 10})
         
-        # Block 2: Discovery & POA
-        # Discovery = everything except "F Inbox" and "Show/Nowshow"
+        # Block 2: Discovery & POA (filtered for focus month)
+        focus_month_start = focus_month.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        if focus_month_num == 12:
+            focus_month_end = focus_month.replace(year=focus_month.year + 1, month=1, day=1) - timedelta(seconds=1)
+        else:
+            focus_month_end = focus_month.replace(month=focus_month_num + 1, day=1) - timedelta(seconds=1)
+        
+        # Discovery = everything except "F Inbox" and "No Show" for the focus month
         discovery_data = df[
+            (df['discovery_date'] >= focus_month_start) & 
+            (df['discovery_date'] <= focus_month_end) &
             (df['stage'].notna()) & 
             (~df['stage'].isin(['F Inbox'])) &
             (~df['show_noshow'].isin(['No Show']))
         ]
         discovery_count = len(discovery_data)
         
-        # POA = "D POA Booked", "B Legals", "Closed Won", "Won", "Signed"
-        poa_data = df[df['stage'].isin(['D POA Booked', 'B Legals', 'Closed Won', 'Won', 'Signed'])]
+        # POA = "D POA Booked", "B Legals", "Closed Won", "Won", "Signed" for the focus month
+        poa_data = df[
+            (df['discovery_date'] >= focus_month_start) & 
+            (df['discovery_date'] <= focus_month_end) &
+            df['stage'].isin(['D POA Booked', 'B Legals', 'Closed Won', 'Won', 'Signed'])
+        ]
         poa_count = len(poa_data)
         
-        # Block 3: Pipe creation
-        # New pipe created this month (from recent discovery dates)
-        current_month_start = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        current_month_end = (current_month_start.replace(month=current_month_start.month + 1) if current_month_start.month < 12 
-                           else current_month_start.replace(year=current_month_start.year + 1, month=1)) - timedelta(seconds=1)
-        
-        new_pipe_this_month = df[
-            (df['discovery_date'] >= current_month_start) & 
-            (df['discovery_date'] <= current_month_end) &
+        # Block 3: Pipe creation (for focus month)
+        new_pipe_focus_month = df[
+            (df['discovery_date'] >= focus_month_start) & 
+            (df['discovery_date'] <= focus_month_end) &
             (df['pipeline'].notna()) & 
             (df['pipeline'] > 0)
         ]
-        new_pipe_created = float(new_pipe_this_month['pipeline'].sum())
+        new_pipe_created = float(new_pipe_focus_month['pipeline'].sum())
         
         # Weighted pipe created (probability adjusted)
         stage_probabilities = {
             'D POA Booked': 70, 'C Proposal sent': 50, 'B Legals': 80,
             'E Verbal commit': 90, 'A Discovery scheduled': 20
         }
-        new_pipe_this_month['probability'] = new_pipe_this_month['stage'].map(stage_probabilities).fillna(10)
-        new_pipe_this_month['weighted_value'] = new_pipe_this_month['pipeline'] * new_pipe_this_month['probability'] / 100
-        weighted_pipe_created = float(new_pipe_this_month['weighted_value'].sum())
+        new_pipe_focus_month['probability'] = new_pipe_focus_month['stage'].map(stage_probabilities).fillna(10)
+        new_pipe_focus_month['weighted_value'] = new_pipe_focus_month['pipeline'] * new_pipe_focus_month['probability'] / 100
+        weighted_pipe_created = float(new_pipe_focus_month['weighted_value'].sum())
         
-        # Block 4: Revenue objective vs closed
-        # Use current month values from the monthly data
-        current_month_str = f"{datetime.now().strftime('%b')} 2025"
-        current_month_target = 0
-        current_month_closed = 0
+        # Block 4: Revenue objective vs closed (for focus month)
+        focus_month_target = 0
+        focus_month_closed = 0
         
         for month_data in months_data:
-            if month_data['month'] == current_month_str:
-                current_month_target = month_data['target_revenue']
-                current_month_closed = month_data['closed_revenue']
+            if month_data['month'] == focus_month_str:
+                focus_month_target = month_data['target_revenue']
+                focus_month_closed = month_data['closed_revenue']
                 break
         
         # Dashboard blocks data
