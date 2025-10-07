@@ -1127,6 +1127,21 @@ async def upload_google_sheets_data(request: GoogleSheetsRequest):
             await db.sales_records.delete_many({})
             # Insert new data
             await db.sales_records.insert_many(records)
+            
+            # Save metadata for future refresh
+            await db.data_metadata.update_one(
+                {"type": "last_update"},
+                {
+                    "$set": {
+                        "last_update": datetime.utcnow(),
+                        "source_type": "google_sheets",
+                        "source_url": request.sheet_url,
+                        "sheet_name": request.sheet_name,
+                        "records_count": valid_records
+                    }
+                },
+                upsert=True
+            )
         
         return UploadResponse(
             message=f"Successfully processed {len(records)} sales records from Google Sheets",
