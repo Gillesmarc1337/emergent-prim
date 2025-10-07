@@ -376,7 +376,8 @@ def calculate_deals_closed(df, start_date, end_date):
         'mrr_closed': mrr_sum,
         'avg_deal_size': avg_deal,
         'on_track': bool(deals_count >= 5 and arr_sum >= 300000),
-        'deals_detail': clean_records(closed_deals[['client', 'expected_arr', 'owner', 'type_of_deal']].to_dict('records'))
+        'deals_detail': clean_records(closed_deals[['client', 'expected_arr', 'owner', 'type_of_deal']].to_dict('records')),
+        'monthly_closed': monthly_closed
     }
 
 def calculate_pipe_metrics(df, week_start, week_end):
