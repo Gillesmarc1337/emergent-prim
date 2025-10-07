@@ -576,6 +576,20 @@ async def upload_sales_data(file: UploadFile = File(...)):
             await db.sales_records.delete_many({})
             # Insert new data
             await db.sales_records.insert_many(records)
+            
+            # Save metadata for CSV upload
+            await db.data_metadata.update_one(
+                {"type": "last_update"},
+                {
+                    "$set": {
+                        "last_update": datetime.utcnow(),
+                        "source_type": "csv",
+                        "source_url": file.filename,
+                        "records_count": valid_records
+                    }
+                },
+                upsert=True
+            )
         
         return UploadResponse(
             message=f"Successfully processed {len(records)} sales records",
