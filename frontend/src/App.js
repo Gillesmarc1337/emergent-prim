@@ -628,7 +628,9 @@ function MainDashboard() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-center">Discovery & POA</CardTitle>
-              <CardDescription className="text-center">Current Status</CardDescription>
+              <CardDescription className="text-center font-medium text-green-600">
+                {dashboardData.dashboard_blocks.block_2_discovery_poa.period}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
