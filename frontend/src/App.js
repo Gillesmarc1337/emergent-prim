@@ -629,20 +629,20 @@ function MainDashboard({ analytics }) {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-center">Discovery & POA</CardTitle>
               <CardDescription className="text-center font-medium text-green-600">
-                {dashboardData.dashboard_blocks.block_2_discovery_poa.period}
+                {analytics.dashboard_blocks.block_2_discovery_poa.period}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">
-                    {dashboardData.dashboard_blocks.block_2_discovery_poa.discovery_actual}/{dashboardData.dashboard_blocks.block_2_discovery_poa.discovery_target}
+                    {analytics.dashboard_blocks.block_2_discovery_poa.discovery_actual}/{analytics.dashboard_blocks.block_2_discovery_poa.discovery_target}
                   </div>
                   <div className="text-sm text-gray-600">Discovery</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-orange-600">
-                    {dashboardData.dashboard_blocks.block_2_discovery_poa.poa_actual}/{dashboardData.dashboard_blocks.block_2_discovery_poa.poa_target}
+                    {analytics.dashboard_blocks.block_2_discovery_poa.poa_actual}/{analytics.dashboard_blocks.block_2_discovery_poa.poa_target}
                   </div>
                   <div className="text-sm text-gray-600">POA</div>
                 </div>
