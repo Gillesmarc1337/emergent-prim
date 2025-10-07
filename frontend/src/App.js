@@ -525,12 +525,12 @@ function MainDashboard() {
         </CardContent>
       </Card>
 
-      {/* 2025 Annual Targets Chart */}
+      {/* July-December 2025 Targets Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>2025 Annual Revenue Targets</CardTitle>
+          <CardTitle>July-December 2025 Revenue Targets</CardTitle>
           <CardDescription>
-            Monthly and Cumulative Progress vs Targets for Year 2025
+            Monthly and Cumulative Progress vs Targets for H2 2025
           </CardDescription>
         </CardHeader>
         <CardContent>
