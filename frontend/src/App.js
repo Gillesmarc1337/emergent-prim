@@ -654,7 +654,9 @@ function MainDashboard() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-center">New Pipe Created</CardTitle>
-              <CardDescription className="text-center">Monthly Performance</CardDescription>
+              <CardDescription className="text-center font-medium text-purple-600">
+                {dashboardData.dashboard_blocks.block_3_pipe_creation.period}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
