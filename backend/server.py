@@ -1167,6 +1167,13 @@ async def get_dashboard_analytics():
         focus_month_num = focus_month.month
         focus_month_str = focus_month.strftime('%b %Y')
         
+        # Define date range for focus month
+        focus_month_start = focus_month.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        if focus_month_num == 12:
+            focus_month_end = focus_month.replace(year=focus_month.year + 1, month=1, day=1) - timedelta(seconds=1)
+        else:
+            focus_month_end = focus_month.replace(month=focus_month_num + 1, day=1) - timedelta(seconds=1)
+        
         # Block 1: Meetings to generate (dynamic by selected month)
         # Fixed targets as per user requirements: 20 inbound, 15 outbound, 10 referral per month
         target_inbound = 20
@@ -1184,13 +1191,6 @@ async def get_dashboard_analytics():
         actual_outbound = len(focus_month_meetings[focus_month_meetings['type_of_source'] == 'Outbound'])
         actual_referral = len(focus_month_meetings[focus_month_meetings['type_of_source'].isin(['Internal referral', 'Client referral'])])
         actual_total = actual_inbound + actual_outbound + actual_referral
-        
-        # Block 2: Discovery & POA (filtered for focus month)
-        focus_month_start = focus_month.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        if focus_month_num == 12:
-            focus_month_end = focus_month.replace(year=focus_month.year + 1, month=1, day=1) - timedelta(seconds=1)
-        else:
-            focus_month_end = focus_month.replace(month=focus_month_num + 1, day=1) - timedelta(seconds=1)
         
         # Block 2: Discovery & POA (filtered for focus month)
         # Targets: 45 discovery, 18 POA per month
