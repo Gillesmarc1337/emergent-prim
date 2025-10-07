@@ -1083,6 +1083,7 @@ function Dashboard() {
                           <th className="text-left p-2 font-semibold">Source</th>
                           <th className="text-center p-2 font-semibold">Relevance</th>
                           <th className="text-left p-2 font-semibold">Owner</th>
+                          <th className="text-left p-2 font-semibold">Stage</th>
                         </tr>
                       </thead>
                       <tbody>
