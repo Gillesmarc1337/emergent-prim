@@ -398,11 +398,14 @@ def calculate_ae_performance(df, start_date, end_date):
     
     # Sort by intros attended descending
     ae_performance.sort(key=lambda x: x['intros_attended'], reverse=True)
+    ae_poa_performance.sort(key=lambda x: x['poa_attended'], reverse=True)
     
     # Total metrics
     total_intros = len(intros_data)
     total_relevant = len(intros_data[intros_data['relevance'] == 'Relevant'])
     total_poa = len(poa_data)
+    total_poa_attended = len(poa_attended_data)
+    total_poa_closed = len(poa_closed_data)
     total_closing = len(poa_data[poa_data['stage'].isin(['Closed Won', 'Won', 'Signed'])])
     total_value = float(poa_data[poa_data['stage'].isin(['Closed Won', 'Won', 'Signed'])]['expected_arr'].fillna(0).sum())
     
@@ -418,16 +421,32 @@ def calculate_ae_performance(df, start_date, end_date):
             'expected_arr': float(row.get('expected_arr', 0)) if pd.notna(row.get('expected_arr', 0)) else 0
         })
     
+    # Detailed POA attended list
+    poa_attended_list = []
+    for _, row in poa_attended_data.iterrows():
+        poa_attended_list.append({
+            'date': row['discovery_date'].strftime('%b %d') if pd.notna(row['discovery_date']) else 'N/A',
+            'client': str(row.get('client', 'N/A')),
+            'ae': str(row.get('owner', 'N/A')),
+            'stage': str(row.get('stage', 'N/A')),
+            'relevance': str(row.get('relevance', 'N/A')),
+            'expected_arr': float(row.get('expected_arr', 0)) if pd.notna(row.get('expected_arr', 0)) else 0
+        })
+    
     return {
         'ae_performance': ae_performance,
+        'ae_poa_performance': ae_poa_performance,
         'total_metrics': {
             'total_intros': total_intros,
             'total_relevant': total_relevant,
             'total_poa': total_poa,
+            'total_poa_attended': total_poa_attended,
+            'total_poa_closed': total_poa_closed,
             'total_closing': total_closing,
             'total_value': total_value
         },
-        'intros_details': intros_list
+        'intros_details': intros_list,
+        'poa_attended_details': poa_attended_list
     }
 
 def calculate_deals_closed(df, start_date, end_date):
