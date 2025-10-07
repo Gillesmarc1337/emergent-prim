@@ -849,8 +849,37 @@ async def get_dashboard_analytics():
         active_pipeline['weighted_value'] = active_pipeline['pipeline'] * active_pipeline['probability'] / 100
         total_weighted_pipeline = float(active_pipeline['weighted_value'].sum())
         
+        # Annual targets for 2025 chart
+        annual_targets_2025 = []
+        cumulative_target = 0
+        cumulative_closed = 0
+        
+        for month in ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']:
+            month_key = f'{month} 2025'
+            month_target = monthly_targets_2025.get(month_key, 500000)
+            cumulative_target += month_target
+            
+            # Find actual closed revenue for this month
+            month_closed = 0
+            for data_point in months_data:
+                if data_point['month'] == month_key:
+                    month_closed = data_point['closed_revenue']
+                    break
+            
+            cumulative_closed += month_closed
+            
+            annual_targets_2025.append({
+                'month': month,
+                'monthly_target': month_target,
+                'monthly_closed': month_closed,
+                'cumulative_target': cumulative_target,
+                'cumulative_closed': cumulative_closed,
+                'gap': cumulative_target - cumulative_closed
+            })
+        
         return {
             'monthly_revenue_chart': months_data,
+            'annual_targets_2025': annual_targets_2025,
             'key_metrics': {
                 'ytd_revenue': ytd_revenue,
                 'ytd_target': ytd_target,
@@ -858,7 +887,9 @@ async def get_dashboard_analytics():
                 'total_pipeline': total_pipeline,
                 'weighted_pipeline': total_weighted_pipeline,
                 'deals_count': len(active_pipeline),
-                'avg_deal_size': float(active_pipeline['pipeline'].mean()) if len(active_pipeline) > 0 else 0
+                'avg_deal_size': float(active_pipeline['pipeline'].mean()) if len(active_pipeline) > 0 else 0,
+                'annual_target_2025': sum(monthly_targets_2025.values()),
+                'ytd_closed_2025': cumulative_closed
             }
         }
         
