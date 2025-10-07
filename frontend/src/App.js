@@ -972,7 +972,7 @@ function Dashboard() {
 
         {/* Main Dashboard */}
         <TabsContent value="dashboard">
-          <MainDashboard />
+          <MainDashboard analytics={analytics} />
         </TabsContent>
 
         {/* Meeting Generation */}
