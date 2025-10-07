@@ -586,6 +586,131 @@ function MainDashboard() {
           </ResponsiveContainer>
         </CardContent>
       </Card>
+
+      {/* 4 Dashboard Blocks */}
+      {dashboardData.dashboard_blocks && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Block 1: Meeting Generation */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg text-center">Meeting Generation</CardTitle>
+              <CardDescription className="text-center">
+                {dashboardData.dashboard_blocks.block_1_meetings.period}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {dashboardData.dashboard_blocks.block_1_meetings.total_target}
+                  </div>
+                  <div className="text-sm text-gray-600">Total Target</div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Inbound:</span>
+                    <span className="font-medium">{dashboardData.dashboard_blocks.block_1_meetings.inbound_target}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Outbound:</span>
+                    <span className="font-medium">{dashboardData.dashboard_blocks.block_1_meetings.outbound_target}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Referral:</span>
+                    <span className="font-medium">{dashboardData.dashboard_blocks.block_1_meetings.referral_target}</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Block 2: Discovery & POA */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg text-center">Discovery & POA</CardTitle>
+              <CardDescription className="text-center">Current Status</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">
+                    {dashboardData.dashboard_blocks.block_2_discovery_poa.discovery_count}
+                  </div>
+                  <div className="text-sm text-gray-600">Discovery</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-600">
+                    {dashboardData.dashboard_blocks.block_2_discovery_poa.poa_count}
+                  </div>
+                  <div className="text-sm text-gray-600">POA</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Block 3: New Pipe Created */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg text-center">New Pipe Created</CardTitle>
+              <CardDescription className="text-center">Monthly Performance</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-purple-600">
+                    ${(dashboardData.dashboard_blocks.block_3_pipe_creation.new_pipe_created / 1000000).toFixed(1)}M
+                  </div>
+                  <div className="text-xs text-gray-600">New Pipe This Month</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-sm font-medium text-gray-700">
+                    Target: $2M/month
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-sm font-bold text-blue-600">
+                    ${(dashboardData.dashboard_blocks.block_3_pipe_creation.weighted_pipe_created / 1000).toFixed(0)}K
+                  </div>
+                  <div className="text-xs text-gray-600">Weighted Pipe</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Block 4: Revenue Objective */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg text-center">Revenue Objective</CardTitle>
+              <CardDescription className="text-center">Current Month</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-gray-600">
+                    ${(dashboardData.dashboard_blocks.block_4_revenue.revenue_target / 1000).toFixed(0)}K
+                  </div>
+                  <div className="text-xs text-gray-600">Target</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-green-600">
+                    ${(dashboardData.dashboard_blocks.block_4_revenue.closed_revenue / 1000).toFixed(0)}K
+                  </div>
+                  <div className="text-xs text-gray-600">Closed</div>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-green-500 h-2 rounded-full" 
+                    style={{ width: `${Math.min(dashboardData.dashboard_blocks.block_4_revenue.progress, 100)}%` }}
+                  ></div>
+                </div>
+                <div className="text-center text-xs text-gray-600">
+                  {dashboardData.dashboard_blocks.block_4_revenue.progress.toFixed(1)}% Complete
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
