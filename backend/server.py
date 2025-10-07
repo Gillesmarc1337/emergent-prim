@@ -1042,9 +1042,107 @@ async def get_dashboard_analytics():
                 'gap': cumulative_target - cumulative_closed
             })
         
+        # Calculate the 4 additional dashboard blocks
+        
+        # Block 1: Meetings to generate (dynamic by year/month)
+        current_month = datetime.now().month
+        monthly_meeting_targets = {
+            7: {'total': 50, 'inbound': 15, 'outbound': 25, 'referral': 10},
+            8: {'total': 52, 'inbound': 16, 'outbound': 26, 'referral': 10},
+            9: {'total': 55, 'inbound': 17, 'outbound': 28, 'referral': 10},
+            10: {'total': 60, 'inbound': 18, 'outbound': 32, 'referral': 10},
+            11: {'total': 58, 'inbound': 18, 'outbound': 30, 'referral': 10},
+            12: {'total': 65, 'inbound': 20, 'outbound': 35, 'referral': 10}
+        }
+        current_target = monthly_meeting_targets.get(current_month, {'total': 55, 'inbound': 17, 'outbound': 28, 'referral': 10})
+        
+        # Block 2: Discovery & POA
+        # Discovery = everything except "F Inbox" and "Show/Nowshow"
+        discovery_data = df[
+            (df['stage'].notna()) & 
+            (~df['stage'].isin(['F Inbox'])) &
+            (~df['show_noshow'].isin(['No Show']))
+        ]
+        discovery_count = len(discovery_data)
+        
+        # POA = "D POA Booked", "B Legals", "Closed Won", "Won", "Signed"
+        poa_data = df[df['stage'].isin(['D POA Booked', 'B Legals', 'Closed Won', 'Won', 'Signed'])]
+        poa_count = len(poa_data)
+        
+        # Block 3: Pipe creation
+        # New pipe created this month (from recent discovery dates)
+        current_month_start = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        current_month_end = (current_month_start.replace(month=current_month_start.month + 1) if current_month_start.month < 12 
+                           else current_month_start.replace(year=current_month_start.year + 1, month=1)) - timedelta(seconds=1)
+        
+        new_pipe_this_month = df[
+            (df['discovery_date'] >= current_month_start) & 
+            (df['discovery_date'] <= current_month_end) &
+            (df['pipeline'].notna()) & 
+            (df['pipeline'] > 0)
+        ]
+        new_pipe_created = float(new_pipe_this_month['pipeline'].sum())
+        
+        # Weighted pipe created (probability adjusted)
+        stage_probabilities = {
+            'D POA Booked': 70, 'C Proposal sent': 50, 'B Legals': 80,
+            'E Verbal commit': 90, 'A Discovery scheduled': 20
+        }
+        new_pipe_this_month['probability'] = new_pipe_this_month['stage'].map(stage_probabilities).fillna(10)
+        new_pipe_this_month['weighted_value'] = new_pipe_this_month['pipeline'] * new_pipe_this_month['probability'] / 100
+        weighted_pipe_created = float(new_pipe_this_month['weighted_value'].sum())
+        
+        # Block 4: Revenue objective vs closed
+        # Use current month values from the monthly data
+        current_month_str = f"{datetime.now().strftime('%b')} 2025"
+        current_month_target = 0
+        current_month_closed = 0
+        
+        for month_data in months_data:
+            if month_data['month'] == current_month_str:
+                current_month_target = month_data['target_revenue']
+                current_month_closed = month_data['closed_revenue']
+                break
+        
+        # Dashboard blocks data
+        dashboard_blocks = {
+            'block_1_meetings': {
+                'title': 'Meeting Generation Target',
+                'total_target': current_target['total'],
+                'inbound_target': current_target['inbound'],
+                'outbound_target': current_target['outbound'],
+                'referral_target': current_target['referral'],
+                'period': f"{datetime.now().strftime('%B %Y')}"
+            },
+            'block_2_discovery_poa': {
+                'title': 'Discovery & POA',
+                'discovery_count': discovery_count,
+                'poa_count': poa_count,
+                'discovery_label': f'{discovery_count} Discovery',
+                'poa_label': f'{poa_count} POA'
+            },
+            'block_3_pipe_creation': {
+                'title': 'New Pipe Created',
+                'monthly_target': 2000000,  # 2M target per month
+                'new_pipe_created': new_pipe_created,
+                'weighted_pipe_created': weighted_pipe_created,
+                'target_label': '2M New Pipe Target/Month',
+                'weighted_label': f'Weighted Pipe: ${int(weighted_pipe_created):,}'
+            },
+            'block_4_revenue': {
+                'title': 'Monthly Revenue Objective',
+                'revenue_target': current_month_target,
+                'closed_revenue': current_month_closed,
+                'target_label': f'Target: ${int(current_month_target):,}',
+                'closed_label': f'Closed: ${int(current_month_closed):,}',
+                'progress': (current_month_closed / current_month_target * 100) if current_month_target > 0 else 0
+            }
+        }
+
         return {
             'monthly_revenue_chart': months_data,
             'annual_targets_2025': period_targets_2025,
+            'dashboard_blocks': dashboard_blocks,
             'key_metrics': {
                 'ytd_revenue': ytd_revenue,
                 'ytd_target': annual_target_2025,
