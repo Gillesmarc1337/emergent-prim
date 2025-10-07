@@ -224,9 +224,9 @@ def calculate_meeting_generation(df, start_date, end_date):
     referrals = period_data[period_data['type_of_source'].isin(['Internal referral', 'Client referral'])]
     
     # Relevance analysis
-    relevant = week_data[week_data['relevance'] == 'Relevant']
-    question_mark = week_data[week_data['relevance'].isin(['Question mark', 'Maybe'])]
-    not_relevant = week_data[week_data['relevance'] == 'Not relevant']
+    relevant = period_data[period_data['relevance'] == 'Relevant']
+    question_mark = period_data[period_data['relevance'].isin(['Question mark', 'Maybe'])]
+    not_relevant = period_data[period_data['relevance'] == 'Not relevant']
     
     # BDR level detail
     bdr_stats = week_data.groupby('bdr').agg({
