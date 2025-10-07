@@ -408,7 +408,7 @@ function DataManagementSection({ onDataUpdated }) {
   );
 }
 
-function MainDashboard() {
+function MainDashboard({ analytics }) {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
