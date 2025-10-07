@@ -238,6 +238,18 @@ def calculate_meeting_generation(df, start_date, end_date):
     total_intros = int(len(period_data))
     target = 50
     
+    # Detailed meetings list for table display
+    meetings_list = []
+    for _, row in period_data.iterrows():
+        meetings_list.append({
+            'date': row['discovery_date'].strftime('%b %d') if pd.notna(row['discovery_date']) else 'N/A',
+            'client': str(row.get('client_company', 'N/A')),
+            'bdr': str(row.get('bdr', 'N/A')),
+            'source': str(row.get('type_of_source', 'N/A')),
+            'relevance': str(row.get('relevance', 'N/A')),
+            'owner': str(row.get('ae', 'N/A'))  # AE as owner
+        })
+    
     return {
         'total_new_intros': total_intros,
         'inbound': int(len(inbound)),
@@ -253,6 +265,7 @@ def calculate_meeting_generation(df, start_date, end_date):
             'total_meetings': int(v['total_meetings']),
             'relevant_meetings': int(v['relevant_meetings'])
         } for k, v in bdr_stats.to_dict('index').items()} if not bdr_stats.empty else {},
+        'meetings_details': meetings_list,
         'target': target,
         'on_track': bool(total_intros >= target)
     }
