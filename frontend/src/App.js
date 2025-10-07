@@ -612,6 +612,9 @@ function Dashboard() {
         const startDate = format(dateRange.from, 'yyyy-MM-dd');
         const endDate = format(dateRange.to, 'yyyy-MM-dd');
         response = await axios.get(`${API}/analytics/custom?start_date=${startDate}&end_date=${endDate}`);
+      } else if (viewMode === 'yearly') {
+        // Use yearly view
+        response = await axios.get(`${API}/analytics/yearly?year=2025`);
       } else {
         // Use monthly offset
         response = await axios.get(`${API}/analytics/monthly?month_offset=${monthOffset}`);
