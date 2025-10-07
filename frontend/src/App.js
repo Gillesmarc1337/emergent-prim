@@ -962,11 +962,12 @@ function Dashboard() {
       </div>
 
       <Tabs defaultValue="dashboard" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="meetings">Meeting Generation</TabsTrigger>
           <TabsTrigger value="attended">Meetings Attended</TabsTrigger>
           <TabsTrigger value="deals">Deals & Pipeline</TabsTrigger>
+          <TabsTrigger value="performance">Performance</TabsTrigger>
           <TabsTrigger value="projections">Projections</TabsTrigger>
         </TabsList>
 
