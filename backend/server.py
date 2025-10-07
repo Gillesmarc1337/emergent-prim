@@ -383,12 +383,6 @@ def calculate_deals_closed(df, start_date, end_date):
         else:
             current_date = current_date.replace(month=current_date.month + 1)
     
-    closed_deals = df[
-        (df['billing_start'] >= start_date) & 
-        (df['billing_start'] <= end_date) &
-        (df['stage'].isin(['Closed Won', 'Won', 'Signed']))
-    ]
-    
     # Convert numpy types to Python native types
     deals_count = int(len(closed_deals))
     arr_sum = float(closed_deals['expected_arr'].sum())
