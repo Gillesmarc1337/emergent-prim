@@ -754,17 +754,35 @@ function Dashboard() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold">{useCustomDate ? 'Custom Report' : 'Monthly Report'}</h1>
+          <h1 className="text-3xl font-bold">
+            {useCustomDate ? 'Custom Report' : 
+             viewMode === 'yearly' ? 'Yearly Report 2025' : 'Monthly Report'}
+          </h1>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Button
-                variant={useCustomDate ? 'outline' : 'default'}
+                variant={!useCustomDate && viewMode === 'monthly' ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setUseCustomDate(false)}
+                onClick={() => {
+                  setUseCustomDate(false);
+                  setViewMode('monthly');
+                }}
                 className="flex items-center gap-1"
               >
                 <Calendar className="h-4 w-4" />
                 Monthly
+              </Button>
+              <Button
+                variant={!useCustomDate && viewMode === 'yearly' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  setUseCustomDate(false);
+                  setViewMode('yearly');
+                }}
+                className="flex items-center gap-1"
+              >
+                <CalendarDays className="h-4 w-4" />
+                Yearly
               </Button>
               <Button
                 variant={useCustomDate ? 'default' : 'outline'}
