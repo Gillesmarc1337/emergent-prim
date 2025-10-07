@@ -655,14 +655,14 @@ function MainDashboard({ analytics }) {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-center">New Pipe Created</CardTitle>
               <CardDescription className="text-center font-medium text-purple-600">
-                {dashboardData.dashboard_blocks.block_3_pipe_creation.period}
+                {analytics.dashboard_blocks.block_3_pipe_creation.period}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="text-center">
                   <div className="text-lg font-bold text-purple-600">
-                    ${(dashboardData.dashboard_blocks.block_3_pipe_creation.new_pipe_created / 1000000).toFixed(1)}M
+                    ${(analytics.dashboard_blocks.block_3_pipe_creation.new_pipe_created / 1000000).toFixed(1)}M
                   </div>
                   <div className="text-xs text-gray-600">New Pipe This Month</div>
                 </div>
@@ -673,7 +673,7 @@ function MainDashboard({ analytics }) {
                 </div>
                 <div className="text-center">
                   <div className="text-sm font-bold text-blue-600">
-                    ${(dashboardData.dashboard_blocks.block_3_pipe_creation.weighted_pipe_created / 1000).toFixed(0)}K
+                    ${(analytics.dashboard_blocks.block_3_pipe_creation.weighted_pipe_created / 1000).toFixed(0)}K
                   </div>
                   <div className="text-xs text-gray-600">Weighted Pipe</div>
                 </div>
