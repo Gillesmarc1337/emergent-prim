@@ -735,6 +735,7 @@ async def get_yearly_analytics(year: int = 2025):
         # Generate all analytics sections for the full year
         meeting_generation = calculate_meeting_generation(df, year_start, year_end)
         meetings_attended = calculate_meetings_attended(df, year_start, year_end)
+        ae_performance = calculate_ae_performance(df, year_start, year_end)
         deals_closed = calculate_deals_closed(df, year_start, year_end)
         pipe_metrics = calculate_pipe_metrics(df, year_start, year_end)
         closing_projections = calculate_closing_projections(df)
