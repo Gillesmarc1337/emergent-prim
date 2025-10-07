@@ -794,7 +794,7 @@ function Dashboard() {
                 Custom Period
               </Button>
             </div>
-            {!useCustomDate && (
+            {!useCustomDate && viewMode === 'monthly' && (
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
