@@ -1118,7 +1118,7 @@ async def get_dashboard_analytics():
                 focus_month_closed = month_data['closed_revenue']
                 break
         
-        # Dashboard blocks data
+        # Dashboard blocks data (dynamic based on focus month)
         dashboard_blocks = {
             'block_1_meetings': {
                 'title': 'Meeting Generation Target',
@@ -1126,14 +1126,15 @@ async def get_dashboard_analytics():
                 'inbound_target': current_target['inbound'],
                 'outbound_target': current_target['outbound'],
                 'referral_target': current_target['referral'],
-                'period': f"{datetime.now().strftime('%B %Y')}"
+                'period': focus_month_str
             },
             'block_2_discovery_poa': {
                 'title': 'Discovery & POA',
                 'discovery_count': discovery_count,
                 'poa_count': poa_count,
                 'discovery_label': f'{discovery_count} Discovery',
-                'poa_label': f'{poa_count} POA'
+                'poa_label': f'{poa_count} POA',
+                'period': focus_month_str
             },
             'block_3_pipe_creation': {
                 'title': 'New Pipe Created',
@@ -1141,15 +1142,17 @@ async def get_dashboard_analytics():
                 'new_pipe_created': new_pipe_created,
                 'weighted_pipe_created': weighted_pipe_created,
                 'target_label': '2M New Pipe Target/Month',
-                'weighted_label': f'Weighted Pipe: ${int(weighted_pipe_created):,}'
+                'weighted_label': f'Weighted Pipe: ${int(weighted_pipe_created):,}',
+                'period': focus_month_str
             },
             'block_4_revenue': {
                 'title': 'Monthly Revenue Objective',
-                'revenue_target': current_month_target,
-                'closed_revenue': current_month_closed,
-                'target_label': f'Target: ${int(current_month_target):,}',
-                'closed_label': f'Closed: ${int(current_month_closed):,}',
-                'progress': (current_month_closed / current_month_target * 100) if current_month_target > 0 else 0
+                'revenue_target': focus_month_target,
+                'closed_revenue': focus_month_closed,
+                'target_label': f'Target: ${int(focus_month_target):,}',
+                'closed_label': f'Closed: ${int(focus_month_closed):,}',
+                'progress': (focus_month_closed / focus_month_target * 100) if focus_month_target > 0 else 0,
+                'period': focus_month_str
             }
         }
 
