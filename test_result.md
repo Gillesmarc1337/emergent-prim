@@ -127,6 +127,9 @@ backend:
         - working: true
           agent: "main"
           comment: "Implemented fixed targets (20 inbound, 15 outbound, 10 referral) and dynamic calculation based on month_offset. API correctly returns different periods for different month_offset values."
+        - working: true
+          agent: "testing"
+          comment: "✅ VERIFIED: API endpoint /api/analytics/monthly correctly returns dashboard_blocks.block_1_meetings with all required fields (period, total_actual, total_target, inbound_actual, inbound_target, outbound_actual, outbound_target, referral_actual, referral_target). Fixed targets confirmed: inbound_target=20, outbound_target=15, referral_target=10. Period changes dynamically: month_offset=0→Oct 2025, month_offset=1→Sep 2025, month_offset=3→Jul 2025."
 
   - task: "Discovery & POA block with targets"
     implemented: true
@@ -139,6 +142,9 @@ backend:
         - working: true
           agent: "main"
           comment: "Implemented targets (45 discovery, 18 POA) with correct filtering (excluding inbox and intro no show). Returns actual/target ratios."
+        - working: true
+          agent: "testing"
+          comment: "✅ VERIFIED: API endpoint /api/analytics/monthly correctly returns dashboard_blocks.block_2_discovery_poa with all required fields (period, discovery_actual, discovery_target, poa_actual, poa_target). Fixed targets confirmed: discovery_target=45, poa_target=18. Period changes dynamically based on month_offset parameter. Actual values calculated correctly for each month's data."
 
 frontend:
   - task: "Dashboard blocks displaying actual/target ratios"
