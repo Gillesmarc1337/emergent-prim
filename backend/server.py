@@ -825,6 +825,7 @@ async def get_monthly_analytics(month_offset: int = 0):
         # Generate all analytics sections
         meeting_generation = calculate_meeting_generation(df, month_start, month_end)
         meetings_attended = calculate_meetings_attended(df, month_start, month_end)
+        ae_performance = calculate_ae_performance(df, month_start, month_end)
         deals_closed = calculate_deals_closed(df, month_start, month_end)
         pipe_metrics = calculate_pipe_metrics(df, month_start, month_end)
         closing_projections = calculate_closing_projections(df)
