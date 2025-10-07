@@ -1063,6 +1063,7 @@ async def get_custom_analytics(
             week_end=custom_end,
             meeting_generation=meeting_generation,
             meetings_attended=meetings_attended,
+            ae_performance=ae_performance,
             attribution=attribution,
             deals_closed=deals_closed,
             pipe_metrics=pipe_metrics,
