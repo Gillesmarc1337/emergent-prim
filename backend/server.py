@@ -771,6 +771,7 @@ async def get_yearly_analytics(year: int = 2025):
             'week_end': year_end,      # Use year_end for compatibility
             'meeting_generation': meeting_generation,
             'meetings_attended': meetings_attended,
+            'ae_performance': ae_performance,
             'attribution': attribution,
             'deals_closed': deals_closed,
             'pipe_metrics': pipe_metrics,
