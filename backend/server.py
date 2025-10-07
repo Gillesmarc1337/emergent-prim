@@ -910,13 +910,12 @@ async def get_dashboard_analytics():
             })
         
         # Calculate YTD metrics for 2025 (correct values)
-        # YTD closed revenue for 2025 (as specified)
-        ytd_revenue = 4500000.0  # Correct YTD Revenue 2025
+        # YTD closed revenue from actual data (Jul-Sep 2025)
+        ytd_closed_revenue = 492396 + 454800 + 182400  # Jul + Aug + Sep 2025
+        ytd_revenue = float(ytd_closed_revenue)
         
-        # Annual target 2025 (H1 estimated + H2 actual)
-        h1_estimated_target = 4200000  # Estimated Jan-June 2025 target
-        h2_actual_target = 4800000     # Jul-Dec 2025 target (from your data)
-        annual_target_2025 = h1_estimated_target + h2_actual_target
+        # Annual target 2025 (corrected target)
+        annual_target_2025 = 4500000.0  # Correct annual target for 2025
         
         # Total pipeline
         active_pipeline = df[~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost'])]
