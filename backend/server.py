@@ -389,14 +389,28 @@ def calculate_deals_closed(df, start_date, end_date):
     mrr_sum = float(closed_deals['expected_mrr'].sum())
     avg_deal = float(closed_deals['expected_arr'].mean() if len(closed_deals) > 0 else 0)
     
+    # Calculate period length to adjust targets
+    period_days = (end_date - start_date).days
+    monthly_target_deals = 3  # More realistic based on your data
+    monthly_target_arr = 200000  # More realistic based on your data
+    
+    # Adjust targets based on period length
+    if period_days <= 31:  # Monthly or shorter
+        target_deals = monthly_target_deals
+        target_arr = monthly_target_arr
+    else:  # Longer periods
+        months_in_period = period_days / 30.0
+        target_deals = int(monthly_target_deals * months_in_period)
+        target_arr = monthly_target_arr * months_in_period
+
     return {
         'deals_closed': deals_count,
-        'target_deals': 5,
+        'target_deals': target_deals,
         'arr_closed': arr_sum,
-        'target_arr': 300000,
+        'target_arr': target_arr,
         'mrr_closed': mrr_sum,
         'avg_deal_size': avg_deal,
-        'on_track': bool(deals_count >= 5 and arr_sum >= 300000),
+        'on_track': bool(deals_count >= target_deals or arr_sum >= target_arr),
         'deals_detail': clean_records(closed_deals[['client', 'expected_arr', 'owner', 'type_of_deal']].to_dict('records')),
         'monthly_closed': monthly_closed
     }
