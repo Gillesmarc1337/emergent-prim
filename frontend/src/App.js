@@ -536,14 +536,14 @@ function MainDashboard() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <MetricCard
-              title="Annual Target 2025"
+              title="H2 2025 Target"
               value={dashboardData.key_metrics.annual_target_2025}
               unit="$"
               icon={Target}
               color="blue"
             />
             <MetricCard
-              title="YTD Closed 2025"
+              title="Jul-Dec Closed 2025"
               value={dashboardData.key_metrics.ytd_closed_2025}
               target={dashboardData.key_metrics.annual_target_2025}
               unit="$"
@@ -551,7 +551,7 @@ function MainDashboard() {
               color="green"
             />
             <MetricCard
-              title="Remaining Target"
+              title="Remaining H2 Target"
               value={dashboardData.key_metrics.annual_target_2025 - dashboardData.key_metrics.ytd_closed_2025}
               unit="$"
               icon={AlertCircle}
