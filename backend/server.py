@@ -211,11 +211,11 @@ def read_google_sheet(sheet_url: str, sheet_name: str = None):
             detail=f"Error reading Google Sheet: {str(e)}. Make sure the sheet is publicly accessible."
         )
 
-def calculate_meeting_generation(df, week_start, week_end):
-    """Calculate meeting generation metrics for last 7 days"""
-    week_data = df[
-        (df['discovery_date'] >= week_start) & 
-        (df['discovery_date'] <= week_end)
+def calculate_meeting_generation(df, start_date, end_date):
+    """Calculate meeting generation metrics for specified period"""
+    period_data = df[
+        (df['discovery_date'] >= start_date) & 
+        (df['discovery_date'] <= end_date)
     ]
     
     # Split by source type
