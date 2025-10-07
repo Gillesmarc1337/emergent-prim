@@ -229,7 +229,7 @@ def calculate_meeting_generation(df, start_date, end_date):
     not_relevant = period_data[period_data['relevance'] == 'Not relevant']
     
     # BDR level detail
-    bdr_stats = week_data.groupby('bdr').agg({
+    bdr_stats = period_data.groupby('bdr').agg({
         'id': 'count',
         'relevance': lambda x: (x == 'Relevant').sum()
     }).rename(columns={'id': 'total_meetings', 'relevance': 'relevant_meetings'})
