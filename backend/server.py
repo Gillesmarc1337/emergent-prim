@@ -348,16 +348,30 @@ def calculate_ae_performance(df, start_date, end_date):
         (~period_data['show_noshow'].isin(['No Show']))
     ].copy()
     
-    # POA = closed / lost / legals / POA booked 
+    # POA Attended = legals, proposal send, POA Booked, Closed, lost
+    poa_attended_stages = ['B Legals', 'Legal', 'C Proposal sent', 'Proposal sent', 
+                          'D POA Booked', 'POA Booked', 'Closed Won', 'Won', 'Signed', 
+                          'Closed Lost', 'Lost', 'I Lost']
+    poa_attended_data = period_data[period_data['stage'].isin(poa_attended_stages)]
+    
+    # POA Closed = Only closed won deals
+    poa_closed_stages = ['Closed Won', 'Won', 'Signed']
+    poa_closed_data = period_data[period_data['stage'].isin(poa_closed_stages)]
+    
+    # Legacy POA definition (for backward compatibility)
     poa_stages = ['Closed Won', 'Won', 'Signed', 'Closed Lost', 'Lost', 'I Lost', 
                   'B Legals', 'D POA Booked', 'Legal', 'POA Booked']
     poa_data = period_data[period_data['stage'].isin(poa_stages)]
     
     # AE Performance calculation
     ae_performance = []
+    ae_poa_performance = []
+    
     for ae in intros_data['owner'].dropna().unique():
         ae_intros = intros_data[intros_data['owner'] == ae]
         ae_poas = poa_data[poa_data['owner'] == ae]
+        ae_poa_attended = poa_attended_data[poa_attended_data['owner'] == ae]
+        ae_poa_closed = poa_closed_data[poa_closed_data['owner'] == ae]
         
         # Relevant intros (assuming relevant means they progressed)
         relevant_intros = ae_intros[ae_intros['relevance'] == 'Relevant']
@@ -373,6 +387,13 @@ def calculate_ae_performance(df, start_date, end_date):
             'poa_fait': len(ae_poas),
             'closing': len(closed_won),
             'valeur_closing': closing_value
+        })
+        
+        # POA Performance metrics
+        ae_poa_performance.append({
+            'ae': str(ae),
+            'poa_attended': len(ae_poa_attended),
+            'poa_closed': len(ae_poa_closed)
         })
     
     # Sort by intros attended descending
