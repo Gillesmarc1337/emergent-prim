@@ -582,8 +582,8 @@ async def get_monthly_analytics(month_offset: int = 0):
         }
         
         analytics = WeeklyAnalytics(
-            week_start=week_start,
-            week_end=week_end,
+            week_start=month_start,
+            week_end=month_end,
             meeting_generation=meeting_generation,
             meetings_attended=meetings_attended,
             attribution=attribution,
