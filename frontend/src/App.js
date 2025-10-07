@@ -630,7 +630,7 @@ function Dashboard() {
 
   useEffect(() => {
     loadAnalytics();
-  }, [monthOffset, dateRange, useCustomDate]);
+  }, [monthOffset, dateRange, useCustomDate, viewMode]);
 
   const handleUploadSuccess = () => {
     loadAnalytics();
