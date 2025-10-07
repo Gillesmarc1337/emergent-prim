@@ -954,7 +954,7 @@ async def get_dashboard_analytics():
         
         return {
             'monthly_revenue_chart': months_data,
-            'annual_targets_2025': annual_targets_2025,
+            'annual_targets_2025': period_targets_2025,
             'key_metrics': {
                 'ytd_revenue': ytd_revenue,
                 'ytd_target': ytd_target,
