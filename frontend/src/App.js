@@ -1066,6 +1066,59 @@ function Dashboard() {
               </Card>
             </div>
 
+            {/* Meetings Details Table */}
+            {analytics.meeting_generation.meetings_details && analytics.meeting_generation.meetings_details.length > 0 && (
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle>Meeting Details</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left p-2 font-semibold">Date</th>
+                          <th className="text-left p-2 font-semibold">Client / Prospect</th>
+                          <th className="text-left p-2 font-semibold">Owner (BDR)</th>
+                          <th className="text-left p-2 font-semibold">Source</th>
+                          <th className="text-center p-2 font-semibold">Relevance</th>
+                          <th className="text-left p-2 font-semibold">Owner</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {analytics.meeting_generation.meetings_details.map((meeting, index) => (
+                          <tr key={index} className="border-b hover:bg-gray-50">
+                            <td className="p-2">{meeting.date}</td>
+                            <td className="p-2 font-medium">{meeting.client}</td>
+                            <td className="p-2">{meeting.bdr}</td>
+                            <td className="p-2">
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                meeting.source === 'Inbound' ? 'bg-blue-100 text-blue-800' :
+                                meeting.source === 'Outbound' ? 'bg-green-100 text-green-800' :
+                                meeting.source.includes('referral') ? 'bg-purple-100 text-purple-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {meeting.source}
+                              </span>
+                            </td>
+                            <td className="p-2 text-center">
+                              <span className={`inline-flex items-center w-3 h-3 rounded-full ${
+                                meeting.relevance === 'Relevant' ? 'bg-green-500' :
+                                meeting.relevance === 'Question mark' || meeting.relevance === 'Maybe' ? 'bg-yellow-500' :
+                                meeting.relevance === 'Not relevant' ? 'bg-red-500' :
+                                'bg-gray-500'
+                              }`}></span>
+                            </td>
+                            <td className="p-2">{meeting.owner}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* BDR Performance */}
             {Object.keys(analytics.meeting_generation.bdr_performance).length > 0 && (
               <Card>
