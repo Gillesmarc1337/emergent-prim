@@ -693,6 +693,126 @@ async def get_custom_analytics(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating custom analytics: {str(e)}")
 
+@api_router.get("/analytics/dashboard")
+async def get_dashboard_analytics():
+    """Generate main dashboard with revenue charts"""
+    try:
+        # Get data from MongoDB
+        records = await db.sales_records.find().to_list(10000)
+        if not records:
+            raise HTTPException(status_code=404, detail="No sales data found. Please upload data first.")
+        
+        # Convert to DataFrame for analysis
+        df = pd.DataFrame(records)
+        
+        # Convert date strings back to datetime
+        date_columns = ['discovery_date', 'poa_date', 'billing_start', 'created_at']
+        for col in date_columns:
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors='coerce')
+        
+        # Get current date and last 12 months
+        today = datetime.now()
+        months_data = []
+        
+        for i in range(12, -6, -1):  # 12 months back to 6 months forward
+            if i > 0:
+                # Past months
+                target_date = today - timedelta(days=30 * i)
+                month_start, month_end = get_month_range(target_date, 0)
+                
+                # Closed revenue
+                closed_deals = df[
+                    (df['billing_start'] >= month_start) & 
+                    (df['billing_start'] <= month_end) &
+                    (df['stage'].isin(['Closed Won', 'Won', 'Signed']))
+                ]
+                closed_revenue = float(closed_deals['expected_arr'].sum())
+                
+                # Target revenue (configurable - could be based on historical data)
+                target_revenue = 500000.0  # Example target
+                
+                # Weighted pipeline (for current and future months only)
+                weighted_pipe = 0.0
+                
+            else:
+                # Current and future months
+                if i == 0:
+                    target_date = today
+                else:
+                    target_date = today + timedelta(days=30 * abs(i))
+                
+                month_start, month_end = get_month_range(target_date, 0)
+                
+                # Closed revenue for current month
+                closed_deals = df[
+                    (df['billing_start'] >= month_start) & 
+                    (df['billing_start'] <= month_end) &
+                    (df['stage'].isin(['Closed Won', 'Won', 'Signed']))
+                ]
+                closed_revenue = float(closed_deals['expected_arr'].sum())
+                
+                # Target revenue
+                target_revenue = 500000.0
+                
+                # Weighted pipeline calculation
+                active_deals = df[~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost'])]
+                stage_probabilities = {
+                    'E Verbal commit': 90,
+                    'D Negotiation': 70,
+                    'C Proposal sent': 50,
+                    'B Discovery completed': 30,
+                    'A Discovery scheduled': 10
+                }
+                
+                active_deals['probability'] = active_deals['stage'].map(stage_probabilities).fillna(0)
+                active_deals['weighted_value'] = active_deals['pipeline'] * active_deals['probability'] / 100
+                
+                # Filter deals likely to close in this month
+                month_weighted_deals = active_deals[active_deals['probability'] >= 30]
+                weighted_pipe = float(month_weighted_deals['weighted_value'].sum())
+            
+            months_data.append({
+                'month': target_date.strftime('%b %Y'),
+                'target_revenue': target_revenue,
+                'closed_revenue': closed_revenue,
+                'weighted_pipe': weighted_pipe,
+                'is_future': i <= 0
+            })
+        
+        # Calculate key metrics
+        ytd_closed = df[
+            (df['billing_start'] >= datetime(today.year, 1, 1)) &
+            (df['stage'].isin(['Closed Won', 'Won', 'Signed']))
+        ]
+        ytd_revenue = float(ytd_closed['expected_arr'].sum())
+        ytd_target = 6000000.0  # Annual target
+        
+        # Total pipeline
+        active_pipeline = df[~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost'])]
+        total_pipeline = float(active_pipeline['pipeline'].sum())
+        
+        # Weighted pipeline
+        active_pipeline['probability'] = active_pipeline['stage'].map(stage_probabilities).fillna(0)
+        active_pipeline['weighted_value'] = active_pipeline['pipeline'] * active_pipeline['probability'] / 100
+        total_weighted_pipeline = float(active_pipeline['weighted_value'].sum())
+        
+        return {
+            'monthly_revenue_chart': months_data,
+            'key_metrics': {
+                'ytd_revenue': ytd_revenue,
+                'ytd_target': ytd_target,
+                'ytd_progress': (ytd_revenue / ytd_target * 100) if ytd_target > 0 else 0,
+                'total_pipeline': total_pipeline,
+                'weighted_pipeline': total_weighted_pipeline,
+                'deals_count': len(active_pipeline),
+                'avg_deal_size': float(active_pipeline['pipeline'].mean()) if len(active_pipeline) > 0 else 0
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating dashboard analytics: {str(e)}")
+
 @api_router.get("/data/records")
 async def get_sales_records(limit: int = 100):
     """Get sales records"""
