@@ -814,17 +814,14 @@ async def get_dashboard_analytics():
         today = datetime.now()
         months_data = []
         
-        # Generate data for 18 months (12 back + 6 forward)
-        for i in range(12, -6, -1):
-            if i > 0:
-                # Past months
-                target_date = today - timedelta(days=30 * i)
-            else:
-                # Current and future months
-                if i == 0:
-                    target_date = today
-                else:
-                    target_date = today + timedelta(days=30 * abs(i))
+        # Focus on July to December 2025 period
+        base_date = datetime(2025, 7, 1)  # July 2025 as starting point
+        
+        # Generate data for July 2025 to December 2025 (6 months)
+        target_months = []
+        for month_offset in range(6):  # July, Aug, Sep, Oct, Nov, Dec
+            target_date = base_date.replace(month=base_date.month + month_offset)
+            target_months.append(target_date)
             
             month_start, month_end = get_month_range(target_date, 0)
             month_str = target_date.strftime('%b %Y')
