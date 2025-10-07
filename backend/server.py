@@ -890,14 +890,23 @@ async def get_dashboard_analytics():
         today = datetime.now()
         months_data = []
         
-        # Focus on July to December 2025 period
-        base_date = datetime(2025, 7, 1)  # July 2025 as starting point
+        # Check if we need full year or H2 view based on request
+        # Default to July-December 2025 (H2) but allow for full year
+        is_yearly_view = False  # This could be a parameter in future
         
-        # Generate data for July 2025 to December 2025 (6 months)
-        target_months = []
-        for month_offset in range(6):  # July, Aug, Sep, Oct, Nov, Dec
-            target_date = base_date.replace(month=base_date.month + month_offset)
-            target_months.append(target_date)
+        if is_yearly_view:
+            # Full year 2025: January to December
+            target_months = []
+            for month_num in range(1, 13):  # Jan to Dec
+                target_date = datetime(2025, month_num, 1)
+                target_months.append(target_date)
+        else:
+            # Focus on July to December 2025 period (H2)
+            base_date = datetime(2025, 7, 1)  # July 2025 as starting point
+            target_months = []
+            for month_offset in range(6):  # July, Aug, Sep, Oct, Nov, Dec
+                target_date = base_date.replace(month=base_date.month + month_offset)
+                target_months.append(target_date)
         
         for target_date in target_months:
             month_start, month_end = get_month_range(target_date, 0)
