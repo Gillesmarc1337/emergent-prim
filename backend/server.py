@@ -778,15 +778,22 @@ async def get_monthly_analytics(month_offset: int = 0):
         focus_month_str = focus_month.strftime('%b %Y')
         
         # Block 1: Meetings to generate (for selected month)
-        monthly_meeting_targets = {
-            7: {'total': 50, 'inbound': 15, 'outbound': 25, 'referral': 10},
-            8: {'total': 52, 'inbound': 16, 'outbound': 26, 'referral': 10},
-            9: {'total': 55, 'inbound': 17, 'outbound': 28, 'referral': 10},
-            10: {'total': 60, 'inbound': 18, 'outbound': 32, 'referral': 10},
-            11: {'total': 58, 'inbound': 18, 'outbound': 30, 'referral': 10},
-            12: {'total': 65, 'inbound': 20, 'outbound': 35, 'referral': 10}
-        }
-        current_target = monthly_meeting_targets.get(focus_month_num, {'total': 55, 'inbound': 17, 'outbound': 28, 'referral': 10})
+        # Fixed targets as per user requirements: 20 inbound, 15 outbound, 10 referral per month
+        target_inbound = 20
+        target_outbound = 15
+        target_referral = 10
+        target_total = target_inbound + target_outbound + target_referral
+        
+        # Calculate actual values for the focus month
+        focus_month_meetings = df[
+            (df['discovery_date'] >= month_start) & 
+            (df['discovery_date'] <= month_end)
+        ]
+        
+        actual_inbound = len(focus_month_meetings[focus_month_meetings['type_of_source'] == 'Inbound'])
+        actual_outbound = len(focus_month_meetings[focus_month_meetings['type_of_source'] == 'Outbound'])
+        actual_referral = len(focus_month_meetings[focus_month_meetings['type_of_source'].isin(['Internal referral', 'Client referral'])])
+        actual_total = actual_inbound + actual_outbound + actual_referral
         
         # Block 2: Discovery & POA (filtered for focus month)
         discovery_data = df[
