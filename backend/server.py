@@ -653,9 +653,9 @@ async def get_yearly_analytics(year: int = 2025):
         
         # Attribution analysis
         attribution = {
-            'intro_attribution': df.groupby('type_of_source')['id'].count().to_dict(),
-            'disco_attribution': df[~df['discovery_date'].isna()].groupby('type_of_source')['id'].count().to_dict(),
-            'bdr_attribution': df.groupby('bdr')['id'].count().to_dict()
+            'intro_attribution': {k: int(v) for k, v in df.groupby('type_of_source')['id'].count().to_dict().items()},
+            'disco_attribution': {k: int(v) for k, v in df[~df['discovery_date'].isna()].groupby('type_of_source')['id'].count().to_dict().items()},
+            'bdr_attribution': {k: int(v) for k, v in df.groupby('bdr')['id'].count().to_dict().items()}
         }
         
         # Old pipe (reviving deals)
