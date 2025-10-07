@@ -796,6 +796,11 @@ async def get_monthly_analytics(month_offset: int = 0):
         actual_total = actual_inbound + actual_outbound + actual_referral
         
         # Block 2: Discovery & POA (filtered for focus month)
+        # Targets: 45 discovery, 18 POA per month
+        target_discovery = 45
+        target_poa = 18
+        
+        # Discovery: all deals except inbox and intro no show
         discovery_data = df[
             (df['discovery_date'] >= month_start) & 
             (df['discovery_date'] <= month_end) &
@@ -803,14 +808,14 @@ async def get_monthly_analytics(month_offset: int = 0):
             (~df['stage'].isin(['F Inbox'])) &
             (~df['show_noshow'].isin(['No Show']))
         ]
-        discovery_count = len(discovery_data)
+        actual_discovery = len(discovery_data)
         
         poa_data = df[
             (df['discovery_date'] >= month_start) & 
             (df['discovery_date'] <= month_end) &
             df['stage'].isin(['D POA Booked', 'B Legals', 'Closed Won', 'Won', 'Signed'])
         ]
-        poa_count = len(poa_data)
+        actual_poa = len(poa_data)
         
         # Block 3: Pipe creation
         new_pipe_focus_month = df[
