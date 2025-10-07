@@ -1748,6 +1748,102 @@ function Dashboard() {
                 </Card>
               ))}
             </div>
+
+            {/* POA Performance Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* AE POA Performance Table */}
+              <div className="lg:col-span-1">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>AE POA Performance</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left p-2 font-semibold">AE</th>
+                            <th className="text-right p-2 font-semibold">POA Attended</th>
+                            <th className="text-right p-2 font-semibold">POA Closed</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {analytics.ae_performance.ae_poa_performance.map((ae, index) => (
+                            <tr key={index} className="border-b hover:bg-gray-50">
+                              <td className="p-2 font-medium">{ae.ae}</td>
+                              <td className="text-right p-2">{ae.poa_attended}</td>
+                              <td className="text-right p-2">{ae.poa_closed}</td>
+                            </tr>
+                          ))}
+                          {/* Total Row */}
+                          <tr className="border-t-2 font-bold">
+                            <td className="p-2">Total</td>
+                            <td className="text-right p-2">{analytics.ae_performance.total_metrics.total_poa_attended}</td>
+                            <td className="text-right p-2">{analytics.ae_performance.total_metrics.total_poa_closed}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* POA Attended Details List */}
+              <div className="lg:col-span-2">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>POA Attended Details</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto max-h-96">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b sticky top-0 bg-white">
+                            <th className="text-left p-2 font-semibold">Date</th>
+                            <th className="text-left p-2 font-semibold">Client</th>
+                            <th className="text-left p-2 font-semibold">AE</th>
+                            <th className="text-left p-2 font-semibold">Stage</th>
+                            <th className="text-center p-2 font-semibold">Relevance</th>
+                            <th className="text-right p-2 font-semibold">Expected ARR</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {analytics.ae_performance.poa_attended_details.map((poa, index) => (
+                            <tr key={index} className="border-b hover:bg-gray-50">
+                              <td className="p-2">{poa.date}</td>
+                              <td className="p-2 font-medium">{poa.client}</td>
+                              <td className="p-2">{poa.ae}</td>
+                              <td className="p-2">
+                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                  poa.stage?.includes('Won') || poa.stage?.includes('Closed Won') ? 'bg-green-100 text-green-800' :
+                                  poa.stage?.includes('Lost') ? 'bg-red-100 text-red-800' :
+                                  poa.stage?.includes('POA') || poa.stage?.includes('Legal') ? 'bg-blue-100 text-blue-800' :
+                                  poa.stage?.includes('Proposal') ? 'bg-purple-100 text-purple-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {poa.stage}
+                                </span>
+                              </td>
+                              <td className="p-2 text-center">
+                                <span className={`inline-flex items-center w-3 h-3 rounded-full ${
+                                  poa.relevance === 'Relevant' ? 'bg-green-500' :
+                                  poa.relevance === 'Question mark' || poa.relevance === 'Maybe' ? 'bg-yellow-500' :
+                                  poa.relevance === 'Not relevant' ? 'bg-red-500' :
+                                  'bg-gray-500'
+                                }`}></span>
+                              </td>
+                              <td className="text-right p-2">
+                                ${poa.expected_arr.toLocaleString()}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </div>
         </TabsContent>
       </Tabs>
