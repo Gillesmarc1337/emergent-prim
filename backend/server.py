@@ -1192,6 +1192,11 @@ async def get_dashboard_analytics():
         else:
             focus_month_end = focus_month.replace(month=focus_month_num + 1, day=1) - timedelta(seconds=1)
         
+        # Block 2: Discovery & POA (filtered for focus month)
+        # Targets: 45 discovery, 18 POA per month
+        target_discovery = 45
+        target_poa = 18
+        
         # Discovery = everything except "F Inbox" and "No Show" for the focus month
         discovery_data = df[
             (df['discovery_date'] >= focus_month_start) & 
@@ -1200,7 +1205,7 @@ async def get_dashboard_analytics():
             (~df['stage'].isin(['F Inbox'])) &
             (~df['show_noshow'].isin(['No Show']))
         ]
-        discovery_count = len(discovery_data)
+        actual_discovery = len(discovery_data)
         
         # POA = "D POA Booked", "B Legals", "Closed Won", "Won", "Signed" for the focus month
         poa_data = df[
@@ -1208,7 +1213,7 @@ async def get_dashboard_analytics():
             (df['discovery_date'] <= focus_month_end) &
             df['stage'].isin(['D POA Booked', 'B Legals', 'Closed Won', 'Won', 'Signed'])
         ]
-        poa_count = len(poa_data)
+        actual_poa = len(poa_data)
         
         # Block 3: Pipe creation (for focus month)
         new_pipe_focus_month = df[
