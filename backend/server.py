@@ -290,7 +290,7 @@ def calculate_meetings_attended(df, start_date, end_date):
     
     # Convert numpy types to Python native types
     attended_count = int(len(attended))
-    scheduled_count = int(len(week_data))
+    scheduled_count = int(len(period_data))
     discoveries_count = int(len(discoveries))
     poa_count = int(len(poa_meetings))
     
