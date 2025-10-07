@@ -966,8 +966,9 @@ async def get_dashboard_analytics():
             'annual_targets_2025': period_targets_2025,
             'key_metrics': {
                 'ytd_revenue': ytd_revenue,
-                'ytd_target': ytd_target,
-                'ytd_progress': (ytd_revenue / ytd_target * 100) if ytd_target > 0 else 0,
+                'ytd_target': annual_target_2025,
+                'ytd_progress': (ytd_revenue / annual_target_2025 * 100) if annual_target_2025 > 0 else 0,
+                'ytd_remaining': annual_target_2025 - ytd_revenue,
                 'total_pipeline': total_pipeline,
                 'weighted_pipeline': total_weighted_pipeline,
                 'deals_count': len(active_pipeline),
