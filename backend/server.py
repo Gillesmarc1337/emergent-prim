@@ -963,7 +963,7 @@ async def get_dashboard_analytics():
                 'weighted_pipeline': total_weighted_pipeline,
                 'deals_count': len(active_pipeline),
                 'avg_deal_size': float(active_pipeline['pipeline'].mean()) if len(active_pipeline) > 0 else 0,
-                'annual_target_2025': sum(monthly_targets_2025.values()),
+                'annual_target_2025': cumulative_target,
                 'ytd_closed_2025': cumulative_closed
             }
         }
