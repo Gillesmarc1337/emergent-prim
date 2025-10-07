@@ -746,73 +746,90 @@ async def get_dashboard_analytics():
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors='coerce')
         
-        # Get current date and last 12 months
+        # Monthly targets for 2025 (configurable)
+        monthly_targets_2025 = {
+            'Jan 2025': 500000, 'Feb 2025': 520000, 'Mar 2025': 540000, 'Apr 2025': 560000,
+            'May 2025': 580000, 'Jun 2025': 600000, 'Jul 2025': 620000, 'Aug 2025': 640000,
+            'Sep 2025': 660000, 'Oct 2025': 680000, 'Nov 2025': 700000, 'Dec 2025': 720000
+        }
+        
+        # Get current date and analyze data
         today = datetime.now()
         months_data = []
         
-        for i in range(12, -6, -1):  # 12 months back to 6 months forward
+        # Generate data for 18 months (12 back + 6 forward)
+        for i in range(12, -6, -1):
             if i > 0:
                 # Past months
                 target_date = today - timedelta(days=30 * i)
-                month_start, month_end = get_month_range(target_date, 0)
-                
-                # Closed revenue
-                closed_deals = df[
-                    (df['billing_start'] >= month_start) & 
-                    (df['billing_start'] <= month_end) &
-                    (df['stage'].isin(['Closed Won', 'Won', 'Signed']))
-                ]
-                closed_revenue = float(closed_deals['expected_arr'].sum())
-                
-                # Target revenue (configurable - could be based on historical data)
-                target_revenue = 500000.0  # Example target
-                
-                # Weighted pipeline (for current and future months only)
-                weighted_pipe = 0.0
-                
             else:
                 # Current and future months
                 if i == 0:
                     target_date = today
                 else:
                     target_date = today + timedelta(days=30 * abs(i))
-                
-                month_start, month_end = get_month_range(target_date, 0)
-                
-                # Closed revenue for current month
-                closed_deals = df[
+            
+            month_start, month_end = get_month_range(target_date, 0)
+            month_str = target_date.strftime('%b %Y')
+            
+            # Find closed deals using billing_start or stage analysis
+            closed_deals = df[
+                (
                     (df['billing_start'] >= month_start) & 
-                    (df['billing_start'] <= month_end) &
-                    (df['stage'].isin(['Closed Won', 'Won', 'Signed']))
+                    (df['billing_start'] <= month_end)
+                ) |
+                (
+                    (df['stage'].isin(['Closed Won', 'Won', 'Signed', 'B Legals'])) &
+                    (df['discovery_date'] >= month_start) & 
+                    (df['discovery_date'] <= month_end)
+                )
+            ]
+            
+            # Remove rows with empty/null values for ARR
+            closed_deals_clean = closed_deals[
+                (closed_deals['expected_arr'].notna()) & 
+                (closed_deals['expected_arr'] != 0) & 
+                (closed_deals['expected_arr'] != '')
+            ]
+            
+            closed_revenue = float(closed_deals_clean['expected_arr'].sum())
+            
+            # Get target for this month
+            target_revenue = monthly_targets_2025.get(month_str, 500000.0)
+            
+            # Weighted pipeline for current/future months
+            if i <= 0:  # Current and future months
+                active_deals = df[
+                    (df['stage'].notna()) & 
+                    (~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost', 'F Inbox'])) &
+                    (df['pipeline'].notna()) & 
+                    (df['pipeline'] != 0)
                 ]
-                closed_revenue = float(closed_deals['expected_arr'].sum())
                 
-                # Target revenue
-                target_revenue = 500000.0
-                
-                # Weighted pipeline calculation
-                active_deals = df[~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost'])]
+                # Map stages to probabilities based on your data structure
                 stage_probabilities = {
+                    'D POA Booked': 70,
+                    'C Proposal sent': 50, 
+                    'B Legals': 80,  # High probability based on your data
                     'E Verbal commit': 90,
-                    'D Negotiation': 70,
-                    'C Proposal sent': 50,
-                    'B Discovery completed': 30,
-                    'A Discovery scheduled': 10
+                    'A Discovery scheduled': 20
                 }
                 
-                active_deals['probability'] = active_deals['stage'].map(stage_probabilities).fillna(0)
+                active_deals['probability'] = active_deals['stage'].map(stage_probabilities).fillna(10)
                 active_deals['weighted_value'] = active_deals['pipeline'] * active_deals['probability'] / 100
                 
-                # Filter deals likely to close in this month
-                month_weighted_deals = active_deals[active_deals['probability'] >= 30]
-                weighted_pipe = float(month_weighted_deals['weighted_value'].sum())
+                # Sum weighted pipeline for deals likely to close
+                weighted_pipe = float(active_deals['weighted_value'].sum())
+            else:
+                weighted_pipe = 0.0
             
             months_data.append({
-                'month': target_date.strftime('%b %Y'),
+                'month': month_str,
                 'target_revenue': target_revenue,
                 'closed_revenue': closed_revenue,
                 'weighted_pipe': weighted_pipe,
-                'is_future': i <= 0
+                'is_future': i <= 0,
+                'deals_count': len(closed_deals_clean)
             })
         
         # Calculate key metrics
