@@ -594,7 +594,7 @@ function MainDashboard() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-center">Meeting Generation</CardTitle>
-              <CardDescription className="text-center">
+              <CardDescription className="text-center font-medium text-blue-600">
                 {dashboardData.dashboard_blocks.block_1_meetings.period}
               </CardDescription>
             </CardHeader>
