@@ -247,7 +247,7 @@ def calculate_meeting_generation(df, start_date, end_date):
             'relevant': int(len(relevant)),
             'question_mark': int(len(question_mark)),
             'not_relevant': int(len(not_relevant)),
-            'relevance_rate': float(len(relevant) / len(week_data) * 100 if len(week_data) > 0 else 0)
+            'relevance_rate': float(len(relevant) / len(period_data) * 100 if len(period_data) > 0 else 0)
         },
         'bdr_performance': {k: {
             'total_meetings': int(v['total_meetings']),
