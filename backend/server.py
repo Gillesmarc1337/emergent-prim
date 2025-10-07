@@ -273,12 +273,12 @@ def calculate_meetings_attended(df, start_date, end_date):
                  ('Closed Lost' if x in ['Closed Lost', 'Lost', 'I Lost'] else 'Open')
     )
     
-    attended = week_data[week_data['show_noshow'] == 'Show']
-    discoveries = week_data[~week_data['discovery_date'].isna()]
-    poa_meetings = week_data[~week_data['poa_date'].isna()]
+    attended = period_data[period_data['show_noshow'] == 'Show']
+    discoveries = period_data[~period_data['discovery_date'].isna()]
+    poa_meetings = period_data[~period_data['poa_date'].isna()]
     
     # AE level performance
-    ae_stats = week_data.groupby('owner').agg({
+    ae_stats = period_data.groupby('owner').agg({
         'id': 'count',
         'show_noshow': lambda x: (x == 'Show').sum(),
         'poa_date': lambda x: x.notna().sum()
