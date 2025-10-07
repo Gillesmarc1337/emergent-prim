@@ -1111,6 +1111,16 @@ function Dashboard() {
                               }`}></span>
                             </td>
                             <td className="p-2">{meeting.owner}</td>
+                            <td className="p-2">
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                meeting.stage?.includes('Won') || meeting.stage?.includes('Closed Won') ? 'bg-green-100 text-green-800' :
+                                meeting.stage?.includes('Lost') ? 'bg-red-100 text-red-800' :
+                                meeting.stage?.includes('POA') || meeting.stage?.includes('Legal') ? 'bg-blue-100 text-blue-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {meeting.stage}
+                              </span>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
