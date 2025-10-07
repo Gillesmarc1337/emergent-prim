@@ -686,31 +686,31 @@ function MainDashboard({ analytics }) {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-center">Revenue Objective</CardTitle>
               <CardDescription className="text-center font-medium text-gray-600">
-                {dashboardData.dashboard_blocks.block_4_revenue.period}
+                {analytics.dashboard_blocks.block_4_revenue.period}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="text-center">
                   <div className="text-lg font-bold text-gray-600">
-                    ${(dashboardData.dashboard_blocks.block_4_revenue.revenue_target / 1000).toFixed(0)}K
+                    ${(analytics.dashboard_blocks.block_4_revenue.revenue_target / 1000).toFixed(0)}K
                   </div>
                   <div className="text-xs text-gray-600">Target</div>
                 </div>
                 <div className="text-center">
                   <div className="text-lg font-bold text-green-600">
-                    ${(dashboardData.dashboard_blocks.block_4_revenue.closed_revenue / 1000).toFixed(0)}K
+                    ${(analytics.dashboard_blocks.block_4_revenue.closed_revenue / 1000).toFixed(0)}K
                   </div>
                   <div className="text-xs text-gray-600">Closed</div>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
                     className="bg-green-500 h-2 rounded-full" 
-                    style={{ width: `${Math.min(dashboardData.dashboard_blocks.block_4_revenue.progress, 100)}%` }}
+                    style={{ width: `${Math.min(analytics.dashboard_blocks.block_4_revenue.progress, 100)}%` }}
                   ></div>
                 </div>
                 <div className="text-center text-xs text-gray-600">
-                  {dashboardData.dashboard_blocks.block_4_revenue.progress.toFixed(1)}% Complete
+                  {analytics.dashboard_blocks.block_4_revenue.progress.toFixed(1)}% Complete
                 </div>
               </div>
             </CardContent>
