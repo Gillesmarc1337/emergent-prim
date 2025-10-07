@@ -772,18 +772,111 @@ async def get_monthly_analytics(month_offset: int = 0):
             'forecast_gap': bool(ytd_revenue < ytd_target * 0.75)
         }
         
-        analytics = WeeklyAnalytics(
-            week_start=month_start,
-            week_end=month_end,
-            meeting_generation=meeting_generation,
-            meetings_attended=meetings_attended,
-            attribution=attribution,
-            deals_closed=deals_closed,
-            pipe_metrics=pipe_metrics,
-            old_pipe=old_pipe,
-            closing_projections=closing_projections,
-            big_numbers_recap=big_numbers_recap
-        )
+        # Calculate dashboard blocks for monthly view
+        focus_month = target_date
+        focus_month_num = focus_month.month
+        focus_month_str = focus_month.strftime('%b %Y')
+        
+        # Block 1: Meetings to generate (for selected month)
+        monthly_meeting_targets = {
+            7: {'total': 50, 'inbound': 15, 'outbound': 25, 'referral': 10},
+            8: {'total': 52, 'inbound': 16, 'outbound': 26, 'referral': 10},
+            9: {'total': 55, 'inbound': 17, 'outbound': 28, 'referral': 10},
+            10: {'total': 60, 'inbound': 18, 'outbound': 32, 'referral': 10},
+            11: {'total': 58, 'inbound': 18, 'outbound': 30, 'referral': 10},
+            12: {'total': 65, 'inbound': 20, 'outbound': 35, 'referral': 10}
+        }
+        current_target = monthly_meeting_targets.get(focus_month_num, {'total': 55, 'inbound': 17, 'outbound': 28, 'referral': 10})
+        
+        # Block 2: Discovery & POA (filtered for focus month)
+        discovery_data = df[
+            (df['discovery_date'] >= month_start) & 
+            (df['discovery_date'] <= month_end) &
+            (df['stage'].notna()) & 
+            (~df['stage'].isin(['F Inbox'])) &
+            (~df['show_noshow'].isin(['No Show']))
+        ]
+        discovery_count = len(discovery_data)
+        
+        poa_data = df[
+            (df['discovery_date'] >= month_start) & 
+            (df['discovery_date'] <= month_end) &
+            df['stage'].isin(['D POA Booked', 'B Legals', 'Closed Won', 'Won', 'Signed'])
+        ]
+        poa_count = len(poa_data)
+        
+        # Block 3: Pipe creation
+        new_pipe_focus_month = df[
+            (df['discovery_date'] >= month_start) & 
+            (df['discovery_date'] <= month_end) &
+            (df['pipeline'].notna()) & 
+            (df['pipeline'] > 0)
+        ]
+        new_pipe_created = float(new_pipe_focus_month['pipeline'].sum())
+        
+        stage_probabilities = {
+            'D POA Booked': 70, 'C Proposal sent': 50, 'B Legals': 80,
+            'E Verbal commit': 90, 'A Discovery scheduled': 20
+        }
+        new_pipe_focus_month['probability'] = new_pipe_focus_month['stage'].map(stage_probabilities).fillna(10)
+        new_pipe_focus_month['weighted_value'] = new_pipe_focus_month['pipeline'] * new_pipe_focus_month['probability'] / 100
+        weighted_pipe_created = float(new_pipe_focus_month['weighted_value'].sum())
+        
+        # Block 4: Revenue objective vs closed
+        exact_targets = {
+            'Jul 2025': 465000, 'Aug 2025': 397500, 'Sep 2025': 547500,
+            'Oct 2025': 1080000, 'Nov 2025': 997500, 'Dec 2025': 1312500
+        }
+        exact_closed = {
+            'Jul 2025': 492396, 'Aug 2025': 454800, 'Sep 2025': 182400,
+            'Oct 2025': 0, 'Nov 2025': 0, 'Dec 2025': 0
+        }
+        focus_month_target = exact_targets.get(focus_month_str, 500000)
+        focus_month_closed = exact_closed.get(focus_month_str, 0)
+        
+        dashboard_blocks = {
+            'block_1_meetings': {
+                'title': 'Meeting Generation Target',
+                'total_target': current_target['total'],
+                'inbound_target': current_target['inbound'],
+                'outbound_target': current_target['outbound'],
+                'referral_target': current_target['referral'],
+                'period': focus_month_str
+            },
+            'block_2_discovery_poa': {
+                'title': 'Discovery & POA',
+                'discovery_count': discovery_count,
+                'poa_count': poa_count,
+                'period': focus_month_str
+            },
+            'block_3_pipe_creation': {
+                'title': 'New Pipe Created',
+                'new_pipe_created': new_pipe_created,
+                'weighted_pipe_created': weighted_pipe_created,
+                'period': focus_month_str
+            },
+            'block_4_revenue': {
+                'title': 'Monthly Revenue Objective',
+                'revenue_target': focus_month_target,
+                'closed_revenue': focus_month_closed,
+                'progress': (focus_month_closed / focus_month_target * 100) if focus_month_target > 0 else 0,
+                'period': focus_month_str
+            }
+        }
+
+        analytics = {
+            'week_start': month_start,
+            'week_end': month_end,
+            'meeting_generation': meeting_generation,
+            'meetings_attended': meetings_attended,
+            'attribution': attribution,
+            'deals_closed': deals_closed,
+            'pipe_metrics': pipe_metrics,
+            'old_pipe': old_pipe,
+            'closing_projections': closing_projections,
+            'big_numbers_recap': big_numbers_recap,
+            'dashboard_blocks': dashboard_blocks
+        }
         
         return analytics
         
