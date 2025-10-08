@@ -744,7 +744,7 @@ def calculate_hot_deals_closing(df):
 def calculate_hot_leads(df):
     """Calculate additional hot leads for next 3 months (Proposal sent + PoA booked)"""
     # Filter deals in target stages
-    hot_leads = df[df['stage'].isin(['Proposal sent', 'PoA booked'])].copy()
+    hot_leads = df[df['stage'].isin(['C Proposal sent', 'D POA Booked'])].copy()
     
     if hot_leads.empty:
         return []
