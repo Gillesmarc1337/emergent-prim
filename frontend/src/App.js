@@ -1607,7 +1607,73 @@ function Dashboard() {
         {/* Deals & Pipeline */}
         <TabsContent value="deals">
           <div className="space-y-6">
-            {/* Deals Closed */}
+            {/* Year 2025 Performance */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">Year 2025 Performance</CardTitle>
+                  <CardDescription>Annual results from July to December 2025</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-4 bg-green-50 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">
+                        {(viewMode === 'yearly' ? analytics : yearlyData)?.deals_closed?.deals_closed || 'N/A'}
+                      </div>
+                      <div className="text-sm text-gray-600">Deals Closed</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        Target: {(viewMode === 'yearly' ? analytics : yearlyData)?.deals_closed?.target_deals || 'N/A'}
+                      </div>
+                    </div>
+                    <div className="text-center p-4 bg-blue-50 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600">
+                        ${((viewMode === 'yearly' ? analytics : yearlyData)?.deals_closed?.arr_closed || 0).toLocaleString()}
+                      </div>
+                      <div className="text-sm text-gray-600">ARR Closed</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        Target: ${((viewMode === 'yearly' ? analytics : yearlyData)?.deals_closed?.target_arr || 0).toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">Selected Month Performance</CardTitle>
+                  <CardDescription>
+                    {new Date(analytics.week_start).toLocaleDateString('en-US', { 
+                      month: 'long', 
+                      year: 'numeric' 
+                    })} results
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-4 bg-purple-50 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-600">
+                        {analytics.deals_closed.deals_closed}
+                      </div>
+                      <div className="text-sm text-gray-600">Deals Closed</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        This Month
+                      </div>
+                    </div>
+                    <div className="text-center p-4 bg-orange-50 rounded-lg">
+                      <div className="text-2xl font-bold text-orange-600">
+                        ${analytics.deals_closed.arr_closed.toLocaleString()}
+                      </div>
+                      <div className="text-sm text-gray-600">ARR Closed</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        This Month
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Deals Closed Details */}
             <AnalyticsSection 
               title="Deals Closed (Current Period)"
               isOnTrack={analytics.deals_closed.on_track}
