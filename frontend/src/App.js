@@ -1613,8 +1613,6 @@ function Dashboard() {
             </Card>
           </div>
         </TabsContent>
-
-      </Tabs>
       </Tabs>
     </div>
   );
