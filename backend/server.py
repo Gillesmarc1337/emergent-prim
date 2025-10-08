@@ -726,6 +726,35 @@ def calculate_closing_projections(df):
         } for k, v in ae_projections.to_dict('index').items()} if not ae_projections.empty else {}
     }
 
+def calculate_hot_deals_closing(df):
+    """Calculate hot deals closing in next 2 weeks to 30 days (legals stage)"""
+    # Filter deals in legals stage
+    legals_deals = df[df['stage'] == 'legals'].copy()
+    
+    if legals_deals.empty:
+        return []
+    
+    # Add expected closing timeframe (2 weeks to 30 days from now)
+    today = datetime.now()
+    legals_deals['expected_close_start'] = today + timedelta(days=14)
+    legals_deals['expected_close_end'] = today + timedelta(days=30)
+    
+    return clean_records(legals_deals[['id', 'client', 'pipeline', 'expected_mrr', 'expected_arr', 'owner', 'stage', 'hubspot_link']].to_dict('records'))
+
+def calculate_hot_leads(df):
+    """Calculate additional hot leads for next 3 months (Proposal sent + PoA booked)"""
+    # Filter deals in target stages
+    hot_leads = df[df['stage'].isin(['Proposal sent', 'PoA booked'])].copy()
+    
+    if hot_leads.empty:
+        return []
+    
+    # Add expected closing timeframe (next 3 months)
+    today = datetime.now()
+    hot_leads['expected_close_end'] = today + timedelta(days=90)
+    
+    return clean_records(hot_leads[['id', 'client', 'pipeline', 'expected_mrr', 'expected_arr', 'owner', 'stage', 'hubspot_link', 'poa_date']].to_dict('records'))
+
 # API Endpoints
 @api_router.get("/")
 async def root():
