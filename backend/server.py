@@ -1819,6 +1819,67 @@ async def get_hot_leads():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting hot leads: {str(e)}")
 
+@api_router.get("/projections/performance-summary")
+async def get_projections_performance_summary():
+    """Get performance summary data for projections tab (same as dashboard)"""
+    try:
+        # Get data from MongoDB
+        records = await db.sales_records.find().to_list(10000)
+        if not records:
+            raise HTTPException(status_code=404, detail="No sales data found")
+        
+        # Convert to DataFrame for analysis
+        df = pd.DataFrame(records)
+        
+        # Convert date strings back to datetime
+        date_columns = ['discovery_date', 'poa_date', 'billing_start', 'created_at']
+        for col in date_columns:
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors='coerce')
+        
+        # Calculate YTD revenue and targets (same logic as dashboard)
+        ytd_closed = df[df['stage'].isin(['Closed Won', 'Won', 'Signed', 'A Closed'])]
+        ytd_revenue = float(ytd_closed['expected_arr'].fillna(0).sum())
+        ytd_target = 3600000  # Same as dashboard
+        
+        # Calculate dashboard blocks data
+        dashboard_blocks = {}
+        
+        # Get current month data for dashboard blocks
+        today = datetime.now()
+        current_month_str = today.strftime('%b %Y')
+        
+        # Filter data for current month
+        current_month_data = df[df['discovery_date'].dt.to_period('M') == today.to_period('M')]
+        
+        # Meeting Generation metrics
+        actual_inbound = len(current_month_data[current_month_data['type_of_source'] == 'inbound'])
+        actual_outbound = len(current_month_data[current_month_data['type_of_source'] == 'outbound'])
+        actual_referral = len(current_month_data[current_month_data['type_of_source'] == 'referral'])
+        
+        dashboard_blocks['meetings'] = {
+            'period': current_month_str,
+            'inbound_actual': actual_inbound,
+            'inbound_target': 20,
+            'outbound_actual': actual_outbound,
+            'outbound_target': 15,
+            'referral_actual': actual_referral,
+            'referral_target': 10
+        }
+        
+        performance_summary = {
+            'ytd_revenue': ytd_revenue,
+            'ytd_target': ytd_target,
+            'remaining_target': float(ytd_target - ytd_revenue),
+            'forecast_gap': bool(ytd_revenue < ytd_target * 0.75),
+            'dashboard_blocks': dashboard_blocks
+        }
+        
+        return performance_summary
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting performance summary: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
