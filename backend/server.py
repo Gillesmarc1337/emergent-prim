@@ -1771,6 +1771,54 @@ async def upload_google_sheets_data(request: GoogleSheetsRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing Google Sheets data: {str(e)}")
 
+@api_router.get("/projections/hot-deals")
+async def get_hot_deals_closing():
+    """Get hot deals closing in next 2 weeks to 30 days (legals stage)"""
+    try:
+        # Get data from MongoDB
+        records = await db.sales_records.find().to_list(10000)
+        if not records:
+            return []
+        
+        # Convert to DataFrame for analysis
+        df = pd.DataFrame(records)
+        
+        # Convert date strings back to datetime
+        date_columns = ['discovery_date', 'poa_date', 'billing_start', 'created_at']
+        for col in date_columns:
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors='coerce')
+        
+        hot_deals = calculate_hot_deals_closing(df)
+        return hot_deals
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting hot deals: {str(e)}")
+
+@api_router.get("/projections/hot-leads")
+async def get_hot_leads():
+    """Get additional hot leads for next 3 months (Proposal sent + PoA booked)"""
+    try:
+        # Get data from MongoDB
+        records = await db.sales_records.find().to_list(10000)
+        if not records:
+            return []
+        
+        # Convert to DataFrame for analysis
+        df = pd.DataFrame(records)
+        
+        # Convert date strings back to datetime
+        date_columns = ['discovery_date', 'poa_date', 'billing_start', 'created_at']
+        for col in date_columns:
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors='coerce')
+        
+        hot_leads = calculate_hot_leads(df)
+        return hot_leads
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting hot leads: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
