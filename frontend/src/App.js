@@ -1783,42 +1783,115 @@ function Dashboard() {
             {/* Pipeline Metrics */}
             <AnalyticsSection 
               title="Pipeline Metrics"
-              isOnTrack={analytics.pipe_metrics.total_aggregate_pipe.on_track}
-              conclusion={analytics.pipe_metrics.total_aggregate_pipe.on_track 
-                ? "Total pipeline is healthy and meeting targets." 
-                : "Need to strengthen pipeline generation to meet targets."}
+              isOnTrack={analytics.pipe_metrics.total_pipe.on_track}
+              conclusion={analytics.pipe_metrics.total_pipe.on_track 
+                ? "Pipeline creation and weighting on track to meet targets." 
+                : "Need to accelerate pipeline generation and improve deal quality."}
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {/* Pipeline Overview - 4 blocks */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                 <MetricCard
-                  title="New Pipeline Created"
-                  value={analytics.pipe_metrics.new_pipe_created.value}
-                  target={analytics.pipe_metrics.new_pipe_created.target}
+                  title="Created Pipe"
+                  value={analytics.pipe_metrics.created_pipe.value}
+                  target={analytics.pipe_metrics.created_pipe.target}
                   unit="$"
                   icon={TrendingUp}
                   color="green"
                 />
                 <MetricCard
-                  title="Hot Pipeline"
-                  value={analytics.pipe_metrics.hot_pipe.value}
-                  target={analytics.pipe_metrics.hot_pipe.target}
+                  title="Created Weighted Pipe"
+                  value={analytics.pipe_metrics.created_pipe.weighted_value}
+                  target={analytics.pipe_metrics.created_pipe.target_weighted}
+                  unit="$"
+                  icon={Target}
+                  color="blue"
+                />
+                <MetricCard
+                  title="Total Pipe"
+                  value={analytics.pipe_metrics.total_pipe.value}
+                  target={analytics.pipe_metrics.total_pipe.target}
+                  unit="$"
+                  icon={BarChart3}
+                  color="purple"
+                />
+                <MetricCard
+                  title="Total Weighted Pipe"
+                  value={analytics.pipe_metrics.total_pipe.weighted_value}
+                  target={analytics.pipe_metrics.total_pipe.target_weighted}
                   unit="$"
                   icon={DollarSign}
                   color="orange"
                 />
-                <MetricCard
-                  title="Total Pipeline"
-                  value={analytics.pipe_metrics.total_aggregate_pipe.value}
-                  target={analytics.pipe_metrics.total_aggregate_pipe.target}
-                  unit="$"
-                  icon={BarChart3}
-                  color="blue"
-                />
               </div>
 
-              {analytics.pipe_metrics.hot_pipe.deals.length > 0 && (
+              {/* AE Breakdown Table */}
+              {analytics.pipe_metrics.ae_breakdown && analytics.pipe_metrics.ae_breakdown.length > 0 && (
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle>AE Pipeline Performance</CardTitle>
+                    <CardDescription>Pipeline breakdown by Account Executive</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left p-3 font-semibold">AE</th>
+                            <th className="text-right p-3 font-semibold">Total Pipe</th>
+                            <th className="text-right p-3 font-semibold">Weighted Pipe</th>
+                            <th className="text-right p-3 font-semibold">New Pipe Created</th>
+                            <th className="text-right p-3 font-semibold">Deals Count</th>
+                            <th className="text-right p-3 font-semibold">New Deals</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {analytics.pipe_metrics.ae_breakdown.map((ae, index) => (
+                            <tr key={index} className="border-b hover:bg-gray-50">
+                              <td className="p-3 font-medium">{ae.ae}</td>
+                              <td className="text-right p-3 font-semibold text-purple-600">
+                                ${ae.total_pipe.toLocaleString()}
+                              </td>
+                              <td className="text-right p-3 font-semibold text-orange-600">
+                                ${ae.weighted_pipe.toLocaleString()}
+                              </td>
+                              <td className="text-right p-3 font-semibold text-green-600">
+                                ${ae.new_pipe_created.toLocaleString()}
+                              </td>
+                              <td className="text-right p-3">{ae.deals_count}</td>
+                              <td className="text-right p-3">{ae.new_deals_count}</td>
+                            </tr>
+                          ))}
+                          {/* Total Row */}
+                          <tr className="border-t-2 font-bold bg-gray-50">
+                            <td className="p-3">Total</td>
+                            <td className="text-right p-3 text-purple-600">
+                              ${analytics.pipe_metrics.total_pipe.value.toLocaleString()}
+                            </td>
+                            <td className="text-right p-3 text-orange-600">
+                              ${analytics.pipe_metrics.total_pipe.weighted_value.toLocaleString()}
+                            </td>
+                            <td className="text-right p-3 text-green-600">
+                              ${analytics.pipe_metrics.created_pipe.value.toLocaleString()}
+                            </td>
+                            <td className="text-right p-3">
+                              {analytics.pipe_metrics.total_pipe.count}
+                            </td>
+                            <td className="text-right p-3">
+                              {analytics.pipe_metrics.created_pipe.count}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Pipeline Details */}
+              {analytics.pipe_metrics.pipe_details && analytics.pipe_metrics.pipe_details.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Hot Pipeline Deals</CardTitle>
+                    <CardTitle>Active Pipeline Details</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
@@ -1826,18 +1899,32 @@ function Dashboard() {
                         <thead>
                           <tr className="border-b">
                             <th className="text-left p-2">Client</th>
-                            <th className="text-right p-2">Value</th>
+                            <th className="text-right p-2">Pipeline Value</th>
+                            <th className="text-right p-2">Weighted Value</th>
                             <th className="text-left p-2">Stage</th>
+                            <th className="text-center p-2">Probability</th>
                             <th className="text-left p-2">Owner</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {analytics.pipe_metrics.hot_pipe.deals.map((deal, index) => (
-                            <tr key={index} className="border-b">
+                          {analytics.pipe_metrics.pipe_details.map((deal, index) => (
+                            <tr key={index} className="border-b hover:bg-gray-50">
                               <td className="p-2 font-medium">{deal.client}</td>
                               <td className="text-right p-2">${deal.pipeline?.toLocaleString()}</td>
+                              <td className="text-right p-2 font-medium text-orange-600">
+                                ${deal.weighted_value?.toLocaleString()}
+                              </td>
                               <td className="p-2">
                                 <Badge variant="outline">{deal.stage}</Badge>
+                              </td>
+                              <td className="text-center p-2">
+                                <span className={`font-medium ${
+                                  deal.probability >= 70 ? 'text-green-600' :
+                                  deal.probability >= 50 ? 'text-yellow-600' :
+                                  deal.probability >= 30 ? 'text-orange-600' : 'text-gray-600'
+                                }`}>
+                                  {deal.probability}%
+                                </span>
                               </td>
                               <td className="p-2">{deal.owner}</td>
                             </tr>
