@@ -195,6 +195,168 @@ def test_data_status():
         print(f"❌ Could not check data status")
         return False
 
+def test_projections_hot_deals():
+    """Test the hot deals projections endpoint"""
+    print(f"\n{'='*60}")
+    print(f"🔥 TESTING HOT DEALS PROJECTIONS ENDPOINT")
+    print(f"{'='*60}")
+    
+    data = test_api_endpoint("/projections/hot-deals")
+    
+    if data is None:
+        return False
+    
+    # Should return a list (even if empty)
+    if not isinstance(data, list):
+        print(f"❌ Expected list response, got {type(data)}")
+        return False
+    
+    print(f"✅ Received list with {len(data)} hot deals")
+    
+    # If we have data, validate structure
+    if len(data) > 0:
+        print(f"📋 Validating hot deals structure:")
+        
+        # Check first deal structure
+        first_deal = data[0]
+        required_fields = ['id', 'client', 'pipeline', 'expected_mrr', 'expected_arr', 'owner', 'stage', 'hubspot_link']
+        
+        success = True
+        for field in required_fields:
+            if field in first_deal:
+                print(f"  ✅ {field}: {first_deal[field]}")
+            else:
+                print(f"  ❌ Missing field: {field}")
+                success = False
+        
+        # Verify stage is "B Legals"
+        if first_deal.get('stage') == 'B Legals':
+            print(f"  ✅ Stage is correctly 'B Legals'")
+        else:
+            print(f"  ❌ Expected stage 'B Legals', got '{first_deal.get('stage')}'")
+            success = False
+        
+        return success
+    else:
+        print(f"⚠️  No hot deals found (empty result is valid)")
+        return True
+
+def test_projections_hot_leads():
+    """Test the hot leads projections endpoint"""
+    print(f"\n{'='*60}")
+    print(f"🎯 TESTING HOT LEADS PROJECTIONS ENDPOINT")
+    print(f"{'='*60}")
+    
+    data = test_api_endpoint("/projections/hot-leads")
+    
+    if data is None:
+        return False
+    
+    # Should return a list (even if empty)
+    if not isinstance(data, list):
+        print(f"❌ Expected list response, got {type(data)}")
+        return False
+    
+    print(f"✅ Received list with {len(data)} hot leads")
+    
+    # If we have data, validate structure
+    if len(data) > 0:
+        print(f"📋 Validating hot leads structure:")
+        
+        # Check first lead structure
+        first_lead = data[0]
+        required_fields = ['id', 'client', 'pipeline', 'expected_mrr', 'expected_arr', 'owner', 'stage', 'hubspot_link', 'poa_date']
+        
+        success = True
+        for field in required_fields:
+            if field in first_lead:
+                print(f"  ✅ {field}: {first_lead[field]}")
+            else:
+                print(f"  ❌ Missing field: {field}")
+                success = False
+        
+        # Verify stage is one of the expected stages
+        expected_stages = ['C Proposal sent', 'D POA Booked']
+        if first_lead.get('stage') in expected_stages:
+            print(f"  ✅ Stage is correctly '{first_lead.get('stage')}'")
+        else:
+            print(f"  ❌ Expected stage in {expected_stages}, got '{first_lead.get('stage')}'")
+            success = False
+        
+        return success
+    else:
+        print(f"⚠️  No hot leads found (empty result is valid)")
+        return True
+
+def test_projections_performance_summary():
+    """Test the performance summary projections endpoint"""
+    print(f"\n{'='*60}")
+    print(f"📊 TESTING PERFORMANCE SUMMARY PROJECTIONS ENDPOINT")
+    print(f"{'='*60}")
+    
+    data = test_api_endpoint("/projections/performance-summary")
+    
+    if data is None:
+        return False
+    
+    # Should return a dict
+    if not isinstance(data, dict):
+        print(f"❌ Expected dict response, got {type(data)}")
+        return False
+    
+    print(f"✅ Received performance summary data")
+    
+    # Validate required fields
+    required_fields = ['ytd_revenue', 'ytd_target', 'remaining_target', 'forecast_gap', 'dashboard_blocks']
+    
+    success = True
+    for field in required_fields:
+        if field in data:
+            print(f"  ✅ {field}: {data[field]}")
+        else:
+            print(f"  ❌ Missing field: {field}")
+            success = False
+    
+    # Validate dashboard_blocks structure
+    if 'dashboard_blocks' in data and isinstance(data['dashboard_blocks'], dict):
+        blocks = data['dashboard_blocks']
+        print(f"  📋 Dashboard blocks validation:")
+        
+        if 'meetings' in blocks:
+            meetings = blocks['meetings']
+            meeting_fields = ['period', 'inbound_actual', 'inbound_target', 'outbound_actual', 'outbound_target', 'referral_actual', 'referral_target']
+            
+            for field in meeting_fields:
+                if field in meetings:
+                    print(f"    ✅ meetings.{field}: {meetings[field]}")
+                else:
+                    print(f"    ❌ Missing meetings.{field}")
+                    success = False
+        else:
+            print(f"    ❌ Missing 'meetings' block in dashboard_blocks")
+            success = False
+    
+    # Validate data types
+    if isinstance(data.get('ytd_revenue'), (int, float)):
+        print(f"  ✅ ytd_revenue is numeric: {data['ytd_revenue']}")
+    else:
+        print(f"  ❌ ytd_revenue should be numeric, got {type(data.get('ytd_revenue'))}")
+        success = False
+    
+    if isinstance(data.get('ytd_target'), (int, float)):
+        print(f"  ✅ ytd_target is numeric: {data['ytd_target']}")
+    else:
+        print(f"  ❌ ytd_target should be numeric, got {type(data.get('ytd_target'))}")
+        success = False
+    
+    if isinstance(data.get('forecast_gap'), bool):
+        print(f"  ✅ forecast_gap is boolean: {data['forecast_gap']}")
+    else:
+        print(f"  ❌ forecast_gap should be boolean, got {type(data.get('forecast_gap'))}")
+        success = False
+    
+    return success
+
 def main():
     """Main testing function"""
     print(f"🚀 Starting Backend API Tests for Sales Analytics Dashboard")
