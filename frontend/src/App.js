@@ -1681,6 +1681,7 @@ function Dashboard() {
                 </CardContent>
               </Card>
             </div>
+            )}
 
             {/* Deals Closed Details */}
             <AnalyticsSection 
