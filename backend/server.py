@@ -279,6 +279,10 @@ def calculate_meetings_attended(df, start_date, end_date):
         (df['discovery_date'] <= end_date)
     ]
     
+    # Debug: Check unique values in show_noshow column
+    print(f"DEBUG: Unique show_noshow values: {period_data['show_noshow'].unique()}")
+    print(f"DEBUG: show_noshow value counts: {period_data['show_noshow'].value_counts()}")
+    
     # All meetings with details for table
     meetings_detail = period_data[~period_data['client'].isna()].copy()
     meetings_detail['meeting_date'] = meetings_detail['discovery_date']
