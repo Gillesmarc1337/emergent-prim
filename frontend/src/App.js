@@ -738,21 +738,28 @@ function Dashboard() {
     
     try {
       let response;
+      let yearlyResponse;
       
       if (useCustomDate && dateRange?.from && dateRange?.to) {
         // Use custom date range
         const startDate = format(dateRange.from, 'yyyy-MM-dd');
         const endDate = format(dateRange.to, 'yyyy-MM-dd');
         response = await axios.get(`${API}/analytics/custom?start_date=${startDate}&end_date=${endDate}`);
+        // Also load yearly data for comparison
+        yearlyResponse = await axios.get(`${API}/analytics/yearly?year=2025`);
       } else if (viewMode === 'yearly') {
         // Use yearly view
         response = await axios.get(`${API}/analytics/yearly?year=2025`);
+        yearlyResponse = response; // Same data
       } else {
         // Use monthly offset
         response = await axios.get(`${API}/analytics/monthly?month_offset=${monthOffset}`);
+        // Also load yearly data for Deals & Pipeline comparison
+        yearlyResponse = await axios.get(`${API}/analytics/yearly?year=2025`);
       }
       
       setAnalytics(response.data);
+      setYearlyData(yearlyResponse.data);
     } catch (error) {
       setError(error.response?.data?.detail || 'Error loading analytics');
     } finally {
