@@ -132,6 +132,9 @@ backend:
         - working: true
           agent: "main"
           comment: "Created /api/projections/hot-deals endpoint that filters deals in B Legals stage. Returns deal data with id, client, pipeline, MRR/ARR, owner, stage, and hubspot_link."
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED SUCCESSFULLY: GET /api/projections/hot-deals returns 13 hot deals in 'B Legals' stage. All required fields present (id, client, pipeline, expected_mrr, expected_arr, owner, stage, hubspot_link). Data structure validated and API responds correctly with proper JSON format."
 
   - task: "Hot Leads API endpoint"
     implemented: true
@@ -144,6 +147,9 @@ backend:
         - working: true
           agent: "main"
           comment: "Created /api/projections/hot-leads endpoint that filters deals in C Proposal sent and D POA Booked stages. Returns comprehensive deal data for MRR/ARR table display."
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED SUCCESSFULLY: GET /api/projections/hot-leads returns 24 hot leads from 'C Proposal sent' and 'D POA Booked' stages. All required fields present including poa_date for MRR/ARR table. API handles both target stages correctly and returns properly formatted JSON."
 
   - task: "Performance Summary API endpoint"
     implemented: true
@@ -156,6 +162,9 @@ backend:
         - working: true
           agent: "main"
           comment: "Created /api/projections/performance-summary endpoint that uses the same calculation logic as dashboard for YTD revenue, targets, and forecast gap detection."
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED SUCCESSFULLY: GET /api/projections/performance-summary returns correct YTD data (revenue: 1,129,596, target: 3,600,000, forecast_gap: true). Dashboard blocks structure validated with proper meeting targets. All data types correct (numeric for revenue/targets, boolean for forecast_gap)."
 
 frontend:
   - task: "Hot Deals drag & drop interface"
