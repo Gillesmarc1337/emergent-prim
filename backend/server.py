@@ -1850,7 +1850,7 @@ async def get_projections_performance_summary():
         current_month_str = today.strftime('%b %Y')
         
         # Filter data for current month
-        current_month_data = df[df['discovery_date'].dt.to_period('M') == today.to_period('M')]
+        current_month_data = df[df['discovery_date'].dt.to_period('M') == pd.Timestamp(today).to_period('M')]
         
         # Meeting Generation metrics
         actual_inbound = len(current_month_data[current_month_data['type_of_source'] == 'inbound'])
