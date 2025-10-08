@@ -297,11 +297,15 @@ def calculate_meetings_attended(df, start_date, end_date):
                  ('Closed Lost' if x in ['Closed Lost', 'Lost', 'I Lost'] else 'Open')
     )
     
-    # Meeting Scheduled = Show + No Show
-    scheduled_meetings = period_data[period_data['show_noshow'].isin(['Show', 'No Show'])]
+    # Since show_noshow column is empty, use fallback logic:
+    # Meeting Scheduled = all meetings with a discovery_date (meeting was scheduled)
+    scheduled_meetings = period_data[period_data['discovery_date'].notna()]
     
-    # Meeting Attended = Show only
-    attended_meetings = period_data[period_data['show_noshow'] == 'Show']
+    # Meeting Attended = meetings that have progressed beyond just being scheduled
+    # (have a stage that indicates the meeting actually happened)
+    attended_stages = ['E Intro attended', 'D POA Booked', 'C Proposal sent', 'B Legals', 
+                      'Closed Won', 'Won', 'Signed', 'Closed Lost', 'Lost', 'I Lost']
+    attended_meetings = period_data[period_data['stage'].isin(attended_stages)]
     
     # POA Generated = POA Booked + Legal + Proposal sent + Closed
     poa_generated_stages = ['D POA Booked', 'POA Booked', 'B Legals', 'Legal', 
