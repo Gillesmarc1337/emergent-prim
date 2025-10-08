@@ -279,14 +279,7 @@ def calculate_meetings_attended(df, start_date, end_date):
         (df['discovery_date'] <= end_date)
     ]
     
-    # Debug: Check sample data from show_noshow column
-    print(f"DEBUG: Sample period_data show_noshow values:")
-    for i, row in period_data.head(10).iterrows():
-        print(f"  Client: {row.get('client', 'N/A')}, show_noshow: '{row.get('show_noshow', 'N/A')}', stage: '{row.get('stage', 'N/A')}'")
-    
-    # Since show_noshow column seems empty, let's try to infer from stage or other fields
-    # For now, let's assume all intro meetings that have a stage are "attended"
-    print(f"DEBUG: Using stage data as fallback for show_noshow")
+    # Note: Using stage data as fallback since show_noshow column is empty in the data
     
     # All meetings with details for table
     meetings_detail = period_data[~period_data['client'].isna()].copy()
