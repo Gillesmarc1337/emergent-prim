@@ -1244,15 +1244,14 @@ function Dashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {Object.entries(analytics.meetings_attended.ae_performance).map(([ae, stats]) => (
-                          <tr key={ae} className="border-b">
-                            <td className="p-2 font-medium">{ae}</td>
+                        {analytics.meetings_attended.ae_performance.map((stats, index) => (
+                          <tr key={index} className="border-b">
+                            <td className="p-2 font-medium">{stats.owner}</td>
                             <td className="text-right p-2">{stats.total_scheduled}</td>
                             <td className="text-right p-2">{stats.attended}</td>
                             <td className="text-right p-2">{stats.poa_generated}</td>
-                            <td className="text-right p-2">
-                              {stats.attended > 0 ? ((stats.poa_generated / stats.attended) * 100).toFixed(1) : 0}%
-                            </td>
+                            <td className="text-right p-2">{stats.deals_closed}</td>
+                            <td className="text-right p-2">{stats.attendance_rate.toFixed(1)}%</td>
                           </tr>
                         ))}
                       </tbody>
