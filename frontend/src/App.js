@@ -1487,6 +1487,120 @@ function Dashboard() {
                 </Card>
               </div>
             </div>
+
+            {/* Conversion Rates Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+              
+              {/* Intro → POA Conversion Rate */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Intro → POA Conversion Rate</CardTitle>
+                  <CardDescription>Conversion from Intros Attended to POA Generated</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {/* Global Rate */}
+                  <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-blue-600">
+                        {analytics.meetings_attended.conversion_rates.intro_to_poa.global_rate.toFixed(1)}%
+                      </div>
+                      <div className="text-sm text-gray-600 mt-1">
+                        Global Conversion Rate
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {analytics.meetings_attended.conversion_rates.intro_to_poa.total_poas} POAs / {analytics.meetings_attended.conversion_rates.intro_to_poa.total_intros} Intros
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* By AE */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left p-2 font-semibold">AE</th>
+                          <th className="text-right p-2 font-semibold">Intros</th>
+                          <th className="text-right p-2 font-semibold">POAs</th>
+                          <th className="text-right p-2 font-semibold">Conv Rate</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {analytics.meetings_attended.conversion_rates.intro_to_poa.by_ae.map((ae, index) => (
+                          <tr key={index} className="border-b hover:bg-gray-50">
+                            <td className="p-2 font-medium">{ae.ae}</td>
+                            <td className="text-right p-2">{ae.intros}</td>
+                            <td className="text-right p-2">{ae.poas}</td>
+                            <td className="text-right p-2">
+                              <span className={`font-medium ${
+                                ae.rate >= 70 ? 'text-green-600' : 
+                                ae.rate >= 40 ? 'text-yellow-600' : 'text-red-600'
+                              }`}>
+                                {ae.rate.toFixed(1)}%
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* POA → Closing Conversion Rate */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>POA → Closing Conversion Rate</CardTitle>
+                  <CardDescription>Conversion from POA Generated to Deals Closed</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {/* Global Rate */}
+                  <div className="mb-6 p-4 bg-green-50 rounded-lg">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-green-600">
+                        {analytics.meetings_attended.conversion_rates.poa_to_closing.global_rate.toFixed(1)}%
+                      </div>
+                      <div className="text-sm text-gray-600 mt-1">
+                        Global Conversion Rate
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {analytics.meetings_attended.conversion_rates.poa_to_closing.total_closed} Closed / {analytics.meetings_attended.conversion_rates.poa_to_closing.total_poas} POAs
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* By AE */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left p-2 font-semibold">AE</th>
+                          <th className="text-right p-2 font-semibold">POAs</th>
+                          <th className="text-right p-2 font-semibold">Closed</th>
+                          <th className="text-right p-2 font-semibold">Conv Rate</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {analytics.meetings_attended.conversion_rates.poa_to_closing.by_ae.map((ae, index) => (
+                          <tr key={index} className="border-b hover:bg-gray-50">
+                            <td className="p-2 font-medium">{ae.ae}</td>
+                            <td className="text-right p-2">{ae.poas}</td>
+                            <td className="text-right p-2">{ae.closed}</td>
+                            <td className="text-right p-2">
+                              <span className={`font-medium ${
+                                ae.rate >= 30 ? 'text-green-600' : 
+                                ae.rate >= 15 ? 'text-yellow-600' : 'text-red-600'
+                              }`}>
+                                {ae.rate.toFixed(1)}%
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </AnalyticsSection>
         </TabsContent>
 
