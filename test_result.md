@@ -214,12 +214,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Dynamic month navigation for blocks"
-    - "Dashboard blocks displaying actual/target ratios"
-  stuck_tasks:
-    - "Dynamic month navigation for blocks"
-  test_all: false
-  test_priority: "stuck_first"
+    - "Hot Deals drag & drop interface"
+    - "Hot Leads table with MRR/ARR"
+    - "Enhanced Performance Summary"
+    - "Enhanced Closing Projections"
+  stuck_tasks: []
+  test_all: true
+  test_priority: "high_first"
 
 agent_communication:
     - agent: "main"
