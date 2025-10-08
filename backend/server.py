@@ -729,7 +729,7 @@ def calculate_closing_projections(df):
 def calculate_hot_deals_closing(df):
     """Calculate hot deals closing in next 2 weeks to 30 days (legals stage)"""
     # Filter deals in legals stage
-    legals_deals = df[df['stage'] == 'legals'].copy()
+    legals_deals = df[df['stage'] == 'B Legals'].copy()
     
     if legals_deals.empty:
         return []
