@@ -1238,8 +1238,9 @@ function Dashboard() {
                           <th className="text-left p-2">AE</th>
                           <th className="text-right p-2">Scheduled</th>
                           <th className="text-right p-2">Attended</th>
-                          <th className="text-right p-2">POAs Generated</th>
-                          <th className="text-right p-2">Conversion Rate</th>
+                          <th className="text-right p-2">POA Generated</th>
+                          <th className="text-right p-2">Deals Closed</th>
+                          <th className="text-right p-2">Attendance Rate</th>
                         </tr>
                       </thead>
                       <tbody>
