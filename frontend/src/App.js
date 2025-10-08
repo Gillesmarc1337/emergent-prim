@@ -1201,16 +1201,16 @@ function Dashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <MetricCard
-                title="Discoveries Completed"
-                value={analytics.meetings_attended.discovery_metrics.completed}
-                target={analytics.meetings_attended.discovery_metrics.target}
+                title="POA Generated"
+                value={analytics.meetings_attended.poa_generated_metrics.completed}
+                target={analytics.meetings_attended.poa_generated_metrics.target}
                 icon={Target}
                 color="purple"
               />
               <MetricCard
-                title="POAs Generated"
-                value={analytics.meetings_attended.poa_metrics.generated}
-                target={analytics.meetings_attended.poa_metrics.target}
+                title="Deals Closed"
+                value={analytics.meetings_attended.deals_closed_metrics.generated}
+                target={analytics.meetings_attended.deals_closed_metrics.target}
                 icon={DollarSign}
                 color="green"
               />
