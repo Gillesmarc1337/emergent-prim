@@ -234,3 +234,5 @@ test_plan:
 agent_communication:
     - agent: "main"
       message: "Successfully implemented all requested enhancements to the Projections tab. Added Hot Deals section with drag & drop for B Legals deals, Hot Leads section with MRR/ARR table for C Proposal sent and D POA Booked deals, enhanced Performance Summary to match dashboard data, and improved Closing Projections with weighted value highlights. All new API endpoints are working and frontend displays correctly."
+    - agent: "testing"
+      message: "✅ BACKEND TESTING COMPLETE: All 3 new projections API endpoints tested successfully. Hot-deals endpoint returns 13 deals in 'B Legals' stage with correct data structure. Hot-leads endpoint returns 24 leads from 'C Proposal sent' and 'D POA Booked' stages with complete MRR/ARR data. Performance-summary endpoint matches dashboard calculation logic with YTD revenue $1.13M vs $3.6M target. All endpoints handle data gracefully and return properly formatted JSON responses. Backend APIs are ready for frontend integration."
