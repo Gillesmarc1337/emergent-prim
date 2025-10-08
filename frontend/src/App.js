@@ -732,6 +732,14 @@ function Dashboard() {
   const [useCustomDate, setUseCustomDate] = useState(false);
   const [importMethod, setImportMethod] = useState('csv'); // 'csv' or 'sheets'
   const [viewMode, setViewMode] = useState('monthly'); // 'monthly' or 'yearly'
+  
+  // New states for projections
+  const [hotDeals, setHotDeals] = useState([]);
+  const [hotLeads, setHotLeads] = useState([]);
+  const [performanceSummary, setPerformanceSummary] = useState(null);
+  const [hiddenDeals, setHiddenDeals] = useState(new Set());
+  const [hiddenLeads, setHiddenLeads] = useState(new Set());
+  const [loadingProjections, setLoadingProjections] = useState(false);
 
   const loadAnalytics = async () => {
     setLoading(true);
