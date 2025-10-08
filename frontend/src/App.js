@@ -1616,6 +1616,7 @@ function Dashboard() {
         <TabsContent value="deals">
           <div className="space-y-6">
             {/* Year 2025 Performance */}
+            {yearlyData && analytics && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               <Card>
                 <CardHeader>
