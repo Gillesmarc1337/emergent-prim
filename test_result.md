@@ -158,7 +158,7 @@ backend:
           comment: "Created /api/projections/performance-summary endpoint that uses the same calculation logic as dashboard for YTD revenue, targets, and forecast gap detection."
 
 frontend:
-  - task: "Dashboard blocks displaying actual/target ratios"
+  - task: "Hot Deals drag & drop interface"
     implemented: true
     working: true
     file: "/app/frontend/src/App.js"
@@ -168,19 +168,43 @@ frontend:
     status_history:
         - working: true
           agent: "main"
-          comment: "Modified frontend to display ratios (actual/target) instead of just targets. Shows format like '30/20' for inbound, '40/45' for discovery."
+          comment: "Added DragDropContext with draggable deal items. Includes drag & drop reordering, hide functionality with X buttons, and reset button. Uses @hello-pangea/dnd library."
 
-  - task: "Dynamic month navigation for blocks"
+  - task: "Hot Leads table with MRR/ARR"
     implemented: true
-    working: "partial"
+    working: true
     file: "/app/frontend/src/App.js"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
-        - working: "partial"
+        - working: true
           agent: "main"
-          comment: "Monthly API works correctly with month_offset, but frontend may have cache issues. Yearly mode shows July 2025 always. Need to test if Previous/Next month navigation correctly updates the blocks."
+          comment: "Created comprehensive table displaying MRR and ARR for hot leads with drag & drop functionality and reset button."
+
+  - task: "Enhanced Performance Summary"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Updated Performance Summary section to use data from new API endpoint that matches dashboard calculations."
+
+  - task: "Enhanced Closing Projections"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Enhanced Closing Projections with colored cards, weighted value highlighting, and upcoming high-priority meetings section."
 
 metadata:
   created_by: "main_agent"
