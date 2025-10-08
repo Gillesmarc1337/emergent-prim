@@ -363,6 +363,36 @@ def calculate_meetings_attended(df, start_date, end_date):
             'conversion_rate': float(deals_closed_count / poa_generated_count * 100 if poa_generated_count > 0 else 0)
         },
         'ae_performance': ae_stats,  # Use the new ae_stats list directly
+        'conversion_rates': {
+            'intro_to_poa': {
+                'global_rate': float(poa_generated_count / attended_count * 100 if attended_count > 0 else 0),
+                'total_intros': attended_count,
+                'total_poas': poa_generated_count,
+                'by_ae': [
+                    {
+                        'ae': ae['owner'],
+                        'intros': ae['attended'],
+                        'poas': ae['poa_generated'],
+                        'rate': float(ae['poa_generated'] / ae['attended'] * 100 if ae['attended'] > 0 else 0)
+                    }
+                    for ae in ae_stats
+                ]
+            },
+            'poa_to_closing': {
+                'global_rate': float(deals_closed_count / poa_generated_count * 100 if poa_generated_count > 0 else 0),
+                'total_poas': poa_generated_count,
+                'total_closed': deals_closed_count,
+                'by_ae': [
+                    {
+                        'ae': ae['owner'],
+                        'poas': ae['poa_generated'],
+                        'closed': ae['deals_closed'],
+                        'rate': float(ae['deals_closed'] / ae['poa_generated'] * 100 if ae['poa_generated'] > 0 else 0)
+                    }
+                    for ae in ae_stats
+                ]
+            }
+        },
         'meetings_detail': clean_records(meetings_detail[['client', 'meeting_date', 'status', 'closed_status', 'owner', 'stage']].to_dict('records')),
         'on_track': bool(attended_count >= 40 and deals_closed_count >= 15)
     }
