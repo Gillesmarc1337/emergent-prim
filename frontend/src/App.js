@@ -1626,20 +1626,20 @@ function Dashboard() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center p-4 bg-green-50 rounded-lg">
                       <div className="text-2xl font-bold text-green-600">
-                        {(viewMode === 'yearly' ? analytics : yearlyData)?.deals_closed?.deals_closed || 'N/A'}
+                        {yearlyData?.deals_closed?.deals_closed || 'Loading...'}
                       </div>
                       <div className="text-sm text-gray-600">Deals Closed</div>
                       <div className="text-xs text-gray-500 mt-1">
-                        Target: {(viewMode === 'yearly' ? analytics : yearlyData)?.deals_closed?.target_deals || 'N/A'}
+                        Target: {yearlyData?.deals_closed?.target_deals || 'Loading...'}
                       </div>
                     </div>
                     <div className="text-center p-4 bg-blue-50 rounded-lg">
                       <div className="text-2xl font-bold text-blue-600">
-                        ${((viewMode === 'yearly' ? analytics : yearlyData)?.deals_closed?.arr_closed || 0).toLocaleString()}
+                        ${yearlyData?.deals_closed?.arr_closed?.toLocaleString() || 'Loading...'}
                       </div>
                       <div className="text-sm text-gray-600">ARR Closed</div>
                       <div className="text-xs text-gray-500 mt-1">
-                        Target: ${((viewMode === 'yearly' ? analytics : yearlyData)?.deals_closed?.target_arr || 0).toLocaleString()}
+                        Target: ${yearlyData?.deals_closed?.target_arr?.toLocaleString() || 'Loading...'}
                       </div>
                     </div>
                   </div>
