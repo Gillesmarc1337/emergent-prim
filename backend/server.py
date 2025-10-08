@@ -537,13 +537,9 @@ def calculate_deals_closed(df, start_date, end_date):
         )
     ]
     
-    # Consider deals with specific characteristics as closed
+    # Consider deals with stage "A Closed" as closed deals
     closed_deals = date_filtered[
-        (date_filtered['stage'].isin(['Closed Won', 'Won', 'Signed', 'B Legals'])) |
-        (
-            (date_filtered['expected_arr'] >= 45000) |  # Based on your data, deals like Perifit, April, Cegid
-            (date_filtered['expected_mrr'] >= 3000)
-        )
+        date_filtered['stage'] == 'A Closed'
     ]
     
     # Monthly breakdown for chart
