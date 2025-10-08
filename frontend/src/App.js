@@ -782,7 +782,67 @@ function Dashboard() {
 
   const handleUploadSuccess = () => {
     loadAnalytics();
+    loadProjectionsData();
   };
+
+  // New functions for projections data
+  const loadProjectionsData = async () => {
+    setLoadingProjections(true);
+    try {
+      const [hotDealsResponse, hotLeadsResponse, performanceResponse] = await Promise.all([
+        axios.get(`${API}/projections/hot-deals`),
+        axios.get(`${API}/projections/hot-leads`),
+        axios.get(`${API}/projections/performance-summary`)
+      ]);
+      
+      setHotDeals(hotDealsResponse.data);
+      setHotLeads(hotLeadsResponse.data);
+      setPerformanceSummary(performanceResponse.data);
+    } catch (error) {
+      console.error('Error loading projections data:', error);
+    } finally {
+      setLoadingProjections(false);
+    }
+  };
+
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const { source, destination } = result;
+    
+    if (source.droppableId === 'hot-deals') {
+      const newDeals = Array.from(hotDeals);
+      const [reorderedItem] = newDeals.splice(source.index, 1);
+      newDeals.splice(destination.index, 0, reorderedItem);
+      setHotDeals(newDeals);
+    } else if (source.droppableId === 'hot-leads') {
+      const newLeads = Array.from(hotLeads);
+      const [reorderedItem] = newLeads.splice(source.index, 1);
+      newLeads.splice(destination.index, 0, reorderedItem);
+      setHotLeads(newLeads);
+    }
+  };
+
+  const hideItem = (type, id) => {
+    if (type === 'deals') {
+      setHiddenDeals(prev => new Set([...prev, id]));
+    } else if (type === 'leads') {
+      setHiddenLeads(prev => new Set([...prev, id]));
+    }
+  };
+
+  const resetView = (type) => {
+    if (type === 'deals') {
+      setHiddenDeals(new Set());
+      loadProjectionsData(); // Reload original data
+    } else if (type === 'leads') {
+      setHiddenLeads(new Set());
+      loadProjectionsData(); // Reload original data
+    }
+  };
+
+  const filteredHotDeals = hotDeals.filter(deal => !hiddenDeals.has(deal.id));
+  const filteredHotLeads = hotLeads.filter(lead => !hiddenLeads.has(lead.id));
 
   if (loading) {
     return (
