@@ -304,22 +304,40 @@ def calculate_meetings_attended(df, start_date, end_date):
     deals_closed_stages = ['Closed Won', 'Won', 'Signed']
     deals_closed = period_data[period_data['stage'].isin(deals_closed_stages)]
     
-    # AE level performance
-    ae_stats = period_data.groupby('owner').agg({
-        'id': 'count',
-        'show_noshow': lambda x: (x == 'Show').sum(),
-        'poa_date': lambda x: x.notna().sum()
-    }).rename(columns={
-        'id': 'total_scheduled',
-        'show_noshow': 'attended',
-        'poa_date': 'poa_generated'
-    })
+    # AE level performance with corrected calculations
+    ae_stats = []
+    for owner in period_data['owner'].dropna().unique():
+        owner_data = period_data[period_data['owner'] == owner]
+        
+        # Meetings Scheduled (Show + No Show)
+        scheduled = len(owner_data[owner_data['show_noshow'].isin(['Show', 'No Show'])])
+        
+        # Meetings Attended (Show only)  
+        attended = len(owner_data[owner_data['show_noshow'] == 'Show'])
+        
+        # POA Generated (POA Booked + Legal + Proposal sent + Closed)
+        poa_gen = len(owner_data[owner_data['stage'].isin(poa_generated_stages)])
+        
+        # Deals Closed
+        closed = len(owner_data[owner_data['stage'].isin(deals_closed_stages)])
+        
+        # Attendance rate
+        attendance_rate = (attended / scheduled * 100) if scheduled > 0 else 0
+        
+        ae_stats.append({
+            'owner': str(owner),
+            'total_scheduled': scheduled,
+            'attended': attended,
+            'poa_generated': poa_gen,
+            'deals_closed': closed,
+            'attendance_rate': float(attendance_rate)
+        })
     
     # Convert numpy types to Python native types
-    attended_count = int(len(attended))
-    scheduled_count = int(len(period_data))
-    discoveries_count = int(len(discoveries))
-    poa_count = int(len(poa_meetings))
+    scheduled_count = int(len(scheduled_meetings))
+    attended_count = int(len(attended_meetings))
+    poa_generated_count = int(len(poa_generated))
+    deals_closed_count = int(len(deals_closed))
     
     return {
         'intro_metrics': {
