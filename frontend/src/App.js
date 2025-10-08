@@ -176,6 +176,79 @@ function MetricCard({ title, value, target, unit = '', trend, icon: Icon, color 
   );
 }
 
+function DraggableDealItem({ deal, index, onHide }) {
+  return (
+    <Draggable draggableId={deal.id} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          className={`p-3 bg-white border rounded-lg shadow-sm mb-2 ${
+            snapshot.isDragging ? 'shadow-lg' : 'hover:shadow-md'
+          } transition-shadow`}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="font-medium">{deal.client}</div>
+              <div className="text-sm text-gray-600">AE: {deal.owner}</div>
+              <div className="text-sm text-blue-600">Pipeline: ${deal.pipeline?.toLocaleString()}</div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onHide(deal.id);
+              }}
+              className="text-red-500 hover:text-red-700"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+    </Draggable>
+  );
+}
+
+function DraggableLeadItem({ lead, index, onHide }) {
+  return (
+    <Draggable draggableId={lead.id} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          className={`p-3 bg-white border rounded-lg shadow-sm mb-2 ${
+            snapshot.isDragging ? 'shadow-lg' : 'hover:shadow-md'
+          } transition-shadow`}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex-1 grid grid-cols-4 gap-2">
+              <div className="font-medium">{lead.client}</div>
+              <div className="text-sm text-gray-600">AE: {lead.owner}</div>
+              <div className="text-sm text-green-600">MRR: ${lead.expected_mrr?.toLocaleString()}</div>
+              <div className="text-sm text-blue-600">ARR: ${lead.expected_arr?.toLocaleString()}</div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onHide(lead.id);
+              }}
+              className="text-red-500 hover:text-red-700"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+    </Draggable>
+  );
+}
+
 function AnalyticsSection({ title, children, conclusion, isOnTrack }) {
   return (
     <Card className="mb-6">
