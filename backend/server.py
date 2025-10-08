@@ -288,9 +288,21 @@ def calculate_meetings_attended(df, start_date, end_date):
                  ('Closed Lost' if x in ['Closed Lost', 'Lost', 'I Lost'] else 'Open')
     )
     
-    attended = period_data[period_data['show_noshow'] == 'Show']
-    discoveries = period_data[~period_data['discovery_date'].isna()]
-    poa_meetings = period_data[~period_data['poa_date'].isna()]
+    # Meeting Scheduled = Show + No Show
+    scheduled_meetings = period_data[period_data['show_noshow'].isin(['Show', 'No Show'])]
+    
+    # Meeting Attended = Show only
+    attended_meetings = period_data[period_data['show_noshow'] == 'Show']
+    
+    # POA Generated = POA Booked + Legal + Proposal sent + Closed
+    poa_generated_stages = ['D POA Booked', 'POA Booked', 'B Legals', 'Legal', 
+                           'C Proposal sent', 'Proposal sent', 
+                           'Closed Won', 'Won', 'Signed', 'Closed Lost', 'Lost', 'I Lost']
+    poa_generated = period_data[period_data['stage'].isin(poa_generated_stages)]
+    
+    # Deals Closed = Closed deals only
+    deals_closed_stages = ['Closed Won', 'Won', 'Signed']
+    deals_closed = period_data[period_data['stage'].isin(deals_closed_stages)]
     
     # AE level performance
     ae_stats = period_data.groupby('owner').agg({
