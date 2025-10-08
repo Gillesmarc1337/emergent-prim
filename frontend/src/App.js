@@ -778,6 +778,7 @@ function Dashboard() {
 
   useEffect(() => {
     loadAnalytics();
+    loadProjectionsData();
   }, [monthOffset, dateRange, useCustomDate, viewMode]);
 
   const handleUploadSuccess = () => {
