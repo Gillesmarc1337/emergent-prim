@@ -2207,57 +2207,194 @@ function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Big Numbers Recap */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance Summary</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <MetricCard
-                    title="YTD Revenue"
-                    value={analytics.big_numbers_recap.ytd_revenue}
-                    target={analytics.big_numbers_recap.ytd_target}
-                    unit="$"
-                    icon={DollarSign}
-                    color="green"
-                  />
-                  <MetricCard
-                    title="Remaining Target"
-                    value={analytics.big_numbers_recap.remaining_target}
-                    unit="$"
-                    icon={Target}
-                    color="orange"
-                  />
-                  <Card>
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-2 mb-2">
-                        <AlertCircle className="h-5 w-5 text-blue-500" />
-                        <span className="text-sm font-medium text-gray-600">Target Status</span>
-                      </div>
-                      <Badge 
-                        variant={analytics.big_numbers_recap.forecast_gap ? 'destructive' : 'default'}
-                        className="text-sm"
-                      >
-                        {analytics.big_numbers_recap.forecast_gap 
-                          ? 'Forecast Gap Detected' 
-                          : 'On Track'}
-                      </Badge>
-                    </CardContent>
-                  </Card>
-                </div>
+            {/* Performance Summary - Updated with Dashboard Data */}
+            {performanceSummary && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Performance Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <MetricCard
+                      title="YTD Revenue"
+                      value={performanceSummary.ytd_revenue}
+                      target={performanceSummary.ytd_target}
+                      unit="$"
+                      icon={DollarSign}
+                      color="green"
+                    />
+                    <MetricCard
+                      title="Remaining Target"
+                      value={performanceSummary.remaining_target}
+                      unit="$"
+                      icon={Target}
+                      color="orange"
+                    />
+                    <Card>
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-2 mb-2">
+                          <AlertCircle className="h-5 w-5 text-blue-500" />
+                          <span className="text-sm font-medium text-gray-600">Target Status</span>
+                        </div>
+                        <Badge 
+                          variant={performanceSummary.forecast_gap ? 'destructive' : 'default'}
+                          className="text-sm"
+                        >
+                          {performanceSummary.forecast_gap 
+                            ? 'Forecast Gap Detected' 
+                            : 'On Track'}
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  </div>
 
-                {analytics.big_numbers_recap.forecast_gap && (
-                  <Alert className="border-orange-500">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      <strong>Action Required:</strong> Need to intensify efforts to close the gap of 
-                      ${analytics.big_numbers_recap.remaining_target.toLocaleString()} and achieve annual targets.
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </CardContent>
-            </Card>
+                  {performanceSummary.forecast_gap && (
+                    <Alert className="border-orange-500">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        <strong>Action Required:</strong> Need to intensify efforts to close the gap of 
+                        ${performanceSummary.remaining_target.toLocaleString()} and achieve annual targets.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Hot Deals Closing (2 weeks to 30 days) */}
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Hot deals closing in the next 2 weeks to 30 days</CardTitle>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => resetView('deals')}
+                    >
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Reset
+                    </Button>
+                  </div>
+                  <CardDescription>Tous les deals en legals (drag & drop to reorder)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {loadingProjections ? (
+                    <div className="text-center py-8">Loading hot deals...</div>
+                  ) : filteredHotDeals.length > 0 ? (
+                    <Droppable droppableId="hot-deals">
+                      {(provided) => (
+                        <div {...provided.droppableProps} ref={provided.innerRef}>
+                          {filteredHotDeals.map((deal, index) => (
+                            <DraggableDealItem 
+                              key={deal.id}
+                              deal={deal}
+                              index={index}
+                              onHide={() => hideItem('deals', deal.id)}
+                            />
+                          ))}
+                          {provided.placeholder}
+                        </div>
+                      )}
+                    </Droppable>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      No hot deals in legals stage found.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Additional Hot Leads (3 months) */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Additional Hot leads that will most likely close within the next 3 months</CardTitle>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => resetView('leads')}
+                    >
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Reset
+                    </Button>
+                  </div>
+                  <CardDescription>Tous les deals sur Proposal sent et PoA booked (drag & drop to reorder)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {loadingProjections ? (
+                    <div className="text-center py-8">Loading hot leads...</div>
+                  ) : filteredHotLeads.length > 0 ? (
+                    <>
+                      <Droppable droppableId="hot-leads">
+                        {(provided) => (
+                          <div {...provided.droppableProps} ref={provided.innerRef}>
+                            {filteredHotLeads.map((lead, index) => (
+                              <DraggableLeadItem 
+                                key={lead.id}
+                                lead={lead}
+                                index={index}
+                                onHide={() => hideItem('leads', lead.id)}
+                              />
+                            ))}
+                            {provided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
+                      
+                      {/* Summary Table */}
+                      <div className="mt-6">
+                        <h4 className="text-lg font-medium mb-3">MRR & ARR Summary</h4>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm border border-gray-200 rounded-lg">
+                            <thead className="bg-gray-50">
+                              <tr>
+                                <th className="text-left p-3 border-b">Client</th>
+                                <th className="text-left p-3 border-b">Owner</th>
+                                <th className="text-right p-3 border-b">MRR</th>
+                                <th className="text-right p-3 border-b">ARR</th>
+                                <th className="text-left p-3 border-b">Stage</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {filteredHotLeads.map((lead, index) => (
+                                <tr key={lead.id} className="border-b hover:bg-gray-50">
+                                  <td className="p-3 font-medium">{lead.client}</td>
+                                  <td className="p-3">{lead.owner}</td>
+                                  <td className="text-right p-3 text-green-600 font-medium">
+                                    ${lead.expected_mrr?.toLocaleString()}
+                                  </td>
+                                  <td className="text-right p-3 text-blue-600 font-medium">
+                                    ${lead.expected_arr?.toLocaleString()}
+                                  </td>
+                                  <td className="p-3">
+                                    <Badge variant="outline">{lead.stage}</Badge>
+                                  </td>
+                                </tr>
+                              ))}
+                              <tr className="bg-gray-50 font-bold">
+                                <td className="p-3" colSpan="2">Total</td>
+                                <td className="text-right p-3 text-green-700">
+                                  ${filteredHotLeads.reduce((sum, lead) => sum + (lead.expected_mrr || 0), 0).toLocaleString()}
+                                </td>
+                                <td className="text-right p-3 text-blue-700">
+                                  ${filteredHotLeads.reduce((sum, lead) => sum + (lead.expected_arr || 0), 0).toLocaleString()}
+                                </td>
+                                <td className="p-3"></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      No hot leads in Proposal sent or PoA booked stages found.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </DragDropContext>
           </div>
         </TabsContent>
       </Tabs>
