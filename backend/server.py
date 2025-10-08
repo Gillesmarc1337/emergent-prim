@@ -322,11 +322,11 @@ def calculate_meetings_attended(df, start_date, end_date):
     for owner in period_data['owner'].dropna().unique():
         owner_data = period_data[period_data['owner'] == owner]
         
-        # Meetings Scheduled (Show + No Show)
-        scheduled = len(owner_data[owner_data['show_noshow'].isin(['Show', 'No Show'])])
+        # Meetings Scheduled = all meetings with discovery_date
+        scheduled = len(owner_data[owner_data['discovery_date'].notna()])
         
-        # Meetings Attended (Show only)  
-        attended = len(owner_data[owner_data['show_noshow'] == 'Show'])
+        # Meetings Attended = meetings that progressed to attended stages
+        attended = len(owner_data[owner_data['stage'].isin(attended_stages)])
         
         # POA Generated (POA Booked + Legal + Proposal sent + Closed)
         poa_gen = len(owner_data[owner_data['stage'].isin(poa_generated_stages)])
