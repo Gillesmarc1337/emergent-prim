@@ -2115,64 +2115,114 @@ function Dashboard() {
         {/* Projections */}
         <TabsContent value="projections">
           <div className="space-y-6">
-            {/* Closing Projections */}
+            {/* Closing Projections - Enhanced */}
             <Card>
               <CardHeader>
                 <CardTitle>Closing Projections</CardTitle>
+                <CardDescription>Upcoming meetings and weighted pipeline highlights</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <Card>
+                  <Card className="border-2 border-orange-200 bg-orange-50">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-lg">Next 7 Days</CardTitle>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <CalendarDays className="h-5 w-5 text-orange-600" />
+                        Next 7 Days
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold mb-2">
+                      <div className="text-2xl font-bold mb-2 text-gray-800">
                         ${analytics.closing_projections.next_7_days.total_value.toLocaleString()}
                       </div>
-                      <div className="text-sm text-gray-500 mb-2">
-                        Weighted Value: ${analytics.closing_projections.next_7_days.weighted_value.toLocaleString()}
+                      <div className="text-lg font-bold text-orange-600 mb-2">
+                        Weighted: ${analytics.closing_projections.next_7_days.weighted_value.toLocaleString()}
                       </div>
                       <div className="text-sm">
-                        {analytics.closing_projections.next_7_days.deals.length} potential deals
+                        <Badge variant="secondary">
+                          {analytics.closing_projections.next_7_days.deals.length} potential deals
+                        </Badge>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className="border-2 border-blue-200 bg-blue-50">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-lg">This Month</CardTitle>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-blue-600" />
+                        This Month
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold mb-2">
+                      <div className="text-2xl font-bold mb-2 text-gray-800">
                         ${analytics.closing_projections.current_month.total_value.toLocaleString()}
                       </div>
-                      <div className="text-sm text-gray-500 mb-2">
-                        Weighted Value: ${analytics.closing_projections.current_month.weighted_value.toLocaleString()}
+                      <div className="text-lg font-bold text-blue-600 mb-2">
+                        Weighted: ${analytics.closing_projections.current_month.weighted_value.toLocaleString()}
                       </div>
                       <div className="text-sm">
-                        {analytics.closing_projections.current_month.deals.length} potential deals
+                        <Badge variant="secondary">
+                          {analytics.closing_projections.current_month.deals.length} potential deals
+                        </Badge>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className="border-2 border-green-200 bg-green-50">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-lg">This Quarter</CardTitle>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <TrendingUp className="h-5 w-5 text-green-600" />
+                        This Quarter
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold mb-2">
+                      <div className="text-2xl font-bold mb-2 text-gray-800">
                         ${analytics.closing_projections.next_quarter.total_value.toLocaleString()}
                       </div>
-                      <div className="text-sm text-gray-500 mb-2">
-                        Weighted Value: ${analytics.closing_projections.next_quarter.weighted_value.toLocaleString()}
+                      <div className="text-lg font-bold text-green-600 mb-2">
+                        Weighted: ${analytics.closing_projections.next_quarter.weighted_value.toLocaleString()}
                       </div>
                       <div className="text-sm">
-                        {analytics.closing_projections.next_quarter.deals.length} potential deals
+                        <Badge variant="secondary">
+                          {analytics.closing_projections.next_quarter.deals.length} potential deals
+                        </Badge>
                       </div>
                     </CardContent>
                   </Card>
                 </div>
+
+                {/* Upcoming Meetings Highlight */}
+                {analytics.closing_projections.next_7_days.deals.length > 0 && (
+                  <Card className="mb-6 bg-yellow-50 border-yellow-200">
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <AlertCircle className="h-5 w-5 text-yellow-600" />
+                        Upcoming High-Priority Meetings (Next 7 Days)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                        {analytics.closing_projections.next_7_days.deals.slice(0, 6).map((deal, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                            <div>
+                              <div className="font-medium">{deal.client}</div>
+                              <div className="text-sm text-gray-600">Owner: {deal.owner}</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-bold">${deal.pipeline?.toLocaleString()}</div>
+                              <Badge className={`text-xs ${
+                                deal.probability >= 70 ? 'bg-green-100 text-green-800' : 
+                                deal.probability >= 50 ? 'bg-yellow-100 text-yellow-800' : 
+                                'bg-orange-100 text-orange-800'
+                              }`}>
+                                {deal.probability}%
+                              </Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
 
                 {/* Projection par AE */}
                 {Object.keys(analytics.closing_projections.ae_projections).length > 0 && (
