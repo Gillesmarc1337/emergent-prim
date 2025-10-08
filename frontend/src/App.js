@@ -723,6 +723,7 @@ function MainDashboard({ analytics }) {
 
 function Dashboard() {
   const [analytics, setAnalytics] = useState(null);
+  const [yearlyData, setYearlyData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [monthOffset, setMonthOffset] = useState(0);
