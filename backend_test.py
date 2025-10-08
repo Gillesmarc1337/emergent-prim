@@ -367,6 +367,9 @@ def main():
     test_results = {
         'connectivity': False,
         'data_status': False,
+        'projections_hot_deals': False,
+        'projections_hot_leads': False,
+        'projections_performance_summary': False,
         'month_offset_0': False,
         'month_offset_1': False,
         'month_offset_3': False
@@ -378,7 +381,12 @@ def main():
     # Test 2: Data availability
     test_results['data_status'] = test_data_status()
     
-    # Test 3: Monthly analytics with different offsets
+    # Test 3: New Projections API endpoints
+    test_results['projections_hot_deals'] = test_projections_hot_deals()
+    test_results['projections_hot_leads'] = test_projections_hot_leads()
+    test_results['projections_performance_summary'] = test_projections_performance_summary()
+    
+    # Test 4: Monthly analytics with different offsets
     # month_offset=0 should show "Oct 2025"
     test_results['month_offset_0'] = test_monthly_analytics_with_offset(0, "Oct 2025")
     
