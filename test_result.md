@@ -103,17 +103,22 @@
 #====================================================================================================
 
 user_problem_statement: |
-  Utilisateur a demandé de rendre les 4 blocs du dashboard dynamiques en fonction du mois sélectionné avec des targets spécifiques:
+  L'utilisateur a demandé d'ajouter de nouveaux blocs dans l'onglet "Projections":
   
-  1. Meeting Generation: 20 inbound, 15 outbound, 10 referral par mois (targets fixes)
-     - Afficher ratios actuel/target (ex: 25/20 inbound, 3/10 referral)
+  1. Nouveau bloc "Hot deals closing in the next 2 weeks to 30 days":
+     - Tous les deals en B Legals
+     - Fonctionnalité drag & drop pour réorganiser
+     - Boutons pour masquer temporairement de la vue
   
-  2. Discovery & POA: 45 discovery, 18 POA par mois (targets)
-     - Discovery: tous les deals sauf inbox et intro no show
+  2. Nouveau bloc "Additional Hot leads that will most likely close within the next 3 months":
+     - Tous les deals sur C Proposal sent et D POA Booked
+     - Drag & drop capability
+     - Tableau avec MRR et ARR
+     - Bouton reset pour recharger les leads
   
-  3. New Pipe Created: garder calculs par mois avec weighted pipe
+  3. Corriger les blocs Performance Summary pour utiliser les mêmes données que le dashboard
   
-  4. Revenue Objective: semble déjà correct
+  4. Améliorer les blocs Closing Projections pour mettre en évidence les upcoming meetings et weighted pipe
 
 backend:
   - task: "Meeting Generation block with dynamic ratios"
