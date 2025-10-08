@@ -346,23 +346,19 @@ def calculate_meetings_attended(df, start_date, end_date):
             'scheduled': scheduled_count,
             'attendance_rate': float(attended_count / scheduled_count * 100 if scheduled_count > 0 else 0)
         },
-        'discovery_metrics': {
+        'poa_generated_metrics': {  # Renamed from discovery_metrics
             'target': 30,
-            'completed': discoveries_count,
-            'conversion_rate': float(discoveries_count / attended_count * 100 if attended_count > 0 else 0)
+            'completed': poa_generated_count,
+            'conversion_rate': float(poa_generated_count / attended_count * 100 if attended_count > 0 else 0)
         },
-        'poa_metrics': {
+        'deals_closed_metrics': {  # Renamed from poa_metrics
             'target': 15,
-            'generated': poa_count,
-            'conversion_rate': float(poa_count / discoveries_count * 100 if discoveries_count > 0 else 0)
+            'generated': deals_closed_count,
+            'conversion_rate': float(deals_closed_count / poa_generated_count * 100 if poa_generated_count > 0 else 0)
         },
-        'ae_performance': {k: {
-            'total_scheduled': int(v['total_scheduled']),
-            'attended': int(v['attended']),
-            'poa_generated': int(v['poa_generated'])
-        } for k, v in ae_stats.to_dict('index').items()} if not ae_stats.empty else {},
+        'ae_performance': ae_stats,  # Use the new ae_stats list directly
         'meetings_detail': clean_records(meetings_detail[['client', 'meeting_date', 'status', 'closed_status', 'owner', 'stage']].to_dict('records')),
-        'on_track': bool(attended_count >= 40 and poa_count >= 15)
+        'on_track': bool(attended_count >= 40 and deals_closed_count >= 15)
     }
 
 def calculate_ae_performance(df, start_date, end_date):
