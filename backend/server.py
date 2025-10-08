@@ -603,7 +603,19 @@ def calculate_deals_closed(df, start_date, end_date):
     }
 
 def calculate_pipe_metrics(df, start_date, end_date):
-    """Calculate pipeline metrics"""
+    """Calculate pipeline metrics with pipe and weighted pipe"""
+    
+    # Add probability and weighted value calculations
+    stage_probabilities = {
+        'E Verbal commit': 90,
+        'D Negotiation': 70,
+        'C Proposal sent': 50,
+        'B Discovery completed': 30,
+        'A Discovery scheduled': 10
+    }
+    df['probability'] = df['stage'].map(stage_probabilities).fillna(0)
+    df['weighted_value'] = df['pipeline'] * df['probability'] / 100
+    
     # New pipe created in period
     new_pipe = df[
         (df['discovery_date'] >= start_date) & 
@@ -611,37 +623,52 @@ def calculate_pipe_metrics(df, start_date, end_date):
         (df['relevance'] == 'Relevant')
     ]
     
-    # Hot pipe deals
-    hot_stages = ['C Proposal sent', 'D Negotiation', 'E Verbal commit']
-    hot_pipe = df[df['stage'].isin(hot_stages)]
+    # Total active pipeline (not closed)
+    active_pipe = df[~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost', 'A Closed'])]
     
-    # Total aggregate pipe
-    active_pipe = df[~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost'])]
+    # AE breakdown
+    ae_breakdown = []
+    for ae in active_pipe['owner'].dropna().unique():
+        ae_deals = active_pipe[active_pipe['owner'] == ae]
+        ae_new_pipe = new_pipe[new_pipe['owner'] == ae]
+        
+        ae_breakdown.append({
+            'ae': str(ae),
+            'total_pipe': float(ae_deals['pipeline'].sum()),
+            'weighted_pipe': float(ae_deals['weighted_value'].sum()),
+            'new_pipe_created': float(ae_new_pipe['pipeline'].sum()),
+            'deals_count': len(ae_deals),
+            'new_deals_count': len(ae_new_pipe)
+        })
+    
+    # Sort by total pipe descending
+    ae_breakdown.sort(key=lambda x: x['total_pipe'], reverse=True)
     
     # Convert numpy types to Python native types
     new_pipe_value = float(new_pipe['pipeline'].sum())
-    hot_pipe_value = float(hot_pipe['pipeline'].sum())
-    active_pipe_value = float(active_pipe['pipeline'].sum())
+    new_weighted_pipe = float(new_pipe['weighted_value'].sum())
+    total_pipe_value = float(active_pipe['pipeline'].sum())
+    total_weighted_pipe = float(active_pipe['weighted_value'].sum())
     
     return {
-        'new_pipe_created': {
+        'created_pipe': {
             'value': new_pipe_value,
+            'weighted_value': new_weighted_pipe,
             'count': int(len(new_pipe)),
-            'target': 500000,
-            'on_track': bool(new_pipe_value >= 500000)
+            'target': 2000000,  # Monthly target for new pipe
+            'target_weighted': 600000,  # Monthly target for weighted pipe
+            'on_track': bool(new_pipe_value >= 2000000)
         },
-        'hot_pipe': {
-            'value': hot_pipe_value,
-            'count': int(len(hot_pipe)),
-            'target': 1000000,
-            'deals': clean_records(hot_pipe[['client', 'pipeline', 'stage', 'owner']].to_dict('records'))
-        },
-        'total_aggregate_pipe': {
-            'value': active_pipe_value,
+        'total_pipe': {
+            'value': total_pipe_value,
+            'weighted_value': total_weighted_pipe,
             'count': int(len(active_pipe)),
-            'target': 2000000,
-            'on_track': bool(active_pipe_value >= 2000000)
-        }
+            'target': 5000000,  # Total pipeline target
+            'target_weighted': 1500000,  # Total weighted pipeline target
+            'on_track': bool(total_pipe_value >= 5000000)
+        },
+        'ae_breakdown': ae_breakdown,
+        'pipe_details': clean_records(active_pipe[['client', 'pipeline', 'weighted_value', 'stage', 'owner', 'probability']].to_dict('records'))
     }
 
 def calculate_closing_projections(df):
