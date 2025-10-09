@@ -281,6 +281,18 @@ frontend:
           agent: "testing"
           comment: "✅ TESTED SUCCESSFULLY: /api/analytics/yearly?year=2025 endpoint now includes dashboard_blocks with proper July-December targets. Fixed minor typo in show_noshow column reference. All 4 blocks present: block_1_meetings (270 total meetings target = 6x45 monthly), block_2_intro_poa (270 intro + 108 POA targets = 6x monthly), block_3_pipe_creation (July-Dec period data), block_4_revenue (4,800,000 total July-Dec revenue target). Period correctly set to 'Jul-Dec 2025'. Meeting breakdown: Inbound=120, Outbound=90, Referral=60 targets. Actual data shows 115 total meetings, 99 intros, 55 POAs, and $1.13M closed revenue (23.5% progress). API working perfectly for July-December period calculations."
 
+  - task: "Corrected targets and new metrics implementation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED SUCCESSFULLY: All 3 requested endpoints verified with corrected targets and new metrics. GET /api/analytics/monthly: ytd_target=4,500,000 (corrected from 3,600,000), pipe_created=6,865,596, active_deals_count=75. GET /api/analytics/yearly?year=2025: Same corrections confirmed. GET /api/projections/performance-summary: All metrics correctly implemented. Backend APIs fully updated with 4.5M target and new metrics (pipe_created for YTD pipe creation value, active_deals_count for active deals excluding lost/inbox/noshow/irrelevant). Comprehensive testing with curl and Python scripts confirms all endpoints working correctly."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
