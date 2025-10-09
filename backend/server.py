@@ -1041,9 +1041,18 @@ async def get_monthly_analytics(month_offset: int = 0):
         actual_referral = len(focus_month_meetings[focus_month_meetings['type_of_source'].isin(['Internal referral', 'Client referral'])])
         actual_total = actual_inbound + actual_outbound + actual_referral
         
-        # Calculate Show and No Show numbers
-        actual_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'Show'])
-        actual_no_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'Noshow'])
+        # Calculate Show and No Show numbers (case insensitive and flexible matching)
+        show_meetings = focus_month_meetings[
+            focus_month_meetings['show_noshow'].notna() & 
+            focus_month_meetings['show_noshow'].str.strip().str.lower().str.contains('show', na=False) &
+            ~focus_month_meetings['show_noshow'].str.strip().str.lower().str.contains('noshow|no show', na=False)
+        ]
+        no_show_meetings = focus_month_meetings[
+            focus_month_meetings['show_noshow'].notna() & 
+            focus_month_meetings['show_noshow'].str.strip().str.lower().str.contains('noshow|no show', na=False)
+        ]
+        actual_show = len(show_meetings)
+        actual_no_show = len(no_show_meetings)
         
         # Block 2: Intro & POA (filtered for focus month)
         # Targets: 45 intro, 18 POA per month
@@ -1464,9 +1473,18 @@ async def get_dashboard_analytics():
         actual_referral = len(focus_month_meetings[focus_month_meetings['type_of_source'].isin(['Internal referral', 'Client referral'])])
         actual_total = actual_inbound + actual_outbound + actual_referral
         
-        # Calculate Show and No Show numbers
-        actual_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'Show'])
-        actual_no_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'Noshow'])
+        # Calculate Show and No Show numbers (case insensitive and flexible matching)
+        show_meetings = focus_month_meetings[
+            focus_month_meetings['show_noshow'].notna() & 
+            focus_month_meetings['show_noshow'].str.strip().str.lower().str.contains('show', na=False) &
+            ~focus_month_meetings['show_noshow'].str.strip().str.lower().str.contains('noshow|no show', na=False)
+        ]
+        no_show_meetings = focus_month_meetings[
+            focus_month_meetings['show_noshow'].notna() & 
+            focus_month_meetings['show_noshow'].str.strip().str.lower().str.contains('noshow|no show', na=False)
+        ]
+        actual_show = len(show_meetings)
+        actual_no_show = len(no_show_meetings)
         
         # Block 2: Intro & POA (filtered for focus month)
         # Targets: 45 intro, 18 POA per month
