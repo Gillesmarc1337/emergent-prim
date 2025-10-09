@@ -1811,7 +1811,7 @@ function Dashboard() {
                         <span className="font-medium">{ae.closing}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Valeur Closing:</span>
+                        <span>Closing Value:</span>
                         <span className="font-medium text-green-600">
                           ${ae.valeur_closing.toLocaleString()}
                         </span>
@@ -1994,7 +1994,7 @@ function Dashboard() {
                             <span className="font-medium">{ae.closing}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span>Valeur Closing:</span>
+                            <span>Closing Value:</span>
                             <span className="font-medium text-green-600">
                               ${ae.valeur_closing.toLocaleString()}
                             </span>
