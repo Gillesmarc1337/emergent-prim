@@ -1880,11 +1880,20 @@ async def debug_show_noshow_values():
         unique_values = df['show_noshow'].unique().tolist()
         value_counts = df['show_noshow'].value_counts().to_dict()
         
+        # Also check what columns exist in the data
+        available_columns = df.columns.tolist()
+        
+        # Check if there are any columns that might contain show/noshow data
+        show_related_columns = [col for col in available_columns if 'show' in col.lower()]
+        
         return {
             "unique_values": unique_values,
             "value_counts": value_counts,
             "total_records": len(df),
-            "non_null_show_noshow": len(df[df['show_noshow'].notna()])
+            "non_null_show_noshow": len(df[df['show_noshow'].notna()]),
+            "available_columns": available_columns,
+            "show_related_columns": show_related_columns,
+            "first_record_sample": records[0] if records else None
         }
         
     except Exception as e:
