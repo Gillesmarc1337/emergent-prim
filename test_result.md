@@ -216,16 +216,19 @@ frontend:
           comment: "Enhanced Closing Projections with colored cards, weighted value highlighting, and upcoming high-priority meetings section."
 
   - task: "Replace Yearly button with July To Dec button"
-    implemented: false
-    working: "NA"
+    implemented: true
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Need to change 'Yearly' button text to 'July To Dec' to better reflect the H2 2025 period focus"
+        - working: true
+          agent: "main"
+          comment: "✅ COMPLETED: Successfully changed 'Yearly' button to 'July To Dec' and title to 'July To Dec 2025 Report'. Backend updated to include dashboard_blocks with 6-month targets (270 meetings, 270 intro, 108 POA, $4.8M revenue). All 4 dashboard blocks now display correctly when clicking July To Dec button with proper Jul-Dec 2025 period labels and 6x monthly targets."
 
   - task: "Verify dashboard blocks show dynamic targets for custom periods"
     implemented: true
