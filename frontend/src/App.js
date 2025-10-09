@@ -579,22 +579,17 @@ function MainDashboard({ analytics }) {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            <ComposedChart data={dashboardData.monthly_revenue_chart}>
+            <BarChart data={dashboardData.monthly_revenue_chart}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
               <Legend />
-              <Bar dataKey="target_revenue" fill={REVENUE_COLORS.target} name="Target Revenue" />
               <Bar dataKey="closed_revenue" fill={REVENUE_COLORS.closed} name="Closed Revenue" />
-              <Line 
-                type="monotone" 
-                dataKey="weighted_pipe" 
-                stroke={REVENUE_COLORS.weighted} 
-                strokeWidth={3}
-                name="Weighted Pipeline" 
-              />
-            </ComposedChart>
+              <Bar dataKey="target_revenue" fill={REVENUE_COLORS.target} name="Target Revenue" />
+              <Bar dataKey="new_weighted_pipe" fill="#FF6B35" name="New Weighted Pipe" />
+              <Bar dataKey="aggregate_weighted_pipe" fill="#4ECDC4" name="Aggregate Weighted Pipe" />
+            </BarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
