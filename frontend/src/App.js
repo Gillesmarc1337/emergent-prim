@@ -932,6 +932,14 @@ function Dashboard() {
     'Aggregate Weighted Pipe': true
   });
 
+  // Handle legend click to toggle series visibility
+  const handleLegendClick = (dataKey) => {
+    setVisibleSeries(prev => ({
+      ...prev,
+      [dataKey]: !prev[dataKey]
+    }));
+  };
+
   const loadAnalytics = async () => {
     setLoading(true);
     setError(null);
