@@ -273,8 +273,9 @@ function DraggableDealItem({ deal, index, onHide }) {
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <div className="font-medium">{deal.client}</div>
-              <div className="text-sm text-gray-600">AE: {deal.owner}</div>
-              <div className="text-sm text-blue-600">Pipeline: ${deal.pipeline?.toLocaleString()}</div>
+              <div className="text-sm text-gray-600">
+                AE: {deal.owner} | Pipeline: ${deal.pipeline?.toLocaleString()}
+              </div>
             </div>
             <Button
               variant="ghost"
