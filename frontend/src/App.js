@@ -707,7 +707,11 @@ function MainDashboard({ analytics }) {
                 <Bar dataKey="new_weighted_pipe" fill="#D97706" name="New Weighted Pipe" />
               )}
               {visibleSeries['Aggregate Weighted Pipe'] && (
-                <Bar dataKey="aggregate_weighted_pipe" fill="#4ECDC4" name="Aggregate Weighted Pipe" />
+                <Bar 
+                  dataKey="aggregate_weighted_pipe" 
+                  fill="#4ECDC4" 
+                  name="Aggregate Weighted Pipe"
+                />
               )}
             </BarChart>
           </ResponsiveContainer>
