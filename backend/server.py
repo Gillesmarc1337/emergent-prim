@@ -1864,37 +1864,6 @@ async def get_hot_leads():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting hot leads: {str(e)}")
 
-@api_router.get("/debug/show-noshow-values")
-async def debug_show_noshow_values():
-    """Debug endpoint to see all unique values in show_noshow field"""
-    try:
-        # Get data from MongoDB
-        records = await db.sales_records.find().to_list(10000)
-        if not records:
-            return []
-        
-        # Convert to DataFrame
-        df = pd.DataFrame(records)
-        
-        # Get unique values in show_noshow column
-        unique_values = df['show_noshow'].unique().tolist()
-        value_counts = df['show_noshow'].value_counts().to_dict()
-        
-        # Also check what columns exist in the data
-        available_columns = df.columns.tolist()
-        
-        # Check if there are any columns that might contain show/noshow data
-        show_related_columns = [col for col in available_columns if 'show' in col.lower()]
-        
-        return {
-            "total_records": len(df),
-            "available_columns": available_columns,
-            "show_related_columns": show_related_columns
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error debugging show_noshow values: {str(e)}")
-
 @api_router.get("/projections/performance-summary")
 async def get_projections_performance_summary():
     """Get performance summary data for projections tab (same as dashboard)"""
