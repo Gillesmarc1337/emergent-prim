@@ -593,8 +593,14 @@ def calculate_deals_closed(df, start_date, end_date):
     
     # Calculate period length to adjust targets
     period_days = (end_date - start_date).days
-    monthly_target_deals = 3  # More realistic based on your data
-    monthly_target_arr = 375000  # 4.5M annual target / 12 months = 375K per month
+    monthly_target_deals = 5  # 5 clients per month as requested
+    
+    # Use specific monthly targets based on the month
+    # October 2025 should be $1,080,000 as specified
+    if start_date.month == 10 and start_date.year == 2025:
+        monthly_target_arr = 1080000  # October 2025 specific target
+    else:
+        monthly_target_arr = 375000  # Default for other months (4.5M annual / 12 = 375K per month)
     
     # Adjust targets based on period length
     if period_days <= 31:  # Monthly or shorter
