@@ -1905,7 +1905,6 @@ function Dashboard() {
                 )}
               </CardContent>
             </Card>
-            </div>
           </AnalyticsSection>
         </TabsContent>
 
