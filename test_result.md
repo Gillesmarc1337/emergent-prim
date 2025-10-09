@@ -247,12 +247,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Hot Deals drag & drop interface"
-    - "Hot Leads table with MRR/ARR"
-    - "Enhanced Performance Summary"
-    - "Enhanced Closing Projections"
+    - "Replace Yearly button with July To Dec button"
+    - "Verify dashboard blocks show dynamic targets for custom periods"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
   - task: "Replace Yearly button with July To Dec button"
