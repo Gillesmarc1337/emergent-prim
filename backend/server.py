@@ -1174,11 +1174,11 @@ async def get_yearly_analytics(year: int = 2025):
                 'total_actual': actual_total_july_dec,
                 'total_target': july_dec_meeting_target,
                 'inbound_actual': actual_inbound_july_dec,
-                'inbound_target': 20 * 6,  # 120 for 6 months
+                'inbound_target': 20 * months_elapsed,
                 'outbound_actual': actual_outbound_july_dec,
-                'outbound_target': 15 * 6,  # 90 for 6 months
+                'outbound_target': 15 * months_elapsed,
                 'referral_actual': actual_referral_july_dec,
-                'referral_target': 10 * 6,  # 60 for 6 months
+                'referral_target': 10 * months_elapsed
                 'unassigned_actual': unassigned_july_dec,
                 'unassigned_target': 0,  # No target for unassigned as it indicates data issue
                 'show_actual': actual_show_july_dec,
