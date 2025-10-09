@@ -70,6 +70,7 @@ class WeeklyAnalytics(BaseModel):
     old_pipe: Dict[str, Any]
     closing_projections: Dict[str, Any]
     big_numbers_recap: Dict[str, Any]
+    dashboard_blocks: Optional[Dict[str, Any]] = None
 
 class UploadResponse(BaseModel):
     message: str
