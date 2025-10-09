@@ -1176,6 +1176,7 @@ async def get_yearly_analytics(year: int = 2025):
                 'title': 'New Pipe Created',
                 'new_pipe_created': new_pipe_july_dec,
                 'weighted_pipe_created': weighted_pipe_july_dec,
+                'aggregate_weighted_pipe': aggregate_weighted_pipe_july_dec,
                 'period': 'Jul-Dec 2025'
             },
             'block_4_revenue': {
