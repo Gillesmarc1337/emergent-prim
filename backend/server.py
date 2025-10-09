@@ -1793,8 +1793,15 @@ async def get_dashboard_analytics():
             new_deals_month['weighted_value'] = new_deals_month['pipeline'] * new_deals_month['probability'] / 100
             new_weighted_pipe = float(new_deals_month['weighted_value'].sum())
             
-            # Aggregate Weighted Pipe (cumulative from July to current month)
-            aggregate_weighted_pipe = calculate_cumulative_aggregate_weighted_pipe(df, target_date)
+            # Aggregate Weighted Pipe (cumulative from July to current month only)
+            current_date = datetime.now()
+            
+            # Only show aggregate weighted pipe for past and current months
+            if target_date <= current_date:
+                aggregate_weighted_pipe = calculate_cumulative_aggregate_weighted_pipe(df, target_date)
+            else:
+                # For future months, set to None or 0 so it doesn't display
+                aggregate_weighted_pipe = None
             
             months_data.append({
                 'month': month_str,
