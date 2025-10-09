@@ -1039,6 +1039,100 @@ async def get_yearly_analytics(year: int = 2025):
             'forecast_gap': float(ytd_closed['expected_arr'].sum()) < 4500000.0 * 0.75
         }
         
+        # Dashboard blocks for July-December period (6 months)
+        # Calculate actual values for July-December period
+        july_dec_start = datetime(year, 7, 1)
+        july_dec_end = datetime(year, 12, 31, 23, 59, 59, 999999)
+        
+        # Meeting generation for July-Dec period
+        july_dec_meetings = df[
+            (df['discovery_date'] >= july_dec_start) & 
+            (df['discovery_date'] <= july_dec_end)
+        ]
+        
+        # Calculate meeting targets for 6-month period (6x monthly targets)
+        monthly_meeting_target = 45  # Base monthly target
+        july_dec_meeting_target = monthly_meeting_target * 6  # 270 for 6 months
+        
+        # Meeting breakdown
+        actual_total_july_dec = len(july_dec_meetings)
+        actual_inbound_july_dec = len(july_dec_meetings[july_dec_meetings['type_of_source'] == 'Inbound'])
+        actual_outbound_july_dec = len(july_dec_meetings[july_dec_meetings['type_of_source'] == 'Outbound'])
+        actual_referral_july_dec = len(july_dec_meetings[july_dec_meetings['type_of_source'] == 'Referral'])
+        actual_show_july_dec = len(july_dec_meetings[july_dec_meetings['show_nowshow'] == 'Show'])
+        actual_no_show_july_dec = len(july_dec_meetings[july_dec_meetings['show_nowshow'] == 'No Show'])
+        
+        # Intro & POA for July-Dec period
+        intro_july_dec = len(july_dec_meetings[july_dec_meetings['show_nowshow'] == 'Show'])
+        monthly_intro_target = 45
+        july_dec_intro_target = monthly_intro_target * 6  # 270 for 6 months
+        
+        poa_stages = ['D POA Booked', 'C Proposal sent', 'B Legals', 'A Closed']
+        poa_july_dec = len(df[
+            (df['discovery_date'] >= july_dec_start) & 
+            (df['discovery_date'] <= july_dec_end) &
+            (df['stage'].isin(poa_stages))
+        ])
+        monthly_poa_target = 18
+        july_dec_poa_target = monthly_poa_target * 6  # 108 for 6 months
+        
+        # New pipe created for July-Dec period
+        new_pipe_july_dec = july_dec_meetings['pipeline'].sum()
+        weighted_pipe_july_dec = 0  # Calculate based on your logic
+        
+        # Revenue for July-Dec period (sum of all July-Dec targets)
+        july_dec_revenue_targets = {
+            'Jul 2025': 465000, 'Aug 2025': 397500, 'Sep 2025': 547500,
+            'Oct 2025': 1080000, 'Nov 2025': 997500, 'Dec 2025': 1312500
+        }
+        total_july_dec_target = sum(july_dec_revenue_targets.values())  # 4,800,000
+        
+        # Calculate actual closed revenue for July-Dec
+        closed_deals_july_dec = df[
+            (df['billing_start'] >= july_dec_start) & 
+            (df['billing_start'] <= july_dec_end) &
+            (df['stage'].isin(['A Closed', 'Closed Won', 'Won', 'Signed']))
+        ]
+        actual_closed_july_dec = closed_deals_july_dec['expected_arr'].sum()
+        
+        dashboard_blocks = {
+            'block_1_meetings': {
+                'title': 'Meetings Generation',
+                'period': 'Jul-Dec 2025',
+                'total_actual': actual_total_july_dec,
+                'total_target': july_dec_meeting_target,
+                'inbound_actual': actual_inbound_july_dec,
+                'inbound_target': 20 * 6,  # 120 for 6 months
+                'outbound_actual': actual_outbound_july_dec,
+                'outbound_target': 15 * 6,  # 90 for 6 months
+                'referral_actual': actual_referral_july_dec,
+                'referral_target': 10 * 6,  # 60 for 6 months
+                'show_actual': actual_show_july_dec,
+                'no_show_actual': actual_no_show_july_dec
+            },
+            'block_2_intro_poa': {
+                'title': 'Intro & POA',
+                'period': 'Jul-Dec 2025',
+                'intro_actual': intro_july_dec,
+                'intro_target': july_dec_intro_target,
+                'poa_actual': poa_july_dec,
+                'poa_target': july_dec_poa_target
+            },
+            'block_3_pipe_creation': {
+                'title': 'New Pipe Created',
+                'new_pipe_created': new_pipe_july_dec,
+                'weighted_pipe_created': weighted_pipe_july_dec,
+                'period': 'Jul-Dec 2025'
+            },
+            'block_4_revenue': {
+                'title': 'July-December Revenue Objective',
+                'revenue_target': total_july_dec_target,
+                'closed_revenue': actual_closed_july_dec,
+                'progress': (actual_closed_july_dec / total_july_dec_target * 100) if total_july_dec_target > 0 else 0,
+                'period': 'Jul-Dec 2025'
+            }
+        }
+
         analytics = {
             'week_start': year_start,  # Use year_start for compatibility
             'week_end': year_end,      # Use year_end for compatibility
@@ -1050,7 +1144,8 @@ async def get_yearly_analytics(year: int = 2025):
             'pipe_metrics': pipe_metrics,
             'old_pipe': old_pipe,
             'closing_projections': closing_projections,
-            'big_numbers_recap': big_numbers_recap
+            'big_numbers_recap': big_numbers_recap,
+            'dashboard_blocks': dashboard_blocks
         }
         
         return analytics
