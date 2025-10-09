@@ -797,6 +797,12 @@ function MainDashboard({ analytics }) {
                     <span>Referral:</span>
                     <span className="font-medium">{analytics.dashboard_blocks.block_1_meetings.referral_actual}/{analytics.dashboard_blocks.block_1_meetings.referral_target}</span>
                   </div>
+                  {analytics.dashboard_blocks.block_1_meetings.unassigned_actual > 0 && (
+                    <div className="flex justify-between">
+                      <span>Unassigned:</span>
+                      <span className="font-medium text-orange-600">{analytics.dashboard_blocks.block_1_meetings.unassigned_actual}</span>
+                    </div>
+                  )}
                   <div className="border-t pt-2 mt-2">
                     <div className="flex justify-between">
                       <span>Show:</span>
