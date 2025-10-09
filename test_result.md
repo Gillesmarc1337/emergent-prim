@@ -231,8 +231,34 @@ test_plan:
   test_all: true
   test_priority: "high_first"
 
+  - task: "Replace Yearly button with July To Dec button"
+    implemented: false
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to change 'Yearly' button text to 'July To Dec' to better reflect the H2 2025 period focus"
+
+  - task: "Verify dashboard blocks show dynamic targets for custom periods"
+    implemented: false
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to verify that when custom date ranges (e.g., 2 months) are selected, dashboard blocks show dynamic targets (e.g., 2x targets for 2-month periods)"
+
 agent_communication:
     - agent: "main"
       message: "Successfully implemented all requested enhancements to the Projections tab. Added Hot Deals section with drag & drop for B Legals deals, Hot Leads section with MRR/ARR table for C Proposal sent and D POA Booked deals, enhanced Performance Summary to match dashboard data, and improved Closing Projections with weighted value highlights. All new API endpoints are working and frontend displays correctly."
     - agent: "testing"
       message: "✅ BACKEND TESTING COMPLETE: All 3 new projections API endpoints tested successfully. Hot-deals endpoint returns 13 deals in 'B Legals' stage with correct data structure. Hot-leads endpoint returns 24 leads from 'C Proposal sent' and 'D POA Booked' stages with complete MRR/ARR data. Performance-summary endpoint matches dashboard calculation logic with YTD revenue $1.13M vs $3.6M target. All endpoints handle data gracefully and return properly formatted JSON responses. Backend APIs are ready for frontend integration."
+    - agent: "main"
+      message: "Starting new tasks: 1) Replace 'Yearly' button with 'July To Dec' to better reflect H2 2025 focus, 2) Verify dashboard blocks correctly display dynamic targets when custom periods are selected (e.g., 2x targets for 2-month periods). Backend logic for dynamic targets is already implemented in /api/analytics/custom endpoint."
