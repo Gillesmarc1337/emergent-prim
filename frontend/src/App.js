@@ -1803,7 +1803,7 @@ function Dashboard() {
                         <span className="font-medium">{ae.intros_attended}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>POA Fait:</span>
+                        <span>POA Done:</span>
                         <span className="font-medium">{ae.poa_fait}</span>
                       </div>
                       <div className="flex justify-between">
@@ -1986,7 +1986,7 @@ function Dashboard() {
                             <span className="font-medium">{ae.intros_attended}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span>POA Fait:</span>
+                            <span>POA Done:</span>
                             <span className="font-medium">{ae.poa_fait}</span>
                           </div>
                           <div className="flex justify-between">
