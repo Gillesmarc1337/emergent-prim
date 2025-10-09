@@ -1685,13 +1685,19 @@ function Dashboard() {
                           <table className="w-full text-sm">
                             <thead>
                               <tr className="border-b">
-                                <th className="text-left p-2 font-semibold">AE</th>
-                                <th className="text-right p-2 font-semibold">POA Attended</th>
-                                <th className="text-right p-2 font-semibold">POA Closed</th>
+                                <SortableTableHeader sortKey="ae" requestSort={requestAePoaSort} sortConfig={aePoaSortConfig} className="text-left p-2 font-semibold">
+                                  AE
+                                </SortableTableHeader>
+                                <SortableTableHeader sortKey="poa_attended" requestSort={requestAePoaSort} sortConfig={aePoaSortConfig} className="text-right p-2 font-semibold">
+                                  POA Attended
+                                </SortableTableHeader>
+                                <SortableTableHeader sortKey="poa_closed" requestSort={requestAePoaSort} sortConfig={aePoaSortConfig} className="text-right p-2 font-semibold">
+                                  POA Closed
+                                </SortableTableHeader>
                               </tr>
                             </thead>
                             <tbody>
-                              {analytics.ae_performance.ae_poa_performance.map((ae, index) => (
+                              {sortedAePoa.map((ae, index) => (
                                 <tr key={index} className="border-b hover:bg-gray-50">
                                   <td className="p-2 font-medium">{ae.ae}</td>
                                   <td className="text-right p-2">{ae.poa_attended}</td>
