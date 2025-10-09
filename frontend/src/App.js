@@ -371,6 +371,8 @@ function MeetingsTable({ meetings, title }) {
     return matchesSearch && matchesFilter;
   });
 
+  const { items: sortedMeetings, requestSort, sortConfig } = useSortableData(filteredMeetings);
+
   return (
     <Card>
       <CardHeader>
@@ -402,16 +404,28 @@ function MeetingsTable({ meetings, title }) {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b">
-                <th className="text-left p-2">Client</th>
-                <th className="text-left p-2">Meeting Date</th>
-                <th className="text-left p-2">Status</th>
-                <th className="text-left p-2">AE Owner</th>
-                <th className="text-left p-2">Stage</th>
-                <th className="text-left p-2">Closed Status</th>
+                <SortableTableHeader sortKey="client" requestSort={requestSort} sortConfig={sortConfig} className="text-left p-2">
+                  Client
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="meeting_date" requestSort={requestSort} sortConfig={sortConfig} className="text-left p-2">
+                  Meeting Date
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="status" requestSort={requestSort} sortConfig={sortConfig} className="text-left p-2">
+                  Status
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="owner" requestSort={requestSort} sortConfig={sortConfig} className="text-left p-2">
+                  AE Owner
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="stage" requestSort={requestSort} sortConfig={sortConfig} className="text-left p-2">
+                  Stage
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="closed_status" requestSort={requestSort} sortConfig={sortConfig} className="text-left p-2">
+                  Closed Status
+                </SortableTableHeader>
               </tr>
             </thead>
             <tbody>
-              {filteredMeetings.map((meeting, index) => (
+              {sortedMeetings.map((meeting, index) => (
                 <tr key={index} className="border-b hover:bg-gray-50">
                   <td className="p-2 font-medium">{meeting.client}</td>
                   <td className="p-2">
@@ -441,7 +455,7 @@ function MeetingsTable({ meetings, title }) {
               ))}
             </tbody>
           </table>
-          {filteredMeetings.length === 0 && (
+          {sortedMeetings.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               No meetings found matching the current filters.
             </div>
