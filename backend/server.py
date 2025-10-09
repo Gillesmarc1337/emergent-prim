@@ -1105,7 +1105,22 @@ async def get_yearly_analytics(year: int = 2025):
         
         # New pipe created for July-Dec period
         new_pipe_july_dec = july_dec_meetings['pipeline'].sum()
-        weighted_pipe_july_dec = 0  # Calculate based on your logic
+        
+        # Calculate weighted pipe properly for July-Dec period
+        stage_probabilities = {
+            'E Verbal commit': 90, 'D Negotiation': 70, 'C Proposal sent': 50,
+            'B Discovery completed': 30, 'A Discovery scheduled': 10,
+            'D POA Booked': 30, 'B Legals': 70, 'A Closed': 100
+        }
+        
+        july_dec_weighted_data = df[
+            (df['discovery_date'] >= july_dec_start) & 
+            (df['discovery_date'] <= july_dec_end)
+        ].copy()
+        
+        july_dec_weighted_data['probability'] = july_dec_weighted_data['stage'].map(stage_probabilities).fillna(0)
+        july_dec_weighted_data['weighted_value'] = july_dec_weighted_data['pipeline'] * july_dec_weighted_data['probability'] / 100.0
+        weighted_pipe_july_dec = july_dec_weighted_data['weighted_value'].sum()
         
         # Revenue for July-Dec period (sum of all July-Dec targets)
         july_dec_revenue_targets = {
