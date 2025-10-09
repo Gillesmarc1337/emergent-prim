@@ -1334,45 +1334,69 @@ function Dashboard() {
               ? "Good performance on meeting attendance and conversions." 
               : "Need to improve attendance rates and conversions."}
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <MetricCard
-                title="Meetings Scheduled"
-                value={analytics.meetings_attended.intro_metrics.scheduled}
-                target={analytics.meetings_attended.intro_metrics.target}
-                icon={Calendar}
-                color="blue"
-              />
-              <MetricCard
-                title="Meetings Attended"
-                value={analytics.meetings_attended.intro_metrics.attended}
-                icon={CheckCircle2}
-                color="green"
-              />
-              <MetricCard
-                title="Attendance Rate"
-                value={analytics.meetings_attended.intro_metrics.attendance_rate.toFixed(1)}
-                unit="%"
-                icon={BarChart3}
-                color="orange"
-              />
-            </div>
+            {/* 📅 SECTION 1: MEETINGS & INTROS PERFORMANCE */}
+            <Card className="mb-6 border-blue-200">
+              <CardHeader className="bg-blue-50">
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <Calendar className="h-6 w-6 text-blue-600" />
+                  Meetings & Intros Performance
+                </CardTitle>
+                <CardDescription>Meeting scheduling, attendance and intro metrics</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <MetricCard
+                    title="Meetings Scheduled"
+                    value={analytics.meetings_attended.intro_metrics.scheduled}
+                    target={analytics.meetings_attended.intro_metrics.target}
+                    icon={Calendar}
+                    color="blue"
+                  />
+                  <MetricCard
+                    title="Meetings Attended"
+                    value={analytics.meetings_attended.intro_metrics.attended}
+                    icon={CheckCircle2}
+                    color="green"
+                  />
+                  <MetricCard
+                    title="Attendance Rate"
+                    value={analytics.meetings_attended.intro_metrics.attendance_rate.toFixed(1)}
+                    unit="%"
+                    icon={BarChart3}
+                    color="orange"
+                  />
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <MetricCard
-                title="POA Generated"
-                value={analytics.meetings_attended.poa_generated_metrics.completed}
-                target={analytics.meetings_attended.poa_generated_metrics.target}
-                icon={Target}
-                color="purple"
-              />
-              <MetricCard
-                title="Deals Closed"
-                value={analytics.meetings_attended.deals_closed_metrics.generated}
-                target={analytics.meetings_attended.deals_closed_metrics.target}
-                icon={DollarSign}
-                color="green"
-              />
-            </div>
+            {/* 🎯 SECTION 2: POA & DEALS PERFORMANCE */}
+            <Card className="mb-6 border-purple-200">
+              <CardHeader className="bg-purple-50">
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <Target className="h-6 w-6 text-purple-600" />
+                  POA & Deals Performance
+                </CardTitle>
+                <CardDescription>POA generation and deal closing metrics</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <MetricCard
+                    title="POA Generated"
+                    value={analytics.meetings_attended.poa_generated_metrics.completed}
+                    target={analytics.meetings_attended.poa_generated_metrics.target}
+                    icon={Target}
+                    color="purple"
+                  />
+                  <MetricCard
+                    title="Deals Closed"
+                    value={analytics.meetings_attended.deals_closed_metrics.generated}
+                    target={analytics.meetings_attended.deals_closed_metrics.target}
+                    icon={DollarSign}
+                    color="green"
+                  />
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Meetings Detail Table */}
             {analytics.meetings_attended.meetings_detail && analytics.meetings_attended.meetings_detail.length > 0 && (
