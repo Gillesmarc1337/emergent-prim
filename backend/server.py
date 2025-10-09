@@ -1149,6 +1149,10 @@ async def get_yearly_analytics(year: int = 2025):
         ]
         actual_closed_july_dec = closed_deals_july_dec['expected_arr'].sum()
         
+        # Calculate unassigned meetings (difference between total and sum of sources)
+        sum_of_sources_july_dec = actual_inbound_july_dec + actual_outbound_july_dec + actual_referral_july_dec
+        unassigned_july_dec = max(0, actual_total_july_dec - sum_of_sources_july_dec)
+        
         dashboard_blocks = {
             'block_1_meetings': {
                 'title': 'Meetings Generation',
@@ -1161,6 +1165,8 @@ async def get_yearly_analytics(year: int = 2025):
                 'outbound_target': 15 * 6,  # 90 for 6 months
                 'referral_actual': actual_referral_july_dec,
                 'referral_target': 10 * 6,  # 60 for 6 months
+                'unassigned_actual': unassigned_july_dec,
+                'unassigned_target': 0,  # No target for unassigned as it indicates data issue
                 'show_actual': actual_show_july_dec,
                 'no_show_actual': actual_no_show_july_dec
             },
