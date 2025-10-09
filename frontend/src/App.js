@@ -583,6 +583,14 @@ function MainDashboard({ analytics }) {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // State for chart series visibility
+  const [visibleSeries, setVisibleSeries] = useState({
+    'Closed Revenue': true,
+    'Target Revenue': true,
+    'New Weighted Pipe': true,
+    'Aggregate Weighted Pipe': true
+  });
 
   const loadDashboard = async () => {
     try {
