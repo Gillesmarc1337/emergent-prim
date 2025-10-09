@@ -923,6 +923,14 @@ function Dashboard() {
   const [hiddenDeals, setHiddenDeals] = useState(new Set());
   const [hiddenLeads, setHiddenLeads] = useState(new Set());
   const [loadingProjections, setLoadingProjections] = useState(false);
+  
+  // State for chart series visibility
+  const [visibleSeries, setVisibleSeries] = useState({
+    'Closed Revenue': true,
+    'Target Revenue': true,
+    'New Weighted Pipe': true,
+    'Aggregate Weighted Pipe': true
+  });
 
   const loadAnalytics = async () => {
     setLoading(true);
