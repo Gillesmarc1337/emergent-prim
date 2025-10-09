@@ -357,6 +357,245 @@ def test_projections_performance_summary():
     
     return success
 
+def test_custom_analytics_dynamic_targets():
+    """Test custom analytics endpoint with dynamic targets for different periods"""
+    print(f"\n{'='*60}")
+    print(f"🎯 TESTING CUSTOM ANALYTICS DYNAMIC TARGETS")
+    print(f"{'='*60}")
+    
+    # Test 1: 1-month period (baseline)
+    print(f"\n📅 Test 1: 1-month period (October 2025)")
+    endpoint_1m = "/analytics/custom?start_date=2025-10-01&end_date=2025-10-31"
+    data_1m = test_api_endpoint(endpoint_1m)
+    
+    if data_1m is None:
+        print("❌ Failed to get 1-month data")
+        return False
+    
+    # Validate dashboard_blocks exist
+    if 'dashboard_blocks' not in data_1m:
+        print("❌ dashboard_blocks not found in 1-month response")
+        return False
+    
+    blocks_1m = data_1m['dashboard_blocks']
+    print(f"✅ Dashboard blocks found for 1-month period")
+    
+    # Extract 1-month targets (baseline)
+    baseline_targets = {}
+    
+    # Block 1: Meetings Generation
+    if 'block_1_meetings' in blocks_1m:
+        block1 = blocks_1m['block_1_meetings']
+        baseline_targets['meetings_total'] = block1.get('total_target', 0)
+        baseline_targets['meetings_inbound'] = block1.get('inbound_target', 0)
+        baseline_targets['meetings_outbound'] = block1.get('outbound_target', 0)
+        baseline_targets['meetings_referral'] = block1.get('referral_target', 0)
+        print(f"  ✓ Block 1 - Total meetings target: {baseline_targets['meetings_total']}")
+    else:
+        print("❌ block_1_meetings not found in 1-month response")
+        return False
+    
+    # Block 2: Intro & POA
+    if 'block_2_intro_poa' in blocks_1m:
+        block2 = blocks_1m['block_2_intro_poa']
+        baseline_targets['intro'] = block2.get('intro_target', 0)
+        baseline_targets['poa'] = block2.get('poa_target', 0)
+        print(f"  ✓ Block 2 - Intro target: {baseline_targets['intro']}, POA target: {baseline_targets['poa']}")
+    else:
+        print("❌ block_2_intro_poa not found in 1-month response")
+        return False
+    
+    # Block 3: New Pipe Created
+    if 'block_3_new_pipe' in blocks_1m:
+        block3 = blocks_1m['block_3_new_pipe']
+        baseline_targets['pipe'] = block3.get('target', 0)
+        print(f"  ✓ Block 3 - Pipe target: {baseline_targets['pipe']}")
+    else:
+        print("❌ block_3_new_pipe not found in 1-month response")
+        return False
+    
+    # Block 4: Revenue Objective
+    if 'block_4_revenue' in blocks_1m:
+        block4 = blocks_1m['block_4_revenue']
+        baseline_targets['revenue'] = block4.get('target_revenue', 0)
+        print(f"  ✓ Block 4 - Revenue target: {baseline_targets['revenue']}")
+    else:
+        print("❌ block_4_revenue not found in 1-month response")
+        return False
+    
+    # Test 2: 2-month period (should have 2x targets)
+    print(f"\n📅 Test 2: 2-month period (October 1 - November 30, 2025)")
+    endpoint_2m = "/analytics/custom?start_date=2025-10-01&end_date=2025-11-30"
+    data_2m = test_api_endpoint(endpoint_2m)
+    
+    if data_2m is None:
+        print("❌ Failed to get 2-month data")
+        return False
+    
+    if 'dashboard_blocks' not in data_2m:
+        print("❌ dashboard_blocks not found in 2-month response")
+        return False
+    
+    blocks_2m = data_2m['dashboard_blocks']
+    print(f"✅ Dashboard blocks found for 2-month period")
+    
+    # Validate 2x multiplier
+    success = True
+    
+    # Block 1: Meetings Generation (2x targets)
+    if 'block_1_meetings' in blocks_2m:
+        block1_2m = blocks_2m['block_1_meetings']
+        expected_total = baseline_targets['meetings_total'] * 2
+        expected_inbound = baseline_targets['meetings_inbound'] * 2
+        expected_outbound = baseline_targets['meetings_outbound'] * 2
+        expected_referral = baseline_targets['meetings_referral'] * 2
+        
+        actual_total = block1_2m.get('total_target', 0)
+        actual_inbound = block1_2m.get('inbound_target', 0)
+        actual_outbound = block1_2m.get('outbound_target', 0)
+        actual_referral = block1_2m.get('referral_target', 0)
+        
+        if actual_total == expected_total:
+            print(f"  ✅ Block 1 - Total meetings target correctly doubled: {actual_total} (expected: {expected_total})")
+        else:
+            print(f"  ❌ Block 1 - Total meetings target NOT doubled: {actual_total} (expected: {expected_total})")
+            success = False
+            
+        if actual_inbound == expected_inbound:
+            print(f"  ✅ Block 1 - Inbound target correctly doubled: {actual_inbound}")
+        else:
+            print(f"  ❌ Block 1 - Inbound target NOT doubled: {actual_inbound} (expected: {expected_inbound})")
+            success = False
+            
+        if actual_outbound == expected_outbound:
+            print(f"  ✅ Block 1 - Outbound target correctly doubled: {actual_outbound}")
+        else:
+            print(f"  ❌ Block 1 - Outbound target NOT doubled: {actual_outbound} (expected: {expected_outbound})")
+            success = False
+            
+        if actual_referral == expected_referral:
+            print(f"  ✅ Block 1 - Referral target correctly doubled: {actual_referral}")
+        else:
+            print(f"  ❌ Block 1 - Referral target NOT doubled: {actual_referral} (expected: {expected_referral})")
+            success = False
+    else:
+        print("❌ block_1_meetings not found in 2-month response")
+        success = False
+    
+    # Block 2: Intro & POA (2x targets)
+    if 'block_2_intro_poa' in blocks_2m:
+        block2_2m = blocks_2m['block_2_intro_poa']
+        expected_intro = baseline_targets['intro'] * 2
+        expected_poa = baseline_targets['poa'] * 2
+        
+        actual_intro = block2_2m.get('intro_target', 0)
+        actual_poa = block2_2m.get('poa_target', 0)
+        
+        if actual_intro == expected_intro:
+            print(f"  ✅ Block 2 - Intro target correctly doubled: {actual_intro} (expected: {expected_intro})")
+        else:
+            print(f"  ❌ Block 2 - Intro target NOT doubled: {actual_intro} (expected: {expected_intro})")
+            success = False
+            
+        if actual_poa == expected_poa:
+            print(f"  ✅ Block 2 - POA target correctly doubled: {actual_poa} (expected: {expected_poa})")
+        else:
+            print(f"  ❌ Block 2 - POA target NOT doubled: {actual_poa} (expected: {expected_poa})")
+            success = False
+    else:
+        print("❌ block_2_intro_poa not found in 2-month response")
+        success = False
+    
+    # Block 3: New Pipe Created (2x target)
+    if 'block_3_new_pipe' in blocks_2m:
+        block3_2m = blocks_2m['block_3_new_pipe']
+        expected_pipe = baseline_targets['pipe'] * 2
+        actual_pipe = block3_2m.get('target', 0)
+        
+        if actual_pipe == expected_pipe:
+            print(f"  ✅ Block 3 - Pipe target correctly doubled: {actual_pipe} (expected: {expected_pipe})")
+        else:
+            print(f"  ❌ Block 3 - Pipe target NOT doubled: {actual_pipe} (expected: {expected_pipe})")
+            success = False
+    else:
+        print("❌ block_3_new_pipe not found in 2-month response")
+        success = False
+    
+    # Block 4: Revenue Objective (2x target)
+    if 'block_4_revenue' in blocks_2m:
+        block4_2m = blocks_2m['block_4_revenue']
+        expected_revenue = baseline_targets['revenue'] * 2
+        actual_revenue = block4_2m.get('target_revenue', 0)
+        
+        if actual_revenue == expected_revenue:
+            print(f"  ✅ Block 4 - Revenue target correctly doubled: {actual_revenue} (expected: {expected_revenue})")
+        else:
+            print(f"  ❌ Block 4 - Revenue target NOT doubled: {actual_revenue} (expected: {expected_revenue})")
+            success = False
+    else:
+        print("❌ block_4_revenue not found in 2-month response")
+        success = False
+    
+    # Test 3: 3-month period (should have 3x targets)
+    print(f"\n📅 Test 3: 3-month period (October 1 - December 31, 2025)")
+    endpoint_3m = "/analytics/custom?start_date=2025-10-01&end_date=2025-12-31"
+    data_3m = test_api_endpoint(endpoint_3m)
+    
+    if data_3m is None:
+        print("❌ Failed to get 3-month data")
+        return False
+    
+    if 'dashboard_blocks' not in data_3m:
+        print("❌ dashboard_blocks not found in 3-month response")
+        return False
+    
+    blocks_3m = data_3m['dashboard_blocks']
+    print(f"✅ Dashboard blocks found for 3-month period")
+    
+    # Validate 3x multiplier for key blocks
+    if 'block_1_meetings' in blocks_3m:
+        block1_3m = blocks_3m['block_1_meetings']
+        expected_total_3m = baseline_targets['meetings_total'] * 3
+        actual_total_3m = block1_3m.get('total_target', 0)
+        
+        if actual_total_3m == expected_total_3m:
+            print(f"  ✅ Block 1 - Total meetings target correctly tripled: {actual_total_3m} (expected: {expected_total_3m})")
+        else:
+            print(f"  ❌ Block 1 - Total meetings target NOT tripled: {actual_total_3m} (expected: {expected_total_3m})")
+            success = False
+    
+    if 'block_2_intro_poa' in blocks_3m:
+        block2_3m = blocks_3m['block_2_intro_poa']
+        expected_intro_3m = baseline_targets['intro'] * 3
+        expected_poa_3m = baseline_targets['poa'] * 3
+        actual_intro_3m = block2_3m.get('intro_target', 0)
+        actual_poa_3m = block2_3m.get('poa_target', 0)
+        
+        if actual_intro_3m == expected_intro_3m:
+            print(f"  ✅ Block 2 - Intro target correctly tripled: {actual_intro_3m} (expected: {expected_intro_3m})")
+        else:
+            print(f"  ❌ Block 2 - Intro target NOT tripled: {actual_intro_3m} (expected: {expected_intro_3m})")
+            success = False
+            
+        if actual_poa_3m == expected_poa_3m:
+            print(f"  ✅ Block 2 - POA target correctly tripled: {actual_poa_3m} (expected: {expected_poa_3m})")
+        else:
+            print(f"  ❌ Block 2 - POA target NOT tripled: {actual_poa_3m} (expected: {expected_poa_3m})")
+            success = False
+    
+    if 'block_4_revenue' in blocks_3m:
+        block4_3m = blocks_3m['block_4_revenue']
+        expected_revenue_3m = baseline_targets['revenue'] * 3
+        actual_revenue_3m = block4_3m.get('target_revenue', 0)
+        
+        if actual_revenue_3m == expected_revenue_3m:
+            print(f"  ✅ Block 4 - Revenue target correctly tripled: {actual_revenue_3m} (expected: {expected_revenue_3m})")
+        else:
+            print(f"  ❌ Block 4 - Revenue target NOT tripled: {actual_revenue_3m} (expected: {expected_revenue_3m})")
+            success = False
+    
+    return success
+
 def main():
     """Main testing function"""
     print(f"🚀 Starting Backend API Tests for Sales Analytics Dashboard")
@@ -370,6 +609,7 @@ def main():
         'projections_hot_deals': False,
         'projections_hot_leads': False,
         'projections_performance_summary': False,
+        'custom_analytics_dynamic_targets': False,
         'month_offset_0': False,
         'month_offset_1': False,
         'month_offset_3': False
@@ -386,7 +626,10 @@ def main():
     test_results['projections_hot_leads'] = test_projections_hot_leads()
     test_results['projections_performance_summary'] = test_projections_performance_summary()
     
-    # Test 4: Monthly analytics with different offsets
+    # Test 4: MAIN TEST - Custom Analytics Dynamic Targets
+    test_results['custom_analytics_dynamic_targets'] = test_custom_analytics_dynamic_targets()
+    
+    # Test 5: Monthly analytics with different offsets
     # month_offset=0 should show "Oct 2025"
     test_results['month_offset_0'] = test_monthly_analytics_with_offset(0, "Oct 2025")
     
@@ -409,6 +652,13 @@ def main():
         print(f"{test_name}: {status}")
     
     print(f"\nOverall: {passed_tests}/{total_tests} tests passed")
+    
+    # Highlight the main test result
+    main_test_result = test_results['custom_analytics_dynamic_targets']
+    if main_test_result:
+        print(f"🎉 MAIN TEST PASSED: Custom Analytics Dynamic Targets working correctly!")
+    else:
+        print(f"❌ MAIN TEST FAILED: Custom Analytics Dynamic Targets not working properly!")
     
     if passed_tests == total_tests:
         print(f"🎉 All tests passed!")
