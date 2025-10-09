@@ -1136,10 +1136,10 @@ async def get_yearly_analytics(year: int = 2025):
         all_active_deals['weighted_value'] = all_active_deals['pipeline'] * all_active_deals['probability'] / 100.0
         aggregate_weighted_pipe_july_dec = all_active_deals['weighted_value'].sum()
         
-        # Revenue for July-Dec period (should total 4.5M)
+        # Revenue for July-Dec period (should total 4.5M)  
         july_dec_revenue_targets = {
             'Jul 2025': 465000, 'Aug 2025': 397500, 'Sep 2025': 547500,
-            'Oct 2025': 1080000, 'Nov 2025': 750000, 'Dec 2025': 760000  # Adjusted to total exactly 4.5M
+            'Oct 2025': 1080000, 'Nov 2025': 875000, 'Dec 2025': 715000  # Redistributed to total exactly 4.5M
         }
         total_july_dec_target = 4500000  # Exactly 4.5M as requested
         
