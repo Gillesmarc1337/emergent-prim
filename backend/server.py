@@ -1120,6 +1120,10 @@ async def get_yearly_analytics(year: int = 2025):
         # New pipe created for July-Dec period
         new_pipe_july_dec = july_dec_meetings['pipeline'].sum()
         
+        # Calculate target pipe created for the period
+        monthly_pipe_target = 2000000  # $2M per month
+        target_pipe_july_dec = monthly_pipe_target * months_elapsed
+        
         # Calculate weighted pipe properly for July-Dec period
         stage_probabilities = {
             'E Verbal commit': 90, 'D Negotiation': 70, 'C Proposal sent': 50,
