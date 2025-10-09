@@ -957,22 +957,6 @@ function Dashboard() {
   const [hiddenDeals, setHiddenDeals] = useState(new Set());
   const [hiddenLeads, setHiddenLeads] = useState(new Set());
   const [loadingProjections, setLoadingProjections] = useState(false);
-  
-  // State for chart series visibility
-  const [visibleSeries, setVisibleSeries] = useState({
-    'Closed Revenue': true,
-    'Target Revenue': true,
-    'New Weighted Pipe': true,
-    'Aggregate Weighted Pipe': true
-  });
-
-  // Handle legend click to toggle series visibility
-  const handleLegendClick = (dataKey) => {
-    setVisibleSeries(prev => ({
-      ...prev,
-      [dataKey]: !prev[dataKey]
-    }));
-  };
 
   const loadAnalytics = async () => {
     setLoading(true);
