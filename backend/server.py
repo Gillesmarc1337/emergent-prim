@@ -1375,7 +1375,7 @@ async def get_custom_analytics(
         actual_referral = len(period_data[period_data['type_of_source'].isin(['Internal referral', 'Client referral'])])
         
         # Intro & POA calculations (using updated definitions)
-        actual_intro = len(period_data[period_data['show_nowshow'] == 'Show'])
+        actual_intro = len(period_data[period_data['show_noshow'] == 'Show'])
         poa_data = period_data[period_data['stage'].isin(['D POA Booked', 'C Proposal sent', 'B Legals', 'A Closed', 'Closed Won', 'Won', 'Signed', 'Closed Lost', 'I Lost'])]
         actual_poa = len(poa_data)
         
@@ -1398,7 +1398,7 @@ async def get_custom_analytics(
                 'referral_actual': actual_referral,
                 'referral_target': 10 * period_duration_months,
                 'show_actual': actual_intro,  # Show count for this period
-                'no_show_actual': len(period_data[period_data['show_nowshow'] == 'Noshow'])
+                'no_show_actual': len(period_data[period_data['show_noshow'] == 'Noshow'])
             },
             'block_2_intro_poa': {
                 'title': 'Intro & POA',
