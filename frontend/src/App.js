@@ -756,7 +756,7 @@ function MainDashboard({ analytics }) {
                   <div className="text-sm font-bold text-blue-600">
                     ${(analytics.dashboard_blocks.block_3_pipe_creation.weighted_pipe_created / 1000).toFixed(0)}K
                   </div>
-                  <div className="text-xs text-gray-600">New Weighted Pipe</div>
+                  <div className="text-xs text-gray-600">Weighted Pipe</div>
                 </div>
               </div>
             </CardContent>
