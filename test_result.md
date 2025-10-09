@@ -263,7 +263,6 @@ metadata:
 test_plan:
   current_focus:
     - "Replace Yearly button with July To Dec button"
-    - "Verify dashboard blocks show dynamic targets for custom periods"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
