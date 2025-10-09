@@ -1175,7 +1175,7 @@ function Dashboard() {
                 className="flex items-center gap-1"
               >
                 <CalendarDays className="h-4 w-4" />
-                Yearly
+                July To Dec
               </Button>
               <Button
                 variant={useCustomDate ? 'default' : 'outline'}
