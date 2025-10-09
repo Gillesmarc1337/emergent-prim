@@ -755,6 +755,77 @@ def calculate_hot_leads(df):
     
     return clean_records(hot_leads[['id', 'client', 'pipeline', 'expected_mrr', 'expected_arr', 'owner', 'stage', 'hubspot_link', 'poa_date']].to_dict('records'))
 
+def calculate_aggregate_weighted_pipe(df, target_date):
+    """Calculate aggregate weighted pipe using the complex Z17 formula"""
+    from datetime import datetime, timedelta
+    
+    # Filter data for the target month and year
+    target_month = target_date.month
+    target_year = target_date.year
+    
+    # Filter deals for the specific month/year, excluding closed/lost
+    filtered_deals = df[
+        (df['discovery_date'].dt.month == target_month) &
+        (df['discovery_date'].dt.year == target_year) &
+        (~df['stage'].isin(['A Closed', 'I Lost'])) &
+        (df['pipeline'].notna()) &
+        (df['pipeline'] != 0)
+    ].copy()
+    
+    if filtered_deals.empty:
+        return 0.0
+    
+    today = datetime.now()
+    total_weighted_value = 0.0
+    
+    for _, deal in filtered_deals.iterrows():
+        pipeline_value = float(deal['pipeline'])
+        stage = deal['stage']
+        source_type = deal['type_of_source']
+        discovery_date = deal['discovery_date']
+        
+        # Calculate days since discovery
+        days_since_discovery = (today - discovery_date).days
+        
+        # Calculate probability based on stage and source type
+        probability = 0.0
+        
+        if stage == 'E Intro attended':
+            if source_type == 'Outbound':
+                probability = 0.17 if days_since_discovery > 180 else 0.15
+            elif source_type == 'Inbound':
+                probability = 0.33 if days_since_discovery > 90 else 0.35
+            elif source_type == 'Client referral':
+                probability = 0.0 if days_since_discovery > 30 else 0.7
+            elif source_type == 'Internal referral':
+                probability = 0.0 if days_since_discovery > 30 else 0.6
+            elif source_type == 'Partnership':
+                probability = 0.25 if days_since_discovery > 60 else 0.4
+                
+        elif stage == 'D POA Booked':
+            probability = 0.5
+            
+        elif stage == 'C Proposal sent':
+            probability = 0.3 if days_since_discovery > 90 else 0.5
+            
+        elif stage == 'B Legals':
+            if source_type == 'Client referral':
+                probability = 0.0 if days_since_discovery > 15 else 0.9
+            elif source_type == 'Internal referral':
+                probability = 0.0 if days_since_discovery > 15 else 0.85
+            elif source_type == 'Outbound':
+                probability = 0.75 if days_since_discovery > 45 else 0.9
+            elif source_type == 'Inbound':
+                probability = 0.75 if days_since_discovery > 45 else 0.9
+            elif source_type == 'Partnership':
+                probability = 0.5 if days_since_discovery > 30 else 0.8
+        
+        # Calculate weighted value for this deal
+        weighted_value = pipeline_value * probability
+        total_weighted_value += weighted_value
+    
+    return float(total_weighted_value)
+
 # API Endpoints
 @api_router.get("/")
 async def root():
