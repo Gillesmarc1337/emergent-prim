@@ -1934,6 +1934,23 @@ async def get_dashboard_analytics():
             }
         }
 
+        # Calculate pipe created (YTD)
+        current_year = datetime.now().year
+        year_start = datetime(current_year, 1, 1)
+        ytd_pipe_created = df[
+            (df['discovery_date'] >= year_start) &
+            (df['discovery_date'] <= datetime.now())
+        ]
+        total_pipe_created = float(ytd_pipe_created['pipeline'].sum())
+        
+        # Calculate active deals count (not lost, not inbox, show and relevant)
+        active_deals_count_data = df[
+            ~df['stage'].isin(['I Lost', 'H Lost - can be revived', 'F Inbox']) &
+            (df['show_noshow'] == 'Show') &
+            (df['relevance'] == 'Relevant')
+        ]
+        active_deals_count = len(active_deals_count_data)
+
         return {
             'monthly_revenue_chart': months_data,
             'annual_targets_2025': period_targets_2025,
@@ -1945,7 +1962,8 @@ async def get_dashboard_analytics():
                 'ytd_remaining': annual_target_2025 - ytd_revenue,
                 'total_pipeline': total_pipeline,
                 'weighted_pipeline': total_weighted_pipeline,
-                'deals_count': len(active_pipeline),
+                'deals_count': active_deals_count,
+                'pipe_created': total_pipe_created,
                 'avg_deal_size': float(active_pipeline['pipeline'].mean()) if len(active_pipeline) > 0 else 0,
                 'annual_target_2025': cumulative_target,
                 'ytd_closed_2025': cumulative_closed
