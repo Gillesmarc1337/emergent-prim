@@ -1887,13 +1887,9 @@ async def debug_show_noshow_values():
         show_related_columns = [col for col in available_columns if 'show' in col.lower()]
         
         return {
-            "unique_values": unique_values,
-            "value_counts": value_counts,
             "total_records": len(df),
-            "non_null_show_noshow": len(df[df['show_noshow'].notna()]),
             "available_columns": available_columns,
-            "show_related_columns": show_related_columns,
-            "first_record_sample": records[0] if records else None
+            "show_related_columns": show_related_columns
         }
         
     except Exception as e:
