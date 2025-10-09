@@ -1043,7 +1043,7 @@ async def get_monthly_analytics(month_offset: int = 0):
         
         # Calculate Show and No Show numbers
         actual_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'Show'])
-        actual_no_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'No Show'])
+        actual_no_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'Noshow'])
         
         # Block 2: Intro & POA (filtered for focus month)
         # Targets: 45 intro, 18 POA per month
@@ -1466,7 +1466,7 @@ async def get_dashboard_analytics():
         
         # Calculate Show and No Show numbers
         actual_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'Show'])
-        actual_no_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'No Show'])
+        actual_no_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'Noshow'])
         
         # Block 2: Intro & POA (filtered for focus month)
         # Targets: 45 intro, 18 POA per month
