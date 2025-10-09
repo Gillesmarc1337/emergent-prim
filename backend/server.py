@@ -306,9 +306,8 @@ def calculate_meetings_attended(df, start_date, end_date):
                            'Closed Won', 'Won', 'Signed', 'Closed Lost', 'Lost', 'I Lost']
     poa_generated = period_data[period_data['stage'].isin(poa_generated_stages)]
     
-    # Deals Closed = Closed deals only
-    deals_closed_stages = ['Closed Won', 'Won', 'Signed']
-    deals_closed = period_data[period_data['stage'].isin(deals_closed_stages)]
+    # Deals Closed = A Closed stage only (as per user requirement)
+    deals_closed = period_data[period_data['stage'] == 'A Closed']
     
     # AE level performance with corrected calculations
     ae_stats = []
