@@ -2298,6 +2298,8 @@ async def get_projections_performance_summary():
             'ytd_revenue': ytd_revenue,
             'ytd_target': ytd_target,
             'remaining_target': float(ytd_target - ytd_revenue),
+            'pipe_created': total_pipe_created,
+            'active_deals_count': active_deals_count,
             'forecast_gap': bool(ytd_revenue < ytd_target * 0.75),
             'dashboard_blocks': dashboard_blocks
         }
