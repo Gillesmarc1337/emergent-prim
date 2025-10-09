@@ -230,6 +230,18 @@ frontend:
           agent: "main"
           comment: "✅ COMPLETED: Successfully changed 'Yearly' button to 'July To Dec' and title to 'July To Dec 2025 Report'. Backend updated to include dashboard_blocks with 6-month targets (270 meetings, 270 intro, 108 POA, $4.8M revenue). All 4 dashboard blocks now display correctly when clicking July To Dec button with proper Jul-Dec 2025 period labels and 6x monthly targets."
 
+  - task: "Translate French terms to English in Meetings Attended tab"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "✅ COMPLETED: Successfully translated French terms to English in AE Performance cards: 'POA Fait:' → 'POA Done:', 'Valeur Closing:' → 'Closing Value:'. Terms 'Intro Attended:' and 'Closing:' were already in English. All AE performance metrics now display consistently in English."
+
   - task: "Verify dashboard blocks show dynamic targets for custom periods"
     implemented: true
     working: true
