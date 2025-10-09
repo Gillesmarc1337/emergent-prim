@@ -345,20 +345,34 @@ def calculate_meetings_attended(df, start_date, end_date):
     poa_generated_count = int(len(poa_generated))
     deals_closed_count = int(len(deals_closed))
     
+    # Calculate dynamic targets based on period duration
+    period_duration_days = (end_date - start_date).days + 1
+    period_duration_months = max(1, round(period_duration_days / 30))  # At least 1 month
+    
+    # Base monthly targets
+    base_meetings_target = 40
+    base_poa_target = 30
+    base_deals_target = 15
+    
+    # Dynamic targets based on period duration
+    dynamic_meetings_target = base_meetings_target * period_duration_months
+    dynamic_poa_target = base_poa_target * period_duration_months
+    dynamic_deals_target = base_deals_target * period_duration_months
+    
     return {
         'intro_metrics': {
-            'target': 40,
+            'target': dynamic_meetings_target,
             'attended': attended_count,
             'scheduled': scheduled_count,
             'attendance_rate': float(attended_count / scheduled_count * 100 if scheduled_count > 0 else 0)
         },
         'poa_generated_metrics': {  # Renamed from discovery_metrics
-            'target': 30,
+            'target': dynamic_poa_target,
             'completed': poa_generated_count,
             'conversion_rate': float(poa_generated_count / attended_count * 100 if attended_count > 0 else 0)
         },
         'deals_closed_metrics': {  # Renamed from poa_metrics
-            'target': 15,
+            'target': dynamic_deals_target,
             'generated': deals_closed_count,
             'conversion_rate': float(deals_closed_count / poa_generated_count * 100 if poa_generated_count > 0 else 0)
         },
