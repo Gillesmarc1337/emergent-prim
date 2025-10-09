@@ -242,6 +242,18 @@ frontend:
           agent: "main"
           comment: "✅ COMPLETED: Successfully translated French terms to English in AE Performance cards: 'POA Fait:' → 'POA Done:', 'Valeur Closing:' → 'Closing Value:'. Terms 'Intro Attended:' and 'Closing:' were already in English. All AE performance metrics now display consistently in English."
 
+  - task: "Optimize vertical space in Hot deals layout"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "✅ COMPLETED: Successfully optimized vertical space in Hot deals closing section by combining 'AE: Guillaume' and 'Pipeline: $0' onto a single line separated by '|'. Each deal now uses only 2 lines instead of 3, significantly improving space efficiency and allowing more deals to be visible without scrolling."
+
   - task: "Verify dashboard blocks show dynamic targets for custom periods"
     implemented: true
     working: true
