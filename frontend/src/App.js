@@ -2047,6 +2047,8 @@ function Dashboard() {
                 )}
               </CardContent>
             </Card>
+              );
+            })()}
           </AnalyticsSection>
         </TabsContent>
 
