@@ -1615,16 +1615,28 @@ function Dashboard() {
                           <table className="w-full text-sm">
                             <thead>
                               <tr className="border-b sticky top-0 bg-white">
-                                <th className="text-left p-2 font-semibold">Date</th>
-                                <th className="text-left p-2 font-semibold">Client</th>
-                                <th className="text-left p-2 font-semibold">AE</th>
-                                <th className="text-left p-2 font-semibold">Stage</th>
-                                <th className="text-center p-2 font-semibold">Relevance</th>
-                                <th className="text-right p-2 font-semibold">Expected ARR</th>
+                                <SortableTableHeader sortKey="date" requestSort={requestIntrosDetailsSort} sortConfig={introsDetailsSortConfig} className="text-left p-2 font-semibold">
+                                  Date
+                                </SortableTableHeader>
+                                <SortableTableHeader sortKey="client" requestSort={requestIntrosDetailsSort} sortConfig={introsDetailsSortConfig} className="text-left p-2 font-semibold">
+                                  Client
+                                </SortableTableHeader>
+                                <SortableTableHeader sortKey="ae" requestSort={requestIntrosDetailsSort} sortConfig={introsDetailsSortConfig} className="text-left p-2 font-semibold">
+                                  AE
+                                </SortableTableHeader>
+                                <SortableTableHeader sortKey="stage" requestSort={requestIntrosDetailsSort} sortConfig={introsDetailsSortConfig} className="text-left p-2 font-semibold">
+                                  Stage
+                                </SortableTableHeader>
+                                <SortableTableHeader sortKey="relevance" requestSort={requestIntrosDetailsSort} sortConfig={introsDetailsSortConfig} className="text-center p-2 font-semibold">
+                                  Relevance
+                                </SortableTableHeader>
+                                <SortableTableHeader sortKey="expected_arr" requestSort={requestIntrosDetailsSort} sortConfig={introsDetailsSortConfig} className="text-right p-2 font-semibold">
+                                  Expected ARR
+                                </SortableTableHeader>
                               </tr>
                             </thead>
                             <tbody>
-                              {analytics.ae_performance.intros_details.map((intro, index) => (
+                              {sortedIntrosDetails.map((intro, index) => (
                                 <tr key={index} className="border-b hover:bg-gray-50">
                                   <td className="p-2">{intro.date}</td>
                                   <td className="p-2 font-medium">{intro.client}</td>
