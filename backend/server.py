@@ -826,6 +826,38 @@ def calculate_aggregate_weighted_pipe(df, target_date):
     
     return float(total_weighted_value)
 
+def calculate_cumulative_aggregate_weighted_pipe(df, target_date):
+    """Calculate cumulative aggregate weighted pipe from July to current month"""
+    from datetime import datetime
+    
+    # Start from July 2025
+    start_month = 7
+    start_year = 2025
+    target_month = target_date.month
+    target_year = target_date.year
+    
+    total_cumulative_value = 0.0
+    
+    # Calculate for each month from July to target month
+    current_month = start_month
+    current_year = start_year
+    
+    while (current_year < target_year) or (current_year == target_year and current_month <= target_month):
+        # Create date for the current month being processed
+        month_date = datetime(current_year, current_month, 1)
+        
+        # Calculate weighted pipe for this specific month
+        monthly_value = calculate_aggregate_weighted_pipe(df, month_date)
+        total_cumulative_value += monthly_value
+        
+        # Move to next month
+        current_month += 1
+        if current_month > 12:
+            current_month = 1
+            current_year += 1
+    
+    return float(total_cumulative_value)
+
 # API Endpoints
 @api_router.get("/")
 async def root():
