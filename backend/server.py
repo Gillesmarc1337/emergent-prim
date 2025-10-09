@@ -417,11 +417,11 @@ def calculate_ae_performance(df, start_date, end_date):
     poa_attended_data = period_data[period_data['stage'].isin(poa_attended_stages)]
     
     # POA Closed = Only closed won deals
-    poa_closed_stages = ['Closed Won', 'Won', 'Signed']
+    poa_closed_stages = ['A Closed']
     poa_closed_data = period_data[period_data['stage'].isin(poa_closed_stages)]
     
-    # Legacy POA definition (for backward compatibility)
-    poa_stages = ['Closed Won', 'Won', 'Signed', 'Closed Lost', 'Lost', 'I Lost', 
+    # Legacy POA definition (for backward compatibility) - Updated to include A Closed
+    poa_stages = ['A Closed', 'Closed Won', 'Won', 'Signed', 'Closed Lost', 'Lost', 'I Lost', 
                   'B Legals', 'D POA Booked', 'Legal', 'POA Booked']
     poa_data = period_data[period_data['stage'].isin(poa_stages)]
     
