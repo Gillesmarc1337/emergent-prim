@@ -1019,6 +1019,16 @@ function Dashboard() {
   const filteredHotDeals = hotDeals.filter(deal => !hiddenDeals.has(deal.id));
   const filteredHotLeads = hotLeads.filter(lead => !hiddenLeads.has(lead.id));
 
+  // Sortable data hooks for AE Performance tables
+  const { items: sortedAeIntros, requestSort: requestAeIntrosSort, sortConfig: aeIntrosSortConfig } = 
+    useSortableData(analytics?.ae_performance?.ae_performance || []);
+  const { items: sortedIntrosDetails, requestSort: requestIntrosDetailsSort, sortConfig: introsDetailsSortConfig } = 
+    useSortableData(analytics?.ae_performance?.intros_details || []);
+  const { items: sortedAePoa, requestSort: requestAePoaSort, sortConfig: aePoaSortConfig } = 
+    useSortableData(analytics?.ae_performance?.ae_poa_performance || []);
+  const { items: sortedPoaDetails, requestSort: requestPoaDetailsSort, sortConfig: poaDetailsSortConfig } = 
+    useSortableData(analytics?.ae_performance?.poa_attended_details || []);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
