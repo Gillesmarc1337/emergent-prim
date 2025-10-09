@@ -1222,7 +1222,7 @@ async def get_monthly_analytics(month_offset: int = 0):
         # Big numbers recap
         ytd_closed = df[df['stage'].isin(['Closed Won', 'Won', 'Signed'])]
         ytd_revenue = float(ytd_closed['expected_arr'].sum())
-        ytd_target = 3600000  # Should be configurable
+        ytd_target = 4500000  # Should be configurable
         big_numbers_recap = {
             'ytd_revenue': ytd_revenue,
             'ytd_target': ytd_target,
@@ -1430,7 +1430,7 @@ async def get_custom_analytics(
         # Big numbers recap
         ytd_closed = df[df['stage'].isin(['Closed Won', 'Won', 'Signed'])]
         ytd_revenue = float(ytd_closed['expected_arr'].sum())
-        ytd_target = 3600000  # Should be configurable
+        ytd_target = 4500000  # Should be configurable
         big_numbers_recap = {
             'ytd_revenue': ytd_revenue,
             'ytd_target': ytd_target,
