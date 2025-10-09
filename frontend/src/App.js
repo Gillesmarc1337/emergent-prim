@@ -634,16 +634,16 @@ function MainDashboard({ analytics }) {
           color="orange"
         />
         <MetricCard
-          title="Weighted Pipeline"
-          value={dashboardData.key_metrics.weighted_pipeline}
+          title="Pipe Created YTD"
+          value={dashboardData.key_metrics.pipe_created}
           unit="$"
-          icon={TrendingUp}
+          icon={PieChart}
           color="purple"
         />
         <MetricCard
           title="Active Deals"
           value={dashboardData.key_metrics.deals_count}
-          icon={Target}
+          icon={Users}
           color="blue"
         />
       </div>
