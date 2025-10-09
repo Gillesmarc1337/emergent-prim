@@ -1343,6 +1343,86 @@ async def get_custom_analytics(
             'forecast_gap': bool(ytd_revenue < ytd_target * 0.75)
         }
         
+        # Calculate dynamic dashboard blocks based on custom period
+        period_duration_days = (custom_end - custom_start).days + 1
+        period_duration_months = max(1, round(period_duration_days / 30))
+        
+        # Base monthly targets
+        base_meetings_target = 45  # Total monthly meetings target
+        base_intro_target = 45     # Monthly intro target  
+        base_poa_target = 18       # Monthly POA target
+        base_pipe_target = 2000000 # Monthly pipe target ($2M)
+        base_revenue_target = 1080000  # Monthly revenue target
+        
+        # Dynamic targets based on period duration
+        dynamic_meetings_target = base_meetings_target * period_duration_months
+        dynamic_intro_target = base_intro_target * period_duration_months
+        dynamic_poa_target = base_poa_target * period_duration_months
+        dynamic_pipe_target = base_pipe_target * period_duration_months
+        dynamic_revenue_target = base_revenue_target * period_duration_months
+        
+        # Filter data for the custom period
+        period_data = df[
+            (df['discovery_date'] >= custom_start) & 
+            (df['discovery_date'] <= custom_end)
+        ]
+        
+        # Calculate actual values for dashboard blocks
+        actual_total_meetings = len(period_data[period_data['discovery_date'].notna()])
+        actual_inbound = len(period_data[period_data['type_of_source'] == 'Inbound'])
+        actual_outbound = len(period_data[period_data['type_of_source'] == 'Outbound'])
+        actual_referral = len(period_data[period_data['type_of_source'].isin(['Internal referral', 'Client referral'])])
+        
+        # Intro & POA calculations (using updated definitions)
+        actual_intro = len(period_data[period_data['show_nowshow'] == 'Show'])
+        poa_data = period_data[period_data['stage'].isin(['D POA Booked', 'C Proposal sent', 'B Legals', 'A Closed', 'Closed Won', 'Won', 'Signed', 'Closed Lost', 'I Lost'])]
+        actual_poa = len(poa_data)
+        
+        # New Pipe and Revenue calculations
+        new_pipe_value = float(period_data['pipeline'].fillna(0).sum()) / 1000000  # Convert to millions
+        closed_deals = period_data[period_data['stage'] == 'A Closed']
+        actual_revenue = float(closed_deals['expected_arr'].fillna(0).sum())
+        
+        # Dashboard blocks with dynamic targets
+        dashboard_blocks = {
+            'block_1_meetings': {
+                'title': 'Meetings Generation',
+                'period': f"{custom_start.strftime('%b %d')} - {custom_end.strftime('%b %d %Y')}",
+                'total_actual': actual_total_meetings,
+                'total_target': dynamic_meetings_target,
+                'inbound_actual': actual_inbound,
+                'inbound_target': 20 * period_duration_months,
+                'outbound_actual': actual_outbound,
+                'outbound_target': 15 * period_duration_months,
+                'referral_actual': actual_referral,
+                'referral_target': 10 * period_duration_months,
+                'show_actual': actual_intro,  # Show count for this period
+                'no_show_actual': len(period_data[period_data['show_nowshow'] == 'Noshow'])
+            },
+            'block_2_intro_poa': {
+                'title': 'Intro & POA',
+                'period': f"{custom_start.strftime('%b %d')} - {custom_end.strftime('%b %d %Y')}",
+                'intro_actual': actual_intro,
+                'intro_target': dynamic_intro_target,
+                'poa_actual': actual_poa,
+                'poa_target': dynamic_poa_target
+            },
+            'block_3_new_pipe': {
+                'title': 'New Pipe Created',
+                'period': f"{custom_start.strftime('%b %d')} - {custom_end.strftime('%b %d %Y')}",
+                'pipe_created': new_pipe_value,
+                'target': dynamic_pipe_target / 1000000,  # Convert to millions for display
+                'weighted_pipe': float(period_data.apply(lambda row: (row['pipeline'] or 0) * 0.3, axis=1).sum()) / 1000000
+            },
+            'block_4_revenue': {
+                'title': 'Revenue Objective',
+                'period': f"{custom_start.strftime('%b %d')} - {custom_end.strftime('%b %d %Y')}",
+                'target_revenue': dynamic_revenue_target,
+                'closed_revenue': actual_revenue,
+                'progress': (actual_revenue / dynamic_revenue_target * 100) if dynamic_revenue_target > 0 else 0
+            }
+        }
+        
         analytics = WeeklyAnalytics(
             week_start=custom_start,
             week_end=custom_end,
@@ -1354,7 +1434,8 @@ async def get_custom_analytics(
             pipe_metrics=pipe_metrics,
             old_pipe=old_pipe,
             closing_projections=closing_projections,
-            big_numbers_recap=big_numbers_recap
+            big_numbers_recap=big_numbers_recap,
+            dashboard_blocks=dashboard_blocks
         )
         
         return analytics
