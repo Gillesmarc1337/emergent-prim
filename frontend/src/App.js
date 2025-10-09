@@ -587,26 +587,8 @@ function MainDashboard({ analytics }) {
   const loadDashboard = async () => {
     try {
       setLoading(true);
-      // Use monthly analytics data as fallback for dashboard data
-      const response = await axios.get(`${API}/analytics/monthly`);
-      const monthlyData = response.data;
-      
-      // Transform monthly analytics to dashboard format with corrected targets
-      const transformedData = {
-        key_metrics: {
-          ytd_revenue: monthlyData.big_numbers_recap?.ytd_revenue || 0,
-          ytd_target: monthlyData.big_numbers_recap?.ytd_target || 4500000,
-          ytd_remaining: monthlyData.big_numbers_recap?.remaining_target || 4500000,
-          weighted_pipeline: monthlyData.pipe_metrics?.weighted_pipeline || 0,
-          deals_count: monthlyData.big_numbers_recap?.active_deals_count || 0,
-          annual_target_2025: monthlyData.big_numbers_recap?.ytd_target || 4500000,
-          ytd_closed_2025: monthlyData.big_numbers_recap?.ytd_revenue || 0,
-          pipe_created: monthlyData.big_numbers_recap?.pipe_created || 0
-        },
-        monthly_revenue_chart: monthlyData.months_data || []
-      };
-      
-      setDashboardData(transformedData);
+      const response = await axios.get(`${API}/analytics/dashboard`);
+      setDashboardData(response.data);
       setError(null);
     } catch (error) {
       setError(error.response?.data?.detail || 'Error loading dashboard');
