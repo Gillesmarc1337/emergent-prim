@@ -1480,7 +1480,7 @@ async def get_dashboard_analytics():
         poa_data = df[
             (df['discovery_date'] >= focus_month_start) & 
             (df['discovery_date'] <= focus_month_end) &
-            df['stage'].isin(['D POA Booked', 'B Legals', 'Closed Won', 'Won', 'Signed'])
+            df['stage'].isin(['D POA Booked', 'C Proposal sent', 'B Legals', 'Closed Won', 'Won', 'Signed', 'Closed Lost', 'I Lost'])
         ]
         actual_poa = len(poa_data)
         
