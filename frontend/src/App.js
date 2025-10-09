@@ -27,7 +27,7 @@ const REVENUE_COLORS = {
   target: '#F59E0B',
   closed: '#10B981', 
   weighted: '#3B82F6',
-  new_weighted: '#FF6B35',
+  new_weighted: '#D97706',
   aggregate_weighted: '#4ECDC4'
 };
 
