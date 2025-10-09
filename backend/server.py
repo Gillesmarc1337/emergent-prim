@@ -1864,6 +1864,36 @@ async def get_hot_leads():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting hot leads: {str(e)}")
 
+@api_router.get("/debug/test-google-sheet-import")
+async def test_google_sheet_import():
+    """Test what data is actually imported from Google Sheet"""
+    try:
+        # Get the current Google Sheet URL from metadata
+        metadata = await db.data_metadata.find_one({"type": "last_update"})
+        if not metadata or "source_url" not in metadata:
+            return {"error": "No Google Sheet URL found in metadata"}
+        
+        # Read fresh data from Google Sheet
+        df = read_google_sheet(metadata["source_url"], metadata.get("sheet_name"))
+        
+        # Clean column names
+        df.columns = df.columns.str.lower().str.replace(' ', '_').str.replace('/', '_')
+        
+        # Get info about show_noshow column
+        show_noshow_info = {
+            "column_exists": "show_noshow" in df.columns,
+            "total_rows": len(df),
+            "non_null_count": len(df[df['show_noshow'].notna()]) if 'show_noshow' in df.columns else 0,
+            "unique_values": df['show_noshow'].unique().tolist() if 'show_noshow' in df.columns else [],
+            "sample_rows": df[['client', 'show_noshow']].head(10).to_dict('records') if 'show_noshow' in df.columns else [],
+            "all_columns": df.columns.tolist()
+        }
+        
+        return show_noshow_info
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error testing Google Sheet import: {str(e)}")
+
 @api_router.get("/projections/performance-summary")
 async def get_projections_performance_summary():
     """Get performance summary data for projections tab (same as dashboard)"""
