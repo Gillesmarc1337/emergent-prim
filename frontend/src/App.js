@@ -1572,13 +1572,19 @@ function Dashboard() {
                           <table className="w-full text-sm">
                             <thead>
                               <tr className="border-b">
-                                <th className="text-left p-2 font-semibold">AE</th>
-                                <th className="text-right p-2 font-semibold">Intros Attended</th>
-                                <th className="text-right p-2 font-semibold">Relevant Intro</th>
+                                <SortableTableHeader sortKey="ae" requestSort={requestAeIntrosSort} sortConfig={aeIntrosSortConfig} className="text-left p-2 font-semibold">
+                                  AE
+                                </SortableTableHeader>
+                                <SortableTableHeader sortKey="intros_attended" requestSort={requestAeIntrosSort} sortConfig={aeIntrosSortConfig} className="text-right p-2 font-semibold">
+                                  Intros Attended
+                                </SortableTableHeader>
+                                <SortableTableHeader sortKey="relevant_intro" requestSort={requestAeIntrosSort} sortConfig={aeIntrosSortConfig} className="text-right p-2 font-semibold">
+                                  Relevant Intro
+                                </SortableTableHeader>
                               </tr>
                             </thead>
                             <tbody>
-                              {analytics.ae_performance.ae_performance.map((ae, index) => (
+                              {sortedAeIntros.map((ae, index) => (
                                 <tr key={index} className="border-b hover:bg-gray-50">
                                   <td className="p-2 font-medium">{ae.ae}</td>
                                   <td className="text-right p-2">{ae.intros_attended}</td>
