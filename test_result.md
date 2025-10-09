@@ -254,6 +254,21 @@ frontend:
           agent: "main"
           comment: "✅ COMPLETED: Successfully optimized vertical space in Hot deals closing section by combining 'AE: Guillaume' and 'Pipeline: $0' onto a single line separated by '|'. Each deal now uses only 2 lines instead of 3, significantly improving space efficiency and allowing more deals to be visible without scrolling."
 
+  - task: "Correct targets from 3.6M to 4.5M and add pipe created + active deals metrics"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py, /app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "✅ COMPLETED: Successfully corrected ytd_target from 3,600,000 to 4,500,000 across all backend endpoints (monthly, yearly, custom, performance-summary). Added pipe_created (YTD pipe created value: $6.9M) and active_deals_count (75 active deals: not lost, not inbox, show and relevant) to big_numbers_recap. Updated frontend Performance Summary section to display 5 KPIs in grid layout and main dashboard KPIs to show corrected targets and new metrics."
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED SUCCESSFULLY: All backend APIs confirmed working with corrected targets: Monthly Analytics (ytd_target=4,500,000), Yearly Analytics (ytd_target=4,500,000), Performance Summary (ytd_target=4,500,000). New metrics properly included: pipe_created=6,865,596 and active_deals_count=75. Frontend verified showing correct 4.5M target and new metrics in both main dashboard and Performance Summary sections."
+
   - task: "Verify dashboard blocks show dynamic targets for custom periods"
     implemented: true
     working: true
