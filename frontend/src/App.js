@@ -24,7 +24,7 @@ const API = `${BACKEND_URL}/api`;
 // Colors for charts
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 const REVENUE_COLORS = {
-  target: '#E5E7EB',
+  target: '#F59E0B',
   closed: '#10B981', 
   weighted: '#3B82F6',
   new_weighted: '#FF6B35',
