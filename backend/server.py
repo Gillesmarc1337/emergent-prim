@@ -439,7 +439,7 @@ def calculate_ae_performance(df, start_date, end_date):
         relevant_intros = ae_intros[ae_intros['relevance'] == 'Relevant']
         
         # Closing value calculation (sum of expected_arr for closed won deals)
-        closed_won = ae_poas[ae_poas['stage'].isin(['Closed Won', 'Won', 'Signed'])]
+        closed_won = ae_poas[ae_poas['stage'] == 'A Closed']
         closing_value = float(closed_won['expected_arr'].fillna(0).sum())
         
         ae_performance.append({
