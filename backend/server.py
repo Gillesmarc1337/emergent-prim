@@ -1126,7 +1126,7 @@ async def get_yearly_analytics(year: int = 2025):
         # This includes all deals regardless of when they were created
         all_active_deals = df[
             ~df['stage'].isin(['I Lost', 'H Lost - can be revived', 'F Inbox', 'A Closed']) &
-            (df['show_nowshow'] == 'Show') &
+            (df['show_noshow'] == 'Show') &
             (df['relevance'] == 'Relevant')
         ].copy()
         
