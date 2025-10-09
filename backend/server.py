@@ -1122,6 +1122,18 @@ async def get_yearly_analytics(year: int = 2025):
         july_dec_weighted_data['weighted_value'] = july_dec_weighted_data['pipeline'] * july_dec_weighted_data['probability'] / 100.0
         weighted_pipe_july_dec = july_dec_weighted_data['weighted_value'].sum()
         
+        # Calculate aggregate weighted pipe (all active deals, not just July-Dec created)
+        # This includes all deals regardless of when they were created
+        all_active_deals = df[
+            ~df['stage'].isin(['I Lost', 'H Lost - can be revived', 'F Inbox', 'A Closed']) &
+            (df['show_nowshow'] == 'Show') &
+            (df['relevance'] == 'Relevant')
+        ].copy()
+        
+        all_active_deals['probability'] = all_active_deals['stage'].map(stage_probabilities).fillna(0)
+        all_active_deals['weighted_value'] = all_active_deals['pipeline'] * all_active_deals['probability'] / 100.0
+        aggregate_weighted_pipe_july_dec = all_active_deals['weighted_value'].sum()
+        
         # Revenue for July-Dec period (sum of all July-Dec targets)
         july_dec_revenue_targets = {
             'Jul 2025': 465000, 'Aug 2025': 397500, 'Sep 2025': 547500,
