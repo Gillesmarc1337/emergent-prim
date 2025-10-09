@@ -1463,22 +1463,20 @@ async def get_dashboard_analytics():
         actual_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'Show'])
         actual_no_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'No Show'])
         
-        # Block 2: Discovery & POA (filtered for focus month)
-        # Targets: 45 discovery, 18 POA per month
-        target_discovery = 45
+        # Block 2: Intro & POA (filtered for focus month)
+        # Targets: 45 intro, 18 POA per month
+        target_intro = 45
         target_poa = 18
         
-        # Discovery = everything except "F Inbox" and "No Show" for the focus month
-        discovery_data = df[
+        # Intro = "Show" (une intro c'est un "show") for the focus month
+        intro_data = df[
             (df['discovery_date'] >= focus_month_start) & 
             (df['discovery_date'] <= focus_month_end) &
-            (df['stage'].notna()) & 
-            (~df['stage'].isin(['F Inbox'])) &
-            (~df['show_noshow'].isin(['No Show']))
+            (df['show_noshow'] == 'Show')
         ]
-        actual_discovery = len(discovery_data)
+        actual_intro = len(intro_data)
         
-        # POA = "D POA Booked", "B Legals", "Closed Won", "Won", "Signed" for the focus month
+        # POA = "D POA Booked", "C Proposal sent", "B Legals", closed ou lost for the focus month
         poa_data = df[
             (df['discovery_date'] >= focus_month_start) & 
             (df['discovery_date'] <= focus_month_end) &
