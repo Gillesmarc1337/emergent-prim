@@ -1838,7 +1838,7 @@ async def get_dashboard_analytics():
         # July to December 2025 targets chart with exact values (total 4.5M)
         exact_targets = {
             'Jul': 465000, 'Aug': 397500, 'Sep': 547500,
-            'Oct': 1080000, 'Nov': 835000, 'Dec': 695000  # Redistributed to total exactly 4.5M (465+397.5+547.5+1080+835+695=4500)
+            'Oct': 1080000, 'Nov': 835000, 'Dec': 1175000  # Redistributed to total exactly 4.5M
         }
         
         exact_closed = {
