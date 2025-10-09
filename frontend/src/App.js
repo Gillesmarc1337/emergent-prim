@@ -664,7 +664,7 @@ function MainDashboard({ analytics }) {
           {/* Block 1: Meeting Generation */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-center">Meeting Generation</CardTitle>
+              <CardTitle className="text-lg text-center">Meetings Generation</CardTitle>
               <CardDescription className="text-center font-medium text-blue-600">
                 {analytics.dashboard_blocks.block_1_meetings.period}
               </CardDescription>
@@ -689,6 +689,16 @@ function MainDashboard({ analytics }) {
                   <div className="flex justify-between">
                     <span>Referral:</span>
                     <span className="font-medium">{analytics.dashboard_blocks.block_1_meetings.referral_actual}/{analytics.dashboard_blocks.block_1_meetings.referral_target}</span>
+                  </div>
+                  <div className="border-t pt-2 mt-2">
+                    <div className="flex justify-between">
+                      <span>Show:</span>
+                      <span className="font-medium text-green-600">{analytics.dashboard_blocks.block_1_meetings.show_actual}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>No Show:</span>
+                      <span className="font-medium text-red-600">{analytics.dashboard_blocks.block_1_meetings.no_show_actual}</span>
+                    </div>
                   </div>
                 </div>
               </div>
