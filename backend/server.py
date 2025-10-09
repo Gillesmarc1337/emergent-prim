@@ -1335,7 +1335,9 @@ async def get_monthly_analytics(month_offset: int = 0):
         
         actual_inbound = len(focus_month_meetings[focus_month_meetings['type_of_source'] == 'Inbound'])
         actual_outbound = len(focus_month_meetings[focus_month_meetings['type_of_source'] == 'Outbound'])
-        actual_referral = len(focus_month_meetings[focus_month_meetings['type_of_source'].isin(['Internal referral', 'Client referral'])])
+        # Include all referral types: Referral, Internal referral, Client referral
+        referral_types = ['Referral', 'Internal referral', 'Client referral']
+        actual_referral = len(focus_month_meetings[focus_month_meetings['type_of_source'].isin(referral_types)])
         
         # Calculate total meetings and unassigned meetings
         actual_total = len(focus_month_meetings)  # Total meetings in the period
@@ -1898,7 +1900,9 @@ async def get_dashboard_analytics():
         
         actual_inbound = len(focus_month_meetings[focus_month_meetings['type_of_source'] == 'Inbound'])
         actual_outbound = len(focus_month_meetings[focus_month_meetings['type_of_source'] == 'Outbound'])
-        actual_referral = len(focus_month_meetings[focus_month_meetings['type_of_source'].isin(['Internal referral', 'Client referral'])])
+        # Include all referral types: Referral, Internal referral, Client referral
+        referral_types = ['Referral', 'Internal referral', 'Client referral']
+        actual_referral = len(focus_month_meetings[focus_month_meetings['type_of_source'].isin(referral_types)])
         
         # Calculate total meetings and unassigned meetings
         actual_total = len(focus_month_meetings)  # Total meetings in the period
