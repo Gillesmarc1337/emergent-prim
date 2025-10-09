@@ -1473,10 +1473,30 @@ async def get_custom_analytics(
         ytd_closed = df[df['stage'].isin(['Closed Won', 'Won', 'Signed'])]
         ytd_revenue = float(ytd_closed['expected_arr'].sum())
         ytd_target = 4500000  # Should be configurable
+        
+        # Calculate pipe created (YTD)
+        current_year = datetime.now().year
+        year_start = datetime(current_year, 1, 1)
+        ytd_pipe_created = df[
+            (df['discovery_date'] >= year_start) &
+            (df['discovery_date'] <= datetime.now())
+        ]
+        total_pipe_created = float(ytd_pipe_created['pipeline'].sum())
+        
+        # Calculate active deals count (not lost, not inbox, show and relevant)
+        active_deals = df[
+            ~df['stage'].isin(['I Lost', 'H Lost - can be revived', 'F Inbox']) &
+            (df['show_noshow'] == 'Show') &
+            (df['relevance'] == 'Relevant')
+        ]
+        active_deals_count = len(active_deals)
+        
         big_numbers_recap = {
             'ytd_revenue': ytd_revenue,
             'ytd_target': ytd_target,
             'remaining_target': float(ytd_target - ytd_revenue),
+            'pipe_created': total_pipe_created,
+            'active_deals_count': active_deals_count,
             'monthly_breakdown': {str(k): float(v) for k, v in df.groupby(df['discovery_date'].dt.to_period('M'))['pipeline'].sum().to_dict().items()},
             'forecast_gap': bool(ytd_revenue < ytd_target * 0.75)
         }
