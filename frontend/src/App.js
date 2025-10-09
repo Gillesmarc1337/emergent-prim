@@ -1538,15 +1538,27 @@ function Dashboard() {
             )}
 
             {/* 👥 SECTION 3: AE PERFORMANCE BREAKDOWN */}
-            <Card className="mb-6 border-green-200">
-              <CardHeader className="bg-green-50">
-                <CardTitle className="text-xl flex items-center gap-2">
-                  <Users className="h-6 w-6 text-green-600" />
-                  AE Performance Breakdown
-                </CardTitle>
-                <CardDescription>Individual AE performance for meetings, intros, and POA</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
+            {(() => {
+              // Sortable data hooks for AE Performance tables
+              const { items: sortedAeIntros, requestSort: requestAeIntrosSort, sortConfig: aeIntrosSortConfig } = 
+                useSortableData(analytics.ae_performance.ae_performance || []);
+              const { items: sortedIntrosDetails, requestSort: requestIntrosDetailsSort, sortConfig: introsDetailsSortConfig } = 
+                useSortableData(analytics.ae_performance.intros_details || []);
+              const { items: sortedAePoa, requestSort: requestAePoaSort, sortConfig: aePoaSortConfig } = 
+                useSortableData(analytics.ae_performance.ae_poa_performance || []);
+              const { items: sortedPoaDetails, requestSort: requestPoaDetailsSort, sortConfig: poaDetailsSortConfig } = 
+                useSortableData(analytics.ae_performance.poa_attended_details || []);
+              
+              return (
+                <Card className="mb-6 border-green-200">
+                  <CardHeader className="bg-green-50">
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      <Users className="h-6 w-6 text-green-600" />
+                      AE Performance Breakdown
+                    </CardTitle>
+                    <CardDescription>Individual AE performance for meetings, intros, and POA</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-6">
                 {/* AE Performance Section - Meetings & Intros */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                   {/* AE Performance Table - Meetings & Intros */}
