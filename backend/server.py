@@ -1334,7 +1334,11 @@ async def get_monthly_analytics(month_offset: int = 0):
         actual_inbound = len(focus_month_meetings[focus_month_meetings['type_of_source'] == 'Inbound'])
         actual_outbound = len(focus_month_meetings[focus_month_meetings['type_of_source'] == 'Outbound'])
         actual_referral = len(focus_month_meetings[focus_month_meetings['type_of_source'].isin(['Internal referral', 'Client referral'])])
-        actual_total = actual_inbound + actual_outbound + actual_referral
+        
+        # Calculate total meetings and unassigned meetings
+        actual_total = len(focus_month_meetings)  # Total meetings in the period
+        sum_of_sources_monthly = actual_inbound + actual_outbound + actual_referral
+        unassigned_monthly = max(0, actual_total - sum_of_sources_monthly)
         
         # Calculate Show and No Show numbers (case insensitive and flexible matching)
         show_meetings = focus_month_meetings[
