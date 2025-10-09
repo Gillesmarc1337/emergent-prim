@@ -1101,7 +1101,7 @@ async def get_yearly_analytics(year: int = 2025):
         referral_types = ['Referral', 'Internal referral', 'Client referral']
         actual_referral_july_dec = len(july_dec_meetings[july_dec_meetings['type_of_source'].isin(referral_types)])
         actual_show_july_dec = len(july_dec_meetings[july_dec_meetings['show_noshow'] == 'Show'])
-        actual_no_show_july_dec = len(july_dec_meetings[july_dec_meetings['show_noshow'] == 'No Show'])
+        actual_no_show_july_dec = len(july_dec_meetings[july_dec_meetings['show_noshow'] == 'Noshow'])
         
         # Intro & POA for July-Dec period
         intro_july_dec = len(july_dec_meetings[july_dec_meetings['show_noshow'] == 'Show'])
