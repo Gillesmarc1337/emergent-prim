@@ -1589,6 +1589,10 @@ async def get_custom_analytics(
         actual_outbound = len(period_data[period_data['type_of_source'] == 'Outbound'])
         actual_referral = len(period_data[period_data['type_of_source'].isin(['Internal referral', 'Client referral'])])
         
+        # Calculate unassigned meetings (difference between total and sum of sources)
+        sum_of_sources_custom = actual_inbound + actual_outbound + actual_referral
+        unassigned_custom = max(0, actual_total_meetings - sum_of_sources_custom)
+        
         # Intro & POA calculations (using updated definitions)
         actual_intro = len(period_data[period_data['show_noshow'] == 'Show'])
         poa_data = period_data[period_data['stage'].isin(['D POA Booked', 'C Proposal sent', 'B Legals', 'A Closed', 'Closed Won', 'Won', 'Signed', 'Closed Lost', 'I Lost'])]
