@@ -1170,7 +1170,7 @@ async def get_yearly_analytics(year: int = 2025):
         dashboard_blocks = {
             'block_1_meetings': {
                 'title': 'Meetings Generation',
-                'period': 'Jul-Dec 2025',
+                'period': f'Jul-Dec 2025 ({months_elapsed} months)',
                 'total_actual': actual_total_july_dec,
                 'total_target': july_dec_meeting_target,
                 'inbound_actual': actual_inbound_july_dec,
@@ -1178,11 +1178,18 @@ async def get_yearly_analytics(year: int = 2025):
                 'outbound_actual': actual_outbound_july_dec,
                 'outbound_target': 15 * months_elapsed,
                 'referral_actual': actual_referral_july_dec,
-                'referral_target': 10 * months_elapsed
+                'referral_target': 10 * months_elapsed,
                 'unassigned_actual': unassigned_july_dec,
                 'unassigned_target': 0,  # No target for unassigned as it indicates data issue
                 'show_actual': actual_show_july_dec,
-                'no_show_actual': actual_no_show_july_dec
+                'no_show_actual': actual_no_show_july_dec,
+                'debug_info': {
+                    'months_elapsed': months_elapsed,
+                    'current_month': current_month,
+                    'july_dec_start': july_dec_start.isoformat(),
+                    'filter_end_date': min(july_dec_end, current_date).isoformat(),
+                    'total_meetings_found': len(july_dec_meetings)
+                }
             },
             'block_2_intro_poa': {
                 'title': 'Intro & POA',
