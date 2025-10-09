@@ -1431,6 +1431,7 @@ async def get_monthly_analytics(month_offset: int = 0):
                 'title': 'New Pipe Created',
                 'new_pipe_created': new_pipe_created,
                 'weighted_pipe_created': weighted_pipe_created,
+                'aggregate_weighted_pipe': aggregate_weighted_pipe_monthly,
                 'period': focus_month_str
             },
             'block_4_revenue': {
