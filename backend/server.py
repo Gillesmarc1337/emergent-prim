@@ -1031,12 +1031,33 @@ async def get_yearly_analytics(year: int = 2025):
         
         # Big numbers recap for the year
         ytd_closed = df[df['stage'].isin(['Closed Won', 'Won', 'Signed'])]
+        ytd_revenue = float(ytd_closed['expected_arr'].sum())
+        
+        # Calculate pipe created (YTD)
+        current_year = datetime.now().year
+        year_start = datetime(current_year, 1, 1)
+        ytd_pipe_created = df[
+            (df['discovery_date'] >= year_start) &
+            (df['discovery_date'] <= datetime.now())
+        ]
+        total_pipe_created = float(ytd_pipe_created['pipeline'].sum())
+        
+        # Calculate active deals count (not lost, not inbox, show and relevant)
+        active_deals = df[
+            ~df['stage'].isin(['I Lost', 'H Lost - can be revived', 'F Inbox']) &
+            (df['show_noshow'] == 'Show') &
+            (df['relevance'] == 'Relevant')
+        ]
+        active_deals_count = len(active_deals)
+        
         big_numbers_recap = {
-            'ytd_revenue': float(ytd_closed['expected_arr'].sum()),
+            'ytd_revenue': ytd_revenue,
             'ytd_target': 4500000.0,  # Annual target
-            'remaining_target': 4500000.0 - float(ytd_closed['expected_arr'].sum()),
+            'remaining_target': 4500000.0 - ytd_revenue,
+            'pipe_created': total_pipe_created,
+            'active_deals_count': active_deals_count,
             'monthly_breakdown': {str(k): float(v) for k, v in df.groupby(df['discovery_date'].dt.to_period('M'))['pipeline'].sum().to_dict().items()} if len(df) > 0 else {},
-            'forecast_gap': float(ytd_closed['expected_arr'].sum()) < 4500000.0 * 0.75
+            'forecast_gap': ytd_revenue < 4500000.0 * 0.75
         }
         
         # Dashboard blocks for July-December period (6 months)
