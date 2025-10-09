@@ -2558,7 +2558,7 @@ function Dashboard() {
                   <CardTitle>Performance Summary</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
                     <MetricCard
                       title="YTD Revenue"
                       value={performanceSummary.ytd_revenue}
@@ -2574,6 +2574,25 @@ function Dashboard() {
                       icon={Target}
                       color="orange"
                     />
+                    <MetricCard
+                      title="Pipe Created"
+                      value={performanceSummary.pipe_created || 0}
+                      unit="$"
+                      icon={PieChart}
+                      color="purple"
+                    />
+                    <Card>
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Users className="h-5 w-5 text-blue-600" />
+                          <span className="text-sm font-medium text-gray-600">Active Deals</span>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-600">
+                          {performanceSummary.active_deals_count || 0}
+                        </div>
+                        <div className="text-xs text-gray-600">Open & Relevant</div>
+                      </CardContent>
+                    </Card>
                     <Card>
                       <CardContent className="p-6">
                         <div className="flex items-center gap-2 mb-2">
