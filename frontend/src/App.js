@@ -705,25 +705,25 @@ function MainDashboard({ analytics }) {
             </CardContent>
           </Card>
 
-          {/* Block 2: Discovery & POA */}
+          {/* Block 2: Intro & POA */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-center">Discovery & POA</CardTitle>
+              <CardTitle className="text-lg text-center">Intro & POA</CardTitle>
               <CardDescription className="text-center font-medium text-green-600">
-                {analytics.dashboard_blocks.block_2_discovery_poa.period}
+                {analytics.dashboard_blocks.block_2_intro_poa.period}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">
-                    {analytics.dashboard_blocks.block_2_discovery_poa.discovery_actual}/{analytics.dashboard_blocks.block_2_discovery_poa.discovery_target}
+                    {analytics.dashboard_blocks.block_2_intro_poa.intro_actual}/{analytics.dashboard_blocks.block_2_intro_poa.intro_target}
                   </div>
-                  <div className="text-sm text-gray-600">Discovery</div>
+                  <div className="text-sm text-gray-600">Intro</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-orange-600">
-                    {analytics.dashboard_blocks.block_2_discovery_poa.poa_actual}/{analytics.dashboard_blocks.block_2_discovery_poa.poa_target}
+                    {analytics.dashboard_blocks.block_2_intro_poa.poa_actual}/{analytics.dashboard_blocks.block_2_intro_poa.poa_target}
                   </div>
                   <div className="text-sm text-gray-600">POA</div>
                 </div>
