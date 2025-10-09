@@ -913,8 +913,8 @@ function MainDashboard({ analytics }) {
                 </div>
                 <div className="text-center">
                   <div className="text-sm font-medium text-gray-700">
-                    {analytics.dashboard_blocks.block_3_pipe_creation.period.includes('months') 
-                      ? `Target: $${((analytics.dashboard_blocks.block_3_pipe_creation.target_pipe_created || 2000000 * 4) / 1000000).toFixed(1)}M (Period)` 
+                    {analytics.dashboard_blocks.block_3_pipe_creation.target_pipe_created 
+                      ? `Target: $${(analytics.dashboard_blocks.block_3_pipe_creation.target_pipe_created / 1000000).toFixed(1)}M (${analytics.dashboard_blocks.block_3_pipe_creation.period})` 
                       : 'Target: $2M/month'}
                   </div>
                 </div>
