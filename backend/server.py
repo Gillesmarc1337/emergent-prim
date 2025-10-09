@@ -1616,6 +1616,8 @@ async def get_custom_analytics(
                 'outbound_target': 15 * period_duration_months,
                 'referral_actual': actual_referral,
                 'referral_target': 10 * period_duration_months,
+                'unassigned_actual': unassigned_custom,
+                'unassigned_target': 0,  # No target for unassigned
                 'show_actual': actual_intro,  # Show count for this period
                 'no_show_actual': len(period_data[period_data['show_noshow'] == 'Noshow'])
             },
