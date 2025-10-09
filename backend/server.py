@@ -1515,7 +1515,7 @@ async def get_dashboard_analytics():
         # Dashboard blocks data (dynamic based on focus month)
         dashboard_blocks = {
             'block_1_meetings': {
-                'title': 'Meeting Generation',
+                'title': 'Meetings Generation',
                 'period': focus_month_str,
                 'total_actual': actual_total,
                 'total_target': target_total,
@@ -1524,13 +1524,15 @@ async def get_dashboard_analytics():
                 'outbound_actual': actual_outbound,
                 'outbound_target': target_outbound,
                 'referral_actual': actual_referral,
-                'referral_target': target_referral
+                'referral_target': target_referral,
+                'show_actual': actual_show,
+                'no_show_actual': actual_no_show
             },
-            'block_2_discovery_poa': {
-                'title': 'Discovery & POA',
+            'block_2_intro_poa': {
+                'title': 'Intro & POA',
                 'period': focus_month_str,
-                'discovery_actual': actual_discovery,
-                'discovery_target': target_discovery,
+                'intro_actual': actual_intro,
+                'intro_target': target_intro,
                 'poa_actual': actual_poa,
                 'poa_target': target_poa
             },
