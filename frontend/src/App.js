@@ -906,7 +906,7 @@ function MainDashboard({ analytics }) {
                     ${(analytics.dashboard_blocks.block_3_pipe_creation.new_pipe_created / 1000000).toFixed(1)}M
                   </div>
                   <div className="text-xs text-gray-600">
-                    {analytics.dashboard_blocks.block_3_pipe_creation.period.includes('months') 
+                    {analytics.dashboard_blocks?.block_3_pipe_creation?.period?.includes('months') 
                       ? 'New Pipe Created (Period)' 
                       : 'New Pipe This Month'}
                   </div>
