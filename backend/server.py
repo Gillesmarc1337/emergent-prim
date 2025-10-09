@@ -2250,7 +2250,24 @@ async def get_projections_performance_summary():
         # Calculate YTD revenue and targets (same logic as dashboard)
         ytd_closed = df[df['stage'].isin(['Closed Won', 'Won', 'Signed', 'A Closed'])]
         ytd_revenue = float(ytd_closed['expected_arr'].fillna(0).sum())
-        ytd_target = 3600000  # Same as dashboard
+        ytd_target = 4500000  # Same as dashboard
+        
+        # Calculate pipe created (YTD)
+        current_year = datetime.now().year
+        year_start = datetime(current_year, 1, 1)
+        ytd_pipe_created = df[
+            (df['discovery_date'] >= year_start) &
+            (df['discovery_date'] <= datetime.now())
+        ]
+        total_pipe_created = float(ytd_pipe_created['pipeline'].fillna(0).sum())
+        
+        # Calculate active deals count (not lost, not inbox, show and relevant)
+        active_deals = df[
+            ~df['stage'].isin(['I Lost', 'H Lost - can be revived', 'F Inbox']) &
+            (df['show_noshow'] == 'Show') &
+            (df['relevance'] == 'Relevant')
+        ]
+        active_deals_count = len(active_deals)
         
         # Calculate dashboard blocks data
         dashboard_blocks = {}
