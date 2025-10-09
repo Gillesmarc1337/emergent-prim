@@ -587,8 +587,8 @@ function MainDashboard({ analytics }) {
   // State for chart series visibility
   const [visibleSeries, setVisibleSeries] = useState({
     'Closed Revenue': true,
-    'Target Revenue': true,
-    'New Weighted Pipe': true,
+    'Target Revenue': false,  // Hidden by default
+    'New Weighted Pipe': false,  // Hidden by default  
     'Aggregate Weighted Pipe': true
   });
 
