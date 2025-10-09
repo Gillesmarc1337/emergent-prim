@@ -610,6 +610,14 @@ function MainDashboard({ analytics }) {
     loadDashboard();
   };
 
+  // Handle legend click to toggle series visibility
+  const handleLegendClick = (dataKey) => {
+    setVisibleSeries(prev => ({
+      ...prev,
+      [dataKey]: !prev[dataKey]
+    }));
+  };
+
   useEffect(() => {
     loadDashboard();
   }, []);
