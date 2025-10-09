@@ -1208,7 +1208,13 @@ async def get_yearly_analytics(year: int = 2025):
                 'new_pipe_created': new_pipe_july_dec,
                 'weighted_pipe_created': weighted_pipe_july_dec,
                 'aggregate_weighted_pipe': aggregate_weighted_pipe_july_dec,
-                'period': 'Jul-Dec 2025'
+                'target_pipe_created': target_pipe_july_dec,
+                'period': f'Jul-Dec 2025 ({months_elapsed} months)',
+                'debug_info': {
+                    'months_elapsed': months_elapsed,
+                    'monthly_target': monthly_pipe_target,
+                    'period_target': target_pipe_july_dec
+                }
             },
             'block_4_revenue': {
                 'title': 'July-December Revenue Objective',
