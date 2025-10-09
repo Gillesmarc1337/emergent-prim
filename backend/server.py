@@ -1023,7 +1023,7 @@ async def get_monthly_analytics(month_offset: int = 0):
         focus_month_num = focus_month.month
         focus_month_str = focus_month.strftime('%b %Y')
         
-        # Block 1: Meetings to generate (for selected month)
+        # Block 1: Meetings Generation (for selected month)
         # Fixed targets as per user requirements: 20 inbound, 15 outbound, 10 referral per month
         target_inbound = 20
         target_outbound = 15
@@ -1041,25 +1041,28 @@ async def get_monthly_analytics(month_offset: int = 0):
         actual_referral = len(focus_month_meetings[focus_month_meetings['type_of_source'].isin(['Internal referral', 'Client referral'])])
         actual_total = actual_inbound + actual_outbound + actual_referral
         
-        # Block 2: Discovery & POA (filtered for focus month)
-        # Targets: 45 discovery, 18 POA per month
-        target_discovery = 45
+        # Calculate Show and No Show numbers
+        actual_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'Show'])
+        actual_no_show = len(focus_month_meetings[focus_month_meetings['show_noshow'] == 'No Show'])
+        
+        # Block 2: Intro & POA (filtered for focus month)
+        # Targets: 45 intro, 18 POA per month
+        target_intro = 45
         target_poa = 18
         
-        # Discovery: all deals except inbox and intro no show
-        discovery_data = df[
+        # Intro = "Show" (une intro c'est un "show") for the focus month
+        intro_data = df[
             (df['discovery_date'] >= month_start) & 
             (df['discovery_date'] <= month_end) &
-            (df['stage'].notna()) & 
-            (~df['stage'].isin(['F Inbox'])) &
-            (~df['show_noshow'].isin(['No Show']))
+            (df['show_noshow'] == 'Show')
         ]
-        actual_discovery = len(discovery_data)
+        actual_intro = len(intro_data)
         
+        # POA = "D POA Booked", "C Proposal sent", "B Legals", closed ou lost for the focus month
         poa_data = df[
             (df['discovery_date'] >= month_start) & 
             (df['discovery_date'] <= month_end) &
-            df['stage'].isin(['D POA Booked', 'B Legals', 'Closed Won', 'Won', 'Signed'])
+            df['stage'].isin(['D POA Booked', 'C Proposal sent', 'B Legals', 'Closed Won', 'Won', 'Signed', 'Closed Lost', 'I Lost'])
         ]
         actual_poa = len(poa_data)
         
