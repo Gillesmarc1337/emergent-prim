@@ -215,6 +215,30 @@ frontend:
           agent: "main"
           comment: "Enhanced Closing Projections with colored cards, weighted value highlighting, and upcoming high-priority meetings section."
 
+  - task: "Replace Yearly button with July To Dec button"
+    implemented: false
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to change 'Yearly' button text to 'July To Dec' to better reflect the H2 2025 period focus"
+
+  - task: "Verify dashboard blocks show dynamic targets for custom periods"
+    implemented: false
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to verify that when custom date ranges (e.g., 2 months) are selected, dashboard blocks show dynamic targets (e.g., 2x targets for 2-month periods)"
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
