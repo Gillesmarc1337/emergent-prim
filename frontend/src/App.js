@@ -1149,7 +1149,7 @@ function Dashboard() {
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-3xl font-bold">
             {useCustomDate ? 'Custom Report' : 
-             viewMode === 'yearly' ? 'Yearly Report 2025' : 'Monthly Report'}
+             viewMode === 'yearly' ? 'July To Dec 2025 Report' : 'Monthly Report'}
           </h1>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
