@@ -820,7 +820,7 @@ function MainDashboard({ analytics }) {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-center">Meetings Generation</CardTitle>
               <CardDescription className="text-center font-medium text-blue-600">
-                {analytics.dashboard_blocks.block_1_meetings.period}
+                {analytics.dashboard_blocks?.block_1_meetings?.period || 'Current Period'}
               </CardDescription>
             </CardHeader>
             <CardContent>
