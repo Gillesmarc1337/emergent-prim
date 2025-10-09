@@ -697,11 +697,6 @@ function MainDashboard({ analytics }) {
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
-              <Legend 
-                onClick={handleLegendClick}
-                wrapperStyle={{ cursor: 'pointer' }}
-                iconType="rect"
-              />
               {visibleSeries['Closed Revenue'] && (
                 <Bar dataKey="closed_revenue" fill={REVENUE_COLORS.closed} name="Closed Revenue" />
               )}
@@ -716,6 +711,38 @@ function MainDashboard({ analytics }) {
               )}
             </BarChart>
           </ResponsiveContainer>
+          
+          {/* Custom Legend */}
+          <div className="flex flex-wrap justify-center gap-4 mt-4 px-4">
+            {Object.entries(visibleSeries).map(([seriesName, isVisible]) => {
+              const colors = {
+                'Closed Revenue': REVENUE_COLORS.closed,
+                'Target Revenue': REVENUE_COLORS.target,
+                'New Weighted Pipe': '#D97706',
+                'Aggregate Weighted Pipe': '#4ECDC4'
+              };
+              
+              return (
+                <button
+                  key={seriesName}
+                  onClick={() => handleLegendClick(seriesName)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all ${
+                    isVisible 
+                      ? 'bg-white shadow-sm border border-gray-200' 
+                      : 'bg-gray-100 opacity-60 hover:opacity-80'
+                  }`}
+                >
+                  <div 
+                    className="w-3 h-3 rounded-sm"
+                    style={{ backgroundColor: colors[seriesName] }}
+                  />
+                  <span className={`text-sm ${isVisible ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>
+                    {seriesName}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
 
