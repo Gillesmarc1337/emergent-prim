@@ -242,6 +242,18 @@ frontend:
           agent: "testing"
           comment: "✅ TESTED SUCCESSFULLY: /api/analytics/custom endpoint correctly implements dynamic targets for custom periods. Verified with comprehensive testing: 1-month period (Oct 2025) shows baseline targets (meetings: 45, intro: 45, POA: 18, revenue: 1,080,000). 2-month period (Oct-Nov 2025) correctly doubles all targets (meetings: 90, intro: 90, POA: 36, revenue: 2,160,000). 3-month period (Oct-Dec 2025) correctly triples targets (meetings: 135, intro: 135, POA: 54, revenue: 3,240,000). All dashboard blocks (block_1_meetings, block_2_intro_poa, block_3_new_pipe, block_4_revenue) show proper dynamic calculation based on period duration. Backend API is working perfectly for dynamic target functionality."
 
+  - task: "Yearly analytics endpoint with July-December dashboard blocks"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED SUCCESSFULLY: /api/analytics/yearly?year=2025 endpoint now includes dashboard_blocks with proper July-December targets. Fixed minor typo in show_noshow column reference. All 4 blocks present: block_1_meetings (270 total meetings target = 6x45 monthly), block_2_intro_poa (270 intro + 108 POA targets = 6x monthly), block_3_pipe_creation (July-Dec period data), block_4_revenue (4,800,000 total July-Dec revenue target). Period correctly set to 'Jul-Dec 2025'. Meeting breakdown: Inbound=120, Outbound=90, Referral=60 targets. Actual data shows 115 total meetings, 99 intros, 55 POAs, and $1.13M closed revenue (23.5% progress). API working perfectly for July-December period calculations."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
