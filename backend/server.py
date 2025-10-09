@@ -1071,10 +1071,14 @@ async def get_yearly_analytics(year: int = 2025):
         july_dec_start = datetime(year, 7, 1)
         july_dec_end = datetime(year, 12, 31, 23, 59, 59, 999999)
         
-        # Meeting generation for July-Dec period
+        # For realistic testing, let's use a period that has actual data
+        # Instead of July-Dec, let's use year-to-date or available data range
+        current_date = datetime.now()
+        
+        # Meeting generation for July-Dec period (only up to current date)
         july_dec_meetings = df[
             (df['discovery_date'] >= july_dec_start) & 
-            (df['discovery_date'] <= july_dec_end)
+            (df['discovery_date'] <= min(july_dec_end, current_date))
         ]
         
         # Calculate meeting targets for 6-month period (6x monthly targets)
