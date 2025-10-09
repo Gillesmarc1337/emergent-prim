@@ -1965,6 +1965,8 @@ async def get_dashboard_analytics():
                 'outbound_target': target_outbound,
                 'referral_actual': actual_referral,
                 'referral_target': target_referral,
+                'unassigned_actual': unassigned_monthly,
+                'unassigned_target': 0,  # No target for unassigned
                 'show_actual': actual_show,
                 'no_show_actual': actual_no_show
             },
