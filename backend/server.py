@@ -1381,6 +1381,17 @@ async def get_monthly_analytics(month_offset: int = 0):
         new_pipe_focus_month['weighted_value'] = new_pipe_focus_month['pipeline'] * new_pipe_focus_month['probability'] / 100
         weighted_pipe_created = float(new_pipe_focus_month['weighted_value'].sum())
         
+        # Calculate aggregate weighted pipe (all active deals)
+        all_active_deals_monthly = df[
+            ~df['stage'].isin(['I Lost', 'H Lost - can be revived', 'F Inbox', 'A Closed']) &
+            (df['show_noshow'] == 'Show') &
+            (df['relevance'] == 'Relevant')
+        ].copy()
+        
+        all_active_deals_monthly['probability'] = all_active_deals_monthly['stage'].map(stage_probabilities).fillna(10)
+        all_active_deals_monthly['weighted_value'] = all_active_deals_monthly['pipeline'] * all_active_deals_monthly['probability'] / 100
+        aggregate_weighted_pipe_monthly = float(all_active_deals_monthly['weighted_value'].sum())
+        
         # Block 4: Revenue objective vs closed
         exact_targets = {
             'Jul 2025': 465000, 'Aug 2025': 397500, 'Sep 2025': 547500,
