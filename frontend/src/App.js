@@ -870,7 +870,7 @@ function MainDashboard({ analytics }) {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-center">Intro & POA</CardTitle>
               <CardDescription className="text-center font-medium text-green-600">
-                {analytics.dashboard_blocks.block_2_intro_poa.period}
+                {analytics.dashboard_blocks?.block_2_intro_poa?.period || 'Current Period'}
               </CardDescription>
             </CardHeader>
             <CardContent>
