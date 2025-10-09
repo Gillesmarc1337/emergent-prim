@@ -896,7 +896,7 @@ function MainDashboard({ analytics }) {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-center">New Pipe Created</CardTitle>
               <CardDescription className="text-center font-medium text-purple-600">
-                {analytics.dashboard_blocks.block_3_pipe_creation.period}
+                {analytics.dashboard_blocks?.block_3_pipe_creation?.period || 'Current Period'}
               </CardDescription>
             </CardHeader>
             <CardContent>
