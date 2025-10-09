@@ -1384,7 +1384,7 @@ async def get_monthly_analytics(month_offset: int = 0):
         # Calculate aggregate weighted pipe (all active deals)
         all_active_deals_monthly = df[
             ~df['stage'].isin(['I Lost', 'H Lost - can be revived', 'F Inbox', 'A Closed']) &
-            (df['show_nowshow'] == 'Show') &
+            (df['show_noshow'] == 'Show') &
             (df['relevance'] == 'Relevant')
         ].copy()
         
