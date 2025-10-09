@@ -1684,8 +1684,17 @@ function Dashboard() {
 
             {/* Cette section a été déplacée dans la Section 3 ci-dessus */}
 
-            {/* Conversion Rates Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+            {/* 🔄 SECTION 4: CONVERSION RATES */}
+            <Card className="mb-6 border-orange-200">
+              <CardHeader className="bg-orange-50">
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <BarChart3 className="h-6 w-6 text-orange-600" />
+                  Conversion Rates Analysis
+                </CardTitle>
+                <CardDescription>Intro to POA and POA to Closing conversion metrics by AE</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
               {/* Intro → POA Conversion Rate */}
               <Card>
