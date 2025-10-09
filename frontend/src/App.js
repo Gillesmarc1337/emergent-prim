@@ -580,33 +580,12 @@ function DataManagementSection({ onDataUpdated }) {
 }
 
 function MainDashboard({ analytics }) {
-  const [dashboardData, setDashboardData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const loadDashboard = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`${API}/analytics/dashboard`);
-      setDashboardData(response.data);
-      setError(null);
-    } catch (error) {
-      setError(error.response?.data?.detail || 'Error loading dashboard');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDataUpdated = () => {
-    // Refresh dashboard when data is updated
-    loadDashboard();
+    // This will be handled by parent component reload
+    window.location.reload();
   };
 
-  useEffect(() => {
-    loadDashboard();
-  }, []);
-
-  if (loading) {
+  if (!analytics || !analytics.big_numbers_recap) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -617,17 +596,20 @@ function MainDashboard({ analytics }) {
     );
   }
 
-  if (error) {
-    return (
-      <Alert className="border-red-500">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          <div className="font-medium">Error</div>
-          <div className="text-sm mt-1">{error}</div>
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  // Prepare dashboard data from analytics
+  const dashboardData = {
+    key_metrics: {
+      ytd_revenue: analytics.big_numbers_recap.ytd_revenue || 0,
+      ytd_target: analytics.big_numbers_recap.ytd_target || 0,
+      ytd_remaining: analytics.big_numbers_recap.remaining_target || 0,
+      weighted_pipeline: analytics.pipe_metrics?.weighted_pipeline || 0,
+      deals_count: analytics.big_numbers_recap.active_deals_count || 0,
+      annual_target_2025: analytics.big_numbers_recap.ytd_target || 0,
+      ytd_closed_2025: analytics.big_numbers_recap.ytd_revenue || 0,
+      pipe_created: analytics.big_numbers_recap.pipe_created || 0
+    },
+    monthly_revenue_chart: analytics.months_data || []
+  };
 
   return (
     <div className="space-y-6">
