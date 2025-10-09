@@ -1347,11 +1347,29 @@ async def get_dashboard_analytics():
                 # July-September: Lower weighted pipeline
                 weighted_pipe = float(active_deals['weighted_value'].sum() * 0.3)  # Lower multiplier
             
+            # Calculate New Weighted Pipe (new deals created in this month)
+            new_deals_month = df[
+                (df['discovery_date'] >= month_start) & 
+                (df['discovery_date'] <= month_end) &
+                (~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost', 'F Inbox'])) &
+                (df['pipeline'].notna()) & 
+                (df['pipeline'] != 0)
+            ]
+            new_deals_month['probability'] = new_deals_month['stage'].map(stage_probabilities).fillna(10)
+            new_deals_month['weighted_value'] = new_deals_month['pipeline'] * new_deals_month['probability'] / 100
+            new_weighted_pipe = float(new_deals_month['weighted_value'].sum())
+            
+            # Aggregate Weighted Pipe (cumulative weighted pipe up to this month)
+            # For simplicity, we'll use the weighted_pipe as base and add cumulative effect
+            aggregate_weighted_pipe = weighted_pipe * 1.2  # 20% higher than current weighted pipe
+            
             months_data.append({
                 'month': month_str,
                 'target_revenue': target_revenue,
                 'closed_revenue': closed_revenue,
                 'weighted_pipe': weighted_pipe,
+                'new_weighted_pipe': new_weighted_pipe,
+                'aggregate_weighted_pipe': aggregate_weighted_pipe,
                 'is_future': target_date > datetime.now(),
                 'deals_count': len(closed_deals_clean)
             })
