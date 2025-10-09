@@ -407,7 +407,7 @@ def calculate_ae_performance(df, start_date, end_date):
     # Intros = tout sauf inbox et noshow
     intros_data = period_data[
         (~period_data['stage'].isin(['F Inbox'])) &
-        (~period_data['show_noshow'].isin(['No Show']))
+        (~period_data['show_noshow'].isin(['Noshow']))
     ].copy()
     
     # POA Attended = legals, proposal send, POA Booked, Closed, lost
