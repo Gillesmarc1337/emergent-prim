@@ -1059,11 +1059,11 @@ async def get_yearly_analytics(year: int = 2025):
         actual_inbound_july_dec = len(july_dec_meetings[july_dec_meetings['type_of_source'] == 'Inbound'])
         actual_outbound_july_dec = len(july_dec_meetings[july_dec_meetings['type_of_source'] == 'Outbound'])
         actual_referral_july_dec = len(july_dec_meetings[july_dec_meetings['type_of_source'] == 'Referral'])
-        actual_show_july_dec = len(july_dec_meetings[july_dec_meetings['show_nowshow'] == 'Show'])
-        actual_no_show_july_dec = len(july_dec_meetings[july_dec_meetings['show_nowshow'] == 'No Show'])
+        actual_show_july_dec = len(july_dec_meetings[july_dec_meetings['show_noshow'] == 'Show'])
+        actual_no_show_july_dec = len(july_dec_meetings[july_dec_meetings['show_noshow'] == 'No Show'])
         
         # Intro & POA for July-Dec period
-        intro_july_dec = len(july_dec_meetings[july_dec_meetings['show_nowshow'] == 'Show'])
+        intro_july_dec = len(july_dec_meetings[july_dec_meetings['show_noshow'] == 'Show'])
         monthly_intro_target = 45
         july_dec_intro_target = monthly_intro_target * 6  # 270 for 6 months
         
