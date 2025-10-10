@@ -4082,8 +4082,8 @@ def test_raw_pipeline_values_investigation():
     return investigation_results
 
 def main():
-    """Run all backend tests with priority on Projections master data verification"""
-    print(f"🚀 Starting Backend API Testing")
+    """Run backend tests with priority focus on raw pipeline values investigation"""
+    print(f"🚀 Starting Backend API Testing - RAW PIPELINE VALUES INVESTIGATION")
     print(f"Backend URL: {BASE_URL}")
     print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
@@ -4095,20 +4095,16 @@ def main():
         all_tests_passed = False
         print(f"\n⚠️  Basic connectivity failed - other tests may not work properly")
     
-    # Test 2: Data availability
-    data_available = test_data_status()
-    if not data_available:
-        print(f"\n⚠️  No data available - tests will return empty results")
+    # HIGHEST PRIORITY TEST: Raw Pipeline Values Investigation
+    print(f"\n🎯 HIGHEST PRIORITY TEST: Raw Pipeline Values Investigation")
+    investigation_results = test_raw_pipeline_values_investigation()
     
-    # HIGHEST PRIORITY TEST: Legals + Proposal Pipeline Discrepancy Analysis
-    print(f"\n🎯 HIGHEST PRIORITY TEST: Legals + Proposal Pipeline Discrepancy Analysis")
-    legals_proposal_success = test_legals_proposal_pipeline_discrepancy()
-    if not legals_proposal_success:
-        all_tests_passed = False
+    # Supporting tests for validation
+    print(f"\n🎯 SUPPORTING TEST: Hot Deals Endpoint Validation")
+    hot_deals_success = test_projections_hot_deals()
     
-    # PRIORITY TEST: Projections Master Data Verification (as requested in review)
-    print(f"\n🎯 PRIORITY TEST: Projections Master Data Verification")
-    master_data_results = test_projections_master_data_verification()
+    print(f"\n🎯 SUPPORTING TEST: Hot Leads Endpoint Validation") 
+    hot_leads_success = test_projections_hot_leads()
     
     # SECONDARY TEST: Legals + Proposal Pipeline Values (previous priority test)
     print(f"\n🎯 SECONDARY TEST: Legals + Proposal Pipeline Values Analysis")
