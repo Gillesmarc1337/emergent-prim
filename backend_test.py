@@ -3376,6 +3376,323 @@ def test_legals_proposal_pipeline_values():
     
     return passed_tests >= 3  # At least 3 out of 5 tests should pass for success
 
+def test_projections_master_data_verification():
+    """Verify the correct master data values for the 4 Projections tab cards"""
+    print(f"\n{'='*80}")
+    print(f"🎯 PROJECTIONS TAB MASTER DATA VERIFICATION")
+    print(f"{'='*80}")
+    
+    print(f"📋 VERIFICATION REQUEST:")
+    print(f"   Current display shows incorrect values:")
+    print(f"   1. Legals: 26 deals")
+    print(f"   2. Proposal Sent: 28 deals")
+    print(f"   3. Legals + Proposal Value: $0")
+    print(f"   4. POA Status: 6 Completed, 0 Upcoming")
+    print(f"")
+    print(f"   Need to verify actual master data values from backend APIs...")
+    
+    master_data_results = {
+        'b_legals_count': 0,
+        'b_legals_pipeline_value': 0,
+        'c_proposal_sent_count': 0,
+        'c_proposal_sent_pipeline_value': 0,
+        'combined_pipeline_value': 0,
+        'poa_completed_count': 0,
+        'poa_upcoming_count': 0
+    }
+    
+    # Test 1: GET /api/analytics/monthly - Check B Legals and C Proposal sent
+    print(f"\n{'='*60}")
+    print(f"📊 TEST 1: GET /api/analytics/monthly")
+    print(f"{'='*60}")
+    
+    monthly_data = test_api_endpoint("/analytics/monthly")
+    if monthly_data:
+        print(f"✅ Monthly analytics data retrieved")
+        
+        # Check closing_projections for deal counts by stage
+        if 'closing_projections' in monthly_data:
+            projections = monthly_data['closing_projections']
+            print(f"📋 Analyzing closing_projections data:")
+            
+            # Check current_month deals
+            if 'current_month' in projections and 'deals' in projections['current_month']:
+                current_deals = projections['current_month']['deals']
+                print(f"  📊 Current month deals found: {len(current_deals)} total")
+                
+                # Count B Legals deals
+                b_legals_deals = [deal for deal in current_deals if deal.get('stage') == 'B Legals']
+                b_legals_pipeline = sum(deal.get('pipeline', 0) for deal in b_legals_deals)
+                master_data_results['b_legals_count'] = len(b_legals_deals)
+                master_data_results['b_legals_pipeline_value'] = b_legals_pipeline
+                
+                print(f"  🎯 B Legals deals: {len(b_legals_deals)} deals, Pipeline: ${b_legals_pipeline:,.2f}")
+                
+                # Count C Proposal sent deals
+                c_proposal_deals = [deal for deal in current_deals if deal.get('stage') == 'C Proposal sent']
+                c_proposal_pipeline = sum(deal.get('pipeline', 0) for deal in c_proposal_deals)
+                master_data_results['c_proposal_sent_count'] = len(c_proposal_deals)
+                master_data_results['c_proposal_sent_pipeline_value'] = c_proposal_pipeline
+                
+                print(f"  🎯 C Proposal sent deals: {len(c_proposal_deals)} deals, Pipeline: ${c_proposal_pipeline:,.2f}")
+                
+                # Calculate combined pipeline value
+                combined_value = b_legals_pipeline + c_proposal_pipeline
+                master_data_results['combined_pipeline_value'] = combined_value
+                print(f"  💰 Combined (B Legals + C Proposal sent) Pipeline: ${combined_value:,.2f}")
+                
+                # Show sample deals for verification
+                if b_legals_deals:
+                    print(f"  📋 Sample B Legals deals:")
+                    for i, deal in enumerate(b_legals_deals[:3]):
+                        print(f"    {i+1}. {deal.get('client', 'N/A')} - ${deal.get('pipeline', 0):,.0f} - {deal.get('owner', 'N/A')}")
+                
+                if c_proposal_deals:
+                    print(f"  📋 Sample C Proposal sent deals:")
+                    for i, deal in enumerate(c_proposal_deals[:3]):
+                        print(f"    {i+1}. {deal.get('client', 'N/A')} - ${deal.get('pipeline', 0):,.0f} - {deal.get('owner', 'N/A')}")
+            
+            # Check next_quarter deals for additional data
+            if 'next_quarter' in projections and 'deals' in projections['next_quarter']:
+                next_quarter_deals = projections['next_quarter']['deals']
+                print(f"  📊 Next quarter deals found: {len(next_quarter_deals)} total")
+                
+                # Additional B Legals and C Proposal sent from next quarter
+                next_b_legals = [deal for deal in next_quarter_deals if deal.get('stage') == 'B Legals']
+                next_c_proposal = [deal for deal in next_quarter_deals if deal.get('stage') == 'C Proposal sent']
+                
+                print(f"  📊 Next quarter B Legals: {len(next_b_legals)} deals")
+                print(f"  📊 Next quarter C Proposal sent: {len(next_c_proposal)} deals")
+        
+        # Check dashboard_blocks for POA data
+        if 'dashboard_blocks' in monthly_data:
+            blocks = monthly_data['dashboard_blocks']
+            
+            if 'block_2_intro_poa' in blocks:
+                poa_block = blocks['block_2_intro_poa']
+                poa_actual = poa_block.get('poa_actual', 0)
+                poa_target = poa_block.get('poa_target', 0)
+                master_data_results['poa_completed_count'] = poa_actual
+                
+                print(f"  🎯 POA Completed (from dashboard blocks): {poa_actual}")
+                print(f"  🎯 POA Target: {poa_target}")
+    else:
+        print(f"❌ Failed to retrieve monthly analytics data")
+    
+    # Test 2: GET /api/projections/hot-deals - Verify B Legals data
+    print(f"\n{'='*60}")
+    print(f"📊 TEST 2: GET /api/projections/hot-deals")
+    print(f"{'='*60}")
+    
+    hot_deals_data = test_api_endpoint("/projections/hot-deals")
+    if hot_deals_data and isinstance(hot_deals_data, list):
+        print(f"✅ Hot deals data retrieved: {len(hot_deals_data)} deals")
+        
+        # All hot deals should be B Legals stage
+        b_legals_hot_deals = [deal for deal in hot_deals_data if deal.get('stage') == 'B Legals']
+        hot_deals_pipeline = sum(deal.get('pipeline', 0) for deal in hot_deals_data)
+        
+        print(f"  🎯 Hot deals (B Legals): {len(b_legals_hot_deals)} deals")
+        print(f"  💰 Hot deals total pipeline: ${hot_deals_pipeline:,.2f}")
+        
+        # Cross-reference with monthly data
+        if master_data_results['b_legals_count'] != len(hot_deals_data):
+            print(f"  ⚠️  Discrepancy: Monthly analytics shows {master_data_results['b_legals_count']} B Legals, hot-deals shows {len(hot_deals_data)}")
+        else:
+            print(f"  ✅ Consistent: Both sources show {len(hot_deals_data)} B Legals deals")
+        
+        # Update master data with hot-deals data if it's more comprehensive
+        if len(hot_deals_data) > master_data_results['b_legals_count']:
+            master_data_results['b_legals_count'] = len(hot_deals_data)
+            master_data_results['b_legals_pipeline_value'] = hot_deals_pipeline
+            print(f"  📊 Updated B Legals data from hot-deals endpoint")
+        
+        # Show sample hot deals
+        if hot_deals_data:
+            print(f"  📋 Sample hot deals:")
+            for i, deal in enumerate(hot_deals_data[:3]):
+                print(f"    {i+1}. {deal.get('client', 'N/A')} - ${deal.get('pipeline', 0):,.0f} - {deal.get('owner', 'N/A')}")
+    else:
+        print(f"❌ Failed to retrieve hot deals data or invalid format")
+    
+    # Test 3: GET /api/projections/hot-leads - Verify C Proposal sent and D POA Booked
+    print(f"\n{'='*60}")
+    print(f"📊 TEST 3: GET /api/projections/hot-leads")
+    print(f"{'='*60}")
+    
+    hot_leads_data = test_api_endpoint("/projections/hot-leads")
+    if hot_leads_data and isinstance(hot_leads_data, list):
+        print(f"✅ Hot leads data retrieved: {len(hot_leads_data)} deals")
+        
+        # Separate by stage
+        c_proposal_hot_leads = [deal for deal in hot_leads_data if deal.get('stage') == 'C Proposal sent']
+        d_poa_booked_leads = [deal for deal in hot_leads_data if deal.get('stage') == 'D POA Booked']
+        
+        c_proposal_hot_pipeline = sum(deal.get('pipeline', 0) for deal in c_proposal_hot_leads)
+        d_poa_booked_pipeline = sum(deal.get('pipeline', 0) for deal in d_poa_booked_leads)
+        
+        print(f"  🎯 Hot leads (C Proposal sent): {len(c_proposal_hot_leads)} deals, Pipeline: ${c_proposal_hot_pipeline:,.2f}")
+        print(f"  🎯 Hot leads (D POA Booked): {len(d_poa_booked_leads)} deals, Pipeline: ${d_poa_booked_pipeline:,.2f}")
+        
+        # Update master data with hot-leads data if it's more comprehensive
+        if len(c_proposal_hot_leads) > master_data_results['c_proposal_sent_count']:
+            master_data_results['c_proposal_sent_count'] = len(c_proposal_hot_leads)
+            master_data_results['c_proposal_sent_pipeline_value'] = c_proposal_hot_pipeline
+            print(f"  📊 Updated C Proposal sent data from hot-leads endpoint")
+        
+        # Recalculate combined pipeline value
+        master_data_results['combined_pipeline_value'] = master_data_results['b_legals_pipeline_value'] + master_data_results['c_proposal_sent_pipeline_value']
+        
+        # Check for upcoming POA meetings
+        upcoming_poa_count = 0
+        upcoming_poa_details = []
+        for deal in hot_leads_data:
+            poa_date = deal.get('poa_date')
+            if poa_date and poa_date != 'No date' and poa_date is not None:
+                # Count as upcoming if has a POA date
+                upcoming_poa_count += 1
+                upcoming_poa_details.append({
+                    'client': deal.get('client', 'N/A'),
+                    'poa_date': poa_date,
+                    'stage': deal.get('stage', 'N/A')
+                })
+        
+        master_data_results['poa_upcoming_count'] = upcoming_poa_count
+        print(f"  📅 Upcoming POA meetings: {upcoming_poa_count}")
+        
+        # Show upcoming POA details
+        if upcoming_poa_details:
+            print(f"  📋 Upcoming POA meetings details:")
+            for i, poa in enumerate(upcoming_poa_details[:5]):
+                print(f"    {i+1}. {poa['client']} - {poa['poa_date']} ({poa['stage']})")
+        
+        # Show sample hot leads
+        if c_proposal_hot_leads:
+            print(f"  📋 Sample C Proposal sent leads:")
+            for i, deal in enumerate(c_proposal_hot_leads[:3]):
+                poa_date = deal.get('poa_date', 'No date')
+                print(f"    {i+1}. {deal.get('client', 'N/A')} - ${deal.get('pipeline', 0):,.0f} - POA: {poa_date}")
+        
+        if d_poa_booked_leads:
+            print(f"  📋 Sample D POA Booked leads:")
+            for i, deal in enumerate(d_poa_booked_leads[:3]):
+                poa_date = deal.get('poa_date', 'No date')
+                print(f"    {i+1}. {deal.get('client', 'N/A')} - ${deal.get('pipeline', 0):,.0f} - POA: {poa_date}")
+    else:
+        print(f"❌ Failed to retrieve hot leads data or invalid format")
+    
+    # Test 4: Cross-reference with dashboard blocks
+    print(f"\n{'='*60}")
+    print(f"📊 TEST 4: Cross-reference with dashboard blocks")
+    print(f"{'='*60}")
+    
+    if monthly_data and 'dashboard_blocks' in monthly_data:
+        blocks = monthly_data['dashboard_blocks']
+        
+        # Check block_2_intro_poa for POA data
+        if 'block_2_intro_poa' in blocks:
+            poa_block = blocks['block_2_intro_poa']
+            print(f"✅ POA block found in dashboard blocks:")
+            for key, value in poa_block.items():
+                print(f"  • {key}: {value}")
+        
+        # Check if there are any other blocks with POA or deal information
+        for block_name, block_data in blocks.items():
+            if isinstance(block_data, dict):
+                poa_fields = [k for k in block_data.keys() if 'poa' in k.lower()]
+                deal_fields = [k for k in block_data.keys() if 'deal' in k.lower()]
+                
+                if poa_fields or deal_fields:
+                    print(f"  📊 {block_name} contains relevant fields:")
+                    for field in poa_fields + deal_fields:
+                        print(f"    • {field}: {block_data[field]}")
+    
+    # Final Summary - Provide CORRECT master data values
+    print(f"\n{'='*80}")
+    print(f"🎯 CORRECT MASTER DATA VALUES FOR PROJECTIONS TAB CARDS")
+    print(f"{'='*80}")
+    
+    print(f"\n📊 VERIFIED MASTER DATA (from backend APIs):")
+    print(f"")
+    print(f"1️⃣ B LEGALS DEALS:")
+    print(f"   • Count: {master_data_results['b_legals_count']} deals")
+    print(f"   • Pipeline Value: ${master_data_results['b_legals_pipeline_value']:,.2f}")
+    print(f"")
+    print(f"2️⃣ C PROPOSAL SENT DEALS:")
+    print(f"   • Count: {master_data_results['c_proposal_sent_count']} deals")
+    print(f"   • Pipeline Value: ${master_data_results['c_proposal_sent_pipeline_value']:,.2f}")
+    print(f"")
+    print(f"3️⃣ COMBINED (B LEGALS + C PROPOSAL SENT):")
+    print(f"   • Total Pipeline Value: ${master_data_results['combined_pipeline_value']:,.2f}")
+    print(f"")
+    print(f"4️⃣ POA STATUS:")
+    print(f"   • Completed: {master_data_results['poa_completed_count']}")
+    print(f"   • Upcoming: {master_data_results['poa_upcoming_count']}")
+    
+    print(f"\n{'='*60}")
+    print(f"📋 COMPARISON WITH CURRENT DISPLAY:")
+    print(f"{'='*60}")
+    
+    # Compare with reported incorrect values
+    current_display = {
+        'legals': 26,
+        'proposal_sent': 28,
+        'combined_value': 0,
+        'poa_completed': 6,
+        'poa_upcoming': 0
+    }
+    
+    print(f"")
+    print(f"📊 DISCREPANCY ANALYSIS:")
+    print(f"   Current Display → Actual Master Data")
+    print(f"")
+    print(f"   Legals: {current_display['legals']} deals → {master_data_results['b_legals_count']} deals")
+    if current_display['legals'] != master_data_results['b_legals_count']:
+        print(f"   ❌ MISMATCH: Difference of {abs(current_display['legals'] - master_data_results['b_legals_count'])} deals")
+    else:
+        print(f"   ✅ MATCH")
+    
+    print(f"")
+    print(f"   Proposal Sent: {current_display['proposal_sent']} deals → {master_data_results['c_proposal_sent_count']} deals")
+    if current_display['proposal_sent'] != master_data_results['c_proposal_sent_count']:
+        print(f"   ❌ MISMATCH: Difference of {abs(current_display['proposal_sent'] - master_data_results['c_proposal_sent_count'])} deals")
+    else:
+        print(f"   ✅ MATCH")
+    
+    print(f"")
+    print(f"   Combined Value: ${current_display['combined_value']:,.2f} → ${master_data_results['combined_pipeline_value']:,.2f}")
+    if current_display['combined_value'] != master_data_results['combined_pipeline_value']:
+        print(f"   ❌ MISMATCH: Difference of ${abs(current_display['combined_value'] - master_data_results['combined_pipeline_value']):,.2f}")
+    else:
+        print(f"   ✅ MATCH")
+    
+    print(f"")
+    print(f"   POA Completed: {current_display['poa_completed']} → {master_data_results['poa_completed_count']}")
+    if current_display['poa_completed'] != master_data_results['poa_completed_count']:
+        print(f"   ❌ MISMATCH: Difference of {abs(current_display['poa_completed'] - master_data_results['poa_completed_count'])}")
+    else:
+        print(f"   ✅ MATCH")
+    
+    print(f"")
+    print(f"   POA Upcoming: {current_display['poa_upcoming']} → {master_data_results['poa_upcoming_count']}")
+    if current_display['poa_upcoming'] != master_data_results['poa_upcoming_count']:
+        print(f"   ❌ MISMATCH: Difference of {abs(current_display['poa_upcoming'] - master_data_results['poa_upcoming_count'])}")
+    else:
+        print(f"   ✅ MATCH")
+    
+    print(f"\n{'='*60}")
+    print(f"🔧 RECOMMENDATIONS FOR FRONTEND FIX:")
+    print(f"{'='*60}")
+    
+    print(f"")
+    print(f"1. Update B Legals count calculation to use: GET /api/projections/hot-deals")
+    print(f"2. Update C Proposal sent count calculation to use: GET /api/projections/hot-leads (filter by stage)")
+    print(f"3. Update combined pipeline value calculation to sum both pipeline values")
+    print(f"4. Update POA completed count to use: dashboard_blocks.block_2_intro_poa.poa_actual")
+    print(f"5. Update POA upcoming count to count deals with future poa_date from hot-leads")
+    
+    return master_data_results
+
 def main():
     """Run all backend tests with priority on pipeline data Excel matching"""
     print(f"🚀 Starting Backend API Testing")
