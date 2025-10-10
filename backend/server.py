@@ -1645,11 +1645,11 @@ async def get_custom_analytics(
                 'total_actual': actual_total_meetings,
                 'total_target': dynamic_meetings_target,
                 'inbound_actual': actual_inbound,
-                'inbound_target': 20 * period_duration_months,
+                'inbound_target': 22 * period_duration_months,
                 'outbound_actual': actual_outbound,
-                'outbound_target': 15 * period_duration_months,
+                'outbound_target': 17 * period_duration_months,
                 'referral_actual': actual_referral,
-                'referral_target': 10 * period_duration_months,
+                'referral_target': 11 * period_duration_months,
                 'unassigned_actual': unassigned_custom,
                 'unassigned_target': 0,  # No target for unassigned
                 'show_actual': actual_intro,  # Show count for this period
