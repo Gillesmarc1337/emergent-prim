@@ -2340,7 +2340,7 @@ function Dashboard() {
                         ).reduce((sum, deal) => sum + (deal.pipeline || 0), 0))).toLocaleString()}
                       </div>
                       <div className="text-xs text-gray-600">
-                        Total Pipeline Value
+                        Valeur brute (sauf Lost/Not Relevant)
                       </div>
                     </CardContent>
                   </Card>
