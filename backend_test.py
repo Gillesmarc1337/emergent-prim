@@ -3890,6 +3890,12 @@ def main():
     if not data_available:
         print(f"\n⚠️  No data available - tests will return empty results")
     
+    # HIGHEST PRIORITY TEST: Legals + Proposal Pipeline Discrepancy Analysis
+    print(f"\n🎯 HIGHEST PRIORITY TEST: Legals + Proposal Pipeline Discrepancy Analysis")
+    legals_proposal_success = test_legals_proposal_pipeline_discrepancy()
+    if not legals_proposal_success:
+        all_tests_passed = False
+    
     # PRIORITY TEST: Projections Master Data Verification (as requested in review)
     print(f"\n🎯 PRIORITY TEST: Projections Master Data Verification")
     master_data_results = test_projections_master_data_verification()
