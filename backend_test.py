@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing for Sales Analytics Dashboard
-Testing dynamic dashboard blocks functionality
+Testing MongoDB data structure and available endpoints for master data verification
 """
 
 import requests
