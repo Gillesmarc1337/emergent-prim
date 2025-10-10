@@ -1123,6 +1123,10 @@ function Dashboard() {
       // Assign columns based on deal stage for logical grouping
       const dealsWithColumns = combinedDeals.map((deal, index) => ({
         ...deal,
+        // Ensure required fields have defaults
+        client: deal.client || deal.company || deal.lead_name || `Deal ${index + 1}`,
+        pipeline: deal.pipeline || deal.expected_arr || deal.value || 0,
+        owner: deal.owner || deal.ae || 'TBD',
         column: deal.column || (() => {
           // Assign columns based on deal stage
           if (deal.stage === 'B Legals') return 'next14';  // Closest to closing
@@ -1132,6 +1136,13 @@ function Dashboard() {
           return index % 3 === 0 ? 'next14' : index % 3 === 1 ? 'next30' : 'next60';
         })()
       }));
+      
+      console.log(`DEBUG: Loaded ${dealsWithColumns.length} deals for interactive board`);
+      console.log('Deals by column:', {
+        next14: dealsWithColumns.filter(d => d.column === 'next14').length,
+        next30: dealsWithColumns.filter(d => d.column === 'next30').length,
+        next60: dealsWithColumns.filter(d => d.column === 'next60').length
+      });
       
       setHotDeals(dealsWithColumns);
       setHotLeads(hotLeadsResponse.data);
