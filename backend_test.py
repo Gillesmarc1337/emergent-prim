@@ -2905,8 +2905,14 @@ def main():
     if not data_available:
         print(f"\n⚠️  No data available - tests will return empty results")
     
-    # PRIORITY TEST: Hot Deals Stage Analysis (as requested in review)
-    print(f"\n🎯 PRIORITY TEST: Hot Deals Stage Analysis")
+    # PRIORITY TEST: Comprehensive Deals Count Analysis (as requested in review)
+    print(f"\n🎯 PRIORITY TEST: Comprehensive Deals Count Analysis")
+    deals_analysis_result = test_deals_count_analysis()
+    if not deals_analysis_result.get('analysis_complete', False):
+        all_tests_passed = False
+    
+    # SECONDARY TEST: Hot Deals Stage Analysis
+    print(f"\n🎯 SECONDARY TEST: Hot Deals Stage Analysis")
     if not test_hot_deals_stage_analysis():
         all_tests_passed = False
     
