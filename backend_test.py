@@ -3125,7 +3125,12 @@ def main():
     if not data_available:
         print(f"\n⚠️  No data available - tests will return empty results")
     
-    # PRIORITY TEST: Comprehensive Deals Count Analysis (as requested in review)
+    # PRIORITY TEST: Dashboard Analytics Structure (as requested in review)
+    print(f"\n🎯 PRIORITY TEST: Dashboard Analytics Structure Analysis")
+    if not test_dashboard_analytics_structure():
+        all_tests_passed = False
+    
+    # SECONDARY TEST: Comprehensive Deals Count Analysis
     print(f"\n🎯 PRIORITY TEST: Comprehensive Deals Count Analysis")
     deals_analysis_result = test_deals_count_analysis()
     if not deals_analysis_result.get('analysis_complete', False):
