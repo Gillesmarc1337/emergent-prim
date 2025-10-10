@@ -758,7 +758,7 @@ def calculate_pipe_metrics(df, start_date, end_date):
             'on_track': bool(total_pipe_value >= 5000000)
         },
         'ae_breakdown': ae_breakdown,
-        'pipe_details': clean_records(active_pipe[['client', 'pipeline', 'weighted_value', 'stage', 'owner', 'probability']].to_dict('records'))
+        'pipe_details': clean_records(active_pipe[['client', 'pipeline', 'weighted_value', 'stage', 'owner']].to_dict('records'))
     }
 
 def calculate_closing_projections(df):
