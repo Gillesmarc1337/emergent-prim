@@ -1081,17 +1081,13 @@ async def get_yearly_analytics(year: int = 2025):
             (df['discovery_date'] <= min(july_dec_end, current_date))
         ]
         
-        # Calculate meeting targets based on actual months elapsed in July-Dec period
+        # Calculate meeting targets for full July-Dec period (6 months)
         monthly_meeting_target = 50  # Base monthly target
         
-        # Calculate how many months from July to current month (or Dec if past Dec)
-        current_month = min(datetime.now().month, 12)  # Cap at December
-        if current_month >= 7:  # If we're in July or later
-            months_elapsed = current_month - 7 + 1  # +1 to include current month
-        else:
-            months_elapsed = 6  # Full 6 months if past December
+        # For yearly analytics, always use full 6-month July-December period
+        months_in_july_dec_period = 6  # July, August, September, October, November, December
         
-        july_dec_meeting_target = monthly_meeting_target * months_elapsed
+        july_dec_meeting_target = monthly_meeting_target * months_in_july_dec_period
         
         # Meeting breakdown
         actual_total_july_dec = len(july_dec_meetings)
