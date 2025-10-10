@@ -2733,7 +2733,7 @@ function Dashboard() {
                                       snapshot.isDragging ? 'shadow-lg scale-105' : ''
                                     }`}
                                   >
-                                    <DraggableDealItem deal={deal} />
+                                    <DealItemContent deal={deal} />
                                   </div>
                                 )}
                               </Draggable>
@@ -2770,7 +2770,7 @@ function Dashboard() {
                                       snapshot.isDragging ? 'shadow-lg scale-105' : ''
                                     }`}
                                   >
-                                    <DraggableDealItem deal={deal} />
+                                    <DealItemContent deal={deal} />
                                   </div>
                                 )}
                               </Draggable>
@@ -2807,7 +2807,7 @@ function Dashboard() {
                                       snapshot.isDragging ? 'shadow-lg scale-105' : ''
                                     }`}
                                   >
-                                    <DraggableDealItem deal={deal} />
+                                    <DealItemContent deal={deal} />
                                   </div>
                                 )}
                               </Draggable>
