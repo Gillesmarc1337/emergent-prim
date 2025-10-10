@@ -905,11 +905,7 @@ function MainDashboard({ analytics }) {
                   <div className="text-lg font-bold text-purple-600">
                     ${(analytics.dashboard_blocks.block_3_pipe_creation.new_pipe_created / 1000000).toFixed(1)}M
                   </div>
-                  <div className="text-xs text-gray-600">
-                    {analytics.dashboard_blocks?.block_3_pipe_creation?.period?.includes('months') 
-                      ? 'New Pipe Created (Period)' 
-                      : 'New Pipe This Month'}
-                  </div>
+                  <div className="text-xs text-gray-600">Total New Pipe Generated</div>
                 </div>
                 <div className="text-center">
                   <div className="text-sm font-medium text-gray-700">
