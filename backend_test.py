@@ -3395,8 +3395,13 @@ def main():
     if not data_available:
         print(f"\n⚠️  No data available - tests will return empty results")
     
-    # PRIORITY TEST: Dashboard Analytics Structure (as requested in review)
-    print(f"\n🎯 PRIORITY TEST: Dashboard Analytics Structure Analysis")
+    # PRIORITY TEST: Legals + Proposal Pipeline Values (as requested in review)
+    print(f"\n🎯 PRIORITY TEST: Legals + Proposal Pipeline Values Analysis")
+    if not test_legals_proposal_pipeline_values():
+        all_tests_passed = False
+    
+    # SECONDARY TEST: Dashboard Analytics Structure
+    print(f"\n🎯 SECONDARY TEST: Dashboard Analytics Structure Analysis")
     if not test_dashboard_analytics_structure():
         all_tests_passed = False
     
