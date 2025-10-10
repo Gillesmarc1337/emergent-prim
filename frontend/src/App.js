@@ -2611,140 +2611,182 @@ function Dashboard() {
               </Card>
             )}
 
-            {/* Hot Deals Closing (2 weeks to 30 days) */}
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Card>
+            {/* Upcoming High-Priority Meetings (Next 7 Days) */}
+            {analytics.meetings_attended?.upcoming_poa && analytics.meetings_attended.upcoming_poa.filter(poa => {
+              const poaDate = new Date(poa.poa_date);
+              const today = new Date();
+              const next7Days = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+              return poaDate > today && poaDate <= next7Days;
+            }).length > 0 && (
+              <Card className="mb-6">
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Hot deals closing in the next 2 weeks to 30 days</CardTitle>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => resetView('deals')}
-                    >
-                      <RotateCcw className="h-4 w-4 mr-2" />
-                      Reset
-                    </Button>
-                  </div>
-                  <CardDescription>Tous les deals en legals (drag & drop to reorder)</CardDescription>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <Calendar className="h-6 w-6 text-blue-600" />
+                    Upcoming High-Priority Meetings (Next 7 Days)
+                  </CardTitle>
+                  <CardDescription>POA meetings scheduled in the next week</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {loadingProjections ? (
-                    <div className="text-center py-8">Loading hot deals...</div>
-                  ) : filteredHotDeals.length > 0 ? (
-                    <Droppable droppableId="hot-deals">
-                      {(provided) => (
-                        <div {...provided.droppableProps} ref={provided.innerRef}>
-                          {filteredHotDeals.map((deal, index) => (
-                            <DraggableDealItem 
-                              key={deal.id}
-                              deal={deal}
-                              index={index}
-                              onHide={() => hideItem('deals', deal.id)}
-                            />
-                          ))}
-                          {provided.placeholder}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {analytics.meetings_attended.upcoming_poa
+                      .filter(poa => {
+                        const poaDate = new Date(poa.poa_date);
+                        const today = new Date();
+                        const next7Days = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+                        return poaDate > today && poaDate <= next7Days;
+                      })
+                      .map((poa, index) => (
+                        <div key={index} className="p-4 border rounded-lg bg-blue-50 border-blue-200">
+                          <div className="font-semibold text-blue-800">{poa.client || 'Client TBD'}</div>
+                          <div className="text-sm text-gray-600">AE: {poa.owner || 'TBD'}</div>
+                          <div className="text-sm font-medium text-blue-600">
+                            📅 {new Date(poa.poa_date).toLocaleDateString('en-US', { 
+                              weekday: 'short', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                          </div>
+                          {poa.pipeline && (
+                            <div className="text-xs text-gray-500">
+                              Pipeline: ${poa.pipeline.toLocaleString()}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </Droppable>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      No hot deals in legals stage found.
-                    </div>
-                  )}
+                      ))
+                    }
+                  </div>
                 </CardContent>
               </Card>
+            )}
 
-              {/* Additional Hot Leads (3 months) */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Additional Hot leads that will most likely close within the next 3 months</CardTitle>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => resetView('leads')}
-                    >
-                      <RotateCcw className="h-4 w-4 mr-2" />
-                      Reset
-                    </Button>
-                  </div>
-                  <CardDescription>Tous les deals sur Proposal sent et PoA booked (drag & drop to reorder)</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {loadingProjections ? (
-                    <div className="text-center py-8">Loading hot leads...</div>
-                  ) : filteredHotLeads.length > 0 ? (
-                    <>
-                      <Droppable droppableId="hot-leads">
+            {/* Interactive Closing Projections Drag & Drop Board */}
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <Target className="h-6 w-6 text-green-600" />
+                  Closing Projections — Interactive Board
+                </CardTitle>
+                <CardDescription>
+                  Drag & drop deals to simulate closing timelines. Changes are visual only and don't affect source data.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Next 14 Days Column */}
+                    <div className="bg-green-50 rounded-lg p-4">
+                      <div className="font-semibold text-green-800 mb-4 text-center">
+                        Next 14 Days
+                        <div className="text-sm text-green-600">
+                          ${filteredHotDeals.filter(deal => deal.column === 'next14').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
+                        </div>
+                      </div>
+                      <Droppable droppableId="next14">
                         {(provided) => (
-                          <div {...provided.droppableProps} ref={provided.innerRef}>
-                            {filteredHotLeads.map((lead, index) => (
-                              <DraggableLeadItem 
-                                key={lead.id}
-                                lead={lead}
-                                index={index}
-                                onHide={() => hideItem('leads', lead.id)}
-                              />
+                          <div 
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className="space-y-2 min-h-96 max-h-96 overflow-y-auto"
+                          >
+                            {filteredHotDeals.filter(deal => deal.column === 'next14').map((deal, index) => (
+                              <Draggable key={deal.id} draggableId={deal.id} index={index}>
+                                {(provided, snapshot) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    className={`p-3 border rounded-lg bg-white shadow-sm ${
+                                      snapshot.isDragging ? 'shadow-lg scale-105' : ''
+                                    }`}
+                                  >
+                                    <DraggableDealItem deal={deal} />
+                                  </div>
+                                )}
+                              </Draggable>
                             ))}
                             {provided.placeholder}
                           </div>
                         )}
                       </Droppable>
-                      
-                      {/* Summary Table */}
-                      <div className="mt-6">
-                        <h4 className="text-lg font-medium mb-3">MRR & ARR Summary</h4>
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-sm border border-gray-200 rounded-lg">
-                            <thead className="bg-gray-50">
-                              <tr>
-                                <th className="text-left p-3 border-b">Client</th>
-                                <th className="text-left p-3 border-b">Owner</th>
-                                <th className="text-right p-3 border-b">MRR</th>
-                                <th className="text-right p-3 border-b">ARR</th>
-                                <th className="text-left p-3 border-b">Stage</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {filteredHotLeads.map((lead, index) => (
-                                <tr key={lead.id} className="border-b hover:bg-gray-50">
-                                  <td className="p-3 font-medium">{lead.client}</td>
-                                  <td className="p-3">{lead.owner}</td>
-                                  <td className="text-right p-3 text-green-600 font-medium">
-                                    ${lead.expected_mrr?.toLocaleString()}
-                                  </td>
-                                  <td className="text-right p-3 text-blue-600 font-medium">
-                                    ${lead.expected_arr?.toLocaleString()}
-                                  </td>
-                                  <td className="p-3">
-                                    <Badge variant="outline">{lead.stage}</Badge>
-                                  </td>
-                                </tr>
-                              ))}
-                              <tr className="bg-gray-50 font-bold">
-                                <td className="p-3" colSpan="2">Total</td>
-                                <td className="text-right p-3 text-green-700">
-                                  ${filteredHotLeads.reduce((sum, lead) => sum + (lead.expected_mrr || 0), 0).toLocaleString()}
-                                </td>
-                                <td className="text-right p-3 text-blue-700">
-                                  ${filteredHotLeads.reduce((sum, lead) => sum + (lead.expected_arr || 0), 0).toLocaleString()}
-                                </td>
-                                <td className="p-3"></td>
-                              </tr>
-                            </tbody>
-                          </table>
+                    </div>
+
+                    {/* Next 30 Days Column */}
+                    <div className="bg-yellow-50 rounded-lg p-4">
+                      <div className="font-semibold text-yellow-800 mb-4 text-center">
+                        Next 30 Days
+                        <div className="text-sm text-yellow-600">
+                          ${filteredHotDeals.filter(deal => deal.column === 'next30').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
                         </div>
                       </div>
-                    </>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      No hot leads in Proposal sent or PoA booked stages found.
+                      <Droppable droppableId="next30">
+                        {(provided) => (
+                          <div 
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className="space-y-2 min-h-96 max-h-96 overflow-y-auto"
+                          >
+                            {filteredHotDeals.filter(deal => deal.column === 'next30').map((deal, index) => (
+                              <Draggable key={deal.id} draggableId={deal.id} index={index}>
+                                {(provided, snapshot) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    className={`p-3 border rounded-lg bg-white shadow-sm ${
+                                      snapshot.isDragging ? 'shadow-lg scale-105' : ''
+                                    }`}
+                                  >
+                                    <DraggableDealItem deal={deal} />
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            </DragDropContext>
+
+                    {/* Next 60-90 Days Column */}
+                    <div className="bg-orange-50 rounded-lg p-4">
+                      <div className="font-semibold text-orange-800 mb-4 text-center">
+                        Next 60–90 Days
+                        <div className="text-sm text-orange-600">
+                          ${filteredHotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
+                        </div>
+                      </div>
+                      <Droppable droppableId="next60">
+                        {(provided) => (
+                          <div 
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className="space-y-2 min-h-96 max-h-96 overflow-y-auto"
+                          >
+                            {filteredHotDeals.filter(deal => deal.column === 'next60').map((deal, index) => (
+                              <Draggable key={deal.id} draggableId={deal.id} index={index}>
+                                {(provided, snapshot) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    className={`p-3 border rounded-lg bg-white shadow-sm ${
+                                      snapshot.isDragging ? 'shadow-lg scale-105' : ''
+                                    }`}
+                                  >
+                                    <DraggableDealItem deal={deal} />
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
+                    </div>
+                  </div>
+                </DragDropContext>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
       </Tabs>
