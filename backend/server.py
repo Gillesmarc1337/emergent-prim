@@ -1205,9 +1205,9 @@ async def get_yearly_analytics(year: int = 2025):
                 'weighted_pipe_created': weighted_pipe_july_dec,
                 'aggregate_weighted_pipe': aggregate_weighted_pipe_july_dec,
                 'target_pipe_created': target_pipe_july_dec,
-                'period': f'Jul-Dec 2025 ({months_elapsed} months)',
+                'period': f'Jul-Dec 2025 ({months_in_july_dec_period} months)',
                 'debug_info': {
-                    'months_elapsed': months_elapsed,
+                    'months_elapsed': months_in_july_dec_period,
                     'monthly_target': monthly_pipe_target,
                     'period_target': target_pipe_july_dec
                 }
