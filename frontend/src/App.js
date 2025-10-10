@@ -910,8 +910,8 @@ function MainDashboard({ analytics }) {
                 <div className="text-center">
                   <div className="text-sm font-medium text-gray-700">
                     {analytics.dashboard_blocks?.block_3_pipe_creation?.target_pipe_created 
-                      ? `Target: $${(analytics.dashboard_blocks.block_3_pipe_creation.target_pipe_created / 1000000).toFixed(1)}M (${analytics.dashboard_blocks.block_3_pipe_creation.period})` 
-                      : 'Target: $2M/month'}
+                      ? `Target: $${(analytics.dashboard_blocks.block_3_pipe_creation.target_pipe_created / 1000000).toFixed(1)}M` 
+                      : 'Target: $2M'}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
