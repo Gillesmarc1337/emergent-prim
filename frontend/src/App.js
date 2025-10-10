@@ -2591,7 +2591,7 @@ function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                  {/* Card 1: Legals Count */}
+                  {/* Card 1: Legals Count - Use master data from hot-deals */}
                   <Card className="border-2 border-purple-200 bg-purple-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
@@ -2601,12 +2601,7 @@ function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold mb-2 text-gray-800">
-                        {(analytics.closing_projections.current_month.deals.filter(deal => 
-                          deal.stage === 'B Legals'
-                        ).length) + 
-                        (analytics.closing_projections.next_quarter.deals.filter(deal => 
-                          deal.stage === 'B Legals'
-                        ).length)}
+                        {hotDeals.filter(deal => deal.stage === 'B Legals').length}
                       </div>
                       <div className="text-xs text-gray-600">
                         Deals in Legals
@@ -2614,7 +2609,7 @@ function Dashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* Card 2: Proposal Sent Count */}
+                  {/* Card 2: Proposal Sent Count - Use master data from hot-leads */}
                   <Card className="border-2 border-indigo-200 bg-indigo-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
@@ -2624,12 +2619,7 @@ function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold mb-2 text-gray-800">
-                        {(analytics.closing_projections.current_month.deals.filter(deal => 
-                          deal.stage === 'C Proposal sent'
-                        ).length) + 
-                        (analytics.closing_projections.next_quarter.deals.filter(deal => 
-                          deal.stage === 'C Proposal sent'
-                        ).length)}
+                        {hotLeads.filter(deal => deal.stage === 'C Proposal sent').length}
                       </div>
                       <div className="text-xs text-gray-600">
                         Deals in Proposal
@@ -2637,7 +2627,7 @@ function Dashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* Card 3: Combined Value of Legals + Proposal Sent */}
+                  {/* Card 3: Combined Value - Use master data pipeline values */}
                   <Card className="border-2 border-green-200 bg-green-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
@@ -2648,19 +2638,16 @@ function Dashboard() {
                     <CardContent>
                       <div className="text-xl font-bold mb-2 text-gray-800">
                         ${(() => {
-                          // Combine all deals from both sources without double counting
-                          const allDeals = [
-                            ...(analytics.closing_projections.current_month.deals || []),
-                            ...(analytics.closing_projections.next_quarter.deals || [])
-                          ];
+                          // Sum pipeline values from master data sources
+                          const legalsValue = hotDeals
+                            .filter(deal => deal.stage === 'B Legals')
+                            .reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
                           
-                          // Remove duplicates and filter by stage, then sum pipeline values
-                          const uniqueDeals = allDeals.filter((deal, index, self) => 
-                            (deal.stage === 'C Proposal sent' || deal.stage === 'B Legals') &&
-                            index === self.findIndex(d => d.id === deal.id) // Remove duplicates by ID
-                          );
+                          const proposalValue = hotLeads
+                            .filter(deal => deal.stage === 'C Proposal sent')
+                            .reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
                           
-                          return uniqueDeals.reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                          return (legalsValue + proposalValue);
                         })().toLocaleString()}
                       </div>
                       <div className="text-xs text-gray-600">
@@ -2669,7 +2656,7 @@ function Dashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* Card 4: POA Status */}
+                  {/* Card 4: POA Status - Use master data for upcoming count */}
                   <Card className="border-2 border-blue-200 bg-blue-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
@@ -2687,7 +2674,14 @@ function Dashboard() {
                         </div>
                         <div>
                           <div className="text-lg font-bold text-blue-600">
-                            {analytics.meetings_attended?.upcoming_poa?.filter(poa => new Date(poa.poa_date) > new Date()).length || 0}
+                            {(() => {
+                              // Count upcoming POA from hot-leads with future poa_date
+                              const today = new Date();
+                              return hotLeads.filter(deal => {
+                                const poaDate = deal.poa_date ? new Date(deal.poa_date) : null;
+                                return poaDate && poaDate > today;
+                              }).length;
+                            })()}
                           </div>
                           <div className="text-xs text-gray-600">Upcoming</div>
                         </div>
