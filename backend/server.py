@@ -1184,8 +1184,8 @@ async def get_yearly_analytics(year: int = 2025):
                 'show_actual': actual_show_july_dec,
                 'no_show_actual': actual_no_show_july_dec,
                 'debug_info': {
-                    'months_elapsed': months_elapsed,
-                    'current_month': current_month,
+                    'months_elapsed': months_in_july_dec_period,
+                    'current_month': 12,  # December (end of July-Dec period)
                     'july_dec_start': july_dec_start.isoformat(),
                     'filter_end_date': min(july_dec_end, current_date).isoformat(),
                     'total_meetings_found': len(july_dec_meetings)
