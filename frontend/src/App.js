@@ -2394,7 +2394,7 @@ function Dashboard() {
                         ${(analytics.dashboard_blocks?.block_3_pipe_creation?.new_pipe_created / 1000000).toFixed(1)}M
                       </div>
                       <div className="text-xs text-gray-600">
-                        New Pipe Created
+                        Nouveau pipe créé ce mois
                       </div>
                     </CardContent>
                   </Card>
