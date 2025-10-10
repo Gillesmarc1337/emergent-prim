@@ -2647,9 +2647,9 @@ def main():
     if not data_available:
         print(f"\n⚠️  No data available - tests will return empty results")
     
-    # PRIORITY TEST: Pipeline Data Excel Matching (as requested in review)
-    print(f"\n🎯 PRIORITY TEST: Pipeline Data Excel Matching")
-    if not test_pipeline_data_excel_matching():
+    # PRIORITY TEST: Hot Deals Stage Analysis (as requested in review)
+    print(f"\n🎯 PRIORITY TEST: Hot Deals Stage Analysis")
+    if not test_hot_deals_stage_analysis():
         all_tests_passed = False
     
     # Test 3: Monthly analytics with different offsets
