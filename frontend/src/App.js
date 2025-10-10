@@ -1114,10 +1114,17 @@ function Dashboard() {
         axios.get(`${API}/projections/performance-summary`)
       ]);
       
-      // Assign default columns to deals if not already assigned
+      // Assign columns based on deal stage for logical grouping
       const dealsWithColumns = hotDealsResponse.data.map((deal, index) => ({
         ...deal,
-        column: deal.column || (index % 3 === 0 ? 'next14' : index % 3 === 1 ? 'next30' : 'next60')
+        column: deal.column || (() => {
+          // Assign columns based on deal stage
+          if (deal.stage === 'B Legals') return 'next14';  // Closest to closing
+          if (deal.stage === 'C Proposal sent') return 'next30';  // Medium term
+          if (deal.stage === 'D POA Booked') return 'next60';  // Longer term
+          // Default assignment for other stages
+          return index % 3 === 0 ? 'next14' : index % 3 === 1 ? 'next30' : 'next60';
+        })()
       }));
       
       setHotDeals(dealsWithColumns);
