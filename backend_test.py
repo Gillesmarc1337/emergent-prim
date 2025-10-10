@@ -964,16 +964,207 @@ def test_october_2025_analytics_detailed():
     
     return success
 
+def test_dashboard_blocks_and_deals_closed():
+    """Test dashboard_blocks presence and deals_closed data structure in monthly and yearly analytics"""
+    print(f"\n{'='*80}")
+    print(f"🎯 TESTING DASHBOARD BLOCKS AND DEALS_CLOSED DATA STRUCTURE")
+    print(f"{'='*80}")
+    
+    test_results = {
+        'monthly_dashboard_blocks': False,
+        'yearly_dashboard_blocks': False,
+        'monthly_deals_closed': False,
+        'yearly_deals_closed': False
+    }
+    
+    # Test 1: GET /api/analytics/monthly - Check dashboard_blocks
+    print(f"\n📊 Test 1: GET /api/analytics/monthly - Dashboard Blocks")
+    print(f"{'='*60}")
+    
+    monthly_data = test_api_endpoint("/analytics/monthly")
+    if monthly_data:
+        if 'dashboard_blocks' in monthly_data:
+            print(f"✅ dashboard_blocks present in monthly analytics")
+            test_results['monthly_dashboard_blocks'] = True
+            
+            # Display dashboard blocks structure
+            blocks = monthly_data['dashboard_blocks']
+            print(f"📋 Dashboard blocks found:")
+            for block_name, block_data in blocks.items():
+                print(f"  • {block_name}: {type(block_data)} with {len(block_data) if isinstance(block_data, dict) else 'N/A'} fields")
+                if isinstance(block_data, dict):
+                    for key, value in list(block_data.items())[:5]:  # Show first 5 fields
+                        print(f"    - {key}: {value}")
+                    if len(block_data) > 5:
+                        print(f"    ... and {len(block_data) - 5} more fields")
+        else:
+            print(f"❌ dashboard_blocks NOT found in monthly analytics response")
+            print(f"📋 Available top-level keys: {list(monthly_data.keys()) if isinstance(monthly_data, dict) else 'Not a dict'}")
+        
+        # Check deals_closed structure
+        if 'deals_closed' in monthly_data:
+            print(f"\n✅ deals_closed present in monthly analytics")
+            test_results['monthly_deals_closed'] = True
+            
+            deals_closed = monthly_data['deals_closed']
+            print(f"📋 deals_closed structure:")
+            if isinstance(deals_closed, dict):
+                for key, value in deals_closed.items():
+                    print(f"  • {key}: {value} ({type(value).__name__})")
+            else:
+                print(f"  • Type: {type(deals_closed)}")
+                print(f"  • Value: {deals_closed}")
+        else:
+            print(f"❌ deals_closed NOT found in monthly analytics response")
+    else:
+        print(f"❌ Failed to get monthly analytics data")
+    
+    # Test 2: GET /api/analytics/yearly - Check dashboard_blocks
+    print(f"\n📊 Test 2: GET /api/analytics/yearly - Dashboard Blocks")
+    print(f"{'='*60}")
+    
+    yearly_data = test_api_endpoint("/analytics/yearly?year=2025")
+    if yearly_data:
+        if 'dashboard_blocks' in yearly_data:
+            print(f"✅ dashboard_blocks present in yearly analytics")
+            test_results['yearly_dashboard_blocks'] = True
+            
+            # Display dashboard blocks structure
+            blocks = yearly_data['dashboard_blocks']
+            print(f"📋 Dashboard blocks found:")
+            for block_name, block_data in blocks.items():
+                print(f"  • {block_name}: {type(block_data)} with {len(block_data) if isinstance(block_data, dict) else 'N/A'} fields")
+                if isinstance(block_data, dict):
+                    for key, value in list(block_data.items())[:5]:  # Show first 5 fields
+                        print(f"    - {key}: {value}")
+                    if len(block_data) > 5:
+                        print(f"    ... and {len(block_data) - 5} more fields")
+        else:
+            print(f"❌ dashboard_blocks NOT found in yearly analytics response")
+            print(f"📋 Available top-level keys: {list(yearly_data.keys()) if isinstance(yearly_data, dict) else 'Not a dict'}")
+        
+        # Check deals_closed structure
+        if 'deals_closed' in yearly_data:
+            print(f"\n✅ deals_closed present in yearly analytics")
+            test_results['yearly_deals_closed'] = True
+            
+            deals_closed = yearly_data['deals_closed']
+            print(f"📋 deals_closed structure:")
+            if isinstance(deals_closed, dict):
+                for key, value in deals_closed.items():
+                    print(f"  • {key}: {value} ({type(value).__name__})")
+            else:
+                print(f"  • Type: {type(deals_closed)}")
+                print(f"  • Value: {deals_closed}")
+        else:
+            print(f"❌ deals_closed NOT found in yearly analytics response")
+    else:
+        print(f"❌ Failed to get yearly analytics data")
+    
+    # Test 3: Detailed analysis of deals_closed structure for "Deals Closed (Current Period)" block
+    print(f"\n📊 Test 3: Deals Closed Data Structure Analysis")
+    print(f"{'='*60}")
+    
+    if test_results['monthly_deals_closed'] and monthly_data:
+        deals_closed = monthly_data['deals_closed']
+        print(f"📋 Monthly deals_closed detailed analysis:")
+        
+        # Check for fields needed for "Deals Closed (Current Period)" dashboard block
+        expected_fields = [
+            'deals_closed', 'target_deals', 'arr_closed', 'target_arr', 
+            'mrr_closed', 'avg_deal_size', 'on_track', 'deals_detail', 'monthly_closed'
+        ]
+        
+        missing_fields = []
+        present_fields = []
+        
+        for field in expected_fields:
+            if field in deals_closed:
+                present_fields.append(field)
+                value = deals_closed[field]
+                print(f"  ✅ {field}: {value} ({type(value).__name__})")
+            else:
+                missing_fields.append(field)
+                print(f"  ❌ {field}: MISSING")
+        
+        print(f"\n📊 Summary for deals_closed structure:")
+        print(f"  ✅ Present fields: {len(present_fields)}/{len(expected_fields)}")
+        print(f"  ❌ Missing fields: {missing_fields}")
+        
+        # Check if deals_detail has proper structure
+        if 'deals_detail' in deals_closed:
+            deals_detail = deals_closed['deals_detail']
+            if isinstance(deals_detail, list) and len(deals_detail) > 0:
+                print(f"  📋 deals_detail sample (first deal):")
+                first_deal = deals_detail[0]
+                for key, value in first_deal.items():
+                    print(f"    • {key}: {value}")
+            else:
+                print(f"  📋 deals_detail: {type(deals_detail)} with {len(deals_detail) if isinstance(deals_detail, list) else 'N/A'} items")
+    
+    # Test 4: Check if dashboard blocks contain deals_closed information
+    print(f"\n📊 Test 4: Dashboard Blocks - Deals Closed Integration")
+    print(f"{'='*60}")
+    
+    deals_closed_in_blocks = False
+    
+    if test_results['monthly_dashboard_blocks'] and monthly_data:
+        blocks = monthly_data['dashboard_blocks']
+        print(f"🔍 Searching for deals_closed related blocks in dashboard_blocks:")
+        
+        for block_name, block_data in blocks.items():
+            if isinstance(block_data, dict):
+                # Look for deals/closed related fields
+                deals_fields = [k for k in block_data.keys() if 'deal' in k.lower() or 'closed' in k.lower()]
+                if deals_fields:
+                    deals_closed_in_blocks = True
+                    print(f"  ✅ {block_name} contains deals/closed fields: {deals_fields}")
+                    for field in deals_fields:
+                        print(f"    • {field}: {block_data[field]}")
+    
+    if not deals_closed_in_blocks:
+        print(f"  ⚠️  No deals/closed related fields found in dashboard_blocks")
+        print(f"  💡 This might explain why 'Deals Closed (Current Period)' block is not displaying")
+    
+    # Summary
+    print(f"\n{'='*60}")
+    print(f"📋 DASHBOARD BLOCKS AND DEALS_CLOSED TEST SUMMARY")
+    print(f"{'='*60}")
+    
+    total_tests = len(test_results)
+    passed_tests = sum(1 for result in test_results.values() if result)
+    
+    for test_name, result in test_results.items():
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"  {test_name}: {status}")
+    
+    print(f"\n📊 Overall Results: {passed_tests}/{total_tests} tests passed")
+    
+    # Diagnostic recommendations
+    print(f"\n💡 DIAGNOSTIC RECOMMENDATIONS:")
+    if not test_results['monthly_dashboard_blocks']:
+        print(f"  • Monthly analytics missing dashboard_blocks - check backend implementation")
+    if not test_results['yearly_dashboard_blocks']:
+        print(f"  • Yearly analytics missing dashboard_blocks - check backend implementation")
+    if not test_results['monthly_deals_closed']:
+        print(f"  • Monthly analytics missing deals_closed - check deals_closed calculation")
+    if not test_results['yearly_deals_closed']:
+        print(f"  • Yearly analytics missing deals_closed - check deals_closed calculation")
+    if not deals_closed_in_blocks:
+        print(f"  • Dashboard blocks don't contain deals_closed data - may need integration")
+    
+    return passed_tests == total_tests
+
 def main():
-    """Main testing function for October 2025 analytics verification"""
-    print(f"🚀 Starting October 2025 Analytics Testing")
+    """Main testing function for dashboard blocks and deals_closed verification"""
+    print(f"🚀 Starting Dashboard Blocks and Deals_Closed Testing")
     print(f"Base URL: {BASE_URL}")
     print(f"Test Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     # Track test results
     test_results = {
         'connectivity': False,
-        'october_2025_detailed': False
+        'dashboard_blocks_deals_closed': False
     }
     
     # Test 1: Basic connectivity
@@ -983,12 +1174,12 @@ def main():
         print(f"❌ Cannot proceed without API connectivity")
         return 1
     
-    # Test 2: Detailed October 2025 analytics examination
-    test_results['october_2025_detailed'] = test_october_2025_analytics_detailed()
+    # Test 2: Dashboard blocks and deals_closed structure verification
+    test_results['dashboard_blocks_deals_closed'] = test_dashboard_blocks_and_deals_closed()
     
     # Summary
     print(f"\n{'='*60}")
-    print(f"📋 OCTOBER 2025 ANALYTICS TEST SUMMARY")
+    print(f"📋 FINAL TEST SUMMARY")
     print(f"{'='*60}")
     
     total_tests = len(test_results)
