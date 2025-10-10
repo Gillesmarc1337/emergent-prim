@@ -2647,12 +2647,21 @@ function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-xl font-bold mb-2 text-gray-800">
-                        ${((analytics.closing_projections.current_month.deals.filter(deal => 
-                          deal.stage === 'C Proposal sent' || deal.stage === 'B Legals'
-                        ).reduce((sum, deal) => sum + (deal.pipeline || 0), 0)) + 
-                        (analytics.closing_projections.next_quarter.deals.filter(deal => 
-                          deal.stage === 'C Proposal sent' || deal.stage === 'B Legals'
-                        ).reduce((sum, deal) => sum + (deal.pipeline || 0), 0))).toLocaleString()}
+                        ${(() => {
+                          // Combine all deals from both sources without double counting
+                          const allDeals = [
+                            ...(analytics.closing_projections.current_month.deals || []),
+                            ...(analytics.closing_projections.next_quarter.deals || [])
+                          ];
+                          
+                          // Remove duplicates and filter by stage, then sum pipeline values
+                          const uniqueDeals = allDeals.filter((deal, index, self) => 
+                            (deal.stage === 'C Proposal sent' || deal.stage === 'B Legals') &&
+                            index === self.findIndex(d => d.id === deal.id) // Remove duplicates by ID
+                          );
+                          
+                          return uniqueDeals.reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                        })().toLocaleString()}
                       </div>
                       <div className="text-xs text-gray-600">
                         Combined Pipeline Value
