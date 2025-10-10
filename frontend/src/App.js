@@ -2448,16 +2448,30 @@ function Dashboard() {
                               <th className="text-left p-2">AE</th>
                               <th className="text-right p-2">Total Pipeline</th>
                               <th className="text-right p-2">Weighted Value</th>
+                              <th className="text-right p-2">Aggregate Pipe</th>
+                              <th className="text-right p-2">Proposal/Legals</th>
                             </tr>
                           </thead>
                           <tbody>
-                            {Object.entries(analytics.closing_projections.ae_projections).map(([ae, stats]) => (
-                              <tr key={ae} className="border-b">
-                                <td className="p-2 font-medium">{ae}</td>
-                                <td className="text-right p-2">${stats.pipeline?.toLocaleString()}</td>
-                                <td className="text-right p-2">${stats.weighted_value?.toLocaleString()}</td>
-                              </tr>
-                            ))}
+                            {Object.entries(analytics.closing_projections.ae_projections).map(([ae, stats]) => {
+                              // Find corresponding AE in pipe_metrics.ae_breakdown for aggregate data
+                              const aeBreakdown = analytics.pipe_metrics?.ae_breakdown?.find(item => item.ae === ae) || {};
+                              
+                              // Count deals in Proposal sent or Legals stage for this AE
+                              const proposalLegalsDeals = (analytics.closing_projections.current_month.deals || [])
+                                .concat(analytics.closing_projections.next_quarter.deals || [])
+                                .filter(deal => deal.owner === ae && (deal.stage === 'C Proposal sent' || deal.stage === 'B Legals')).length;
+                              
+                              return (
+                                <tr key={ae} className="border-b">
+                                  <td className="p-2 font-medium">{ae}</td>
+                                  <td className="text-right p-2">${stats.pipeline?.toLocaleString()}</td>
+                                  <td className="text-right p-2">${stats.weighted_value?.toLocaleString()}</td>
+                                  <td className="text-right p-2">${aeBreakdown.weighted_pipe?.toLocaleString() || 0}</td>
+                                  <td className="text-right p-2">{proposalLegalsDeals}</td>
+                                </tr>
+                              );
+                            })}
                           </tbody>
                         </table>
                       </div>
