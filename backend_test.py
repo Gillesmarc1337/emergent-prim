@@ -3693,6 +3693,184 @@ def test_projections_master_data_verification():
     
     return master_data_results
 
+def test_legals_proposal_pipeline_discrepancy():
+    """Test B Legals + C Proposal sent pipeline values to identify Excel vs Frontend discrepancy"""
+    print(f"\n{'='*80}")
+    print(f"🔍 TESTING LEGALS + PROPOSAL PIPELINE VALUES DISCREPANCY")
+    print(f"{'='*80}")
+    
+    print(f"📋 ISSUE DESCRIPTION:")
+    print(f"   • Excel master data shows: B Legals + C Proposal sent = $2,481,600")
+    print(f"   • Frontend displays: $4,483,200 (almost exactly double)")
+    print(f"   • Need to identify source of 2x multiplier")
+    
+    # Test 1: GET /api/projections/hot-deals (B Legals deals)
+    print(f"\n📊 Test 1: GET /api/projections/hot-deals (B Legals Pipeline)")
+    print(f"{'='*60}")
+    
+    hot_deals_data = test_api_endpoint("/projections/hot-deals")
+    b_legals_total = 0
+    b_legals_count = 0
+    
+    if hot_deals_data and isinstance(hot_deals_data, list):
+        print(f"✅ Hot deals endpoint accessible, found {len(hot_deals_data)} deals")
+        
+        # Calculate B Legals pipeline total
+        for deal in hot_deals_data:
+            if deal.get('stage') == 'B Legals':
+                pipeline_value = deal.get('pipeline', 0)
+                b_legals_total += pipeline_value
+                b_legals_count += 1
+                print(f"  • {deal.get('client', 'Unknown')}: ${pipeline_value:,.0f} (Stage: {deal.get('stage')})")
+        
+        print(f"\n📊 B Legals Summary:")
+        print(f"   • Count: {b_legals_count} deals")
+        print(f"   • Total Pipeline: ${b_legals_total:,.0f}")
+        
+    else:
+        print(f"❌ Failed to get hot deals data")
+        return False
+    
+    # Test 2: GET /api/projections/hot-leads (C Proposal sent + D POA Booked)
+    print(f"\n📊 Test 2: GET /api/projections/hot-leads (C Proposal sent Pipeline)")
+    print(f"{'='*60}")
+    
+    hot_leads_data = test_api_endpoint("/projections/hot-leads")
+    c_proposal_total = 0
+    c_proposal_count = 0
+    d_poa_total = 0
+    d_poa_count = 0
+    
+    if hot_leads_data and isinstance(hot_leads_data, list):
+        print(f"✅ Hot leads endpoint accessible, found {len(hot_leads_data)} deals")
+        
+        # Calculate C Proposal sent and D POA Booked pipeline totals
+        for deal in hot_leads_data:
+            pipeline_value = deal.get('pipeline', 0)
+            stage = deal.get('stage', '')
+            
+            if stage == 'C Proposal sent':
+                c_proposal_total += pipeline_value
+                c_proposal_count += 1
+                print(f"  • {deal.get('client', 'Unknown')}: ${pipeline_value:,.0f} (Stage: {stage})")
+            elif stage == 'D POA Booked':
+                d_poa_total += pipeline_value
+                d_poa_count += 1
+                print(f"  • {deal.get('client', 'Unknown')}: ${pipeline_value:,.0f} (Stage: {stage})")
+        
+        print(f"\n📊 C Proposal sent Summary:")
+        print(f"   • Count: {c_proposal_count} deals")
+        print(f"   • Total Pipeline: ${c_proposal_total:,.0f}")
+        
+        print(f"\n📊 D POA Booked Summary:")
+        print(f"   • Count: {d_poa_count} deals")
+        print(f"   • Total Pipeline: ${d_poa_total:,.0f}")
+        
+    else:
+        print(f"❌ Failed to get hot leads data")
+        return False
+    
+    # Test 3: Calculate combined totals and compare with Excel
+    print(f"\n📊 Test 3: Combined Pipeline Analysis")
+    print(f"{'='*60}")
+    
+    # B Legals + C Proposal sent (as per Excel calculation)
+    excel_comparison_total = b_legals_total + c_proposal_total
+    
+    # All hot deals + hot leads combined
+    all_deals_total = b_legals_total + c_proposal_total + d_poa_total
+    
+    print(f"📋 PIPELINE VALUE BREAKDOWN:")
+    print(f"   • B Legals Total: ${b_legals_total:,.0f}")
+    print(f"   • C Proposal sent Total: ${c_proposal_total:,.0f}")
+    print(f"   • D POA Booked Total: ${d_poa_total:,.0f}")
+    print(f"   • B Legals + C Proposal sent: ${excel_comparison_total:,.0f}")
+    print(f"   • All Deals Combined: ${all_deals_total:,.0f}")
+    
+    print(f"\n🔍 COMPARISON WITH REPORTED VALUES:")
+    excel_master_value = 2481600
+    frontend_display_value = 4483200
+    
+    print(f"   • Excel Master Data: ${excel_master_value:,.0f}")
+    print(f"   • Frontend Display: ${frontend_display_value:,.0f}")
+    print(f"   • Backend B Legals + C Proposal: ${excel_comparison_total:,.0f}")
+    print(f"   • Backend All Deals: ${all_deals_total:,.0f}")
+    
+    # Analysis of discrepancies
+    print(f"\n🔍 DISCREPANCY ANALYSIS:")
+    
+    # Check if backend matches frontend
+    if abs(all_deals_total - frontend_display_value) < 1000:
+        print(f"   ✅ Backend total (${all_deals_total:,.0f}) matches frontend display (${frontend_display_value:,.0f})")
+        print(f"   🔍 Issue: Frontend includes D POA Booked deals, but Excel only counts B Legals + C Proposal")
+    elif abs(excel_comparison_total - frontend_display_value) < 1000:
+        print(f"   ✅ Backend B Legals + C Proposal (${excel_comparison_total:,.0f}) matches frontend display")
+        print(f"   🔍 Issue: Values match, need to check calculation logic")
+    else:
+        print(f"   ❌ Backend values don't match frontend display")
+        
+        # Check for 2x multiplier
+        if abs(excel_comparison_total * 2 - frontend_display_value) < 1000:
+            print(f"   🚨 FOUND 2X MULTIPLIER: Backend B Legals + C Proposal × 2 = ${excel_comparison_total * 2:,.0f}")
+            print(f"   🔍 Frontend is doubling the backend values!")
+        elif abs(all_deals_total * 2 - frontend_display_value) < 1000:
+            print(f"   🚨 FOUND 2X MULTIPLIER: Backend all deals × 2 = ${all_deals_total * 2:,.0f}")
+            print(f"   🔍 Frontend is doubling all backend values!")
+        
+        # Check if backend matches Excel
+        if abs(excel_comparison_total - excel_master_value) < 1000:
+            print(f"   ✅ Backend B Legals + C Proposal (${excel_comparison_total:,.0f}) matches Excel (${excel_master_value:,.0f})")
+            print(f"   🔍 Backend is correct, issue is in frontend calculation")
+        else:
+            print(f"   ❌ Backend B Legals + C Proposal (${excel_comparison_total:,.0f}) differs from Excel (${excel_master_value:,.0f})")
+            print(f"   🔍 Difference: ${abs(excel_comparison_total - excel_master_value):,.0f}")
+    
+    # Test 4: Check if values are in thousands vs full amounts
+    print(f"\n📊 Test 4: Value Format Analysis (Thousands vs Full Amounts)")
+    print(f"{'='*60}")
+    
+    # Check if backend values might be in thousands
+    if b_legals_total > 0:
+        sample_deal = next((deal for deal in hot_deals_data if deal.get('stage') == 'B Legals'), None)
+        if sample_deal:
+            pipeline_value = sample_deal.get('pipeline', 0)
+            print(f"📋 Sample B Legals deal analysis:")
+            print(f"   • Client: {sample_deal.get('client', 'Unknown')}")
+            print(f"   • Pipeline value: {pipeline_value}")
+            
+            if pipeline_value < 10000:
+                print(f"   🔍 Value appears to be in thousands (K format)")
+                print(f"   💡 If multiplied by 1000: ${pipeline_value * 1000:,.0f}")
+            else:
+                print(f"   🔍 Value appears to be in full amount format")
+    
+    # Test 5: Recommendations
+    print(f"\n💡 RECOMMENDATIONS:")
+    print(f"{'='*60}")
+    
+    if abs(all_deals_total - frontend_display_value) < 1000:
+        print(f"   1. ✅ Backend API values are correct")
+        print(f"   2. 🔍 Frontend should only sum B Legals + C Proposal sent (exclude D POA Booked)")
+        print(f"   3. 📊 Expected frontend value should be: ${excel_comparison_total:,.0f}")
+    elif abs(excel_comparison_total * 2 - frontend_display_value) < 1000:
+        print(f"   1. ✅ Backend API values are correct")
+        print(f"   2. 🚨 Frontend is applying a 2x multiplier - remove this multiplication")
+        print(f"   3. 📊 Frontend should display: ${excel_comparison_total:,.0f}")
+    else:
+        print(f"   1. 🔍 Need to investigate backend calculation logic")
+        print(f"   2. 🔍 Check if backend is using correct stage filters")
+        print(f"   3. 🔍 Verify data source consistency between Excel and MongoDB")
+    
+    # Summary
+    print(f"\n📋 SUMMARY:")
+    print(f"   • B Legals deals: {b_legals_count} deals, ${b_legals_total:,.0f}")
+    print(f"   • C Proposal sent deals: {c_proposal_count} deals, ${c_proposal_total:,.0f}")
+    print(f"   • Combined (B + C): ${excel_comparison_total:,.0f}")
+    print(f"   • Excel target: ${excel_master_value:,.0f}")
+    print(f"   • Frontend shows: ${frontend_display_value:,.0f}")
+    
+    return True
+
 def main():
     """Run all backend tests with priority on Projections master data verification"""
     print(f"🚀 Starting Backend API Testing")
