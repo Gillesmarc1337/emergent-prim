@@ -1350,10 +1350,10 @@ async def get_monthly_analytics(month_offset: int = 0):
         focus_month_str = focus_month.strftime('%b %Y')
         
         # Block 1: Meetings Generation (for selected month)
-        # Fixed targets as per user requirements: 20 inbound, 15 outbound, 10 referral per month
-        target_inbound = 20
-        target_outbound = 15
-        target_referral = 10
+        # Fixed targets as per user requirements: 22 inbound, 17 outbound, 11 referral per month = 50 total
+        target_inbound = 22
+        target_outbound = 17
+        target_referral = 11
         target_total = target_inbound + target_outbound + target_referral
         
         # Calculate actual values for the focus month
