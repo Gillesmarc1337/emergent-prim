@@ -284,8 +284,11 @@ def calculate_meeting_generation(df, start_date, end_date):
             'relevant_meetings': int(v['relevant_meetings'])
         } for k, v in bdr_stats.to_dict('index').items()} if not bdr_stats.empty else {},
         'meetings_details': meetings_list,
-        'target': target,
-        'on_track': bool(total_intros >= target)
+        'target': total_target,
+        'inbound_target': inbound_target,
+        'outbound_target': outbound_target,
+        'referral_target': referral_target,
+        'on_track': bool(total_intros >= total_target)
     }
 
 def calculate_meetings_attended(df, start_date, end_date):
