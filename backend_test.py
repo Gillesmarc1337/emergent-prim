@@ -2242,55 +2242,89 @@ def identify_best_pipeline_match(matching_results, target_created, target_weight
     return best_match
 
 def main():
-    """Main testing function for meeting generation targets correction verification"""
-    print(f"🚀 Starting Meeting Generation Targets Correction Testing")
-    print(f"Base URL: {BASE_URL}")
-    print(f"Test Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    """Run all backend tests with priority on pipeline data Excel matching"""
+    print(f"🚀 Starting Backend API Testing")
+    print(f"Backend URL: {BASE_URL}")
+    print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
-    # Track test results
-    test_results = {
-        'connectivity': False,
-        'meeting_generation_structure': False,
-        'meeting_targets_dashboard': False
-    }
+    # Track overall success
+    all_tests_passed = True
     
     # Test 1: Basic connectivity
-    test_results['connectivity'] = test_basic_connectivity()
+    if not test_basic_connectivity():
+        all_tests_passed = False
+        print(f"\n⚠️  Basic connectivity failed - other tests may not work properly")
     
-    if not test_results['connectivity']:
-        print(f"❌ Cannot proceed without API connectivity")
-        return 1
+    # Test 2: Data availability
+    data_available = test_data_status()
+    if not data_available:
+        print(f"\n⚠️  No data available - tests will return empty results")
     
-    # Test 2: Meeting generation structure verification (main focus)
-    test_results['meeting_generation_structure'] = test_meeting_generation_structure()
+    # PRIORITY TEST: Pipeline Data Excel Matching (as requested in review)
+    print(f"\n🎯 PRIORITY TEST: Pipeline Data Excel Matching")
+    if not test_pipeline_data_excel_matching():
+        all_tests_passed = False
     
-    # Test 3: Meeting targets in dashboard blocks (secondary verification)
-    test_results['meeting_targets_dashboard'] = test_meeting_targets_correction()
+    # Test 3: Monthly analytics with different offsets
+    monthly_tests = [
+        (0, "Oct 2025"),
+        (-1, "Nov 2025"),
+        (1, "Sep 2025")
+    ]
     
-    # Summary
-    print(f"\n{'='*60}")
-    print(f"📋 FINAL TEST SUMMARY")
-    print(f"{'='*60}")
+    for offset, expected_period in monthly_tests:
+        if not test_monthly_analytics_with_offset(offset, expected_period):
+            all_tests_passed = False
     
-    total_tests = len(test_results)
-    passed_tests = sum(1 for result in test_results.values() if result)
+    # Test 4: Projections endpoints
+    if not test_projections_hot_deals():
+        all_tests_passed = False
     
-    for test_name, result in test_results.items():
-        status = "✅ PASSED" if result else "❌ FAILED"
-        print(f"{test_name}: {status}")
+    if not test_projections_hot_leads():
+        all_tests_passed = False
     
-    print(f"\nOverall: {passed_tests}/{total_tests} tests passed")
+    if not test_projections_performance_summary():
+        all_tests_passed = False
     
-    if test_results['meeting_generation_structure']:
-        print(f"\n🎯 MEETING GENERATION TARGETS CORRECTION: ✅ VERIFIED")
-        print(f"   The calculate_meeting_generation function correctly returns individual targets")
-        print(f"   Targets scale correctly based on period duration")
-        print(f"   All math adds up correctly (22+17+11=50 per month)")
+    # Test 5: Custom analytics dynamic targets
+    if not test_custom_analytics_dynamic_targets():
+        all_tests_passed = False
+    
+    # Test 6: MongoDB data structure exploration
+    if not explore_mongodb_data_structure():
+        print(f"\n⚠️  MongoDB data structure exploration completed - see results above")
+    
+    # Test 7: Master data access verification
+    if not test_master_data_access():
+        print(f"\n⚠️  Master data access verification completed - see results above")
+    
+    # Test 8: October 2025 analytics detailed analysis
+    if not test_october_2025_analytics_detailed():
+        all_tests_passed = False
+    
+    # Test 9: Dashboard blocks and deals_closed structure
+    if not test_dashboard_blocks_and_deals_closed():
+        all_tests_passed = False
+    
+    # Test 10: Meeting targets correction verification
+    if not test_meeting_targets_correction():
+        all_tests_passed = False
+    
+    # Test 11: Meeting generation structure verification
+    if not test_meeting_generation_structure():
+        all_tests_passed = False
+    
+    # Final summary
+    print(f"\n{'='*80}")
+    print(f"🏁 FINAL TEST SUMMARY")
+    print(f"{'='*80}")
+    
+    if all_tests_passed:
+        print(f"✅ ALL TESTS PASSED - Backend API is working correctly")
+        return 0
     else:
-        print(f"\n🎯 MEETING GENERATION TARGETS CORRECTION: ❌ NEEDS FIXING")
-        print(f"   Issues found in meeting_generation structure or target calculations")
-    
-    return 0 if passed_tests == total_tests else 1
+        print(f"❌ SOME TESTS FAILED - Check individual test results above")
+        return 1
 
 if __name__ == "__main__":
     exit_code = main()
