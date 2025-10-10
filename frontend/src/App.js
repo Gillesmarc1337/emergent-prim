@@ -917,13 +917,13 @@ function MainDashboard({ analytics }) {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="text-center">
                     <div className="text-sm font-bold text-blue-600">
-                      ${(analytics.dashboard_blocks.block_3_pipe_creation.weighted_pipe_created / 1000).toFixed(0)}K
+                      ${(analytics.dashboard_blocks.block_3_pipe_creation.weighted_pipe_created / 1000000).toFixed(1)}M
                     </div>
                     <div className="text-xs text-gray-600">New Weighted Pipe</div>
                   </div>
                   <div className="text-center">
                     <div className="text-sm font-bold text-teal-600">
-                      ${(analytics.dashboard_blocks.block_3_pipe_creation.aggregate_weighted_pipe / 1000).toFixed(0)}K
+                      ${(analytics.dashboard_blocks.block_3_pipe_creation.aggregate_weighted_pipe / 1000000).toFixed(1)}M
                     </div>
                     <div className="text-xs text-gray-600">Aggregate Weighted Pipe</div>
                   </div>
