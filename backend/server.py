@@ -1036,10 +1036,10 @@ async def get_yearly_analytics(year: int = 2025):
         
         # Generate analytics sections - use July-December period for meeting_generation to match dashboard blocks
         meeting_generation = calculate_meeting_generation(df, july_dec_start, july_dec_end)
-        meetings_attended = calculate_meetings_attended(df, year_start, year_end)
-        ae_performance = calculate_ae_performance(df, year_start, year_end)
-        deals_closed = calculate_deals_closed(df, year_start, year_end)
-        pipe_metrics = calculate_pipe_metrics(df, year_start, year_end)
+        meetings_attended = calculate_meetings_attended(df, july_dec_start, july_dec_end)
+        ae_performance = calculate_ae_performance(df, july_dec_start, july_dec_end)
+        deals_closed = calculate_deals_closed(df, july_dec_start, july_dec_end)
+        pipe_metrics = calculate_pipe_metrics(df, july_dec_start, july_dec_end)
         closing_projections = calculate_closing_projections(df)
         
         # Attribution analysis
