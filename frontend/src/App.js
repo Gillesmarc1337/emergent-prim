@@ -2463,12 +2463,21 @@ function Dashboard() {
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                           <thead>
-                            <tr className="border-b">
-                              <th className="text-left p-2">AE</th>
-                              <th className="text-right p-2">Total Pipeline</th>
-                              <th className="text-right p-2">Weighted Value</th>
-                              <th className="text-right p-2">Aggregate Pipe</th>
-                              <th className="text-right p-2">Proposal/Legals</th>
+                            <tr className="border-b bg-gray-50">
+                              <th className="text-left p-2 font-semibold">AE</th>
+                              <th className="text-right p-2 font-semibold">
+                                Total Pipeline
+                                <div className="text-xs font-normal text-gray-500">Brut (sauf Lost)</div>
+                              </th>
+                              <th className="text-right p-2 font-semibold">
+                                Weighted Value
+                                <div className="text-xs font-normal text-gray-500">Pondéré période</div>
+                              </th>
+                              <th className="text-right p-2 font-semibold">
+                                Aggregate Pipe
+                                <div className="text-xs font-normal text-gray-500">Cumul historique</div>
+                              </th>
+                              <th className="text-right p-2 font-semibold">Proposal/Legals</th>
                             </tr>
                           </thead>
                           <tbody>
