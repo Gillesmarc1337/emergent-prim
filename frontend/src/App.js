@@ -2107,40 +2107,63 @@ function Dashboard() {
                 ? "Pipeline creation and weighting on track to meet targets." 
                 : "Need to accelerate pipeline generation and improve deal quality."}
             >
-              {/* Pipeline Overview - 4 blocks */}
+              {/* Pipeline Overview - 4 blocks uniformisées avec Dashboard */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                 <MetricCard
-                  title="Created Pipe"
+                  title="New Pipe Created (month)"
                   value={analytics.pipe_metrics.created_pipe.value}
                   target={analytics.pipe_metrics.created_pipe.target}
                   unit="$"
                   icon={TrendingUp}
                   color="green"
+                  tooltip="Sum of ARR from all deals created this period, including Closed, Lost, and Not Relevant."
                 />
                 <MetricCard
-                  title="Created Weighted Pipe"
+                  title="Created Weighted Pipe (month)"
                   value={analytics.pipe_metrics.created_pipe.weighted_value}
                   target={analytics.pipe_metrics.created_pipe.target_weighted}
                   unit="$"
                   icon={Target}
                   color="blue"
+                  tooltip="ARR × stage-weight by source and recency, includes all deals created this period."
                 />
                 <MetricCard
-                  title="Total Pipe"
+                  title="Total Pipe (period)"
                   value={analytics.pipe_metrics.total_pipe.value}
                   target={analytics.pipe_metrics.total_pipe.target}
                   unit="$"
                   icon={BarChart3}
                   color="purple"
+                  tooltip="Sum of ARR for all active deals (excluding Closed, Lost, and Not Relevant)."
                 />
                 <MetricCard
-                  title="Total Weighted Pipe"
+                  title="Total Weighted Pipe (period)"
                   value={analytics.pipe_metrics.total_pipe.weighted_value}
                   target={analytics.pipe_metrics.total_pipe.target_weighted}
                   unit="$"
                   icon={DollarSign}
                   color="orange"
+                  tooltip="ARR × stage-weight for all active deals."
                 />
+              </div>
+              
+              {/* Pipeline Logic Explanation */}
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="font-semibold text-blue-800 mb-2">📋 Pipeline Logic Summary</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-700">
+                  <div>
+                    <span className="font-medium">Created Metrics:</span> All deals created in selected period (includes Closed/Lost/Not Relevant)
+                  </div>
+                  <div>
+                    <span className="font-medium">Total Metrics:</span> All active deals (excludes Closed/Lost/Not Relevant)
+                  </div>
+                  <div>
+                    <span className="font-medium">Weighted Value:</span> Uses Excel formula with stage × source × recency factors
+                  </div>
+                  <div>
+                    <span className="font-medium">Dynamic Targets:</span> Scaled by selected period duration
+                  </div>
+                </div>
               </div>
 
               {/* AE Breakdown Table */}
