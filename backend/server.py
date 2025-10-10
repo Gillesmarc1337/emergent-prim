@@ -642,18 +642,69 @@ def calculate_deals_closed(df, start_date, end_date):
     }
 
 def calculate_pipe_metrics(df, start_date, end_date):
-    """Calculate pipeline metrics with pipe and weighted pipe"""
+    """Calculate pipeline metrics with Excel-exact weighted pipe logic"""
     
-    # Add probability and weighted value calculations
-    stage_probabilities = {
-        'E Verbal commit': 90,
-        'D Negotiation': 70,
-        'C Proposal sent': 50,
-        'B Discovery completed': 30,
-        'A Discovery scheduled': 10
-    }
-    df['probability'] = df['stage'].map(stage_probabilities).fillna(0)
-    df['weighted_value'] = df['pipeline'] * df['probability'] / 100
+    # Implement exact Excel weighting formula
+    def calculate_weighted_value(row):
+        """Calculate weighted value using exact Excel formula logic"""
+        stage = row.get('stage', '')
+        source = row.get('type_of_source', '')
+        pipeline_value = row.get('pipeline', 0)
+        discovery_date = row.get('discovery_date')
+        
+        # Skip if no pipeline value
+        if not pipeline_value or pipeline_value == 0:
+            return 0
+            
+        # Calculate days since creation
+        if pd.isna(discovery_date):
+            days_since_creation = 0
+        else:
+            try:
+                if isinstance(discovery_date, str):
+                    discovery_date = pd.to_datetime(discovery_date)
+                days_since_creation = (pd.Timestamp.now() - discovery_date).days
+            except:
+                days_since_creation = 0
+        
+        # Initialize weight
+        weight = 0
+        
+        # Excel formula implementation
+        if stage == 'E Intro attended':
+            if source == 'Outbound':
+                weight = 0.17 if days_since_creation > 180 else 0.15
+            elif source == 'Inbound':
+                weight = 0.33 if days_since_creation > 90 else 0.35
+            elif source == 'Client referral':
+                weight = 0 if days_since_creation > 30 else 0.7
+            elif source == 'Internal referral':
+                weight = 0 if days_since_creation > 30 else 0.6
+            elif source == 'Partnership':
+                weight = 0.25 if days_since_creation > 60 else 0.4
+                
+        elif stage == 'D POA Booked':
+            weight = 0.5
+            
+        elif stage == 'C Proposal sent':
+            weight = 0.3 if days_since_creation > 90 else 0.5
+            
+        elif stage == 'B Legals':
+            if source == 'Client referral':
+                weight = 0 if days_since_creation > 15 else 0.9
+            elif source == 'Internal referral':
+                weight = 0 if days_since_creation > 15 else 0.85
+            elif source == 'Outbound':
+                weight = 0.75 if days_since_creation > 45 else 0.9
+            elif source == 'Inbound':
+                weight = 0.75 if days_since_creation > 45 else 0.9
+            elif source == 'Partnership':
+                weight = 0.5 if days_since_creation > 30 else 0.8
+        
+        return float(pipeline_value * weight)
+    
+    # Apply Excel weighting formula to each row
+    df['weighted_value'] = df.apply(calculate_weighted_value, axis=1)
     
     # New pipe created in period
     new_pipe = df[
