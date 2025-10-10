@@ -2638,14 +2638,14 @@ function Dashboard() {
                     <CardContent>
                       <div className="text-xl font-bold mb-2 text-gray-800">
                         ${(() => {
-                          // Sum pipeline values from master data sources
+                          // Sum RAW deal values (expected_arr field - no weighting/probability)
                           const legalsValue = hotDeals
                             .filter(deal => deal.stage === 'B Legals')
-                            .reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                            .reduce((sum, deal) => sum + (deal.expected_arr || deal.pipeline || 0), 0);
                           
                           const proposalValue = hotLeads
                             .filter(deal => deal.stage === 'C Proposal sent')
-                            .reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                            .reduce((sum, deal) => sum + (deal.expected_arr || deal.pipeline || 0), 0);
                           
                           return (legalsValue + proposalValue);
                         })().toLocaleString()}
