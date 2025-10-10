@@ -1972,6 +1972,275 @@ def analyze_proposal_and_legals_stages(monthly_data, yearly_data):
     
     return analysis
 
+def test_pipeline_data_excel_matching():
+    """Test pipeline data to find matches with Excel formulas for Created Pipe and Weighted Pipe"""
+    print(f"\n{'='*80}")
+    print(f"🎯 TESTING PIPELINE DATA FOR EXCEL FORMULA MATCHING")
+    print(f"{'='*80}")
+    
+    # Target values from Excel calculations
+    excel_created_pipe_total = 6338600  # $6,338,600
+    excel_weighted_pipe_total = 2297760  # $2,297,760
+    
+    # Expected AE breakdowns from Excel
+    excel_ae_breakdown = {
+        'Rémi': {'created': 1692000, 'weighted': 767400},
+        'Guillaume': {'created': 1706600, 'weighted': 686640},
+        'Bruno': {'created': 1704000, 'weighted': 565920},
+        'Sadie': {'created': 1092000, 'weighted': 205800},
+        'François': {'created': 144000, 'weighted': 72000}
+    }
+    
+    print(f"🎯 Target Excel Values:")
+    print(f"   • Created Pipe Total: ${excel_created_pipe_total:,}")
+    print(f"   • Weighted Pipe Total: ${excel_weighted_pipe_total:,}")
+    print(f"   • AE Breakdown Expected: {len(excel_ae_breakdown)} AEs")
+    
+    # Test endpoints to find matching data
+    endpoints_to_test = [
+        "/analytics/monthly",
+        "/analytics/yearly?year=2025",
+        "/analytics/custom?start_date=2025-07-01&end_date=2025-12-31"
+    ]
+    
+    matching_results = {}
+    
+    for endpoint in endpoints_to_test:
+        print(f"\n{'='*60}")
+        print(f"🔍 TESTING ENDPOINT: {endpoint}")
+        print(f"{'='*60}")
+        
+        data = test_api_endpoint(endpoint)
+        if data is None:
+            print(f"❌ Failed to get data from {endpoint}")
+            continue
+        
+        # Search for pipeline data fields
+        pipeline_matches = find_pipeline_data_matches(data, excel_created_pipe_total, excel_weighted_pipe_total, excel_ae_breakdown)
+        
+        if pipeline_matches:
+            matching_results[endpoint] = pipeline_matches
+            print(f"✅ Found potential matches in {endpoint}")
+        else:
+            print(f"❌ No matches found in {endpoint}")
+    
+    # Summary of findings
+    print(f"\n{'='*80}")
+    print(f"📊 PIPELINE DATA MATCHING SUMMARY")
+    print(f"{'='*80}")
+    
+    if matching_results:
+        print(f"✅ POTENTIAL MATCHES FOUND:")
+        
+        for endpoint, matches in matching_results.items():
+            print(f"\n📍 Endpoint: {endpoint}")
+            
+            if 'created_pipe_matches' in matches:
+                print(f"  🎯 Created Pipe Matches:")
+                for match in matches['created_pipe_matches']:
+                    print(f"    • {match}")
+            
+            if 'weighted_pipe_matches' in matches:
+                print(f"  ⚖️  Weighted Pipe Matches:")
+                for match in matches['weighted_pipe_matches']:
+                    print(f"    • {match}")
+            
+            if 'ae_breakdown_matches' in matches:
+                print(f"  👥 AE Breakdown Matches:")
+                for match in matches['ae_breakdown_matches']:
+                    print(f"    • {match}")
+            
+            if 'exact_totals' in matches:
+                print(f"  🎯 EXACT TOTAL MATCHES:")
+                for match in matches['exact_totals']:
+                    print(f"    • {match}")
+        
+        # Identify the best matching endpoint
+        best_match = identify_best_pipeline_match(matching_results, excel_created_pipe_total, excel_weighted_pipe_total)
+        if best_match:
+            print(f"\n🏆 BEST MATCH IDENTIFIED:")
+            print(f"   📍 Endpoint: {best_match['endpoint']}")
+            print(f"   🎯 Field for Created Pipe: {best_match['created_pipe_field']}")
+            print(f"   ⚖️  Field for Weighted Pipe: {best_match['weighted_pipe_field']}")
+            print(f"   💰 Created Pipe Value: ${best_match['created_pipe_value']:,}")
+            print(f"   💰 Weighted Pipe Value: ${best_match['weighted_pipe_value']:,}")
+            
+            return True
+    else:
+        print(f"❌ NO MATCHES FOUND")
+        print(f"   The backend data does not contain fields matching the Excel totals")
+        print(f"   Expected: Created Pipe ${excel_created_pipe_total:,}, Weighted Pipe ${excel_weighted_pipe_total:,}")
+        
+        return False
+
+def find_pipeline_data_matches(data, target_created, target_weighted, target_ae_breakdown):
+    """Search for pipeline data that matches Excel calculations"""
+    matches = {
+        'created_pipe_matches': [],
+        'weighted_pipe_matches': [],
+        'ae_breakdown_matches': [],
+        'exact_totals': []
+    }
+    
+    def search_for_values(obj, path="", tolerance=1000):
+        """Recursively search for matching values with tolerance"""
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                current_path = f"{path}.{key}" if path else key
+                
+                # Check for numeric values that might match our targets
+                if isinstance(value, (int, float)):
+                    # Check Created Pipe match (within tolerance)
+                    if abs(value - target_created) <= tolerance:
+                        matches['created_pipe_matches'].append(f"{current_path}: ${value:,} (target: ${target_created:,})")
+                        if abs(value - target_created) == 0:
+                            matches['exact_totals'].append(f"EXACT Created Pipe: {current_path} = ${value:,}")
+                    
+                    # Check Weighted Pipe match (within tolerance)
+                    if abs(value - target_weighted) <= tolerance:
+                        matches['weighted_pipe_matches'].append(f"{current_path}: ${value:,} (target: ${target_weighted:,})")
+                        if abs(value - target_weighted) == 0:
+                            matches['exact_totals'].append(f"EXACT Weighted Pipe: {current_path} = ${value:,}")
+                
+                # Look for pipe-related field names
+                pipe_keywords = ['pipe', 'pipeline', 'weighted', 'created', 'total']
+                if any(keyword in key.lower() for keyword in pipe_keywords) and isinstance(value, (int, float)):
+                    if value > 100000:  # Only consider substantial values
+                        matches['created_pipe_matches'].append(f"PIPE FIELD: {current_path}: ${value:,}")
+                
+                # Recursively search nested objects
+                if isinstance(value, dict):
+                    search_for_values(value, current_path, tolerance)
+                elif isinstance(value, list) and len(value) > 0:
+                    for i, item in enumerate(value[:5]):  # Check first 5 items
+                        if isinstance(item, dict):
+                            search_for_values(item, f"{current_path}[{i}]", tolerance)
+    
+    # Search the entire data structure
+    search_for_values(data)
+    
+    # Look for AE breakdown data
+    ae_breakdown_found = find_ae_breakdown_matches(data, target_ae_breakdown)
+    if ae_breakdown_found:
+        matches['ae_breakdown_matches'] = ae_breakdown_found
+    
+    # Return matches only if we found something
+    return matches if any(matches.values()) else None
+
+def find_ae_breakdown_matches(data, target_ae_breakdown):
+    """Look for AE breakdown data that matches Excel calculations"""
+    ae_matches = []
+    
+    def search_ae_data(obj, path=""):
+        """Search for AE-related data structures"""
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                current_path = f"{path}.{key}" if path else key
+                
+                # Look for AE-related keys
+                if 'ae' in key.lower() or 'owner' in key.lower() or 'breakdown' in key.lower():
+                    if isinstance(value, list):
+                        # Check if this looks like AE breakdown data
+                        for i, ae_data in enumerate(value):
+                            if isinstance(ae_data, dict) and 'ae' in ae_data:
+                                ae_name = ae_data.get('ae', '')
+                                
+                                # Check for pipeline values
+                                for field_name, field_value in ae_data.items():
+                                    if isinstance(field_value, (int, float)) and field_value > 10000:
+                                        # Check if this matches any of our target AE values
+                                        for target_ae, target_values in target_ae_breakdown.items():
+                                            if target_ae.lower() in ae_name.lower() or ae_name.lower() in target_ae.lower():
+                                                for value_type, target_val in target_values.items():
+                                                    if abs(field_value - target_val) <= 5000:  # 5K tolerance
+                                                        ae_matches.append(f"AE {ae_name} - {field_name}: ${field_value:,} (target {value_type}: ${target_val:,})")
+                
+                # Recursively search
+                if isinstance(value, dict):
+                    search_ae_data(value, current_path)
+    
+    search_ae_data(data)
+    return ae_matches
+
+def identify_best_pipeline_match(matching_results, target_created, target_weighted):
+    """Identify the best matching endpoint and fields for pipeline data"""
+    best_match = None
+    best_score = 0
+    
+    for endpoint, matches in matching_results.items():
+        score = 0
+        created_field = None
+        weighted_field = None
+        created_value = None
+        weighted_value = None
+        
+        # Check for exact matches first
+        if 'exact_totals' in matches:
+            for exact_match in matches['exact_totals']:
+                if 'Created Pipe' in exact_match:
+                    score += 100
+                    # Extract field name and value
+                    parts = exact_match.split(': ')
+                    if len(parts) >= 2:
+                        created_field = parts[1].split(' = ')[0]
+                        created_value = target_created
+                
+                if 'Weighted Pipe' in exact_match:
+                    score += 100
+                    # Extract field name and value
+                    parts = exact_match.split(': ')
+                    if len(parts) >= 2:
+                        weighted_field = parts[1].split(' = ')[0]
+                        weighted_value = target_weighted
+        
+        # Check for close matches
+        if 'created_pipe_matches' in matches:
+            for match in matches['created_pipe_matches']:
+                if 'target:' in match:
+                    score += 50
+                    if not created_field:
+                        # Extract field name
+                        field_part = match.split(':')[0]
+                        created_field = field_part
+                        # Extract value
+                        value_part = match.split('$')[1].split(' ')[0].replace(',', '')
+                        try:
+                            created_value = int(value_part)
+                        except:
+                            pass
+        
+        if 'weighted_pipe_matches' in matches:
+            for match in matches['weighted_pipe_matches']:
+                if 'target:' in match:
+                    score += 50
+                    if not weighted_field:
+                        # Extract field name
+                        field_part = match.split(':')[0]
+                        weighted_field = field_part
+                        # Extract value
+                        value_part = match.split('$')[1].split(' ')[0].replace(',', '')
+                        try:
+                            weighted_value = int(value_part)
+                        except:
+                            pass
+        
+        # Check for AE breakdown matches
+        if 'ae_breakdown_matches' in matches and len(matches['ae_breakdown_matches']) > 0:
+            score += 25
+        
+        if score > best_score and created_field and weighted_field:
+            best_score = score
+            best_match = {
+                'endpoint': endpoint,
+                'created_pipe_field': created_field,
+                'weighted_pipe_field': weighted_field,
+                'created_pipe_value': created_value or 0,
+                'weighted_pipe_value': weighted_value or 0,
+                'score': score
+            }
+    
+    return best_match
+
 def main():
     """Main testing function for meeting generation targets correction verification"""
     print(f"🚀 Starting Meeting Generation Targets Correction Testing")
