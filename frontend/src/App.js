@@ -258,7 +258,23 @@ function MetricCard({ title, value, target, unit = '', trend, icon: Icon, color 
   );
 }
 
-function DraggableDealItem({ deal, index, onHide }) {
+function DraggableDealItem({ deal, index, onHide, showActions = false }) {
+  const [isVisible, setIsVisible] = useState(true);
+  const [status, setStatus] = useState(deal.status || 'active');
+  const [label, setLabel] = useState(deal.label || '');
+
+  if (!isVisible || status === 'won' || status === 'lost') return null;
+
+  const handleStatusChange = (newStatus) => {
+    setStatus(newStatus);
+    // Visual only - no backend update
+  };
+
+  const handleDelete = () => {
+    setIsVisible(false);
+    if (onHide) onHide();
+  };
+
   return (
     <Draggable draggableId={deal.id} index={index}>
       {(provided, snapshot) => (
@@ -266,9 +282,9 @@ function DraggableDealItem({ deal, index, onHide }) {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className={`p-3 bg-white border rounded-lg shadow-sm mb-2 ${
-            snapshot.isDragging ? 'shadow-lg' : 'hover:shadow-md'
-          } transition-shadow`}
+          className={`bg-white border-l-4 border-l-green-500 p-4 mb-2 rounded shadow-sm hover:shadow-md transition-shadow ${
+            snapshot.isDragging ? 'rotate-2 scale-105' : ''
+          }`}
         >
           <div className="flex items-center justify-between">
             <div className="flex-1">
@@ -276,18 +292,49 @@ function DraggableDealItem({ deal, index, onHide }) {
               <div className="text-sm text-gray-600">
                 AE: {deal.owner} | Pipeline: ${deal.pipeline?.toLocaleString()}
               </div>
+              {deal.poa_date && (
+                <div className="text-xs text-blue-600">
+                  POA: {new Date(deal.poa_date).toLocaleDateString()}
+                </div>
+              )}
+              {label && (
+                <div className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded mt-1 inline-block">
+                  {label}
+                </div>
+              )}
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onHide(deal.id);
-              }}
-              className="text-red-500 hover:text-red-700"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            
+            {showActions && (
+              <div className="flex gap-1 ml-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleStatusChange('won')}
+                  className="text-green-600 hover:text-green-700"
+                  title="Mark as Won"
+                >
+                  ✓
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleStatusChange('lost')}
+                  className="text-red-600 hover:text-red-700"
+                  title="Mark as Lost"
+                >
+                  ✗
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleDelete}
+                  className="text-gray-600 hover:text-gray-700"
+                  title="Remove from board"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}
