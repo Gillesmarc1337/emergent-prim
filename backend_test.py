@@ -2628,6 +2628,264 @@ def test_hot_deals_stage_analysis():
     
     return True
 
+def test_deals_count_analysis():
+    """Comprehensive analysis of all deals across different endpoints to identify missing deals"""
+    print(f"\n{'='*80}")
+    print(f"🔍 COMPREHENSIVE DEALS COUNT ANALYSIS")
+    print(f"{'='*80}")
+    
+    deals_analysis = {
+        'hot_deals': {'count': 0, 'deals': [], 'stages': set(), 'clients': set()},
+        'hot_leads': {'count': 0, 'deals': [], 'stages': set(), 'clients': set()},
+        'monthly_current_month': {'count': 0, 'deals': [], 'stages': set(), 'clients': set()},
+        'monthly_next_quarter': {'count': 0, 'deals': [], 'stages': set(), 'clients': set()},
+        'all_unique_deals': set(),
+        'all_unique_clients': set(),
+        'stage_distribution': {}
+    }
+    
+    # Test 1: GET /api/projections/hot-deals
+    print(f"\n🔥 Test 1: GET /api/projections/hot-deals")
+    print(f"{'='*60}")
+    
+    hot_deals_data = test_api_endpoint("/projections/hot-deals")
+    if hot_deals_data and isinstance(hot_deals_data, list):
+        deals_analysis['hot_deals']['count'] = len(hot_deals_data)
+        deals_analysis['hot_deals']['deals'] = hot_deals_data
+        
+        print(f"✅ Hot deals endpoint returned {len(hot_deals_data)} deals")
+        
+        for deal in hot_deals_data:
+            if isinstance(deal, dict):
+                stage = deal.get('stage', 'Unknown')
+                client = deal.get('client', 'Unknown')
+                deal_id = deal.get('id', f"client_{client}")
+                
+                deals_analysis['hot_deals']['stages'].add(stage)
+                deals_analysis['hot_deals']['clients'].add(client)
+                deals_analysis['all_unique_deals'].add(deal_id)
+                deals_analysis['all_unique_clients'].add(client)
+                
+                # Track stage distribution
+                if stage not in deals_analysis['stage_distribution']:
+                    deals_analysis['stage_distribution'][stage] = 0
+                deals_analysis['stage_distribution'][stage] += 1
+        
+        print(f"📊 Hot deals stages: {list(deals_analysis['hot_deals']['stages'])}")
+        print(f"👥 Hot deals clients: {len(deals_analysis['hot_deals']['clients'])} unique clients")
+        
+        # Show sample deals
+        if len(hot_deals_data) > 0:
+            print(f"📋 Sample hot deals:")
+            for i, deal in enumerate(hot_deals_data[:3]):  # Show first 3
+                client = deal.get('client', 'N/A')
+                stage = deal.get('stage', 'N/A')
+                pipeline = deal.get('pipeline', 0)
+                print(f"  {i+1}. {client} - {stage} - ${pipeline:,.0f}")
+    else:
+        print(f"❌ Hot deals endpoint failed or returned invalid data")
+    
+    # Test 2: GET /api/projections/hot-leads
+    print(f"\n🎯 Test 2: GET /api/projections/hot-leads")
+    print(f"{'='*60}")
+    
+    hot_leads_data = test_api_endpoint("/projections/hot-leads")
+    if hot_leads_data and isinstance(hot_leads_data, list):
+        deals_analysis['hot_leads']['count'] = len(hot_leads_data)
+        deals_analysis['hot_leads']['deals'] = hot_leads_data
+        
+        print(f"✅ Hot leads endpoint returned {len(hot_leads_data)} deals")
+        
+        for deal in hot_leads_data:
+            if isinstance(deal, dict):
+                stage = deal.get('stage', 'Unknown')
+                client = deal.get('client', 'Unknown')
+                deal_id = deal.get('id', f"client_{client}")
+                
+                deals_analysis['hot_leads']['stages'].add(stage)
+                deals_analysis['hot_leads']['clients'].add(client)
+                deals_analysis['all_unique_deals'].add(deal_id)
+                deals_analysis['all_unique_clients'].add(client)
+                
+                # Track stage distribution
+                if stage not in deals_analysis['stage_distribution']:
+                    deals_analysis['stage_distribution'][stage] = 0
+                deals_analysis['stage_distribution'][stage] += 1
+        
+        print(f"📊 Hot leads stages: {list(deals_analysis['hot_leads']['stages'])}")
+        print(f"👥 Hot leads clients: {len(deals_analysis['hot_leads']['clients'])} unique clients")
+        
+        # Show sample deals
+        if len(hot_leads_data) > 0:
+            print(f"📋 Sample hot leads:")
+            for i, deal in enumerate(hot_leads_data[:3]):  # Show first 3
+                client = deal.get('client', 'N/A')
+                stage = deal.get('stage', 'N/A')
+                pipeline = deal.get('pipeline', 0)
+                print(f"  {i+1}. {client} - {stage} - ${pipeline:,.0f}")
+    else:
+        print(f"❌ Hot leads endpoint failed or returned invalid data")
+    
+    # Test 3: GET /api/analytics/monthly - Check closing_projections
+    print(f"\n📊 Test 3: GET /api/analytics/monthly - Closing Projections")
+    print(f"{'='*60}")
+    
+    monthly_data = test_api_endpoint("/analytics/monthly")
+    if monthly_data and 'closing_projections' in monthly_data:
+        closing_proj = monthly_data['closing_projections']
+        print(f"✅ Closing projections found in monthly analytics")
+        
+        # Check current_month deals
+        if 'current_month' in closing_proj and 'deals' in closing_proj['current_month']:
+            current_month_deals = closing_proj['current_month']['deals']
+            deals_analysis['monthly_current_month']['count'] = len(current_month_deals)
+            deals_analysis['monthly_current_month']['deals'] = current_month_deals
+            
+            print(f"📅 Current month deals: {len(current_month_deals)}")
+            
+            for deal in current_month_deals:
+                if isinstance(deal, dict):
+                    stage = deal.get('stage', 'Unknown')
+                    client = deal.get('client', 'Unknown')
+                    deal_id = f"monthly_current_{client}_{stage}"
+                    
+                    deals_analysis['monthly_current_month']['stages'].add(stage)
+                    deals_analysis['monthly_current_month']['clients'].add(client)
+                    deals_analysis['all_unique_deals'].add(deal_id)
+                    deals_analysis['all_unique_clients'].add(client)
+                    
+                    # Track stage distribution
+                    if stage not in deals_analysis['stage_distribution']:
+                        deals_analysis['stage_distribution'][stage] = 0
+                    deals_analysis['stage_distribution'][stage] += 1
+            
+            print(f"📊 Current month stages: {list(deals_analysis['monthly_current_month']['stages'])}")
+            
+            # Show sample deals
+            if len(current_month_deals) > 0:
+                print(f"📋 Sample current month deals:")
+                for i, deal in enumerate(current_month_deals[:3]):  # Show first 3
+                    client = deal.get('client', 'N/A')
+                    stage = deal.get('stage', 'N/A')
+                    pipeline = deal.get('pipeline', 0)
+                    print(f"  {i+1}. {client} - {stage} - ${pipeline:,.0f}")
+        
+        # Check next_quarter deals
+        if 'next_quarter' in closing_proj and 'deals' in closing_proj['next_quarter']:
+            next_quarter_deals = closing_proj['next_quarter']['deals']
+            deals_analysis['monthly_next_quarter']['count'] = len(next_quarter_deals)
+            deals_analysis['monthly_next_quarter']['deals'] = next_quarter_deals
+            
+            print(f"📅 Next quarter deals: {len(next_quarter_deals)}")
+            
+            for deal in next_quarter_deals:
+                if isinstance(deal, dict):
+                    stage = deal.get('stage', 'Unknown')
+                    client = deal.get('client', 'Unknown')
+                    deal_id = f"monthly_quarter_{client}_{stage}"
+                    
+                    deals_analysis['monthly_next_quarter']['stages'].add(stage)
+                    deals_analysis['monthly_next_quarter']['clients'].add(client)
+                    deals_analysis['all_unique_deals'].add(deal_id)
+                    deals_analysis['all_unique_clients'].add(client)
+                    
+                    # Track stage distribution
+                    if stage not in deals_analysis['stage_distribution']:
+                        deals_analysis['stage_distribution'][stage] = 0
+                    deals_analysis['stage_distribution'][stage] += 1
+            
+            print(f"📊 Next quarter stages: {list(deals_analysis['monthly_next_quarter']['stages'])}")
+            
+            # Show sample deals
+            if len(next_quarter_deals) > 0:
+                print(f"📋 Sample next quarter deals:")
+                for i, deal in enumerate(next_quarter_deals[:3]):  # Show first 3
+                    client = deal.get('client', 'N/A')
+                    stage = deal.get('stage', 'N/A')
+                    pipeline = deal.get('pipeline', 0)
+                    print(f"  {i+1}. {client} - {stage} - ${pipeline:,.0f}")
+    else:
+        print(f"❌ Closing projections not found in monthly analytics")
+    
+    # Analysis Summary
+    print(f"\n{'='*80}")
+    print(f"📊 COMPREHENSIVE DEALS ANALYSIS SUMMARY")
+    print(f"{'='*80}")
+    
+    total_deals_by_source = (
+        deals_analysis['hot_deals']['count'] +
+        deals_analysis['hot_leads']['count'] +
+        deals_analysis['monthly_current_month']['count'] +
+        deals_analysis['monthly_next_quarter']['count']
+    )
+    
+    print(f"\n📈 DEALS COUNT BY SOURCE:")
+    print(f"  🔥 Hot deals (B Legals): {deals_analysis['hot_deals']['count']} deals")
+    print(f"  🎯 Hot leads (C Proposal sent + D POA Booked): {deals_analysis['hot_leads']['count']} deals")
+    print(f"  📅 Monthly current month projections: {deals_analysis['monthly_current_month']['count']} deals")
+    print(f"  📅 Monthly next quarter projections: {deals_analysis['monthly_next_quarter']['count']} deals")
+    print(f"  📊 Total deals across all sources: {total_deals_by_source} deals")
+    print(f"  👥 Unique clients across all sources: {len(deals_analysis['all_unique_clients'])} clients")
+    
+    print(f"\n🎭 STAGE DISTRIBUTION ACROSS ALL SOURCES:")
+    for stage, count in sorted(deals_analysis['stage_distribution'].items()):
+        print(f"  • {stage}: {count} deals")
+    
+    print(f"\n🔍 POTENTIAL ISSUES ANALYSIS:")
+    
+    # Check if interactive board should have more deals
+    interactive_board_deals = deals_analysis['hot_deals']['count'] + deals_analysis['hot_leads']['count']
+    print(f"  📊 Interactive board total (hot-deals + hot-leads): {interactive_board_deals} deals")
+    
+    if interactive_board_deals < 10:
+        print(f"  ⚠️  Interactive board shows only {interactive_board_deals} deals - this seems low")
+        print(f"  💡 Consider checking if other deal sources should be included:")
+        print(f"     - Monthly current month projections: {deals_analysis['monthly_current_month']['count']} additional deals")
+        print(f"     - Monthly next quarter projections: {deals_analysis['monthly_next_quarter']['count']} additional deals")
+    
+    # Check for stage overlap
+    hot_deals_stages = deals_analysis['hot_deals']['stages']
+    hot_leads_stages = deals_analysis['hot_leads']['stages']
+    monthly_current_stages = deals_analysis['monthly_current_month']['stages']
+    monthly_quarter_stages = deals_analysis['monthly_next_quarter']['stages']
+    
+    print(f"\n🎭 STAGE OVERLAP ANALYSIS:")
+    print(f"  🔥 Hot deals stages: {list(hot_deals_stages)}")
+    print(f"  🎯 Hot leads stages: {list(hot_leads_stages)}")
+    print(f"  📅 Monthly current stages: {list(monthly_current_stages)}")
+    print(f"  📅 Monthly quarter stages: {list(monthly_quarter_stages)}")
+    
+    # Check for missing stages that should be in interactive board
+    all_projection_stages = hot_deals_stages | hot_leads_stages
+    all_monthly_stages = monthly_current_stages | monthly_quarter_stages
+    missing_from_interactive = all_monthly_stages - all_projection_stages
+    
+    if missing_from_interactive:
+        print(f"  ⚠️  Stages in monthly projections but NOT in interactive board: {list(missing_from_interactive)}")
+        print(f"  💡 These stages might need to be added to hot-deals or hot-leads endpoints")
+    
+    # Recommendations
+    print(f"\n💡 RECOMMENDATIONS:")
+    if total_deals_by_source < 40:
+        print(f"  1. Total deals ({total_deals_by_source}) is less than expected 40+ deals")
+        print(f"  2. Check if data is properly loaded in the system")
+        print(f"  3. Verify stage filtering logic in hot-deals and hot-leads endpoints")
+    
+    if interactive_board_deals < 20:
+        print(f"  4. Interactive board shows only {interactive_board_deals} deals")
+        print(f"  5. Consider including deals from monthly projections in interactive board")
+        print(f"  6. Review stage criteria for hot-deals (currently B Legals only)")
+        print(f"  7. Review stage criteria for hot-leads (currently C Proposal sent + D POA Booked)")
+    
+    # Return analysis results
+    return {
+        'total_deals': total_deals_by_source,
+        'interactive_board_deals': interactive_board_deals,
+        'unique_clients': len(deals_analysis['all_unique_clients']),
+        'stage_distribution': deals_analysis['stage_distribution'],
+        'analysis_complete': True
+    }
+
 def main():
     """Run all backend tests with priority on pipeline data Excel matching"""
     print(f"🚀 Starting Backend API Testing")
