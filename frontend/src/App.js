@@ -1341,18 +1341,21 @@ function Dashboard() {
               <MetricCard
                 title="Inbound"
                 value={analytics.meeting_generation.inbound}
+                target={analytics.meeting_generation.inbound_target}
                 icon={TrendingUp}
                 color="green"
               />
               <MetricCard
                 title="Outbound"
                 value={analytics.meeting_generation.outbound}
+                target={analytics.meeting_generation.outbound_target}
                 icon={Target}
                 color="orange"
               />
               <MetricCard
                 title="Referrals"
                 value={analytics.meeting_generation.referrals}
+                target={analytics.meeting_generation.referral_target}
                 icon={Users}
                 color="purple"
               />
