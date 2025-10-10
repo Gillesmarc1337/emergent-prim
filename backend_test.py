@@ -1570,6 +1570,408 @@ def test_meeting_generation_structure():
     
     return passed_tests == total_tests
 
+def test_pipeline_data_structure_inspection():
+    """
+    Comprehensive inspection of pipeline data structure for Deals & Pipeline tab implementation
+    Focus on pipeline metrics, stage-based data, POA metrics, and weighted pipeline calculations
+    """
+    print(f"\n{'='*80}")
+    print(f"🔍 PIPELINE DATA STRUCTURE INSPECTION FOR DEALS & PIPELINE TAB")
+    print(f"{'='*80}")
+    
+    pipeline_data_findings = {
+        'monthly_pipeline_data': {},
+        'yearly_pipeline_data': {},
+        'deals_by_stage': {},
+        'poa_metrics': {},
+        'weighted_pipeline': {},
+        'ae_breakdown': {}
+    }
+    
+    # Test 1: GET /api/analytics/monthly - Pipeline Data Structure
+    print(f"\n📊 Test 1: GET /api/analytics/monthly - Pipeline Data Inspection")
+    print(f"{'='*60}")
+    
+    monthly_data = test_api_endpoint("/analytics/monthly")
+    if monthly_data:
+        print(f"✅ Monthly analytics data retrieved successfully")
+        
+        # Inspect pipeline-related sections
+        pipeline_sections = ['pipe_metrics', 'deals_closed', 'closing_projections', 'dashboard_blocks', 'big_numbers_recap']
+        
+        for section in pipeline_sections:
+            if section in monthly_data:
+                print(f"\n🔍 Inspecting {section} section:")
+                section_data = monthly_data[section]
+                
+                if section == 'pipe_metrics':
+                    pipeline_data_findings['monthly_pipeline_data']['pipe_metrics'] = section_data
+                    print(f"  📋 Pipe Metrics Structure:")
+                    if isinstance(section_data, dict):
+                        for key, value in section_data.items():
+                            print(f"    • {key}: {type(value)} - {value if not isinstance(value, (dict, list)) else f'{len(value)} items'}")
+                            
+                            # Deep dive into created_pipe and total_pipe
+                            if key in ['created_pipe', 'total_pipe'] and isinstance(value, dict):
+                                print(f"      📊 {key} details:")
+                                for sub_key, sub_value in value.items():
+                                    print(f"        - {sub_key}: {sub_value}")
+                
+                elif section == 'deals_closed':
+                    pipeline_data_findings['monthly_pipeline_data']['deals_closed'] = section_data
+                    print(f"  📋 Deals Closed Structure:")
+                    if isinstance(section_data, dict):
+                        for key, value in section_data.items():
+                            print(f"    • {key}: {value} ({type(value).__name__})")
+                
+                elif section == 'dashboard_blocks':
+                    pipeline_data_findings['monthly_pipeline_data']['dashboard_blocks'] = section_data
+                    print(f"  📋 Dashboard Blocks - Pipeline Related:")
+                    if isinstance(section_data, dict):
+                        for block_name, block_data in section_data.items():
+                            if 'pipe' in block_name.lower() or 'deal' in block_name.lower():
+                                print(f"    🎯 {block_name}:")
+                                if isinstance(block_data, dict):
+                                    for key, value in block_data.items():
+                                        print(f"      - {key}: {value}")
+                
+                elif section == 'closing_projections':
+                    pipeline_data_findings['monthly_pipeline_data']['closing_projections'] = section_data
+                    print(f"  📋 Closing Projections Structure:")
+                    if isinstance(section_data, dict):
+                        for key, value in section_data.items():
+                            print(f"    • {key}: {type(value)} - {len(value) if isinstance(value, (dict, list)) else value}")
+                            
+                            # Look for deals by timeframe
+                            if isinstance(value, dict) and 'deals' in value:
+                                deals = value['deals']
+                                if isinstance(deals, list) and len(deals) > 0:
+                                    print(f"      📊 Sample deal structure:")
+                                    sample_deal = deals[0]
+                                    for deal_key, deal_value in sample_deal.items():
+                                        print(f"        - {deal_key}: {deal_value}")
+        
+        # Look for stage-based data
+        print(f"\n🔍 Searching for stage-based deal data:")
+        stage_data_found = search_for_stage_data(monthly_data)
+        pipeline_data_findings['deals_by_stage']['monthly'] = stage_data_found
+        
+        # Look for POA-related metrics
+        print(f"\n🔍 Searching for POA-related metrics:")
+        poa_data_found = search_for_poa_data(monthly_data)
+        pipeline_data_findings['poa_metrics']['monthly'] = poa_data_found
+        
+        # Look for weighted pipeline calculations
+        print(f"\n🔍 Searching for weighted pipeline data:")
+        weighted_data_found = search_for_weighted_pipeline_data(monthly_data)
+        pipeline_data_findings['weighted_pipeline']['monthly'] = weighted_data_found
+        
+    else:
+        print(f"❌ Failed to retrieve monthly analytics data")
+    
+    # Test 2: GET /api/analytics/yearly - Pipeline Data Structure
+    print(f"\n📊 Test 2: GET /api/analytics/yearly - Pipeline Data Inspection")
+    print(f"{'='*60}")
+    
+    yearly_data = test_api_endpoint("/analytics/yearly?year=2025")
+    if yearly_data:
+        print(f"✅ Yearly analytics data retrieved successfully")
+        
+        # Similar inspection for yearly data
+        for section in pipeline_sections:
+            if section in yearly_data:
+                section_data = yearly_data[section]
+                pipeline_data_findings['yearly_pipeline_data'][section] = section_data
+        
+        # Look for stage-based data in yearly
+        stage_data_found = search_for_stage_data(yearly_data)
+        pipeline_data_findings['deals_by_stage']['yearly'] = stage_data_found
+        
+        # Look for POA-related metrics in yearly
+        poa_data_found = search_for_poa_data(yearly_data)
+        pipeline_data_findings['poa_metrics']['yearly'] = poa_data_found
+        
+        # Look for weighted pipeline calculations in yearly
+        weighted_data_found = search_for_weighted_pipeline_data(yearly_data)
+        pipeline_data_findings['weighted_pipeline']['yearly'] = weighted_data_found
+        
+    else:
+        print(f"❌ Failed to retrieve yearly analytics data")
+    
+    # Test 3: Look for AE breakdown with pipeline data
+    print(f"\n📊 Test 3: AE Breakdown with Pipeline Data")
+    print(f"{'='*60}")
+    
+    ae_pipeline_data = search_for_ae_pipeline_breakdown(monthly_data, yearly_data)
+    pipeline_data_findings['ae_breakdown'] = ae_pipeline_data
+    
+    # Test 4: Specific stage analysis - "Proposal sent" and "Legals"
+    print(f"\n📊 Test 4: Specific Stage Analysis - Proposal Sent & Legals")
+    print(f"{'='*60}")
+    
+    proposal_legals_data = analyze_proposal_and_legals_stages(monthly_data, yearly_data)
+    pipeline_data_findings['proposal_legals_analysis'] = proposal_legals_data
+    
+    # Summary Report
+    print(f"\n{'='*80}")
+    print(f"📋 PIPELINE DATA STRUCTURE SUMMARY REPORT")
+    print(f"{'='*80}")
+    
+    print(f"\n🎯 KEY FINDINGS FOR DEALS & PIPELINE TAB IMPLEMENTATION:")
+    
+    # 1. Deals by Stage Data
+    print(f"\n1️⃣ DEALS BY STAGE DATA:")
+    if pipeline_data_findings['deals_by_stage']:
+        for period, stage_data in pipeline_data_findings['deals_by_stage'].items():
+            if stage_data:
+                print(f"  ✅ {period.upper()}: Stage-based data available")
+                for stage_info in stage_data[:3]:  # Show first 3 findings
+                    print(f"    • {stage_info}")
+            else:
+                print(f"  ❌ {period.upper()}: No stage-based data found")
+    else:
+        print(f"  ❌ No stage-based data structure identified")
+    
+    # 2. POA Metrics
+    print(f"\n2️⃣ POA BOOKED METRICS:")
+    if pipeline_data_findings['poa_metrics']:
+        for period, poa_data in pipeline_data_findings['poa_metrics'].items():
+            if poa_data:
+                print(f"  ✅ {period.upper()}: POA metrics available")
+                for poa_info in poa_data[:3]:  # Show first 3 findings
+                    print(f"    • {poa_info}")
+            else:
+                print(f"  ❌ {period.upper()}: No POA metrics found")
+    else:
+        print(f"  ❌ No POA metrics structure identified")
+    
+    # 3. Weighted Pipeline
+    print(f"\n3️⃣ WEIGHTED PIPELINE CALCULATIONS:")
+    if pipeline_data_findings['weighted_pipeline']:
+        for period, weighted_data in pipeline_data_findings['weighted_pipeline'].items():
+            if weighted_data:
+                print(f"  ✅ {period.upper()}: Weighted pipeline data available")
+                for weighted_info in weighted_data[:3]:  # Show first 3 findings
+                    print(f"    • {weighted_info}")
+            else:
+                print(f"  ❌ {period.upper()}: No weighted pipeline data found")
+    else:
+        print(f"  ❌ No weighted pipeline structure identified")
+    
+    # 4. AE Breakdown
+    print(f"\n4️⃣ AE BREAKDOWN WITH PIPELINE DATA:")
+    if pipeline_data_findings['ae_breakdown']:
+        print(f"  ✅ AE breakdown data available:")
+        for ae_info in pipeline_data_findings['ae_breakdown'][:5]:  # Show first 5 findings
+            print(f"    • {ae_info}")
+    else:
+        print(f"  ❌ No AE breakdown with pipeline data found")
+    
+    # 5. Specific Recommendations
+    print(f"\n5️⃣ RECOMMENDATIONS FOR DEALS & PIPELINE TAB:")
+    
+    # Check if we have the required data for the user's requirements
+    has_proposal_sent = any('proposal sent' in str(finding).lower() for findings in pipeline_data_findings['deals_by_stage'].values() for finding in findings)
+    has_legals = any('legals' in str(finding).lower() for findings in pipeline_data_findings['deals_by_stage'].values() for finding in findings)
+    has_poa_booked = any('poa' in str(finding).lower() for findings in pipeline_data_findings['poa_metrics'].values() for finding in findings)
+    has_weighted_pipe = any('weighted' in str(finding).lower() for findings in pipeline_data_findings['weighted_pipeline'].values() for finding in findings)
+    
+    if has_proposal_sent:
+        print(f"  ✅ 'Proposal sent' stage data: Available for pipeline metrics")
+    else:
+        print(f"  ⚠️  'Proposal sent' stage data: May need custom filtering")
+    
+    if has_legals:
+        print(f"  ✅ 'Legals' stage data: Available for pipeline metrics")
+    else:
+        print(f"  ⚠️  'Legals' stage data: May need custom filtering")
+    
+    if has_poa_booked:
+        print(f"  ✅ POA booked metrics: Available")
+    else:
+        print(f"  ⚠️  POA booked metrics: May need custom calculation")
+    
+    if has_weighted_pipe:
+        print(f"  ✅ Weighted pipeline: Available")
+    else:
+        print(f"  ⚠️  Weighted pipeline: May need custom calculation")
+    
+    return len([f for f in [has_proposal_sent, has_legals, has_poa_booked, has_weighted_pipe] if f]) >= 3
+
+def search_for_stage_data(data, path=""):
+    """Search for stage-based deal data in the response"""
+    stage_findings = []
+    
+    def recursive_search(obj, current_path=""):
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                new_path = f"{current_path}.{key}" if current_path else key
+                
+                # Look for stage-related keys
+                if 'stage' in key.lower():
+                    stage_findings.append(f"Stage field found: {new_path} = {value}")
+                
+                # Look for specific stages
+                if isinstance(value, str) and any(stage in value.lower() for stage in ['proposal sent', 'legals', 'poa booked']):
+                    stage_findings.append(f"Target stage found: {new_path} = {value}")
+                
+                # Recursive search
+                if isinstance(value, (dict, list)):
+                    recursive_search(value, new_path)
+                    
+        elif isinstance(obj, list):
+            for i, item in enumerate(obj[:5]):  # Check first 5 items
+                recursive_search(item, f"{current_path}[{i}]")
+    
+    recursive_search(data)
+    return stage_findings
+
+def search_for_poa_data(data):
+    """Search for POA-related metrics in the response"""
+    poa_findings = []
+    
+    def recursive_search(obj, current_path=""):
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                new_path = f"{current_path}.{key}" if current_path else key
+                
+                # Look for POA-related keys
+                if 'poa' in key.lower():
+                    poa_findings.append(f"POA field found: {new_path} = {value}")
+                
+                # Look for POA in values
+                if isinstance(value, str) and 'poa' in value.lower():
+                    poa_findings.append(f"POA reference found: {new_path} = {value}")
+                
+                # Recursive search
+                if isinstance(value, (dict, list)):
+                    recursive_search(value, new_path)
+                    
+        elif isinstance(obj, list):
+            for i, item in enumerate(obj[:5]):  # Check first 5 items
+                recursive_search(item, f"{current_path}[{i}]")
+    
+    recursive_search(data)
+    return poa_findings
+
+def search_for_weighted_pipeline_data(data):
+    """Search for weighted pipeline calculations in the response"""
+    weighted_findings = []
+    
+    def recursive_search(obj, current_path=""):
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                new_path = f"{current_path}.{key}" if current_path else key
+                
+                # Look for weighted-related keys
+                if 'weighted' in key.lower():
+                    weighted_findings.append(f"Weighted field found: {new_path} = {value}")
+                
+                # Look for probability or percentage fields (often used in weighted calculations)
+                if 'probability' in key.lower() or 'percent' in key.lower():
+                    weighted_findings.append(f"Probability field found: {new_path} = {value}")
+                
+                # Look for aggregate pipeline
+                if 'aggregate' in key.lower() and 'pipe' in key.lower():
+                    weighted_findings.append(f"Aggregate pipeline found: {new_path} = {value}")
+                
+                # Recursive search
+                if isinstance(value, (dict, list)):
+                    recursive_search(value, new_path)
+                    
+        elif isinstance(obj, list):
+            for i, item in enumerate(obj[:5]):  # Check first 5 items
+                recursive_search(item, f"{current_path}[{i}]")
+    
+    recursive_search(data)
+    return weighted_findings
+
+def search_for_ae_pipeline_breakdown(monthly_data, yearly_data):
+    """Search for AE breakdown with pipeline data"""
+    ae_findings = []
+    
+    datasets = [("monthly", monthly_data), ("yearly", yearly_data)]
+    
+    for period_name, data in datasets:
+        if not data:
+            continue
+            
+        # Look for AE performance sections
+        if 'ae_performance' in data:
+            ae_perf = data['ae_performance']
+            ae_findings.append(f"{period_name}: ae_performance section found with {len(ae_perf) if isinstance(ae_perf, dict) else 'unknown'} entries")
+            
+            # Check structure
+            if isinstance(ae_perf, dict):
+                for key, value in list(ae_perf.items())[:3]:  # Check first 3
+                    ae_findings.append(f"{period_name}: ae_performance.{key} = {value}")
+        
+        # Look for pipe_metrics with AE breakdown
+        if 'pipe_metrics' in data:
+            pipe_metrics = data['pipe_metrics']
+            if isinstance(pipe_metrics, dict) and 'ae_breakdown' in pipe_metrics:
+                ae_breakdown = pipe_metrics['ae_breakdown']
+                ae_findings.append(f"{period_name}: pipe_metrics.ae_breakdown found with {len(ae_breakdown) if isinstance(ae_breakdown, list) else 'unknown'} AEs")
+                
+                # Check structure of AE breakdown
+                if isinstance(ae_breakdown, list) and len(ae_breakdown) > 0:
+                    sample_ae = ae_breakdown[0]
+                    if isinstance(sample_ae, dict):
+                        ae_findings.append(f"{period_name}: AE breakdown structure: {list(sample_ae.keys())}")
+    
+    return ae_findings
+
+def analyze_proposal_and_legals_stages(monthly_data, yearly_data):
+    """Analyze specific data for Proposal sent and Legals stages"""
+    analysis = {
+        'proposal_sent_deals': [],
+        'legals_deals': [],
+        'stage_counts': {},
+        'stage_values': {}
+    }
+    
+    datasets = [("monthly", monthly_data), ("yearly", yearly_data)]
+    
+    for period_name, data in datasets:
+        if not data:
+            continue
+        
+        # Look through all sections for deals with these stages
+        def find_deals_by_stage(obj, target_stages, current_path=""):
+            deals_found = []
+            
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    new_path = f"{current_path}.{key}" if current_path else key
+                    
+                    # Check if this is a deal with stage information
+                    if key == 'stage' and isinstance(value, str):
+                        for target_stage in target_stages:
+                            if target_stage.lower() in value.lower():
+                                deals_found.append(f"{period_name}: Deal with {value} stage found at {current_path}")
+                    
+                    # Recursive search
+                    if isinstance(value, (dict, list)):
+                        deals_found.extend(find_deals_by_stage(value, target_stages, new_path))
+                        
+            elif isinstance(obj, list):
+                for i, item in enumerate(obj):
+                    deals_found.extend(find_deals_by_stage(item, target_stages, f"{current_path}[{i}]"))
+            
+            return deals_found
+        
+        # Search for Proposal sent and Legals deals
+        target_stages = ['proposal sent', 'legals', 'c proposal sent', 'b legals']
+        deals_found = find_deals_by_stage(data, target_stages)
+        
+        for deal in deals_found:
+            if 'proposal' in deal.lower():
+                analysis['proposal_sent_deals'].append(deal)
+            if 'legals' in deal.lower():
+                analysis['legals_deals'].append(deal)
+    
+    return analysis
+
 def main():
     """Main testing function for meeting generation targets correction verification"""
     print(f"🚀 Starting Meeting Generation Targets Correction Testing")
