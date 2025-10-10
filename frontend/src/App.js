@@ -213,9 +213,13 @@ function FileUpload({ onUploadSuccess }) {
   );
 }
 
-function MetricCard({ title, value, target, unit = '', trend, icon: Icon, color = 'blue' }) {
+function MetricCard({ title, value, target, unit = '', trend, icon: Icon, color = 'blue', statusBadge }) {
   const percentage = target ? (value / target * 100) : 0;
   const isOnTrack = percentage >= 90;
+  
+  // Use custom statusBadge if provided, otherwise default logic
+  const displayBadge = statusBadge || (isOnTrack ? 'On Track' : 'Needs Attention');
+  const badgeVariant = displayBadge === 'On Track' ? 'default' : 'secondary';
   
   return (
     <Card>
@@ -243,11 +247,13 @@ function MetricCard({ title, value, target, unit = '', trend, icon: Icon, color 
               </div>
               <Progress value={percentage} className="h-2" />
               <div className="flex justify-between text-xs">
-                <span className={isOnTrack ? 'text-green-600' : 'text-orange-600'}>
+                <span className={percentage >= 80 ? 'text-green-600' : percentage >= 60 ? 'text-orange-600' : 'text-red-600'}>
                   {percentage.toFixed(1)}% of target
                 </span>
-                <Badge variant={isOnTrack ? 'default' : 'secondary'}>
-                  {isOnTrack ? 'On Track' : 'Needs Attention'}
+                <Badge variant={badgeVariant} className={
+                  displayBadge === 'On Track' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
+                }>
+                  {displayBadge}
                 </Badge>
               </div>
             </>
