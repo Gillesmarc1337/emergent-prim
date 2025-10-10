@@ -3106,6 +3106,276 @@ def test_dashboard_analytics_structure():
     
     return success
 
+def test_legals_proposal_pipeline_values():
+    """Test Legals + Proposal Sent pipeline values calculation and upcoming POA dates"""
+    print(f"\n{'='*80}")
+    print(f"🎯 TESTING LEGALS + PROPOSAL SENT PIPELINE VALUES & UPCOMING POA DATES")
+    print(f"{'='*80}")
+    
+    test_results = {
+        'monthly_closing_projections': False,
+        'hot_deals_legals': False,
+        'hot_leads_proposal': False,
+        'upcoming_poa_dates': False,
+        'pipeline_calculation': False
+    }
+    
+    # Test 1: GET /api/analytics/monthly - Check closing_projections data
+    print(f"\n📊 Test 1: GET /api/analytics/monthly - Closing Projections Analysis")
+    print(f"{'='*60}")
+    
+    monthly_data = test_api_endpoint("/analytics/monthly")
+    if monthly_data and 'closing_projections' in monthly_data:
+        closing_proj = monthly_data['closing_projections']
+        print(f"✅ closing_projections found in monthly analytics")
+        
+        # Analyze current_month deals for B Legals and C Proposal sent
+        legals_deals = []
+        proposal_deals = []
+        total_legals_pipeline = 0
+        total_proposal_pipeline = 0
+        
+        if 'current_month' in closing_proj and 'deals' in closing_proj['current_month']:
+            deals = closing_proj['current_month']['deals']
+            print(f"📋 Found {len(deals)} deals in current_month closing_projections")
+            
+            for deal in deals:
+                stage = deal.get('stage', '')
+                pipeline = deal.get('pipeline', 0)
+                client = deal.get('client', 'Unknown')
+                
+                if stage == 'B Legals':
+                    legals_deals.append(deal)
+                    total_legals_pipeline += pipeline
+                elif stage == 'C Proposal sent':
+                    proposal_deals.append(deal)
+                    total_proposal_pipeline += pipeline
+            
+            print(f"\n🔍 Stage Analysis:")
+            print(f"  📊 B Legals deals: {len(legals_deals)} deals, Total pipeline: ${total_legals_pipeline:,.2f}")
+            print(f"  📊 C Proposal sent deals: {len(proposal_deals)} deals, Total pipeline: ${total_proposal_pipeline:,.2f}")
+            
+            # Calculate combined Legals + Proposal pipeline
+            combined_pipeline = total_legals_pipeline + total_proposal_pipeline
+            print(f"  🎯 Combined Legals + Proposal pipeline: ${combined_pipeline:,.2f}")
+            
+            # Compare with the reported $8,966,400
+            reported_value = 8966400
+            print(f"  📈 Reported value in UI: ${reported_value:,.2f}")
+            print(f"  🔍 Difference: ${abs(combined_pipeline - reported_value):,.2f}")
+            
+            if abs(combined_pipeline - reported_value) < 1000:  # Allow small rounding differences
+                print(f"  ✅ Pipeline calculation matches reported value")
+                test_results['pipeline_calculation'] = True
+            else:
+                print(f"  ❌ Pipeline calculation does NOT match reported value")
+                print(f"     This suggests the UI may be using a different data source or calculation")
+            
+            test_results['monthly_closing_projections'] = True
+        else:
+            print(f"❌ current_month deals not found in closing_projections")
+    else:
+        print(f"❌ closing_projections not found in monthly analytics")
+    
+    # Test 2: GET /api/projections/hot-deals - Check B Legals pipeline values
+    print(f"\n📊 Test 2: GET /api/projections/hot-deals - B Legals Pipeline Values")
+    print(f"{'='*60}")
+    
+    hot_deals_data = test_api_endpoint("/projections/hot-deals")
+    if hot_deals_data and isinstance(hot_deals_data, list):
+        print(f"✅ Hot deals endpoint returned {len(hot_deals_data)} deals")
+        
+        hot_deals_pipeline = 0
+        hot_deals_legals_count = 0
+        
+        for deal in hot_deals_data:
+            stage = deal.get('stage', '')
+            pipeline = deal.get('pipeline', 0)
+            client = deal.get('client', 'Unknown')
+            
+            if stage == 'B Legals':
+                hot_deals_legals_count += 1
+                hot_deals_pipeline += pipeline
+                print(f"  📊 {client}: ${pipeline:,.2f} (Stage: {stage})")
+        
+        print(f"\n🔍 Hot Deals Analysis:")
+        print(f"  📊 B Legals deals in hot-deals: {hot_deals_legals_count}")
+        print(f"  💰 Total B Legals pipeline from hot-deals: ${hot_deals_pipeline:,.2f}")
+        
+        test_results['hot_deals_legals'] = True
+    else:
+        print(f"❌ Failed to get hot deals data or invalid format")
+    
+    # Test 3: GET /api/projections/hot-leads - Check C Proposal sent pipeline values
+    print(f"\n📊 Test 3: GET /api/projections/hot-leads - C Proposal sent Pipeline Values")
+    print(f"{'='*60}")
+    
+    hot_leads_data = test_api_endpoint("/projections/hot-leads")
+    if hot_leads_data and isinstance(hot_leads_data, list):
+        print(f"✅ Hot leads endpoint returned {len(hot_leads_data)} deals")
+        
+        hot_leads_proposal_pipeline = 0
+        hot_leads_proposal_count = 0
+        hot_leads_poa_pipeline = 0
+        hot_leads_poa_count = 0
+        
+        for deal in hot_leads_data:
+            stage = deal.get('stage', '')
+            pipeline = deal.get('pipeline', 0)
+            client = deal.get('client', 'Unknown')
+            
+            if stage == 'C Proposal sent':
+                hot_leads_proposal_count += 1
+                hot_leads_proposal_pipeline += pipeline
+                print(f"  📊 {client}: ${pipeline:,.2f} (Stage: {stage})")
+            elif stage == 'D POA Booked':
+                hot_leads_poa_count += 1
+                hot_leads_poa_pipeline += pipeline
+        
+        print(f"\n🔍 Hot Leads Analysis:")
+        print(f"  📊 C Proposal sent deals: {hot_leads_proposal_count}, Pipeline: ${hot_leads_proposal_pipeline:,.2f}")
+        print(f"  📊 D POA Booked deals: {hot_leads_poa_count}, Pipeline: ${hot_leads_poa_pipeline:,.2f}")
+        print(f"  💰 Total hot leads pipeline: ${hot_leads_proposal_pipeline + hot_leads_poa_pipeline:,.2f}")
+        
+        test_results['hot_leads_proposal'] = True
+    else:
+        print(f"❌ Failed to get hot leads data or invalid format")
+    
+    # Test 4: Check for upcoming POA dates
+    print(f"\n📊 Test 4: Upcoming High-Priority Meetings (POA Dates)")
+    print(f"{'='*60}")
+    
+    from datetime import datetime, timedelta
+    today = datetime.now()
+    upcoming_meetings = []
+    
+    # Check hot leads for upcoming POA dates
+    if hot_leads_data:
+        for deal in hot_leads_data:
+            poa_date = deal.get('poa_date')
+            client = deal.get('client', 'Unknown')
+            stage = deal.get('stage', '')
+            
+            if poa_date:
+                try:
+                    # Parse POA date (handle different formats)
+                    if isinstance(poa_date, str):
+                        poa_datetime = datetime.fromisoformat(poa_date.replace('Z', '+00:00'))
+                    else:
+                        poa_datetime = poa_date
+                    
+                    # Check if POA date is in the future (upcoming)
+                    if poa_datetime > today:
+                        days_until = (poa_datetime - today).days
+                        upcoming_meetings.append({
+                            'client': client,
+                            'poa_date': poa_datetime.strftime('%Y-%m-%d'),
+                            'days_until': days_until,
+                            'stage': stage,
+                            'pipeline': deal.get('pipeline', 0)
+                        })
+                except Exception as e:
+                    print(f"  ⚠️  Error parsing POA date for {client}: {e}")
+    
+    # Also check monthly analytics for discovery dates after today
+    if monthly_data and 'closing_projections' in monthly_data:
+        closing_proj = monthly_data['closing_projections']
+        if 'current_month' in closing_proj and 'deals' in closing_proj['current_month']:
+            for deal in closing_proj['current_month']['deals']:
+                # Note: discovery_date would be in the past, but we're looking for any future meeting dates
+                # This is more for completeness as POA dates are the main focus
+                pass
+    
+    print(f"🔍 Upcoming POA Meetings Analysis:")
+    if upcoming_meetings:
+        print(f"  ✅ Found {len(upcoming_meetings)} upcoming POA meetings:")
+        
+        # Sort by days until meeting
+        upcoming_meetings.sort(key=lambda x: x['days_until'])
+        
+        for meeting in upcoming_meetings[:10]:  # Show first 10
+            print(f"    📅 {meeting['client']}: {meeting['poa_date']} ({meeting['days_until']} days) - ${meeting['pipeline']:,.0f}")
+        
+        if len(upcoming_meetings) > 10:
+            print(f"    ... and {len(upcoming_meetings) - 10} more meetings")
+        
+        test_results['upcoming_poa_dates'] = True
+    else:
+        print(f"  ⚠️  No upcoming POA meetings found in the data")
+        print(f"     This could mean:")
+        print(f"     - All POA dates are in the past")
+        print(f"     - POA dates are not properly set in the data")
+        print(f"     - The data format is different than expected")
+    
+    # Test 5: Cross-reference pipeline calculations
+    print(f"\n📊 Test 5: Cross-Reference Pipeline Calculations")
+    print(f"{'='*60}")
+    
+    print(f"🔍 Pipeline Value Comparison:")
+    print(f"  📊 From monthly closing_projections:")
+    print(f"     - B Legals: ${total_legals_pipeline:,.2f}")
+    print(f"     - C Proposal sent: ${total_proposal_pipeline:,.2f}")
+    print(f"     - Combined: ${total_legals_pipeline + total_proposal_pipeline:,.2f}")
+    
+    if 'hot_deals_pipeline' in locals():
+        print(f"  📊 From hot-deals endpoint:")
+        print(f"     - B Legals: ${hot_deals_pipeline:,.2f}")
+    
+    if 'hot_leads_proposal_pipeline' in locals():
+        print(f"  📊 From hot-leads endpoint:")
+        print(f"     - C Proposal sent: ${hot_leads_proposal_pipeline:,.2f}")
+    
+    # Check for discrepancies
+    discrepancies = []
+    
+    if 'hot_deals_pipeline' in locals() and abs(total_legals_pipeline - hot_deals_pipeline) > 1000:
+        discrepancies.append(f"B Legals pipeline differs between endpoints: ${abs(total_legals_pipeline - hot_deals_pipeline):,.2f}")
+    
+    if 'hot_leads_proposal_pipeline' in locals() and abs(total_proposal_pipeline - hot_leads_proposal_pipeline) > 1000:
+        discrepancies.append(f"C Proposal sent pipeline differs between endpoints: ${abs(total_proposal_pipeline - hot_leads_proposal_pipeline):,.2f}")
+    
+    if discrepancies:
+        print(f"\n⚠️  Discrepancies found:")
+        for discrepancy in discrepancies:
+            print(f"    • {discrepancy}")
+    else:
+        print(f"\n✅ Pipeline values are consistent across endpoints")
+    
+    # Summary
+    print(f"\n{'='*60}")
+    print(f"📋 LEGALS + PROPOSAL PIPELINE TEST SUMMARY")
+    print(f"{'='*60}")
+    
+    total_tests = len(test_results)
+    passed_tests = sum(1 for result in test_results.values() if result)
+    
+    for test_name, result in test_results.items():
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"  {test_name}: {status}")
+    
+    print(f"\n📊 Overall Results: {passed_tests}/{total_tests} tests passed")
+    
+    # Key findings
+    print(f"\n🔍 KEY FINDINGS:")
+    if 'total_legals_pipeline' in locals() and 'total_proposal_pipeline' in locals():
+        combined = total_legals_pipeline + total_proposal_pipeline
+        print(f"  💰 Correct Legals + Proposal pipeline value: ${combined:,.2f}")
+        print(f"  📈 Current UI display: $8,966,400")
+        
+        if abs(combined - 8966400) > 1000:
+            print(f"  ⚠️  ISSUE: UI value differs from calculated value by ${abs(combined - 8966400):,.2f}")
+            print(f"     Recommendation: Check if UI is using different data source or calculation")
+        else:
+            print(f"  ✅ UI value matches calculated pipeline value")
+    
+    if upcoming_meetings:
+        print(f"  📅 Upcoming POA meetings: {len(upcoming_meetings)} meetings found")
+        print(f"     Next meeting: {upcoming_meetings[0]['client']} on {upcoming_meetings[0]['poa_date']}")
+    else:
+        print(f"  📅 No upcoming POA meetings found in current data")
+    
+    return passed_tests >= 3  # At least 3 out of 5 tests should pass for success
+
 def main():
     """Run all backend tests with priority on pipeline data Excel matching"""
     print(f"🚀 Starting Backend API Testing")
