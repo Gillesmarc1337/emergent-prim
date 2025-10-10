@@ -1155,16 +1155,255 @@ def test_dashboard_blocks_and_deals_closed():
     
     return passed_tests == total_tests
 
+def test_meeting_targets_correction():
+    """Test meeting targets correction for 50 per month across all analytics endpoints"""
+    print(f"\n{'='*80}")
+    print(f"🎯 TESTING MEETING TARGETS CORRECTION (50 PER MONTH)")
+    print(f"{'='*80}")
+    
+    test_results = {
+        'monthly_targets': False,
+        'yearly_targets': False,
+        'custom_targets': False
+    }
+    
+    # Expected targets per month: 22 inbound + 17 outbound + 11 referral = 50 total
+    expected_monthly_targets = {
+        'total_target': 50,
+        'inbound_target': 22,
+        'outbound_target': 17,
+        'referral_target': 11
+    }
+    
+    # Test 1: GET /api/analytics/monthly - Verify meeting targets are 50 total
+    print(f"\n📊 Test 1: GET /api/analytics/monthly - Monthly Meeting Targets")
+    print(f"{'='*60}")
+    
+    monthly_data = test_api_endpoint("/analytics/monthly")
+    if monthly_data and 'dashboard_blocks' in monthly_data:
+        blocks = monthly_data['dashboard_blocks']
+        
+        if 'block_1_meetings' in blocks:
+            block1 = blocks['block_1_meetings']
+            print(f"✅ block_1_meetings found in monthly analytics")
+            
+            # Verify targets
+            success = True
+            for target_key, expected_value in expected_monthly_targets.items():
+                actual_value = block1.get(target_key, 'NOT FOUND')
+                if actual_value == expected_value:
+                    print(f"  ✅ {target_key}: {actual_value} (matches expected {expected_value})")
+                else:
+                    print(f"  ❌ {target_key}: {actual_value} (expected {expected_value})")
+                    success = False
+            
+            # Verify math adds up correctly (22+17+11=50)
+            inbound = block1.get('inbound_target', 0)
+            outbound = block1.get('outbound_target', 0)
+            referral = block1.get('referral_target', 0)
+            total = block1.get('total_target', 0)
+            calculated_total = inbound + outbound + referral
+            
+            if calculated_total == 50 and total == 50:
+                print(f"  ✅ Math verification: {inbound}+{outbound}+{referral}={calculated_total} (matches total_target={total})")
+            else:
+                print(f"  ❌ Math verification: {inbound}+{outbound}+{referral}={calculated_total} (total_target={total}, expected 50)")
+                success = False
+            
+            test_results['monthly_targets'] = success
+        else:
+            print(f"❌ block_1_meetings not found in monthly analytics")
+    else:
+        print(f"❌ Failed to get monthly analytics or dashboard_blocks missing")
+    
+    # Test 2: GET /api/analytics/yearly - Verify July-Dec targets (6 months * 50 = 300)
+    print(f"\n📊 Test 2: GET /api/analytics/yearly - July-December Meeting Targets")
+    print(f"{'='*60}")
+    
+    yearly_data = test_api_endpoint("/analytics/yearly?year=2025")
+    if yearly_data and 'dashboard_blocks' in yearly_data:
+        blocks = yearly_data['dashboard_blocks']
+        
+        if 'block_1_meetings' in blocks:
+            block1 = blocks['block_1_meetings']
+            print(f"✅ block_1_meetings found in yearly analytics")
+            
+            # For July-Dec period (6 months), targets should be 6x monthly targets
+            expected_july_dec_targets = {
+                'total_target': 50 * 6,  # 300
+                'inbound_target': 22 * 6,  # 132
+                'outbound_target': 17 * 6,  # 102
+                'referral_target': 11 * 6   # 66
+            }
+            
+            success = True
+            for target_key, expected_value in expected_july_dec_targets.items():
+                actual_value = block1.get(target_key, 'NOT FOUND')
+                if actual_value == expected_value:
+                    print(f"  ✅ {target_key}: {actual_value} (matches expected {expected_value} for 6 months)")
+                else:
+                    print(f"  ❌ {target_key}: {actual_value} (expected {expected_value} for 6 months)")
+                    success = False
+            
+            # Verify math for July-Dec period
+            inbound = block1.get('inbound_target', 0)
+            outbound = block1.get('outbound_target', 0)
+            referral = block1.get('referral_target', 0)
+            total = block1.get('total_target', 0)
+            calculated_total = inbound + outbound + referral
+            
+            if calculated_total == 300 and total == 300:
+                print(f"  ✅ July-Dec math verification: {inbound}+{outbound}+{referral}={calculated_total} (matches total_target={total})")
+            else:
+                print(f"  ❌ July-Dec math verification: {inbound}+{outbound}+{referral}={calculated_total} (total_target={total}, expected 300)")
+                success = False
+            
+            # Verify period is correctly labeled
+            period = block1.get('period', 'NOT FOUND')
+            if 'Jul-Dec 2025' in str(period):
+                print(f"  ✅ Period correctly labeled: {period}")
+            else:
+                print(f"  ⚠️  Period label: {period} (expected to contain 'Jul-Dec 2025')")
+            
+            test_results['yearly_targets'] = success
+        else:
+            print(f"❌ block_1_meetings not found in yearly analytics")
+    else:
+        print(f"❌ Failed to get yearly analytics or dashboard_blocks missing")
+    
+    # Test 3: GET /api/analytics/custom - Verify dynamic targets multiply correctly
+    print(f"\n📊 Test 3: GET /api/analytics/custom - Dynamic Target Multiplication")
+    print(f"{'='*60}")
+    
+    # Test 3a: 2-month period (should be 2x50 = 100 total)
+    print(f"\n📅 Test 3a: 2-month custom period (Oct-Nov 2025)")
+    custom_2m_data = test_api_endpoint("/analytics/custom?start_date=2025-10-01&end_date=2025-11-30")
+    
+    success_2m = False
+    if custom_2m_data and 'dashboard_blocks' in custom_2m_data:
+        blocks = custom_2m_data['dashboard_blocks']
+        
+        if 'block_1_meetings' in blocks:
+            block1 = blocks['block_1_meetings']
+            print(f"✅ block_1_meetings found in 2-month custom analytics")
+            
+            # For 2-month period, targets should be 2x monthly targets
+            expected_2m_targets = {
+                'total_target': 50 * 2,  # 100
+                'inbound_target': 22 * 2,  # 44
+                'outbound_target': 17 * 2,  # 34
+                'referral_target': 11 * 2   # 22
+            }
+            
+            success_2m = True
+            for target_key, expected_value in expected_2m_targets.items():
+                actual_value = block1.get(target_key, 'NOT FOUND')
+                if actual_value == expected_value:
+                    print(f"    ✅ {target_key}: {actual_value} (matches expected {expected_value} for 2 months)")
+                else:
+                    print(f"    ❌ {target_key}: {actual_value} (expected {expected_value} for 2 months)")
+                    success_2m = False
+            
+            # Verify math for 2-month period
+            inbound = block1.get('inbound_target', 0)
+            outbound = block1.get('outbound_target', 0)
+            referral = block1.get('referral_target', 0)
+            total = block1.get('total_target', 0)
+            calculated_total = inbound + outbound + referral
+            
+            if calculated_total == 100 and total == 100:
+                print(f"    ✅ 2-month math verification: {inbound}+{outbound}+{referral}={calculated_total} (matches total_target={total})")
+            else:
+                print(f"    ❌ 2-month math verification: {inbound}+{outbound}+{referral}={calculated_total} (total_target={total}, expected 100)")
+                success_2m = False
+        else:
+            print(f"❌ block_1_meetings not found in 2-month custom analytics")
+    else:
+        print(f"❌ Failed to get 2-month custom analytics or dashboard_blocks missing")
+    
+    # Test 3b: 3-month period (should be 3x50 = 150 total)
+    print(f"\n📅 Test 3b: 3-month custom period (Oct-Dec 2025)")
+    custom_3m_data = test_api_endpoint("/analytics/custom?start_date=2025-10-01&end_date=2025-12-31")
+    
+    success_3m = False
+    if custom_3m_data and 'dashboard_blocks' in custom_3m_data:
+        blocks = custom_3m_data['dashboard_blocks']
+        
+        if 'block_1_meetings' in blocks:
+            block1 = blocks['block_1_meetings']
+            print(f"✅ block_1_meetings found in 3-month custom analytics")
+            
+            # For 3-month period, targets should be 3x monthly targets
+            expected_3m_targets = {
+                'total_target': 50 * 3,  # 150
+                'inbound_target': 22 * 3,  # 66
+                'outbound_target': 17 * 3,  # 51
+                'referral_target': 11 * 3   # 33
+            }
+            
+            success_3m = True
+            for target_key, expected_value in expected_3m_targets.items():
+                actual_value = block1.get(target_key, 'NOT FOUND')
+                if actual_value == expected_value:
+                    print(f"    ✅ {target_key}: {actual_value} (matches expected {expected_value} for 3 months)")
+                else:
+                    print(f"    ❌ {target_key}: {actual_value} (expected {expected_value} for 3 months)")
+                    success_3m = False
+            
+            # Verify math for 3-month period
+            inbound = block1.get('inbound_target', 0)
+            outbound = block1.get('outbound_target', 0)
+            referral = block1.get('referral_target', 0)
+            total = block1.get('total_target', 0)
+            calculated_total = inbound + outbound + referral
+            
+            if calculated_total == 150 and total == 150:
+                print(f"    ✅ 3-month math verification: {inbound}+{outbound}+{referral}={calculated_total} (matches total_target={total})")
+            else:
+                print(f"    ❌ 3-month math verification: {inbound}+{outbound}+{referral}={calculated_total} (total_target={total}, expected 150)")
+                success_3m = False
+        else:
+            print(f"❌ block_1_meetings not found in 3-month custom analytics")
+    else:
+        print(f"❌ Failed to get 3-month custom analytics or dashboard_blocks missing")
+    
+    test_results['custom_targets'] = success_2m and success_3m
+    
+    # Summary
+    print(f"\n{'='*60}")
+    print(f"📋 MEETING TARGETS CORRECTION TEST SUMMARY")
+    print(f"{'='*60}")
+    
+    total_tests = len(test_results)
+    passed_tests = sum(1 for result in test_results.values() if result)
+    
+    for test_name, result in test_results.items():
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"  {test_name}: {status}")
+    
+    print(f"\n📊 Overall Results: {passed_tests}/{total_tests} tests passed")
+    
+    if passed_tests == total_tests:
+        print(f"\n🎉 SUCCESS: All meeting targets are correctly set to 50 per month base!")
+        print(f"   ✅ Monthly: 22 inbound + 17 outbound + 11 referral = 50 total")
+        print(f"   ✅ Yearly (July-Dec): 6 months × 50 = 300 total")
+        print(f"   ✅ Custom periods: Correctly multiply base 50 per month")
+    else:
+        print(f"\n❌ ISSUES FOUND: Some meeting targets are not correctly configured")
+        print(f"   Please check the backend implementation for target calculations")
+    
+    return passed_tests == total_tests
+
 def main():
-    """Main testing function for dashboard blocks and deals_closed verification"""
-    print(f"🚀 Starting Dashboard Blocks and Deals_Closed Testing")
+    """Main testing function for meeting targets correction verification"""
+    print(f"🚀 Starting Meeting Targets Correction Testing")
     print(f"Base URL: {BASE_URL}")
     print(f"Test Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     # Track test results
     test_results = {
         'connectivity': False,
-        'dashboard_blocks_deals_closed': False
+        'meeting_targets': False
     }
     
     # Test 1: Basic connectivity
@@ -1174,8 +1413,8 @@ def main():
         print(f"❌ Cannot proceed without API connectivity")
         return 1
     
-    # Test 2: Dashboard blocks and deals_closed structure verification
-    test_results['dashboard_blocks_deals_closed'] = test_dashboard_blocks_and_deals_closed()
+    # Test 2: Meeting targets correction verification
+    test_results['meeting_targets'] = test_meeting_targets_correction()
     
     # Summary
     print(f"\n{'='*60}")
