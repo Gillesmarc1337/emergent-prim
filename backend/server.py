@@ -1598,7 +1598,7 @@ async def get_custom_analytics(
         period_duration_months = max(1, round(period_duration_days / 30))
         
         # Base monthly targets
-        base_meetings_target = 45  # Total monthly meetings target
+        base_meetings_target = 50  # Total monthly meetings target
         base_intro_target = 45     # Monthly intro target  
         base_poa_target = 18       # Monthly POA target
         base_pipe_target = 2000000 # Monthly pipe target ($2M)
