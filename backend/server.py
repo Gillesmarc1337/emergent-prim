@@ -1118,7 +1118,7 @@ async def get_yearly_analytics(year: int = 2025):
         
         # Calculate target pipe created for the period
         monthly_pipe_target = 2000000  # $2M per month
-        target_pipe_july_dec = monthly_pipe_target * months_elapsed
+        target_pipe_july_dec = monthly_pipe_target * months_in_july_dec_period
         
         # Calculate weighted pipe properly for July-Dec period
         stage_probabilities = {
