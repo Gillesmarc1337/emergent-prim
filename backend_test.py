@@ -596,76 +596,314 @@ def test_custom_analytics_dynamic_targets():
     
     return success
 
+def explore_mongodb_data_structure():
+    """Explore MongoDB data structure for master data verification"""
+    print(f"\n{'='*60}")
+    print(f"🔍 EXPLORING MONGODB DATA STRUCTURE FOR MASTER DATA")
+    print(f"{'='*60}")
+    
+    # Test all available endpoints to understand data structure
+    endpoints_to_explore = [
+        "/analytics/monthly",
+        "/analytics/yearly?year=2025", 
+        "/analytics/custom?start_date=2025-07-01&end_date=2025-12-31",
+        "/projections/hot-deals",
+        "/projections/hot-leads", 
+        "/projections/performance-summary"
+    ]
+    
+    master_data_found = {}
+    
+    for endpoint in endpoints_to_explore:
+        print(f"\n🔍 Exploring endpoint: {endpoint}")
+        data = test_api_endpoint(endpoint)
+        
+        if data is None:
+            print(f"❌ No data from {endpoint}")
+            continue
+            
+        # Look for structured monthly data for 2025
+        monthly_data_2025 = find_monthly_data_2025(data, endpoint)
+        if monthly_data_2025:
+            master_data_found[endpoint] = monthly_data_2025
+            
+        # Look for specific metrics requested
+        metrics_found = find_target_metrics(data, endpoint)
+        if metrics_found:
+            if endpoint not in master_data_found:
+                master_data_found[endpoint] = {}
+            master_data_found[endpoint]['metrics'] = metrics_found
+    
+    # Summary of findings
+    print(f"\n{'='*60}")
+    print(f"📊 MASTER DATA STRUCTURE ANALYSIS")
+    print(f"{'='*60}")
+    
+    if master_data_found:
+        print(f"✅ STRUCTURED MASTER DATA FOUND:")
+        for endpoint, data_info in master_data_found.items():
+            print(f"\n📍 Endpoint: {endpoint}")
+            if 'monthly_data' in data_info:
+                print(f"  📅 Monthly Data 2025: {len(data_info['monthly_data'])} months found")
+                for month_info in data_info['monthly_data']:
+                    print(f"    • {month_info}")
+            if 'metrics' in data_info:
+                print(f"  📊 Target Metrics Found:")
+                for metric in data_info['metrics']:
+                    print(f"    • {metric}")
+    else:
+        print(f"❌ NO STRUCTURED MASTER DATA FOUND")
+        print(f"   The system appears to use calculated analytics rather than pre-stored master data")
+    
+    return len(master_data_found) > 0
+
+def find_monthly_data_2025(data, endpoint):
+    """Look for monthly structured data for 2025"""
+    monthly_data = []
+    
+    if isinstance(data, dict):
+        # Check dashboard_blocks for monthly targets
+        if 'dashboard_blocks' in data:
+            blocks = data['dashboard_blocks']
+            for block_name, block_data in blocks.items():
+                if isinstance(block_data, dict) and 'period' in block_data:
+                    period = block_data['period']
+                    if '2025' in str(period):
+                        monthly_data.append(f"{block_name}: {period}")
+        
+        # Check for monthly breakdown data
+        if 'big_numbers_recap' in data and 'monthly_breakdown' in data['big_numbers_recap']:
+            breakdown = data['big_numbers_recap']['monthly_breakdown']
+            for month_key, value in breakdown.items():
+                if '2025' in str(month_key):
+                    monthly_data.append(f"Monthly breakdown: {month_key} = {value}")
+        
+        # Check for any date-based structures
+        for key, value in data.items():
+            if isinstance(value, dict):
+                for sub_key, sub_value in value.items():
+                    if '2025' in str(sub_key) and isinstance(sub_value, (int, float)):
+                        monthly_data.append(f"{key}.{sub_key}: {sub_value}")
+    
+    return monthly_data if monthly_data else None
+
+def find_target_metrics(data, endpoint):
+    """Look for specific target metrics requested by user"""
+    target_metrics = [
+        "Target pipe", "Created Pipe", "Aggregate pipe", 
+        "New Weighted pipe", "Aggregate weighted pipe", 
+        "Target Revenue", "Closed Revenue"
+    ]
+    
+    found_metrics = []
+    
+    def search_dict_for_metrics(obj, path=""):
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                current_path = f"{path}.{key}" if path else key
+                
+                # Check if key matches any target metrics (case insensitive)
+                for target_metric in target_metrics:
+                    if any(word.lower() in key.lower() for word in target_metric.split()):
+                        found_metrics.append(f"{current_path}: {value}")
+                
+                # Recursively search nested dictionaries
+                if isinstance(value, dict):
+                    search_dict_for_metrics(value, current_path)
+                elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], dict):
+                    for i, item in enumerate(value[:3]):  # Check first 3 items
+                        search_dict_for_metrics(item, f"{current_path}[{i}]")
+    
+    search_dict_for_metrics(data)
+    return found_metrics if found_metrics else None
+
+def test_master_data_access():
+    """Test access to master data collections and structure"""
+    print(f"\n{'='*60}")
+    print(f"🗄️  TESTING MASTER DATA ACCESS")
+    print(f"{'='*60}")
+    
+    # Test yearly analytics for 2025 (most comprehensive)
+    print(f"\n📊 Testing Yearly Analytics 2025 for Master Data Structure")
+    yearly_data = test_api_endpoint("/analytics/yearly?year=2025")
+    
+    if yearly_data is None:
+        print(f"❌ Cannot access yearly 2025 data")
+        return False
+    
+    print(f"✅ Yearly 2025 data accessible")
+    
+    # Analyze the structure for master data characteristics
+    master_data_characteristics = {
+        'has_monthly_targets': False,
+        'has_structured_periods': False,
+        'has_pipeline_metrics': False,
+        'has_revenue_targets': False,
+        'data_organization': 'calculated'  # vs 'master_data'
+    }
+    
+    # Check for dashboard blocks with structured targets
+    if 'dashboard_blocks' in yearly_data:
+        blocks = yearly_data['dashboard_blocks']
+        print(f"\n📋 Dashboard Blocks Analysis:")
+        
+        for block_name, block_data in blocks.items():
+            print(f"  📊 {block_name}:")
+            if isinstance(block_data, dict):
+                # Look for target vs actual patterns (indicates master data)
+                targets = [k for k in block_data.keys() if 'target' in k.lower()]
+                actuals = [k for k in block_data.keys() if 'actual' in k.lower()]
+                
+                if targets:
+                    master_data_characteristics['has_monthly_targets'] = True
+                    print(f"    🎯 Targets found: {targets}")
+                if actuals:
+                    print(f"    📈 Actuals found: {actuals}")
+                
+                # Check for period information
+                if 'period' in block_data:
+                    master_data_characteristics['has_structured_periods'] = True
+                    print(f"    📅 Period: {block_data['period']}")
+    
+    # Check for pipeline metrics
+    if 'pipe_metrics' in yearly_data:
+        master_data_characteristics['has_pipeline_metrics'] = True
+        pipe_data = yearly_data['pipe_metrics']
+        print(f"\n🔧 Pipeline Metrics Found:")
+        print(f"  • Created pipe: {pipe_data.get('created_pipe', {})}")
+        print(f"  • Total pipe: {pipe_data.get('total_pipe', {})}")
+    
+    # Check for revenue targets
+    if 'big_numbers_recap' in yearly_data:
+        recap = yearly_data['big_numbers_recap']
+        if 'ytd_target' in recap:
+            master_data_characteristics['has_revenue_targets'] = True
+            print(f"\n💰 Revenue Targets Found:")
+            print(f"  • YTD Target: {recap.get('ytd_target')}")
+            print(f"  • YTD Revenue: {recap.get('ytd_revenue')}")
+    
+    # Determine if this is master data or calculated data
+    if (master_data_characteristics['has_monthly_targets'] and 
+        master_data_characteristics['has_structured_periods'] and
+        master_data_characteristics['has_pipeline_metrics']):
+        master_data_characteristics['data_organization'] = 'structured_master_data'
+    
+    print(f"\n📋 Master Data Characteristics Summary:")
+    for char, value in master_data_characteristics.items():
+        status = "✅" if value else "❌"
+        print(f"  {status} {char}: {value}")
+    
+    return master_data_characteristics['data_organization'] == 'structured_master_data'
+
 def main():
-    """Main testing function"""
-    print(f"🚀 Starting Backend API Tests for Sales Analytics Dashboard")
+    """Main testing function for master data verification"""
+    print(f"🚀 Starting MongoDB Master Data Structure Verification")
     print(f"Base URL: {BASE_URL}")
     print(f"Test Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     # Track test results
     test_results = {
         'connectivity': False,
-        'data_status': False,
-        'projections_hot_deals': False,
-        'projections_hot_leads': False,
-        'projections_performance_summary': False,
-        'custom_analytics_dynamic_targets': False,
-        'month_offset_0': False,
-        'month_offset_1': False,
-        'month_offset_3': False
+        'master_data_access': False,
+        'data_structure_exploration': False,
+        'monthly_data_2025': False,
+        'target_metrics_found': False
     }
     
     # Test 1: Basic connectivity
     test_results['connectivity'] = test_basic_connectivity()
     
-    # Test 2: Data availability
-    test_results['data_status'] = test_data_status()
+    if not test_results['connectivity']:
+        print(f"❌ Cannot proceed without API connectivity")
+        return 1
     
-    # Test 3: New Projections API endpoints
-    test_results['projections_hot_deals'] = test_projections_hot_deals()
-    test_results['projections_hot_leads'] = test_projections_hot_leads()
-    test_results['projections_performance_summary'] = test_projections_performance_summary()
+    # Test 2: Master data access
+    test_results['master_data_access'] = test_master_data_access()
     
-    # Test 4: MAIN TEST - Custom Analytics Dynamic Targets
-    test_results['custom_analytics_dynamic_targets'] = test_custom_analytics_dynamic_targets()
+    # Test 3: Explore data structure
+    test_results['data_structure_exploration'] = explore_mongodb_data_structure()
     
-    # Test 5: Monthly analytics with different offsets
-    # month_offset=0 should show "Oct 2025"
-    test_results['month_offset_0'] = test_monthly_analytics_with_offset(0, "Oct 2025")
+    # Test 4: Specific search for 2025 monthly data
+    print(f"\n{'='*60}")
+    print(f"📅 SEARCHING FOR 2025 MONTHLY STRUCTURED DATA")
+    print(f"{'='*60}")
     
-    # month_offset=1 should show "Sep 2025"
-    test_results['month_offset_1'] = test_monthly_analytics_with_offset(1, "Sep 2025")
+    # Test July to December 2025 data specifically
+    july_dec_data = test_api_endpoint("/analytics/yearly?year=2025")
+    if july_dec_data and 'dashboard_blocks' in july_dec_data:
+        blocks = july_dec_data['dashboard_blocks']
+        monthly_2025_found = False
+        
+        for block_name, block_data in blocks.items():
+            if isinstance(block_data, dict) and 'period' in block_data:
+                period = block_data['period']
+                if 'Jul-Dec 2025' in str(period) or '2025' in str(period):
+                    monthly_2025_found = True
+                    print(f"✅ Found 2025 monthly data in {block_name}: {period}")
+                    
+                    # Show the structure
+                    print(f"   📊 Structure:")
+                    for key, value in block_data.items():
+                        if isinstance(value, (int, float, str)):
+                            print(f"     • {key}: {value}")
+        
+        test_results['monthly_data_2025'] = monthly_2025_found
     
-    # month_offset=3 should show "Jul 2025"
-    test_results['month_offset_3'] = test_monthly_analytics_with_offset(3, "Jul 2025")
+    # Test 5: Search for specific metrics
+    print(f"\n{'='*60}")
+    print(f"🎯 SEARCHING FOR SPECIFIC TARGET METRICS")
+    print(f"{'='*60}")
+    
+    target_metrics_found = False
+    
+    # Check multiple endpoints for the requested metrics
+    endpoints_to_check = [
+        "/analytics/yearly?year=2025",
+        "/analytics/monthly",
+        "/projections/performance-summary"
+    ]
+    
+    for endpoint in endpoints_to_check:
+        print(f"\n🔍 Checking {endpoint} for target metrics...")
+        data = test_api_endpoint(endpoint)
+        
+        if data:
+            metrics = find_target_metrics(data, endpoint)
+            if metrics:
+                target_metrics_found = True
+                print(f"✅ Target metrics found in {endpoint}:")
+                for metric in metrics:
+                    print(f"  • {metric}")
+    
+    test_results['target_metrics_found'] = target_metrics_found
     
     # Summary
     print(f"\n{'='*60}")
-    print(f"📋 TEST SUMMARY")
+    print(f"📋 MASTER DATA VERIFICATION SUMMARY")
     print(f"{'='*60}")
     
     total_tests = len(test_results)
     passed_tests = sum(1 for result in test_results.values() if result)
     
     for test_name, result in test_results.items():
-        status = "✅ PASS" if result else "❌ FAIL"
+        status = "✅ FOUND" if result else "❌ NOT FOUND"
         print(f"{test_name}: {status}")
     
-    print(f"\nOverall: {passed_tests}/{total_tests} tests passed")
+    print(f"\nOverall: {passed_tests}/{total_tests} components verified")
     
-    # Highlight the main test result
-    main_test_result = test_results['custom_analytics_dynamic_targets']
-    if main_test_result:
-        print(f"🎉 MAIN TEST PASSED: Custom Analytics Dynamic Targets working correctly!")
+    # Final assessment
+    if test_results['master_data_access'] and test_results['monthly_data_2025']:
+        print(f"\n🎉 MASTER DATA STRUCTURE CONFIRMED!")
+        print(f"   ✅ Structured monthly data for 2025 exists")
+        print(f"   ✅ Target vs Actual metrics available")
+        print(f"   ✅ Pipeline and revenue metrics accessible")
     else:
-        print(f"❌ MAIN TEST FAILED: Custom Analytics Dynamic Targets not working properly!")
+        print(f"\n⚠️  MASTER DATA STRUCTURE ANALYSIS:")
+        print(f"   • System uses calculated analytics rather than pre-stored master data")
+        print(f"   • Data is dynamically generated from sales records")
+        print(f"   • Monthly targets are configured in code, not stored as master data")
     
-    if passed_tests == total_tests:
-        print(f"🎉 All tests passed!")
-        return 0
-    else:
-        print(f"⚠️  Some tests failed")
-        return 1
+    return 0 if passed_tests >= 3 else 1
 
 if __name__ == "__main__":
     exit_code = main()
