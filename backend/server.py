@@ -762,24 +762,19 @@ def calculate_pipe_metrics(df, start_date, end_date):
     }
 
 def calculate_closing_projections(df):
-    """Calculate closing projections"""
-    today = datetime.now()
-    next_7_days = today + timedelta(days=7)
-    end_of_month = (today.replace(day=1) + timedelta(days=32)).replace(day=1) - timedelta(days=1)
-    end_of_quarter = today.replace(month=((today.month - 1) // 3 + 1) * 3, day=31)
+    """Calculate closing projections with Excel-exact weighted pipeline logic"""
     
-    # Probability mapping based on stage
+    # Apply centralized Excel weighting formula
+    df['weighted_value'] = df.apply(calculate_excel_weighted_value, axis=1)
+    
+    # Calculate simplified probability for filtering (approximation for projections)
     stage_probabilities = {
-        'E Verbal commit': 90,
-        'D Negotiation': 70,
-        'C Proposal sent': 50,
-        'B Discovery completed': 30,
-        'A Discovery scheduled': 10
+        'B Legals': 85,  # High probability stage
+        'C Proposal sent': 50,  # Medium probability stage  
+        'D POA Booked': 50,  # Medium probability stage
+        'E Intro attended': 25  # Lower probability stage
     }
-    
-    # Add probability column
     df['probability'] = df['stage'].map(stage_probabilities).fillna(0)
-    df['weighted_value'] = df['pipeline'] * df['probability'] / 100
     
     # Filter active deals
     active_deals = df[~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost'])]
