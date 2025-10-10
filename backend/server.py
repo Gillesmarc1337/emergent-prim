@@ -1111,7 +1111,7 @@ async def get_yearly_analytics(year: int = 2025):
             (df['stage'].isin(poa_stages))
         ])
         monthly_poa_target = 18
-        july_dec_poa_target = monthly_poa_target * months_elapsed
+        july_dec_poa_target = monthly_poa_target * months_in_july_dec_period
         
         # New pipe created for July-Dec period
         new_pipe_july_dec = july_dec_meetings['pipeline'].sum()
