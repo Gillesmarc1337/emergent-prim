@@ -2295,7 +2295,26 @@ function Dashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Closing Projections</CardTitle>
-                <CardDescription>Upcoming meetings and weighted pipeline highlights</CardDescription>
+                <CardDescription>Pipeline metrics with advanced weighting methodology</CardDescription>
+                
+                {/* Pipeline Metrics Explanation */}
+                <div className="mt-3 p-3 bg-gray-50 rounded-lg text-xs">
+                  <div className="font-semibold mb-2">📊 Pipeline Metrics Explained:</div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+                    <div>
+                      <span className="font-medium text-purple-700">• Total Pipeline:</span>
+                      <br />Valeur brute (sauf Lost/Not Relevant)
+                    </div>
+                    <div>
+                      <span className="font-medium text-blue-700">• Weighted Value:</span>
+                      <br />Pondéré par stage/source/temps
+                    </div>
+                    <div>
+                      <span className="font-medium text-green-700">• Aggregate Pipe:</span>
+                      <br />Cumul historique pondéré
+                    </div>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
