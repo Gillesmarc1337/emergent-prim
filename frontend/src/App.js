@@ -733,13 +733,86 @@ function MainDashboard({ analytics }) {
           icon={AlertCircle}
           color="orange"
         />
-        <MetricCard
-          title="Pipe Created YTD"
-          value={dashboardData.key_metrics.pipe_created}
-          unit="$"
-          icon={PieChart}
-          color="purple"
-        />
+        {(() => {
+          // Calculate period duration for dynamic targets
+          const monthlyData = dashboardData.monthly_revenue_chart || [];
+          const periodMonths = Math.max(1, monthlyData.length); // Number of months in period
+          
+          // Base monthly targets
+          const baseNewPipeTarget = 2000000; // $2M per month
+          const baseAggregateWeightedTarget = 800000; // $800K per month
+          
+          // Dynamic targets
+          const newPipeTarget = baseNewPipeTarget * periodMonths;
+          const aggregateWeightedTarget = baseAggregateWeightedTarget * periodMonths;
+          
+          // Period description
+          const periodDescription = periodMonths === 6 ? "Jul–Dec 2025 (6 months)" : 
+                                  periodMonths === 1 ? "Current Month (1 month)" :
+                                  `Selected Period (${periodMonths} months)`;
+          
+          return (
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <PieChart className="h-5 w-5 text-purple-500" />
+                    <span className="text-sm font-medium text-gray-600">New Pipe Created (Selected Period)</span>
+                  </div>
+                </div>
+                
+                <div className="text-xs text-gray-500 mb-3">{periodDescription}</div>
+                
+                <div className="space-y-4">
+                  {/* 1. Total New Pipe Generated */}
+                  <div>
+                    <div className="text-lg font-bold">
+                      ${(dashboardData.key_metrics.pipe_created / 1000000).toFixed(1)}M
+                    </div>
+                    <div className="text-xs text-gray-500">Total New Pipe Generated</div>
+                    <div className="text-xs text-gray-400">Target: ${(newPipeTarget / 1000000).toFixed(1)}M</div>
+                    <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
+                      <div 
+                        className="bg-purple-500 h-1 rounded-full" 
+                        style={{ width: `${Math.min((dashboardData.key_metrics.pipe_created / newPipeTarget) * 100, 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  
+                  {/* 2. New Weighted Pipe */}
+                  <div>
+                    <div className="text-sm font-bold text-blue-600">
+                      ${(dashboardData.dashboard_blocks?.block_3_pipe_creation?.weighted_pipe_created / 1000000 || 0).toFixed(1)}M
+                    </div>
+                    <div className="text-xs text-gray-500">New Weighted Pipe</div>
+                  </div>
+                  
+                  {/* 3. Aggregate Weighted Pipe */}
+                  <div>
+                    <div className="text-sm font-bold text-green-600">
+                      ${(dashboardData.key_metrics.weighted_pipeline / 1000000).toFixed(1)}M
+                    </div>
+                    <div className="text-xs text-gray-500">Aggregate Weighted Pipe</div>
+                    <div className="text-xs text-gray-400">Target: ${(aggregateWeightedTarget / 1000000).toFixed(1)}M</div>
+                    <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
+                      <div 
+                        className="bg-green-500 h-1 rounded-full" 
+                        style={{ width: `${Math.min((dashboardData.key_metrics.weighted_pipeline / aggregateWeightedTarget) * 100, 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Tooltip info */}
+                <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
+                  <div className="font-medium mb-1">📊 Includes all deals created in period</div>
+                  <div>• Weighted: Excel logic (Stage × Source × Recency)</div>
+                  <div>• Targets: 2M New Pipe + 800K Aggregate per month</div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })()}
         <MetricCard
           title="Active Deals"
           value={dashboardData.key_metrics.deals_count}
