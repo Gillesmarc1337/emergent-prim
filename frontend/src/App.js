@@ -2696,39 +2696,73 @@ function Dashboard() {
                   </Card>
                 </div>
 
-                {/* Upcoming Meetings Highlight */}
-                {analytics.closing_projections.next_7_days.deals.length > 0 && (
-                  <Card className="mb-6 bg-yellow-50 border-yellow-200">
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        <AlertCircle className="h-5 w-5 text-yellow-600" />
-                        Upcoming High-Priority Meetings (Next 7 Days)
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                        {analytics.closing_projections.next_7_days.deals.slice(0, 6).map((deal, index) => (
-                          <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                            <div>
-                              <div className="font-medium">{deal.client}</div>
-                              <div className="text-sm text-gray-600">Owner: {deal.owner}</div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-sm font-bold">${deal.pipeline?.toLocaleString()}</div>
-                              <Badge className={`text-xs ${
-                                deal.probability >= 70 ? 'bg-green-100 text-green-800' : 
-                                deal.probability >= 50 ? 'bg-yellow-100 text-yellow-800' : 
-                                'bg-orange-100 text-orange-800'
-                              }`}>
-                                {deal.probability}%
-                              </Badge>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+                {/* Upcoming High-Priority Meetings (Next 7 Days) with POA Dates */}
+                {(() => {
+                  // Get upcoming POA meetings from hot leads that have dates after today
+                  const today = new Date();
+                  const next7Days = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+                  
+                  // Combine all deals with POA dates or discovery dates
+                  const upcomingMeetings = [
+                    ...(analytics.closing_projections.current_month.deals || []),
+                    ...(analytics.closing_projections.next_quarter.deals || [])
+                  ].filter(deal => {
+                    // Check if deal has POA date or discovery date in next 7 days
+                    const poaDate = deal.poa_date ? new Date(deal.poa_date) : null;
+                    const discoveryDate = deal.discovery_date ? new Date(deal.discovery_date) : null;
+                    
+                    return (poaDate && poaDate > today && poaDate <= next7Days) ||
+                           (discoveryDate && discoveryDate > today && discoveryDate <= next7Days);
+                  }).slice(0, 6); // Limit to 6 meetings
+                  
+                  return upcomingMeetings.length > 0 ? (
+                    <Card className="mb-6 bg-yellow-50 border-yellow-200">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <AlertCircle className="h-5 w-5 text-yellow-600" />
+                          Upcoming High-Priority Meetings (Next 7 Days)
+                        </CardTitle>
+                        <CardDescription>POA and Discovery meetings scheduled in the next week</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                          {upcomingMeetings.map((deal, index) => {
+                            const poaDate = deal.poa_date ? new Date(deal.poa_date) : null;
+                            const discoveryDate = deal.discovery_date ? new Date(deal.discovery_date) : null;
+                            const meetingDate = poaDate || discoveryDate;
+                            const meetingType = poaDate ? 'POA' : 'Discovery';
+                            
+                            return (
+                              <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                                <div className="flex-1">
+                                  <div className="font-medium">{deal.client || deal.company || 'Deal'}</div>
+                                  <div className="text-sm text-gray-600">Owner: {deal.owner || 'TBD'}</div>
+                                  <div className="text-xs font-medium text-blue-600">
+                                    📅 {meetingType}: {meetingDate.toLocaleDateString('en-US', { 
+                                      weekday: 'short', 
+                                      month: 'short', 
+                                      day: 'numeric' 
+                                    })}
+                                  </div>
+                                </div>
+                                <div className="text-right ml-3">
+                                  <div className="text-sm font-bold">${(deal.pipeline || 0).toLocaleString()}</div>
+                                  <Badge className={`text-xs ${
+                                    (deal.probability || 0) >= 70 ? 'bg-green-100 text-green-800' : 
+                                    (deal.probability || 0) >= 50 ? 'bg-yellow-100 text-yellow-800' : 
+                                    'bg-orange-100 text-orange-800'
+                                  }`}>
+                                    {deal.probability || 50}%
+                                  </Badge>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : null;
+                })()}
 
                 {/* Projection par AE */}
                 {Object.keys(analytics.closing_projections.ae_projections).length > 0 && (
