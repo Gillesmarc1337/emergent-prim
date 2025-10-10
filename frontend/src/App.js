@@ -2759,7 +2759,7 @@ function Dashboard() {
                       <div className="font-semibold text-green-800 mb-4 text-center">
                         Next 14 Days
                         <div className="text-sm text-green-600">
-                          ${filteredHotDeals.filter(deal => deal.column === 'next14').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
+                          ${hotDeals.filter(deal => deal.column === 'next14').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
                         </div>
                       </div>
                       <Droppable droppableId="next14">
