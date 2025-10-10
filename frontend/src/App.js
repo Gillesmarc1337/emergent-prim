@@ -1589,50 +1589,7 @@ function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Meetings Detail Table */}
-            {analytics.meetings_attended.meetings_detail && analytics.meetings_attended.meetings_detail.length > 0 && (
-              <MeetingsTable 
-                meetings={analytics.meetings_attended.meetings_detail}
-                title="All Meetings Detail"
-              />
-            )}
-
-            {/* AE Performance */}
-            {Object.keys(analytics.meetings_attended.ae_performance).length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>AE Performance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left p-2">AE</th>
-                          <th className="text-right p-2">Scheduled</th>
-                          <th className="text-right p-2">Attended</th>
-                          <th className="text-right p-2">POA Generated</th>
-                          <th className="text-right p-2">Deals Closed</th>
-                          <th className="text-right p-2">Attendance Rate</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {analytics.meetings_attended.ae_performance.map((stats, index) => (
-                          <tr key={index} className="border-b">
-                            <td className="p-2 font-medium">{stats.owner}</td>
-                            <td className="text-right p-2">{stats.total_scheduled}</td>
-                            <td className="text-right p-2">{stats.attended}</td>
-                            <td className="text-right p-2">{stats.poa_generated}</td>
-                            <td className="text-right p-2">{stats.deals_closed}</td>
-                            <td className="text-right p-2">{stats.attendance_rate.toFixed(1)}%</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            {/* Removed duplicate detail tables - now organized in structured sections below */}
 
             {/* 👥 SECTION 3: AE PERFORMANCE BREAKDOWN */}
             <Card className="mb-6 border-green-200">
