@@ -2819,7 +2819,7 @@ function Dashboard() {
                       <div className="font-semibold text-orange-800 mb-4 text-center">
                         Next 60–90 Days
                         <div className="text-sm text-orange-600">
-                          ${filteredHotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
+                          ${hotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
                         </div>
                       </div>
                       <Droppable droppableId="next60">
