@@ -351,7 +351,7 @@ def calculate_meetings_attended(df, start_date, end_date):
     period_duration_months = max(1, round(period_duration_days / 30))  # At least 1 month
     
     # Base monthly targets
-    base_meetings_target = 40
+    base_meetings_target = 50
     base_poa_target = 30
     base_deals_target = 15
     
