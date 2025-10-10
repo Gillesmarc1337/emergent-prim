@@ -2407,6 +2407,227 @@ def identify_best_pipeline_match(matching_results, target_created, target_weight
     
     return best_match
 
+def test_hot_deals_stage_analysis():
+    """Analyze hot deals data to understand stage distribution and column assignment issues"""
+    print(f"\n{'='*80}")
+    print(f"🔥 ANALYZING HOT DEALS STAGE DISTRIBUTION FOR COLUMN ASSIGNMENT")
+    print(f"{'='*80}")
+    
+    # Test GET /api/projections/hot-deals to examine actual stage data
+    print(f"\n📊 Step 1: Testing GET /api/projections/hot-deals")
+    print(f"{'='*60}")
+    
+    hot_deals_data = test_api_endpoint("/projections/hot-deals")
+    
+    if hot_deals_data is None:
+        print(f"❌ Failed to get hot deals data")
+        return False
+    
+    if not isinstance(hot_deals_data, list):
+        print(f"❌ Expected list response, got {type(hot_deals_data)}")
+        return False
+    
+    print(f"✅ Retrieved {len(hot_deals_data)} hot deals")
+    
+    # Analyze stage distribution in hot deals
+    stage_distribution = {}
+    stage_examples = {}
+    
+    print(f"\n📋 Step 2: Analyzing Stage Distribution in Hot Deals")
+    print(f"{'='*60}")
+    
+    for deal in hot_deals_data:
+        stage = deal.get('stage', 'UNKNOWN')
+        
+        # Count stages
+        if stage not in stage_distribution:
+            stage_distribution[stage] = 0
+            stage_examples[stage] = []
+        
+        stage_distribution[stage] += 1
+        
+        # Keep first 3 examples of each stage
+        if len(stage_examples[stage]) < 3:
+            stage_examples[stage].append({
+                'client': deal.get('client', 'N/A'),
+                'pipeline': deal.get('pipeline', 0),
+                'owner': deal.get('owner', 'N/A')
+            })
+    
+    # Display stage analysis
+    print(f"📊 Stage Distribution in Hot Deals:")
+    for stage, count in sorted(stage_distribution.items()):
+        print(f"  • {stage}: {count} deals")
+        
+        # Show examples
+        if stage_examples[stage]:
+            print(f"    Examples:")
+            for i, example in enumerate(stage_examples[stage], 1):
+                print(f"      {i}. {example['client']} - ${example['pipeline']:,.0f} - {example['owner']}")
+    
+    # Test all deals to understand broader stage landscape
+    print(f"\n📊 Step 3: Testing All Available Endpoints for Stage Analysis")
+    print(f"{'='*60}")
+    
+    # Get broader dataset from monthly analytics
+    monthly_data = test_api_endpoint("/analytics/monthly")
+    all_stages_found = set()
+    
+    if monthly_data:
+        # Check closing_projections for more stage data
+        if 'closing_projections' in monthly_data:
+            projections = monthly_data['closing_projections']
+            
+            for period_key in ['next_7_days', 'current_month', 'next_quarter']:
+                if period_key in projections and 'deals' in projections[period_key]:
+                    deals = projections[period_key]['deals']
+                    print(f"\n🔍 Stages found in closing_projections.{period_key} ({len(deals)} deals):")
+                    
+                    period_stages = {}
+                    for deal in deals:
+                        stage = deal.get('stage', 'UNKNOWN')
+                        all_stages_found.add(stage)
+                        
+                        if stage not in period_stages:
+                            period_stages[stage] = 0
+                        period_stages[stage] += 1
+                    
+                    for stage, count in sorted(period_stages.items()):
+                        print(f"    • {stage}: {count} deals")
+        
+        # Check pipe_metrics for additional stage data
+        if 'pipe_metrics' in monthly_data and 'pipe_details' in monthly_data['pipe_metrics']:
+            pipe_details = monthly_data['pipe_metrics']['pipe_details']
+            print(f"\n🔍 Stages found in pipe_metrics.pipe_details ({len(pipe_details)} deals):")
+            
+            pipe_stages = {}
+            for deal in pipe_details:
+                stage = deal.get('stage', 'UNKNOWN')
+                all_stages_found.add(stage)
+                
+                if stage not in pipe_stages:
+                    pipe_stages[stage] = 0
+                pipe_stages[stage] += 1
+            
+            for stage, count in sorted(pipe_stages.items()):
+                print(f"    • {stage}: {count} deals")
+    
+    # Test hot leads endpoint for comparison
+    print(f"\n📊 Step 4: Testing GET /api/projections/hot-leads for Stage Comparison")
+    print(f"{'='*60}")
+    
+    hot_leads_data = test_api_endpoint("/projections/hot-leads")
+    
+    if hot_leads_data and isinstance(hot_leads_data, list):
+        print(f"✅ Retrieved {len(hot_leads_data)} hot leads")
+        
+        leads_stage_distribution = {}
+        for lead in hot_leads_data:
+            stage = lead.get('stage', 'UNKNOWN')
+            all_stages_found.add(stage)
+            
+            if stage not in leads_stage_distribution:
+                leads_stage_distribution[stage] = 0
+            leads_stage_distribution[stage] += 1
+        
+        print(f"📊 Stage Distribution in Hot Leads:")
+        for stage, count in sorted(leads_stage_distribution.items()):
+            print(f"  • {stage}: {count} deals")
+    else:
+        print(f"❌ Failed to get hot leads data or invalid format")
+    
+    # Comprehensive stage analysis
+    print(f"\n📊 Step 5: Comprehensive Stage Analysis")
+    print(f"{'='*60}")
+    
+    print(f"🔍 ALL UNIQUE STAGES FOUND ACROSS ALL ENDPOINTS:")
+    for stage in sorted(all_stages_found):
+        print(f"  • '{stage}'")
+    
+    # Analyze stage naming patterns for column assignment
+    print(f"\n🎯 Step 6: Stage Analysis for Column Assignment Logic")
+    print(f"{'='*60}")
+    
+    # Look for POA Booked variations
+    poa_booked_stages = [stage for stage in all_stages_found if 'poa' in stage.lower() and 'booked' in stage.lower()]
+    print(f"📋 POA Booked stage variations found:")
+    if poa_booked_stages:
+        for stage in poa_booked_stages:
+            print(f"  • '{stage}'")
+    else:
+        print(f"  ❌ No POA Booked stages found")
+        # Look for similar patterns
+        poa_stages = [stage for stage in all_stages_found if 'poa' in stage.lower()]
+        if poa_stages:
+            print(f"  🔍 POA-related stages found:")
+            for stage in poa_stages:
+                print(f"    • '{stage}'")
+    
+    # Look for Legals variations
+    legals_stages = [stage for stage in all_stages_found if 'legal' in stage.lower()]
+    print(f"\n📋 Legals stage variations found:")
+    if legals_stages:
+        for stage in legals_stages:
+            print(f"  • '{stage}'")
+    else:
+        print(f"  ❌ No Legals stages found")
+    
+    # Look for Proposal sent variations
+    proposal_stages = [stage for stage in all_stages_found if 'proposal' in stage.lower()]
+    print(f"\n📋 Proposal sent stage variations found:")
+    if proposal_stages:
+        for stage in proposal_stages:
+            print(f"  • '{stage}'")
+    else:
+        print(f"  ❌ No Proposal sent stages found")
+    
+    # Identify stages that should go to 60-90 days column
+    print(f"\n🎯 Step 7: Identifying Stages for 60-90 Days Column")
+    print(f"{'='*60}")
+    
+    # Based on the analysis, identify which stages should be in 60-90 days
+    potential_60_90_stages = []
+    
+    # POA Booked deals should typically go to 60-90 days
+    potential_60_90_stages.extend(poa_booked_stages)
+    
+    # Some proposal stages might also go to 60-90 days depending on timing
+    potential_60_90_stages.extend(proposal_stages)
+    
+    print(f"📊 Stages that should potentially go to 60-90 days column:")
+    if potential_60_90_stages:
+        for stage in potential_60_90_stages:
+            print(f"  • '{stage}'")
+    else:
+        print(f"  ⚠️  No obvious candidates for 60-90 days column found")
+    
+    # Summary and recommendations
+    print(f"\n📋 Step 8: Summary and Recommendations")
+    print(f"{'='*60}")
+    
+    print(f"🔍 KEY FINDINGS:")
+    print(f"  • Total unique stages found: {len(all_stages_found)}")
+    print(f"  • Hot deals endpoint returns: {len(hot_deals_data)} deals")
+    print(f"  • Hot leads endpoint returns: {len(hot_leads_data) if hot_leads_data else 0} deals")
+    
+    print(f"\n🎯 STAGE NAMING ANALYSIS:")
+    print(f"  • POA Booked variations: {poa_booked_stages if poa_booked_stages else 'None found'}")
+    print(f"  • Legals variations: {legals_stages if legals_stages else 'None found'}")
+    print(f"  • Proposal sent variations: {proposal_stages if proposal_stages else 'None found'}")
+    
+    print(f"\n💡 RECOMMENDATIONS FOR COLUMN ASSIGNMENT:")
+    if not poa_booked_stages and not proposal_stages:
+        print(f"  ❌ ISSUE: No POA Booked or Proposal sent stages found")
+        print(f"  🔧 This explains why deals aren't appearing in 60-90 days column")
+        print(f"  📝 Check if stage names in data match the expected names in frontend logic")
+    else:
+        print(f"  ✅ Found relevant stages for 60-90 days column")
+        print(f"  📝 Verify frontend logic uses these exact stage names:")
+        for stage in potential_60_90_stages:
+            print(f"    - '{stage}'")
+    
+    return True
+
 def main():
     """Run all backend tests with priority on pipeline data Excel matching"""
     print(f"🚀 Starting Backend API Testing")
