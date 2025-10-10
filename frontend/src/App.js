@@ -1630,69 +1630,124 @@ function Dashboard() {
               ? "Good performance on meeting attendance and conversions." 
               : "Need to improve attendance rates and conversions."}
           >
-            {/* 📅 SECTION 1: MEETINGS & INTROS PERFORMANCE */}
-            <Card className="mb-6 border-blue-200">
-              <CardHeader className="bg-blue-50">
-                <CardTitle className="text-xl flex items-center gap-2">
-                  <Calendar className="h-6 w-6 text-blue-600" />
-                  Meetings & Intros Performance
-                </CardTitle>
-                <CardDescription>Meeting scheduling, attendance and intro metrics</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <MetricCard
-                    title="Meetings Scheduled"
-                    value={analytics.meetings_attended.intro_metrics.scheduled}
-                    target={analytics.meetings_attended.intro_metrics.target}
-                    icon={Calendar}
-                    color="blue"
-                  />
-                  <MetricCard
-                    title="Meetings Attended"
-                    value={analytics.meetings_attended.intro_metrics.attended}
-                    icon={CheckCircle2}
-                    color="green"
-                  />
-                  <MetricCard
-                    title="Attendance Rate"
-                    value={analytics.meetings_attended.intro_metrics.attendance_rate.toFixed(1)}
-                    unit="%"
-                    icon={BarChart3}
-                    color="orange"
-                  />
-                </div>
-              </CardContent>
-            </Card>
+            {(() => {
+              // Calculate period duration in months for dynamic targets
+              let periodMonths = 1; // Default to 1 month
+              
+              if (useCustomDate && dateRange?.from && dateRange?.to) {
+                // Custom date range
+                const startDate = new Date(dateRange.from);
+                const endDate = new Date(dateRange.to);
+                const diffTime = Math.abs(endDate - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                periodMonths = Math.max(1, Math.round(diffDays / 30.44)); // Convert days to months
+              } else if (viewMode === 'yearly') {
+                // July to December = 6 months
+                periodMonths = 6;
+              } else {
+                // Monthly view = 1 month
+                periodMonths = 1;
+              }
 
-            {/* 🎯 SECTION 2: POA & DEALS PERFORMANCE */}
-            <Card className="mb-6 border-purple-200">
-              <CardHeader className="bg-purple-50">
-                <CardTitle className="text-xl flex items-center gap-2">
-                  <Target className="h-6 w-6 text-purple-600" />
-                  POA & Deals Performance
-                </CardTitle>
-                <CardDescription>POA generation and deal closing metrics</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <MetricCard
-                    title="POA Generated"
-                    value={analytics.meetings_attended.poa_generated_metrics.completed}
-                    target={analytics.meetings_attended.poa_generated_metrics.target}
-                    icon={Target}
-                    color="purple"
-                  />
-                  <MetricCard
-                    title="Deals Closed"
-                    value={analytics.meetings_attended.deals_closed_metrics.generated}
-                    target={analytics.meetings_attended.deals_closed_metrics.target}
-                    icon={DollarSign}
-                    color="green"
-                  />
-                </div>
-              </CardContent>
-            </Card>
+              // Base monthly targets
+              const baseMeetingsScheduledTarget = 50;
+              const basePOAGeneratedTarget = 18;
+              const baseDealsClosedTarget = 6;
+
+              // Dynamic targets based on period duration
+              const dynamicMeetingsScheduledTarget = baseMeetingsScheduledTarget * periodMonths;
+              const dynamicPOAGeneratedTarget = basePOAGeneratedTarget * periodMonths;
+              const dynamicDealsClosedTarget = baseDealsClosedTarget * periodMonths;
+
+              // Calculate achievement percentages
+              const meetingsScheduledAchievement = analytics.meetings_attended.intro_metrics.scheduled / dynamicMeetingsScheduledTarget * 100;
+              const poaGeneratedAchievement = analytics.meetings_attended.poa_generated_metrics.completed / dynamicPOAGeneratedTarget * 100;
+              const dealsClosedAchievement = analytics.meetings_attended.deals_closed_metrics.generated / dynamicDealsClosedTarget * 100;
+
+              return (
+                <>
+                  {/* Period and Target Info */}
+                  <div className="mb-4 p-3 bg-gray-50 rounded-lg border">
+                    <div className="text-sm text-gray-600">
+                      <strong>Selected Period:</strong> {periodMonths} month{periodMonths > 1 ? 's' : ''} 
+                      {viewMode === 'yearly' ? ' (July–December 2025)' : 
+                       useCustomDate ? ` (${dateRange?.from?.toLocaleDateString()} - ${dateRange?.to?.toLocaleDateString()})` : 
+                       ' (Current Month)'}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Base monthly targets: Meetings Scheduled (50) • POA Generated (18) • Deals Closed (6)
+                    </div>
+                  </div>
+
+                  {/* 📅 SECTION 1: MEETINGS & INTROS PERFORMANCE */}
+                  <Card className="mb-6 border-blue-200">
+                    <CardHeader className="bg-blue-50">
+                      <CardTitle className="text-xl flex items-center gap-2">
+                        <Calendar className="h-6 w-6 text-blue-600" />
+                        Meetings & Intros Performance
+                      </CardTitle>
+                      <CardDescription>Meeting scheduling, attendance and intro metrics with dynamic targets</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <MetricCard
+                          title="Meetings Scheduled"
+                          value={analytics.meetings_attended.intro_metrics.scheduled}
+                          target={dynamicMeetingsScheduledTarget}
+                          icon={Calendar}
+                          color={meetingsScheduledAchievement >= 80 ? "green" : meetingsScheduledAchievement >= 60 ? "orange" : "red"}
+                          statusBadge={meetingsScheduledAchievement >= 80 ? "On Track" : "Needs Attention"}
+                        />
+                        <MetricCard
+                          title="Meetings Attended"
+                          value={analytics.meetings_attended.intro_metrics.attended}
+                          icon={CheckCircle2}
+                          color="green"
+                        />
+                        <MetricCard
+                          title="Attendance Rate"
+                          value={analytics.meetings_attended.intro_metrics.attendance_rate.toFixed(1)}
+                          unit="%"
+                          icon={BarChart3}
+                          color="orange"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* 🎯 SECTION 2: POA & DEALS PERFORMANCE */}
+                  <Card className="mb-6 border-purple-200">
+                    <CardHeader className="bg-purple-50">
+                      <CardTitle className="text-xl flex items-center gap-2">
+                        <Target className="h-6 w-6 text-purple-600" />
+                        POA & Deals Performance
+                      </CardTitle>
+                      <CardDescription>POA generation and deal closing metrics with dynamic targets</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <MetricCard
+                          title="POA Generated"
+                          value={analytics.meetings_attended.poa_generated_metrics.completed}
+                          target={dynamicPOAGeneratedTarget}
+                          icon={Target}
+                          color={poaGeneratedAchievement >= 80 ? "green" : poaGeneratedAchievement >= 60 ? "orange" : "red"}
+                          statusBadge={poaGeneratedAchievement >= 80 ? "On Track" : "Needs Attention"}
+                        />
+                        <MetricCard
+                          title="Deals Closed"
+                          value={analytics.meetings_attended.deals_closed_metrics.generated}
+                          target={dynamicDealsClosedTarget}
+                          icon={DollarSign}
+                          color={dealsClosedAchievement >= 80 ? "green" : dealsClosedAchievement >= 60 ? "orange" : "red"}
+                          statusBadge={dealsClosedAchievement >= 80 ? "On Track" : "Needs Attention"}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
+              );
+            })()}
 
             {/* Removed duplicate detail tables - now organized in structured sections below */}
 
