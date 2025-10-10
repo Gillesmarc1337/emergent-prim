@@ -3871,6 +3871,216 @@ def test_legals_proposal_pipeline_discrepancy():
     
     return True
 
+def test_raw_pipeline_values_investigation():
+    """
+    PRIORITY TEST: Investigate raw pipeline values for B Legals + C Proposal sent deals
+    Target: Find correct field names that give us $2,481,600 total (Excel master data)
+    """
+    print(f"\n{'='*80}")
+    print(f"🎯 RAW PIPELINE VALUES INVESTIGATION - B LEGALS + C PROPOSAL SENT")
+    print(f"{'='*80}")
+    print(f"🎯 TARGET: Find raw deal values totaling $2,481,600 (Excel master data)")
+    print(f"🔍 INVESTIGATION: Identify correct field names for raw pipeline values")
+    
+    investigation_results = {
+        'b_legals_raw_total': 0,
+        'c_proposal_raw_total': 0,
+        'combined_raw_total': 0,
+        'correct_field_name': None,
+        'b_legals_deals_count': 0,
+        'c_proposal_deals_count': 0,
+        'field_analysis': {}
+    }
+    
+    # Test 1: GET /api/projections/hot-deals (B Legals deals)
+    print(f"\n📊 Test 1: GET /api/projections/hot-deals - B Legals Raw Values")
+    print(f"{'='*60}")
+    
+    hot_deals_data = test_api_endpoint("/projections/hot-deals")
+    if hot_deals_data and isinstance(hot_deals_data, list):
+        print(f"✅ Hot deals endpoint accessible - {len(hot_deals_data)} deals found")
+        investigation_results['b_legals_deals_count'] = len(hot_deals_data)
+        
+        if len(hot_deals_data) > 0:
+            print(f"\n🔍 Analyzing B Legals deals for RAW pipeline values:")
+            
+            # Analyze first deal to understand available fields
+            first_deal = hot_deals_data[0]
+            print(f"\n📋 Available fields in B Legals deals:")
+            for field, value in first_deal.items():
+                print(f"  • {field}: {value} ({type(value).__name__})")
+            
+            # Calculate totals for different potential raw value fields
+            potential_raw_fields = ['pipeline', 'value', 'expected_arr', 'expected_mrr']
+            
+            for field in potential_raw_fields:
+                if field in first_deal:
+                    field_total = sum(deal.get(field, 0) or 0 for deal in hot_deals_data)
+                    investigation_results['field_analysis'][f'b_legals_{field}'] = field_total
+                    print(f"\n💰 B Legals {field} total: ${field_total:,.2f}")
+                    
+                    # Show individual deal values for this field
+                    print(f"   📋 Individual B Legals {field} values:")
+                    for i, deal in enumerate(hot_deals_data[:5]):  # Show first 5 deals
+                        deal_value = deal.get(field, 0) or 0
+                        client = deal.get('client', 'Unknown')
+                        print(f"     {i+1}. {client}: ${deal_value:,.2f}")
+                    if len(hot_deals_data) > 5:
+                        print(f"     ... and {len(hot_deals_data) - 5} more deals")
+            
+            # Use 'pipeline' as the primary raw value field (most common)
+            if 'pipeline' in first_deal:
+                investigation_results['b_legals_raw_total'] = sum(deal.get('pipeline', 0) or 0 for deal in hot_deals_data)
+                print(f"\n🎯 B Legals RAW PIPELINE TOTAL: ${investigation_results['b_legals_raw_total']:,.2f}")
+        else:
+            print(f"⚠️  No B Legals deals found in hot-deals endpoint")
+    else:
+        print(f"❌ Failed to get hot deals data or invalid format")
+    
+    # Test 2: GET /api/projections/hot-leads (C Proposal sent + D POA Booked deals)
+    print(f"\n📊 Test 2: GET /api/projections/hot-leads - C Proposal Sent Raw Values")
+    print(f"{'='*60}")
+    
+    hot_leads_data = test_api_endpoint("/projections/hot-leads")
+    if hot_leads_data and isinstance(hot_leads_data, list):
+        print(f"✅ Hot leads endpoint accessible - {len(hot_leads_data)} deals found")
+        
+        # Filter for only C Proposal sent deals (exclude D POA Booked)
+        c_proposal_deals = [deal for deal in hot_leads_data if deal.get('stage') == 'C Proposal sent']
+        investigation_results['c_proposal_deals_count'] = len(c_proposal_deals)
+        
+        print(f"🔍 Filtered to C Proposal sent deals only: {len(c_proposal_deals)} deals")
+        
+        if len(c_proposal_deals) > 0:
+            print(f"\n🔍 Analyzing C Proposal sent deals for RAW pipeline values:")
+            
+            # Analyze first deal to understand available fields
+            first_deal = c_proposal_deals[0]
+            print(f"\n📋 Available fields in C Proposal sent deals:")
+            for field, value in first_deal.items():
+                print(f"  • {field}: {value} ({type(value).__name__})")
+            
+            # Calculate totals for different potential raw value fields
+            potential_raw_fields = ['pipeline', 'value', 'expected_arr', 'expected_mrr']
+            
+            for field in potential_raw_fields:
+                if field in first_deal:
+                    field_total = sum(deal.get(field, 0) or 0 for deal in c_proposal_deals)
+                    investigation_results['field_analysis'][f'c_proposal_{field}'] = field_total
+                    print(f"\n💰 C Proposal sent {field} total: ${field_total:,.2f}")
+                    
+                    # Show individual deal values for this field
+                    print(f"   📋 Individual C Proposal sent {field} values:")
+                    for i, deal in enumerate(c_proposal_deals[:5]):  # Show first 5 deals
+                        deal_value = deal.get(field, 0) or 0
+                        client = deal.get('client', 'Unknown')
+                        print(f"     {i+1}. {client}: ${deal_value:,.2f}")
+                    if len(c_proposal_deals) > 5:
+                        print(f"     ... and {len(c_proposal_deals) - 5} more deals")
+            
+            # Use 'pipeline' as the primary raw value field
+            if 'pipeline' in first_deal:
+                investigation_results['c_proposal_raw_total'] = sum(deal.get('pipeline', 0) or 0 for deal in c_proposal_deals)
+                print(f"\n🎯 C Proposal sent RAW PIPELINE TOTAL: ${investigation_results['c_proposal_raw_total']:,.2f}")
+        else:
+            print(f"⚠️  No C Proposal sent deals found in hot-leads endpoint")
+    else:
+        print(f"❌ Failed to get hot leads data or invalid format")
+    
+    # Test 3: Calculate combined totals and compare to target
+    print(f"\n📊 Test 3: Combined Totals Analysis")
+    print(f"{'='*60}")
+    
+    investigation_results['combined_raw_total'] = investigation_results['b_legals_raw_total'] + investigation_results['c_proposal_raw_total']
+    target_total = 2481600  # Target from Excel master data
+    
+    print(f"\n💰 RAW PIPELINE VALUES SUMMARY:")
+    print(f"  🔥 B Legals deals: {investigation_results['b_legals_deals_count']} deals = ${investigation_results['b_legals_raw_total']:,.2f}")
+    print(f"  🎯 C Proposal sent deals: {investigation_results['c_proposal_deals_count']} deals = ${investigation_results['c_proposal_raw_total']:,.2f}")
+    print(f"  📊 COMBINED TOTAL: ${investigation_results['combined_raw_total']:,.2f}")
+    print(f"  🎯 TARGET (Excel): ${target_total:,.2f}")
+    
+    difference = investigation_results['combined_raw_total'] - target_total
+    print(f"\n🔍 COMPARISON ANALYSIS:")
+    if abs(difference) < 1000:  # Within $1,000 tolerance
+        print(f"  ✅ MATCH: Combined total matches target (difference: ${difference:,.2f})")
+        investigation_results['correct_field_name'] = 'pipeline'
+    else:
+        print(f"  ❌ MISMATCH: Combined total differs from target by ${difference:,.2f}")
+        print(f"     • If positive: Backend calculates ${abs(difference):,.2f} MORE than Excel")
+        print(f"     • If negative: Backend calculates ${abs(difference):,.2f} LESS than Excel")
+    
+    # Test 4: Alternative field analysis
+    print(f"\n📊 Test 4: Alternative Field Analysis")
+    print(f"{'='*60}")
+    
+    print(f"\n🔍 Testing alternative field combinations to find ${target_total:,.2f}:")
+    
+    for field in ['pipeline', 'expected_arr', 'expected_mrr']:
+        b_legals_field_total = investigation_results['field_analysis'].get(f'b_legals_{field}', 0)
+        c_proposal_field_total = investigation_results['field_analysis'].get(f'c_proposal_{field}', 0)
+        combined_field_total = b_legals_field_total + c_proposal_field_total
+        field_difference = combined_field_total - target_total
+        
+        print(f"\n💰 {field.upper()} field analysis:")
+        print(f"  • B Legals {field}: ${b_legals_field_total:,.2f}")
+        print(f"  • C Proposal {field}: ${c_proposal_field_total:,.2f}")
+        print(f"  • Combined {field}: ${combined_field_total:,.2f}")
+        print(f"  • Difference from target: ${field_difference:,.2f}")
+        
+        if abs(field_difference) < abs(difference):
+            print(f"  ✅ {field} is CLOSER to target than pipeline field")
+            investigation_results['correct_field_name'] = field
+            difference = field_difference
+        elif abs(field_difference) < 1000:
+            print(f"  ✅ {field} MATCHES target (within $1,000 tolerance)")
+            investigation_results['correct_field_name'] = field
+    
+    # Test 5: Detailed field mapping recommendations
+    print(f"\n📊 Test 5: Field Mapping Recommendations")
+    print(f"{'='*60}")
+    
+    print(f"\n🎯 FIELD IDENTIFICATION RESULTS:")
+    if investigation_results['correct_field_name']:
+        print(f"  ✅ RECOMMENDED FIELD: '{investigation_results['correct_field_name']}'")
+        print(f"  📊 This field gives the closest match to Excel master data target")
+    else:
+        print(f"  ⚠️  NO EXACT MATCH FOUND")
+        print(f"  📊 Backend data may use different calculation methodology than Excel")
+    
+    print(f"\n📋 COMPLETE FIELD ANALYSIS:")
+    for field_key, field_value in investigation_results['field_analysis'].items():
+        print(f"  • {field_key}: ${field_value:,.2f}")
+    
+    # Summary and recommendations
+    print(f"\n{'='*60}")
+    print(f"📋 RAW PIPELINE VALUES INVESTIGATION SUMMARY")
+    print(f"{'='*60}")
+    
+    print(f"\n🎯 KEY FINDINGS:")
+    print(f"  • B Legals deals found: {investigation_results['b_legals_deals_count']}")
+    print(f"  • C Proposal sent deals found: {investigation_results['c_proposal_deals_count']}")
+    print(f"  • Combined raw total: ${investigation_results['combined_raw_total']:,.2f}")
+    print(f"  • Target from Excel: ${target_total:,.2f}")
+    print(f"  • Difference: ${difference:,.2f}")
+    
+    if investigation_results['correct_field_name']:
+        print(f"\n✅ RECOMMENDED SOLUTION:")
+        print(f"  • Use field: '{investigation_results['correct_field_name']}'")
+        print(f"  • This field provides the raw deal values closest to Excel master data")
+    else:
+        print(f"\n⚠️  INVESTIGATION RESULTS:")
+        print(f"  • No backend field exactly matches Excel total of ${target_total:,.2f}")
+        print(f"  • Backend may be using different filtering or calculation logic")
+        print(f"  • Recommend verifying Excel calculation methodology")
+    
+    print(f"\n🔍 NEXT STEPS:")
+    print(f"  1. Verify which field contains the raw deal values (no weighting/probability)")
+    print(f"  2. Confirm Excel calculation includes same deals as backend")
+    print(f"  3. Check if Excel applies any additional filtering not present in backend")
+    
+    return investigation_results
+
 def main():
     """Run all backend tests with priority on Projections master data verification"""
     print(f"🚀 Starting Backend API Testing")
