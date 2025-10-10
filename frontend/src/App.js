@@ -1069,7 +1069,19 @@ function Dashboard() {
 
     const { source, destination } = result;
     
-    if (source.droppableId === 'hot-deals') {
+    // Handle column-based drag and drop for the new interactive board
+    if (['next14', 'next30', 'next60'].includes(source.droppableId) || 
+        ['next14', 'next30', 'next60'].includes(destination.droppableId)) {
+      
+      const newDeals = Array.from(filteredHotDeals);
+      const draggedDeal = newDeals.find(deal => deal.id === result.draggableId);
+      
+      if (draggedDeal) {
+        // Update the deal's column assignment
+        draggedDeal.column = destination.droppableId;
+        setHotDeals(newDeals);
+      }
+    } else if (source.droppableId === 'hot-deals') {
       const newDeals = Array.from(hotDeals);
       const [reorderedItem] = newDeals.splice(source.index, 1);
       newDeals.splice(destination.index, 0, reorderedItem);
@@ -1081,6 +1093,9 @@ function Dashboard() {
       setHotLeads(newLeads);
     }
   };
+
+  // Alias for backward compatibility
+  const handleOnDragEnd = onDragEnd;
 
   const hideItem = (type, id) => {
     if (type === 'deals') {
