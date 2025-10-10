@@ -2376,7 +2376,7 @@ function Dashboard() {
                         ${(analytics.dashboard_blocks?.block_3_pipe_creation?.aggregate_weighted_pipe / 1000000).toFixed(1)}M
                       </div>
                       <div className="text-xs text-gray-600">
-                        Total Active Pipeline
+                        Cumul historique pondéré
                       </div>
                     </CardContent>
                   </Card>
