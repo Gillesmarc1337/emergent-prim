@@ -1114,8 +1114,14 @@ function Dashboard() {
         axios.get(`${API}/projections/performance-summary`)
       ]);
       
+      // Combine hot deals (B Legals) and hot leads (POA Booked + Proposal sent) for the interactive board
+      const combinedDeals = [
+        ...hotDealsResponse.data.map(deal => ({...deal, source: 'hot-deals'})),
+        ...hotLeadsResponse.data.map(lead => ({...lead, source: 'hot-leads'}))
+      ];
+
       // Assign columns based on deal stage for logical grouping
-      const dealsWithColumns = hotDealsResponse.data.map((deal, index) => ({
+      const dealsWithColumns = combinedDeals.map((deal, index) => ({
         ...deal,
         column: deal.column || (() => {
           // Assign columns based on deal stage
