@@ -236,9 +236,24 @@ def calculate_meeting_generation(df, start_date, end_date):
         'relevance': lambda x: (x == 'Relevant').sum()
     }).rename(columns={'id': 'total_meetings', 'relevance': 'relevant_meetings'})
     
+    # Calculate dynamic targets based on period duration
+    period_duration_days = (end_date - start_date).days + 1
+    period_duration_months = max(1, round(period_duration_days / 30))  # At least 1 month
+    
+    # Base monthly targets (50 total = 22 inbound + 17 outbound + 11 referrals)
+    monthly_inbound_target = 22
+    monthly_outbound_target = 17 
+    monthly_referral_target = 11
+    monthly_total_target = 50
+    
+    # Dynamic targets based on period duration
+    inbound_target = monthly_inbound_target * period_duration_months
+    outbound_target = monthly_outbound_target * period_duration_months
+    referral_target = monthly_referral_target * period_duration_months
+    total_target = monthly_total_target * period_duration_months
+    
     # Convert numpy types to Python native types
     total_intros = int(len(period_data))
-    target = 50
     
     # Detailed meetings list for table display (matching meetings_attended format)
     meetings_list = []
