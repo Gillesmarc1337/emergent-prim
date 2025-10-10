@@ -1082,7 +1082,7 @@ async def get_yearly_analytics(year: int = 2025):
         ]
         
         # Calculate meeting targets based on actual months elapsed in July-Dec period
-        monthly_meeting_target = 45  # Base monthly target
+        monthly_meeting_target = 50  # Base monthly target
         
         # Calculate how many months from July to current month (or Dec if past Dec)
         current_month = min(datetime.now().month, 12)  # Cap at December
