@@ -2800,20 +2800,13 @@ function Dashboard() {
                             className="space-y-2 min-h-96 max-h-96 overflow-y-auto"
                           >
                             {filteredHotDeals.filter(deal => deal.column === 'next30').map((deal, index) => (
-                              <Draggable key={deal.id} draggableId={deal.id} index={index}>
-                                {(provided, snapshot) => (
-                                  <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    className={`p-3 border rounded-lg bg-white shadow-sm ${
-                                      snapshot.isDragging ? 'shadow-lg scale-105' : ''
-                                    }`}
-                                  >
-                                    <DealItemContent deal={deal} />
-                                  </div>
-                                )}
-                              </Draggable>
+                              <DraggableDealItem 
+                                key={deal.id}
+                                deal={deal} 
+                                index={index}
+                                showActions={true}
+                                onHide={() => hideItem('deals', deal.id)}
+                              />
                             ))}
                             {provided.placeholder}
                           </div>
