@@ -1327,65 +1327,141 @@ function Dashboard() {
             title="Meeting Generation (Current Period)"
             isOnTrack={analytics.meeting_generation.on_track}
             conclusion={analytics.meeting_generation.on_track 
-              ? "You are on track to meet your meeting generation targets." 
+              ? "BDR team is on track to meet meeting generation targets." 
               : "Need to increase prospecting efforts to reach targets."}
           >
+            {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <MetricCard
-                title="Total New Intros"
+                title="Total Meetings Scheduled"
                 value={analytics.meeting_generation.total_new_intros}
                 target={analytics.meeting_generation.target}
                 icon={Users}
                 color="blue"
               />
               <MetricCard
-                title="Inbound"
+                title="Inbound Meetings"
                 value={analytics.meeting_generation.inbound}
-                target={analytics.meeting_generation.inbound_target}
                 icon={TrendingUp}
                 color="green"
               />
               <MetricCard
-                title="Outbound"
+                title="Outbound Meetings"
                 value={analytics.meeting_generation.outbound}
-                target={analytics.meeting_generation.outbound_target}
                 icon={Target}
                 color="orange"
               />
               <MetricCard
-                title="Referrals"
-                value={analytics.meeting_generation.referrals}
-                target={analytics.meeting_generation.referral_target}
+                title="Referral/Partnership"
+                value={analytics.meeting_generation.referrals + (analytics.meeting_generation.partnership || 0)}
                 icon={Users}
                 color="purple"
               />
             </div>
 
+            {/* BDR Performance Table */}
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>BDR Performance & Targets</CardTitle>
+                <CardDescription>
+                  Meeting generation efficiency per BDR with relevance analysis and target tracking
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b bg-gray-50">
+                        <th className="text-left p-3 font-semibold">BDR Name</th>
+                        <th className="text-right p-3 font-semibold"># of Meetings Scheduled</th>
+                        <th className="text-right p-3 font-semibold"># of Relevant Meetings</th>
+                        <th className="text-right p-3 font-semibold">% of Relevant Meetings</th>
+                        <th className="text-right p-3 font-semibold">Target</th>
+                        <th className="text-right p-3 font-semibold">% of Target Achieved</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(analytics.meeting_generation.bdr_performance || {}).map(([bdr, stats]) => {
+                        // Calculate targets: 6 per month for standard, 7 for seniors
+                        const isSeenior = bdr.toLowerCase().includes('senior') || bdr.toLowerCase().includes('sr');
+                        const monthlyTarget = isSeenior ? 7 : 6;
+                        const periodMonths = Math.max(1, Math.round((new Date(analytics.period_end) - new Date(analytics.period_start)) / (1000 * 60 * 60 * 24 * 30.44)));
+                        const periodTarget = monthlyTarget * periodMonths;
+                        
+                        const totalMeetings = stats.total_meetings || 0;
+                        const relevantMeetings = stats.relevant_meetings || 0;
+                        const relevancePercentage = totalMeetings > 0 ? (relevantMeetings / totalMeetings * 100) : 0;
+                        const targetAchieved = totalMeetings > 0 ? (totalMeetings / periodTarget * 100) : 0;
+                        
+                        return (
+                          <tr key={bdr} className="border-b hover:bg-gray-50">
+                            <td className="p-3 font-medium">
+                              {bdr}
+                              {isSeenior && <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-1 rounded">Senior</span>}
+                            </td>
+                            <td className="text-right p-3">{totalMeetings}</td>
+                            <td className="text-right p-3">{relevantMeetings}</td>
+                            <td className="text-right p-3">
+                              <span className={`font-medium ${
+                                relevancePercentage >= 70 ? 'text-green-600' : 
+                                relevancePercentage >= 50 ? 'text-yellow-600' : 'text-red-600'
+                              }`}>
+                                {relevancePercentage.toFixed(1)}%
+                              </span>
+                            </td>
+                            <td className="text-right p-3">
+                              {periodTarget}
+                              <div className="text-xs text-gray-500">{monthlyTarget}/month</div>
+                            </td>
+                            <td className="text-right p-3">
+                              <span className={`font-medium ${
+                                targetAchieved >= 100 ? 'text-green-600' : 
+                                targetAchieved >= 80 ? 'text-yellow-600' : 'text-red-600'
+                              }`}>
+                                {targetAchieved.toFixed(1)}%
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Source & Relevance Analysis */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Source Distribution</CardTitle>
+                  <CardTitle>Meetings by Source</CardTitle>
+                  <CardDescription>Distribution across all sources</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <RechartsPieChart>
-                      <Pie
-                        data={sourceData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {sourceData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </RechartsPieChart>
-                  </ResponsiveContainer>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Inbound</span>
+                      <span className="font-bold text-green-600">{analytics.meeting_generation.inbound}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Outbound</span>
+                      <span className="font-bold text-orange-600">{analytics.meeting_generation.outbound}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Referrals</span>
+                      <span className="font-bold text-purple-600">{analytics.meeting_generation.referrals}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Partnership</span>
+                      <span className="font-bold text-blue-600">{analytics.meeting_generation.partnership || 0}</span>
+                    </div>
+                    <div className="pt-2 border-t">
+                      <div className="flex justify-between items-center font-semibold">
+                        <span>Total</span>
+                        <span>{analytics.meeting_generation.total_new_intros}</span>
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -1393,23 +1469,32 @@ function Dashboard() {
                 <CardHeader>
                   <CardTitle>Relevance Analysis</CardTitle>
                   <CardDescription>
-                    Relevance Rate: {analytics.meeting_generation.relevance_analysis.relevance_rate.toFixed(1)}%
+                    Overall Relevance Rate: {analytics.meeting_generation.relevance_analysis.relevance_rate.toFixed(1)}%
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {relevanceData.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div 
-                            className="w-4 h-4 rounded" 
-                            style={{ backgroundColor: item.color }}
-                          ></div>
-                          <span className="font-medium">{item.name}</span>
-                        </div>
-                        <span className="font-bold">{item.value}</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-green-500"></div>
+                        <span className="font-medium">Relevant</span>
                       </div>
-                    ))}
+                      <span className="font-bold text-green-600">{analytics.meeting_generation.relevance_analysis.relevant}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-yellow-500"></div>
+                        <span className="font-medium">Questionable</span>
+                      </div>
+                      <span className="font-bold text-yellow-600">{analytics.meeting_generation.relevance_analysis.question_mark}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-red-500"></div>
+                        <span className="font-medium">Not Relevant</span>
+                      </div>
+                      <span className="font-bold text-red-600">{analytics.meeting_generation.relevance_analysis.not_relevant}</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
