@@ -1598,6 +1598,289 @@ def test_pipeline_data_structure_inspection():
         
         # Inspect pipeline-related sections
         pipeline_sections = ['pipe_metrics', 'deals_closed', 'closing_projections', 'dashboard_blocks', 'big_numbers_recap']
+def test_excel_weighting_implementation():
+    """Test the updated Excel-based weighting logic implementation"""
+    print(f"\n{'='*80}")
+    print(f"🧮 TESTING EXCEL-BASED WEIGHTING LOGIC IMPLEMENTATION")
+    print(f"{'='*80}")
+    
+    test_results = {
+        'monthly_weighted_values': False,
+        'yearly_weighted_values': False,
+        'weighted_vs_pipeline_comparison': False,
+        'closing_projections_weighting': False
+    }
+    
+    # Test 1: GET /api/analytics/monthly - Verify Excel weighted calculations
+    print(f"\n📊 Test 1: GET /api/analytics/monthly - Excel Weighted Calculations")
+    print(f"{'='*60}")
+    
+    monthly_data = test_api_endpoint("/analytics/monthly")
+    if monthly_data:
+        print(f"✅ Monthly analytics data retrieved successfully")
+        
+        # Check pipe_metrics for Excel weighting
+        if 'pipe_metrics' in monthly_data:
+            pipe_metrics = monthly_data['pipe_metrics']
+            print(f"✅ pipe_metrics found in monthly analytics")
+            
+            # Examine created_pipe weighted values
+            if 'created_pipe' in pipe_metrics:
+                created_pipe = pipe_metrics['created_pipe']
+                print(f"\n📋 Created Pipe Metrics:")
+                print(f"  • value: {created_pipe.get('value', 'NOT FOUND')}")
+                print(f"  • weighted_value: {created_pipe.get('weighted_value', 'NOT FOUND')}")
+                
+                # Check if weighted_value exists and is different from value
+                pipe_value = created_pipe.get('value', 0)
+                weighted_value = created_pipe.get('weighted_value', 0)
+                
+                if weighted_value != 0 and weighted_value != pipe_value:
+                    print(f"  ✅ Excel weighting detected: weighted_value ({weighted_value}) differs from pipeline value ({pipe_value})")
+                    test_results['monthly_weighted_values'] = True
+                else:
+                    print(f"  ⚠️  Weighted value same as pipeline value or zero - may indicate simple probability weighting")
+            
+            # Examine total_pipe weighted values
+            if 'total_pipe' in pipe_metrics:
+                total_pipe = pipe_metrics['total_pipe']
+                print(f"\n📋 Total Pipe Metrics:")
+                print(f"  • value: {total_pipe.get('value', 'NOT FOUND')}")
+                print(f"  • weighted_value: {total_pipe.get('weighted_value', 'NOT FOUND')}")
+                
+                # Check weighted vs unweighted ratio
+                total_value = total_pipe.get('value', 0)
+                total_weighted = total_pipe.get('weighted_value', 0)
+                
+                if total_value > 0 and total_weighted > 0:
+                    ratio = total_weighted / total_value
+                    print(f"  📊 Weighted/Pipeline ratio: {ratio:.3f}")
+                    
+                    # Excel weighting should result in more nuanced ratios (not simple 0.5, 0.3, etc.)
+                    if 0.1 < ratio < 0.9 and ratio not in [0.3, 0.5, 0.7]:
+                        print(f"  ✅ Ratio suggests Excel formula weighting (complex calculation)")
+                    else:
+                        print(f"  ⚠️  Ratio suggests simple stage probability weighting")
+        else:
+            print(f"❌ pipe_metrics not found in monthly analytics")
+    else:
+        print(f"❌ Failed to retrieve monthly analytics data")
+    
+    # Test 2: GET /api/analytics/yearly - Verify consistency across endpoints
+    print(f"\n📊 Test 2: GET /api/analytics/yearly - Consistency Check")
+    print(f"{'='*60}")
+    
+    yearly_data = test_api_endpoint("/analytics/yearly?year=2025")
+    if yearly_data:
+        print(f"✅ Yearly analytics data retrieved successfully")
+        
+        # Check pipe_metrics for Excel weighting
+        if 'pipe_metrics' in yearly_data:
+            pipe_metrics = yearly_data['pipe_metrics']
+            print(f"✅ pipe_metrics found in yearly analytics")
+            
+            # Compare with monthly data
+            if monthly_data and 'pipe_metrics' in monthly_data:
+                monthly_pipe = monthly_data['pipe_metrics']
+                
+                # Check if both use same weighting logic
+                monthly_created_weighted = monthly_pipe.get('created_pipe', {}).get('weighted_value', 0)
+                yearly_created_weighted = pipe_metrics.get('created_pipe', {}).get('weighted_value', 0)
+                
+                print(f"\n📊 Weighted Value Comparison:")
+                print(f"  • Monthly created_pipe weighted_value: {monthly_created_weighted}")
+                print(f"  • Yearly created_pipe weighted_value: {yearly_created_weighted}")
+                
+                # They should be different (different time periods) but use same calculation method
+                if monthly_created_weighted != yearly_created_weighted and both_non_zero(monthly_created_weighted, yearly_created_weighted):
+                    print(f"  ✅ Different periods show different weighted values (expected)")
+                    test_results['yearly_weighted_values'] = True
+                else:
+                    print(f"  ⚠️  Weighted values are same or one is zero")
+        else:
+            print(f"❌ pipe_metrics not found in yearly analytics")
+    else:
+        print(f"❌ Failed to retrieve yearly analytics data")
+    
+    # Test 3: Compare weighted values vs pipeline values for realism
+    print(f"\n📊 Test 3: Weighted vs Pipeline Value Realism Check")
+    print(f"{'='*60}")
+    
+    if monthly_data and 'pipe_metrics' in monthly_data:
+        pipe_metrics = monthly_data['pipe_metrics']
+        
+        # Analyze AE breakdown for realistic weighting
+        if 'ae_breakdown' in pipe_metrics:
+            ae_breakdown = pipe_metrics['ae_breakdown']
+            print(f"✅ AE breakdown found with {len(ae_breakdown)} AEs")
+            
+            realistic_weighting_count = 0
+            total_aes = len(ae_breakdown)
+            
+            print(f"\n📋 AE-level Weighted vs Pipeline Analysis:")
+            for ae_data in ae_breakdown[:5]:  # Check first 5 AEs
+                ae_name = ae_data.get('ae', 'Unknown')
+                total_pipe = ae_data.get('total_pipe', 0)
+                weighted_pipe = ae_data.get('weighted_pipe', 0)
+                
+                if total_pipe > 0 and weighted_pipe > 0:
+                    ratio = weighted_pipe / total_pipe
+                    print(f"  • {ae_name}: ${total_pipe:,.0f} → ${weighted_pipe:,.0f} (ratio: {ratio:.3f})")
+                    
+                    # Check if ratio suggests Excel formula (stage × source × recency)
+                    if 0.1 < ratio < 0.8 and not is_simple_probability(ratio):
+                        realistic_weighting_count += 1
+                        print(f"    ✅ Ratio suggests complex Excel weighting")
+                    else:
+                        print(f"    ⚠️  Ratio suggests simple probability weighting")
+                else:
+                    print(f"  • {ae_name}: No pipeline or weighted data")
+            
+            if realistic_weighting_count >= min(3, total_aes // 2):
+                print(f"\n✅ Majority of AEs show realistic Excel weighting patterns")
+                test_results['weighted_vs_pipeline_comparison'] = True
+            else:
+                print(f"\n⚠️  Most AEs show simple probability weighting patterns")
+    
+    # Test 4: Check closing_projections use Excel weighting
+    print(f"\n📊 Test 4: Closing Projections Excel Weighting")
+    print(f"{'='*60}")
+    
+    if monthly_data and 'closing_projections' in monthly_data:
+        closing_proj = monthly_data['closing_projections']
+        print(f"✅ closing_projections found in monthly analytics")
+        
+        # Check different time periods for weighted values
+        periods = ['next_7_days', 'current_month', 'next_quarter']
+        excel_weighting_detected = False
+        
+        for period in periods:
+            if period in closing_proj:
+                period_data = closing_proj[period]
+                total_value = period_data.get('total_value', 0)
+                weighted_value = period_data.get('weighted_value', 0)
+                
+                print(f"\n📋 {period.replace('_', ' ').title()}:")
+                print(f"  • total_value: ${total_value:,.0f}")
+                print(f"  • weighted_value: ${weighted_value:,.0f}")
+                
+                if total_value > 0 and weighted_value > 0:
+                    ratio = weighted_value / total_value
+                    print(f"  • ratio: {ratio:.3f}")
+                    
+                    # Check if this looks like Excel weighting (complex calculation)
+                    if 0.1 < ratio < 0.9 and not is_simple_probability(ratio):
+                        print(f"  ✅ Excel weighting pattern detected")
+                        excel_weighting_detected = True
+                    else:
+                        print(f"  ⚠️  Simple probability pattern detected")
+        
+        if excel_weighting_detected:
+            test_results['closing_projections_weighting'] = True
+            print(f"\n✅ Closing projections use Excel weighting logic")
+        else:
+            print(f"\n⚠️  Closing projections may not use Excel weighting")
+    else:
+        print(f"❌ closing_projections not found in monthly analytics")
+    
+    # Test 5: Look for evidence of stage × source × recency factors
+    print(f"\n📊 Test 5: Excel Formula Factors Analysis")
+    print(f"{'='*60}")
+    
+    if monthly_data and 'pipe_metrics' in monthly_data and 'pipe_details' in monthly_data['pipe_metrics']:
+        pipe_details = monthly_data['pipe_metrics']['pipe_details']
+        print(f"✅ pipe_details found with {len(pipe_details)} deals")
+        
+        # Analyze individual deals for Excel weighting patterns
+        excel_factors_detected = analyze_excel_factors(pipe_details)
+        
+        if excel_factors_detected:
+            print(f"✅ Excel formula factors (stage × source × recency) detected in deal analysis")
+        else:
+            print(f"⚠️  Excel formula factors not clearly detected")
+    
+    # Summary
+    print(f"\n{'='*60}")
+    print(f"📋 EXCEL WEIGHTING IMPLEMENTATION TEST SUMMARY")
+    print(f"{'='*60}")
+    
+    total_tests = len(test_results)
+    passed_tests = sum(1 for result in test_results.values() if result)
+    
+    for test_name, result in test_results.items():
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"  {test_name}: {status}")
+    
+    print(f"\n📊 Overall Results: {passed_tests}/{total_tests} tests passed")
+    
+    # Detailed findings
+    print(f"\n💡 KEY FINDINGS:")
+    if test_results['monthly_weighted_values']:
+        print(f"  ✅ Monthly analytics implements Excel weighting (weighted_value ≠ pipeline value)")
+    if test_results['yearly_weighted_values']:
+        print(f"  ✅ Yearly analytics consistent with Excel weighting implementation")
+    if test_results['weighted_vs_pipeline_comparison']:
+        print(f"  ✅ Weighted values show realistic patterns vs pipeline values")
+    if test_results['closing_projections_weighting']:
+        print(f"  ✅ Closing projections use Excel weighting logic")
+    
+    if passed_tests >= 3:
+        print(f"\n🎉 SUCCESS: Excel weighting implementation appears to be working correctly!")
+        print(f"   The backend now implements Excel formula (stage × source × recency) instead of simple probabilities")
+    else:
+        print(f"\n❌ ISSUES: Excel weighting implementation may not be fully working")
+        print(f"   Some endpoints may still use simple stage-only probabilities")
+    
+    return passed_tests >= 3
+
+def both_non_zero(val1, val2):
+    """Check if both values are non-zero"""
+    return val1 != 0 and val2 != 0
+
+def is_simple_probability(ratio):
+    """Check if ratio suggests simple probability weighting (0.3, 0.5, 0.7, etc.)"""
+    simple_probs = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    return any(abs(ratio - prob) < 0.05 for prob in simple_probs)
+
+def analyze_excel_factors(pipe_details):
+    """Analyze pipe details for evidence of Excel formula factors"""
+    if not pipe_details or len(pipe_details) == 0:
+        return False
+    
+    print(f"\n📋 Analyzing {len(pipe_details)} deals for Excel factors:")
+    
+    # Look for deals with different stages and check weighted values
+    stage_weighted_ratios = {}
+    
+    for deal in pipe_details[:10]:  # Analyze first 10 deals
+        stage = deal.get('stage', 'Unknown')
+        pipeline = deal.get('pipeline', 0)
+        weighted = deal.get('weighted_value', 0)
+        
+        if pipeline > 0 and weighted > 0:
+            ratio = weighted / pipeline
+            if stage not in stage_weighted_ratios:
+                stage_weighted_ratios[stage] = []
+            stage_weighted_ratios[stage].append(ratio)
+    
+    # Check if different stages have different weighting patterns
+    excel_pattern_detected = False
+    
+    for stage, ratios in stage_weighted_ratios.items():
+        if len(ratios) > 0:
+            avg_ratio = sum(ratios) / len(ratios)
+            print(f"  • {stage}: avg ratio {avg_ratio:.3f} ({len(ratios)} deals)")
+            
+            # Excel weighting should show variation within stages (due to source/recency factors)
+            if len(ratios) > 1:
+                ratio_variance = max(ratios) - min(ratios)
+                if ratio_variance > 0.1:  # Significant variation suggests complex weighting
+                    print(f"    ✅ High variance ({ratio_variance:.3f}) suggests Excel factors")
+                    excel_pattern_detected = True
+                else:
+                    print(f"    ⚠️  Low variance ({ratio_variance:.3f}) suggests simple weighting")
+    
+    return excel_pattern_detected
         
         for section in pipeline_sections:
             if section in monthly_data:
