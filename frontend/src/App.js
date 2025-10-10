@@ -295,6 +295,19 @@ function DraggableDealItem({ deal, index, onHide }) {
   );
 }
 
+function DealItemContent({ deal }) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex-1">
+        <div className="font-medium">{deal.client}</div>
+        <div className="text-sm text-gray-600">
+          AE: {deal.owner} | Pipeline: ${deal.pipeline?.toLocaleString()}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function DraggableLeadItem({ lead, index, onHide }) {
   return (
     <Draggable draggableId={lead.id} index={index}>
