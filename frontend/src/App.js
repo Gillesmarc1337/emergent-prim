@@ -1054,7 +1054,13 @@ function Dashboard() {
         axios.get(`${API}/projections/performance-summary`)
       ]);
       
-      setHotDeals(hotDealsResponse.data);
+      // Assign default columns to deals if not already assigned
+      const dealsWithColumns = hotDealsResponse.data.map((deal, index) => ({
+        ...deal,
+        column: deal.column || (index % 3 === 0 ? 'next14' : index % 3 === 1 ? 'next30' : 'next60')
+      }));
+      
+      setHotDeals(dealsWithColumns);
       setHotLeads(hotLeadsResponse.data);
       setPerformanceSummary(performanceResponse.data);
     } catch (error) {
