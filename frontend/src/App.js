@@ -2298,69 +2298,103 @@ function Dashboard() {
                 <CardDescription>Upcoming meetings and weighted pipeline highlights</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <Card className="border-2 border-orange-200 bg-orange-50">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                  {/* Card 1: Deals en Proposal sent ou Legals */}
+                  <Card className="border-2 border-purple-200 bg-purple-50">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        <CalendarDays className="h-5 w-5 text-orange-600" />
-                        Next 7 Days
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-purple-600" />
+                        Deals Proposal/Legals
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold mb-2 text-gray-800">
-                        ${analytics.closing_projections.next_7_days.total_value.toLocaleString()}
+                        {(analytics.closing_projections.current_month.deals.filter(deal => 
+                          deal.stage === 'C Proposal sent' || deal.stage === 'B Legals'
+                        ).length) + 
+                        (analytics.closing_projections.next_quarter.deals.filter(deal => 
+                          deal.stage === 'C Proposal sent' || deal.stage === 'B Legals'
+                        ).length)}
                       </div>
-                      <div className="text-lg font-bold text-orange-600 mb-2">
-                        Weighted: ${analytics.closing_projections.next_7_days.weighted_value.toLocaleString()}
-                      </div>
-                      <div className="text-sm">
-                        <Badge variant="secondary">
-                          {analytics.closing_projections.next_7_days.deals.length} potential deals
-                        </Badge>
+                      <div className="text-xs text-gray-600">
+                        Proposal + Legals
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="border-2 border-blue-200 bg-blue-50">
+                  {/* Card 2: Valeur des deals en Legals et Proposal sent */}
+                  <Card className="border-2 border-indigo-200 bg-indigo-50">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        <Calendar className="h-5 w-5 text-blue-600" />
-                        This Month
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-indigo-600" />
+                        Valeur Proposal/Legals
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold mb-2 text-gray-800">
-                        ${analytics.closing_projections.current_month.total_value.toLocaleString()}
+                      <div className="text-xl font-bold mb-2 text-gray-800">
+                        ${((analytics.closing_projections.current_month.deals.filter(deal => 
+                          deal.stage === 'C Proposal sent' || deal.stage === 'B Legals'
+                        ).reduce((sum, deal) => sum + (deal.pipeline || 0), 0)) + 
+                        (analytics.closing_projections.next_quarter.deals.filter(deal => 
+                          deal.stage === 'C Proposal sent' || deal.stage === 'B Legals'
+                        ).reduce((sum, deal) => sum + (deal.pipeline || 0), 0))).toLocaleString()}
                       </div>
-                      <div className="text-lg font-bold text-blue-600 mb-2">
-                        Weighted: ${analytics.closing_projections.current_month.weighted_value.toLocaleString()}
-                      </div>
-                      <div className="text-sm">
-                        <Badge variant="secondary">
-                          {analytics.closing_projections.current_month.deals.length} potential deals
-                        </Badge>
+                      <div className="text-xs text-gray-600">
+                        Total Pipeline Value
                       </div>
                     </CardContent>
                   </Card>
 
+                  {/* Card 3: Nombre de POA booked */}
                   <Card className="border-2 border-green-200 bg-green-50">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-green-600" />
-                        This Quarter
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        POA Booked
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold mb-2 text-gray-800">
-                        ${analytics.closing_projections.next_quarter.total_value.toLocaleString()}
+                        {analytics.dashboard_blocks?.block_2_intro_poa?.poa_actual || 0}
                       </div>
-                      <div className="text-lg font-bold text-green-600 mb-2">
-                        Weighted: ${analytics.closing_projections.next_quarter.weighted_value.toLocaleString()}
+                      <div className="text-xs text-gray-600">
+                        Target: {analytics.dashboard_blocks?.block_2_intro_poa?.poa_target || 0}
                       </div>
-                      <div className="text-sm">
-                        <Badge variant="secondary">
-                          {analytics.closing_projections.next_quarter.deals.length} potential deals
-                        </Badge>
+                    </CardContent>
+                  </Card>
+
+                  {/* Card 4: Weighted pipe en cours (aggregate) */}
+                  <Card className="border-2 border-blue-200 bg-blue-50">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-blue-600" />
+                        Aggregate Weighted
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-xl font-bold mb-2 text-gray-800">
+                        ${(analytics.dashboard_blocks?.block_3_pipe_creation?.aggregate_weighted_pipe / 1000000).toFixed(1)}M
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        Total Active Pipeline
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Card 5: Pipe du mois en cours */}
+                  <Card className="border-2 border-orange-200 bg-orange-50">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-orange-600" />
+                        Pipe Mois En Cours
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-xl font-bold mb-2 text-gray-800">
+                        ${(analytics.dashboard_blocks?.block_3_pipe_creation?.new_pipe_created / 1000000).toFixed(1)}M
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        New Pipe Created
                       </div>
                     </CardContent>
                   </Card>
