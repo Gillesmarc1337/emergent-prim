@@ -1139,7 +1139,7 @@ function Dashboard() {
     if (['next14', 'next30', 'next60'].includes(source.droppableId) || 
         ['next14', 'next30', 'next60'].includes(destination.droppableId)) {
       
-      const newDeals = Array.from(filteredHotDeals);
+      const newDeals = Array.from(hotDeals);
       const draggedDeal = newDeals.find(deal => deal.id === result.draggableId);
       
       if (draggedDeal) {
