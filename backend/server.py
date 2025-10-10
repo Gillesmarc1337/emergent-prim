@@ -1089,11 +1089,6 @@ async def get_yearly_analytics(year: int = 2025):
             'forecast_gap': ytd_revenue < 4500000.0 * 0.75
         }
         
-        # Dashboard blocks for July-December period (6 months)
-        # Calculate actual values for July-December period
-        july_dec_start = datetime(year, 7, 1)
-        july_dec_end = datetime(year, 12, 31, 23, 59, 59, 999999)
-        
         # For realistic testing, let's use a period that has actual data
         # Instead of July-Dec, let's use year-to-date or available data range
         current_date = datetime.now()
