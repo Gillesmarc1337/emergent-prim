@@ -1102,7 +1102,7 @@ async def get_yearly_analytics(year: int = 2025):
         # Intro & POA for July-Dec period
         intro_july_dec = len(july_dec_meetings[july_dec_meetings['show_noshow'] == 'Show'])
         monthly_intro_target = 45
-        july_dec_intro_target = monthly_intro_target * months_elapsed
+        july_dec_intro_target = monthly_intro_target * months_in_july_dec_period
         
         poa_stages = ['D POA Booked', 'C Proposal sent', 'B Legals', 'A Closed']
         poa_july_dec = len(df[
