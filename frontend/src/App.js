@@ -2104,9 +2104,20 @@ function Dashboard() {
               title="Pipeline Metrics"
               isOnTrack={analytics.pipe_metrics.total_pipe.on_track}
               conclusion={analytics.pipe_metrics.total_pipe.on_track 
-                ? "Pipeline creation and weighting on track to meet targets." 
+                ? "Pipeline creation and weighting aligned with Excel methodology and targets." 
                 : "Need to accelerate pipeline generation and improve deal quality."}
             >
+              {/* Excel Formula Reference */}
+              <div className="mb-4 p-3 bg-gray-50 rounded-lg border">
+                <div className="font-semibold text-gray-800 mb-1">🧮 Excel-Based Weighted Calculation</div>
+                <div className="text-xs text-gray-600">
+                  Weighted values calculated using exact Excel formula: Stage probability × Source factor × Recency adjustment
+                  <br />
+                  <strong>Stages:</strong> E Intro attended, D POA Booked, C Proposal sent, B Legals
+                  <br />
+                  <strong>Sources:</strong> Outbound, Inbound, Client referral, Internal referral, Partnership
+                </div>
+              </div>
               {/* Pipeline Overview - 4 blocks uniformisées avec Dashboard */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                 <MetricCard
