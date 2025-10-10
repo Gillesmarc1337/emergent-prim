@@ -2886,6 +2886,226 @@ def test_deals_count_analysis():
         'analysis_complete': True
     }
 
+def test_dashboard_analytics_structure():
+    """Test GET /api/analytics/dashboard endpoint structure for 3rd card implementation"""
+    print(f"\n{'='*80}")
+    print(f"📊 TESTING DASHBOARD ANALYTICS ENDPOINT STRUCTURE")
+    print(f"{'='*80}")
+    
+    # Test the dashboard endpoint
+    print(f"\n🔍 Testing GET /api/analytics/dashboard")
+    data = test_api_endpoint("/analytics/dashboard")
+    
+    if data is None:
+        print(f"❌ Failed to get dashboard analytics data")
+        return False
+    
+    print(f"✅ Successfully retrieved dashboard analytics data")
+    
+    # Examine the response structure
+    print(f"\n📋 Dashboard Analytics Response Structure:")
+    if isinstance(data, dict):
+        for key in data.keys():
+            print(f"  • {key}: {type(data[key])}")
+    
+    # 1. Check key_metrics section
+    print(f"\n{'='*60}")
+    print(f"🔍 EXAMINING KEY_METRICS SECTION")
+    print(f"{'='*60}")
+    
+    success = True
+    
+    if 'key_metrics' in data:
+        key_metrics = data['key_metrics']
+        print(f"✅ key_metrics section found")
+        
+        print(f"\n📊 Available fields in key_metrics:")
+        for field, value in key_metrics.items():
+            print(f"  • {field}: {value} ({type(value).__name__})")
+        
+        # Check for specific fields needed for 3rd card
+        required_fields = [
+            'pipe_created',  # Total New Pipe Generated (SUM of all created deals in period)
+            'ytd_revenue',   # Revenue data
+            'ytd_target',    # Target data
+            'total_pipeline', # Pipeline data
+            'weighted_pipeline' # Weighted pipeline data
+        ]
+        
+        print(f"\n🎯 Checking for required fields for 3rd card:")
+        for field in required_fields:
+            if field in key_metrics:
+                value = key_metrics[field]
+                print(f"  ✅ {field}: {value}")
+            else:
+                print(f"  ❌ {field}: NOT FOUND")
+                success = False
+    else:
+        print(f"❌ key_metrics section not found in response")
+        success = False
+    
+    # 2. Check dashboard_blocks section for pipe data
+    print(f"\n{'='*60}")
+    print(f"🔧 EXAMINING DASHBOARD_BLOCKS FOR PIPE DATA")
+    print(f"{'='*60}")
+    
+    if 'dashboard_blocks' in data:
+        dashboard_blocks = data['dashboard_blocks']
+        print(f"✅ dashboard_blocks section found")
+        
+        # Check block_3_pipe_creation specifically
+        if 'block_3_pipe_creation' in dashboard_blocks:
+            block_3 = dashboard_blocks['block_3_pipe_creation']
+            print(f"✅ block_3_pipe_creation found")
+            
+            print(f"\n📊 Available fields in block_3_pipe_creation:")
+            for field, value in block_3.items():
+                print(f"  • {field}: {value}")
+            
+            # Check for specific pipe fields
+            pipe_fields = [
+                'new_pipe_created',      # New pipe created in period
+                'weighted_pipe_created', # New weighted pipe
+                'monthly_target'         # Target for pipe creation
+            ]
+            
+            print(f"\n🎯 Checking pipe creation fields:")
+            for field in pipe_fields:
+                if field in block_3:
+                    value = block_3[field]
+                    print(f"  ✅ {field}: {value}")
+                else:
+                    print(f"  ❌ {field}: NOT FOUND")
+        else:
+            print(f"❌ block_3_pipe_creation not found in dashboard_blocks")
+            success = False
+    else:
+        print(f"❌ dashboard_blocks section not found in response")
+        success = False
+    
+    # 3. Check monthly_revenue_chart for period information
+    print(f"\n{'='*60}")
+    print(f"📅 EXAMINING MONTHLY_REVENUE_CHART FOR PERIOD DATA")
+    print(f"{'='*60}")
+    
+    if 'monthly_revenue_chart' in data:
+        monthly_chart = data['monthly_revenue_chart']
+        print(f"✅ monthly_revenue_chart found with {len(monthly_chart)} months")
+        
+        if len(monthly_chart) > 0:
+            print(f"\n📊 Sample month data structure:")
+            sample_month = monthly_chart[0]
+            for field, value in sample_month.items():
+                print(f"  • {field}: {value}")
+            
+            # Check for weighted pipe fields
+            weighted_fields = [
+                'weighted_pipe',           # Weighted pipe for the month
+                'new_weighted_pipe',       # New weighted pipe created
+                'aggregate_weighted_pipe'  # Aggregate weighted pipe
+            ]
+            
+            print(f"\n🎯 Checking weighted pipe fields in monthly data:")
+            for field in weighted_fields:
+                if field in sample_month:
+                    value = sample_month[field]
+                    print(f"  ✅ {field}: {value}")
+                else:
+                    print(f"  ❌ {field}: NOT FOUND")
+        
+        # Calculate period information for dynamic targets
+        print(f"\n📊 Period analysis for dynamic target calculation:")
+        print(f"  • Total months in chart: {len(monthly_chart)}")
+        
+        # Check if we can determine the period duration
+        if len(monthly_chart) >= 2:
+            first_month = monthly_chart[0]['month']
+            last_month = monthly_chart[-1]['month']
+            print(f"  • Period range: {first_month} to {last_month}")
+            print(f"  • This represents a {len(monthly_chart)}-month period")
+            print(f"  • For dynamic targets: multiply base monthly targets by {len(monthly_chart)}")
+    else:
+        print(f"❌ monthly_revenue_chart not found in response")
+        success = False
+    
+    # 4. Analysis for 3rd card implementation
+    print(f"\n{'='*60}")
+    print(f"💡 ANALYSIS FOR 3RD CARD IMPLEMENTATION")
+    print(f"{'='*60}")
+    
+    print(f"\n🎯 Fields available for 3rd card requirements:")
+    
+    # Total New Pipe Generated
+    if 'key_metrics' in data and 'pipe_created' in data['key_metrics']:
+        pipe_created = data['key_metrics']['pipe_created']
+        print(f"  ✅ Total New Pipe Generated: {pipe_created} (from key_metrics.pipe_created)")
+    elif 'dashboard_blocks' in data and 'block_3_pipe_creation' in data['dashboard_blocks']:
+        if 'new_pipe_created' in data['dashboard_blocks']['block_3_pipe_creation']:
+            new_pipe = data['dashboard_blocks']['block_3_pipe_creation']['new_pipe_created']
+            print(f"  ✅ Total New Pipe Generated: {new_pipe} (from dashboard_blocks.block_3_pipe_creation.new_pipe_created)")
+    else:
+        print(f"  ❌ Total New Pipe Generated: NOT AVAILABLE")
+        success = False
+    
+    # New Weighted Pipe
+    if 'dashboard_blocks' in data and 'block_3_pipe_creation' in data['dashboard_blocks']:
+        if 'weighted_pipe_created' in data['dashboard_blocks']['block_3_pipe_creation']:
+            weighted_pipe = data['dashboard_blocks']['block_3_pipe_creation']['weighted_pipe_created']
+            print(f"  ✅ New Weighted Pipe: {weighted_pipe} (from dashboard_blocks.block_3_pipe_creation.weighted_pipe_created)")
+    elif 'monthly_revenue_chart' in data and len(data['monthly_revenue_chart']) > 0:
+        if 'new_weighted_pipe' in data['monthly_revenue_chart'][0]:
+            new_weighted = data['monthly_revenue_chart'][0]['new_weighted_pipe']
+            print(f"  ✅ New Weighted Pipe: {new_weighted} (from monthly_revenue_chart[0].new_weighted_pipe)")
+    else:
+        print(f"  ❌ New Weighted Pipe: NOT AVAILABLE")
+        success = False
+    
+    # Aggregate Weighted Pipe
+    if 'key_metrics' in data and 'weighted_pipeline' in data['key_metrics']:
+        weighted_pipeline = data['key_metrics']['weighted_pipeline']
+        print(f"  ✅ Aggregate Weighted Pipe: {weighted_pipeline} (from key_metrics.weighted_pipeline)")
+    elif 'monthly_revenue_chart' in data and len(data['monthly_revenue_chart']) > 0:
+        if 'aggregate_weighted_pipe' in data['monthly_revenue_chart'][0]:
+            aggregate_weighted = data['monthly_revenue_chart'][0]['aggregate_weighted_pipe']
+            print(f"  ✅ Aggregate Weighted Pipe: {aggregate_weighted} (from monthly_revenue_chart[0].aggregate_weighted_pipe)")
+    else:
+        print(f"  ❌ Aggregate Weighted Pipe: NOT AVAILABLE")
+        success = False
+    
+    # Dynamic target calculation
+    print(f"\n🎯 Dynamic target calculation capability:")
+    if 'monthly_revenue_chart' in data:
+        months_count = len(data['monthly_revenue_chart'])
+        print(f"  ✅ Period duration: {months_count} months")
+        print(f"  ✅ Dynamic targets can be calculated as: base_monthly_target × {months_count}")
+        print(f"  • Example: New Pipe Target = 2,000,000 × {months_count} = {2000000 * months_count:,}")
+        print(f"  • Example: Aggregate Weighted Target = 800,000 × {months_count} = {800000 * months_count:,}")
+    else:
+        print(f"  ❌ Cannot determine period duration for dynamic targets")
+        success = False
+    
+    # 5. Summary and recommendations
+    print(f"\n{'='*60}")
+    print(f"📋 SUMMARY AND RECOMMENDATIONS")
+    print(f"{'='*60}")
+    
+    if success:
+        print(f"✅ Dashboard endpoint provides all necessary data for 3rd card implementation")
+        print(f"\n💡 Recommended implementation approach:")
+        print(f"  1. Use key_metrics.pipe_created for 'Total New Pipe Generated'")
+        print(f"  2. Use dashboard_blocks.block_3_pipe_creation.weighted_pipe_created for 'New Weighted Pipe'")
+        print(f"  3. Use key_metrics.weighted_pipeline for 'Aggregate Weighted Pipe'")
+        print(f"  4. Calculate dynamic targets using monthly_revenue_chart length × base targets")
+        print(f"  5. Base targets: New Pipe = 2M/month, Aggregate Weighted = 800K/month")
+    else:
+        print(f"❌ Some required data is missing from dashboard endpoint")
+        print(f"\n⚠️  Issues that need to be addressed:")
+        print(f"  • Check if all required fields are properly calculated and returned")
+        print(f"  • Verify that weighted pipe calculations are working correctly")
+        print(f"  • Ensure period information is available for dynamic target calculation")
+    
+    return success
+
 def main():
     """Run all backend tests with priority on pipeline data Excel matching"""
     print(f"🚀 Starting Backend API Testing")
