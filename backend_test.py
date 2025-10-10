@@ -3694,7 +3694,7 @@ def test_projections_master_data_verification():
     return master_data_results
 
 def main():
-    """Run all backend tests with priority on pipeline data Excel matching"""
+    """Run all backend tests with priority on Projections master data verification"""
     print(f"🚀 Starting Backend API Testing")
     print(f"Backend URL: {BASE_URL}")
     print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -3712,8 +3712,12 @@ def main():
     if not data_available:
         print(f"\n⚠️  No data available - tests will return empty results")
     
-    # PRIORITY TEST: Legals + Proposal Pipeline Values (as requested in review)
-    print(f"\n🎯 PRIORITY TEST: Legals + Proposal Pipeline Values Analysis")
+    # PRIORITY TEST: Projections Master Data Verification (as requested in review)
+    print(f"\n🎯 PRIORITY TEST: Projections Master Data Verification")
+    master_data_results = test_projections_master_data_verification()
+    
+    # SECONDARY TEST: Legals + Proposal Pipeline Values (previous priority test)
+    print(f"\n🎯 SECONDARY TEST: Legals + Proposal Pipeline Values Analysis")
     if not test_legals_proposal_pipeline_values():
         all_tests_passed = False
     
