@@ -2351,36 +2351,59 @@ function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                  {/* Card 1: Deals en Proposal sent ou Legals */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  {/* Card 1: Legals Count */}
                   <Card className="border-2 border-purple-200 bg-purple-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
                         <FileText className="h-4 w-4 text-purple-600" />
-                        Deals Proposal/Legals
+                        Legals
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold mb-2 text-gray-800">
                         {(analytics.closing_projections.current_month.deals.filter(deal => 
-                          deal.stage === 'C Proposal sent' || deal.stage === 'B Legals'
+                          deal.stage === 'B Legals'
                         ).length) + 
                         (analytics.closing_projections.next_quarter.deals.filter(deal => 
-                          deal.stage === 'C Proposal sent' || deal.stage === 'B Legals'
+                          deal.stage === 'B Legals'
                         ).length)}
                       </div>
                       <div className="text-xs text-gray-600">
-                        Proposal + Legals
+                        Deals in Legals
                       </div>
                     </CardContent>
                   </Card>
 
-                  {/* Card 2: Valeur des deals en Legals et Proposal sent */}
+                  {/* Card 2: Proposal Sent Count */}
                   <Card className="border-2 border-indigo-200 bg-indigo-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-indigo-600" />
-                        Valeur Proposal/Legals
+                        <Target className="h-4 w-4 text-indigo-600" />
+                        Proposal Sent
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold mb-2 text-gray-800">
+                        {(analytics.closing_projections.current_month.deals.filter(deal => 
+                          deal.stage === 'C Proposal sent'
+                        ).length) + 
+                        (analytics.closing_projections.next_quarter.deals.filter(deal => 
+                          deal.stage === 'C Proposal sent'
+                        ).length)}
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        Deals in Proposal
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Card 3: Combined Value of Legals + Proposal Sent */}
+                  <Card className="border-2 border-green-200 bg-green-50">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-green-600" />
+                        Legals + Proposal Value
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -2393,61 +2416,33 @@ function Dashboard() {
                         ).reduce((sum, deal) => sum + (deal.pipeline || 0), 0))).toLocaleString()}
                       </div>
                       <div className="text-xs text-gray-600">
-                        Valeur brute (sauf Lost/Not Relevant)
+                        Combined Pipeline Value
                       </div>
                     </CardContent>
                   </Card>
 
-                  {/* Card 3: Nombre de POA booked */}
-                  <Card className="border-2 border-green-200 bg-green-50">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                        POA Booked
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold mb-2 text-gray-800">
-                        {analytics.dashboard_blocks?.block_2_intro_poa?.poa_actual || 0}
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        Target: {analytics.dashboard_blocks?.block_2_intro_poa?.poa_target || 0}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Card 4: Weighted pipe en cours (aggregate) */}
+                  {/* Card 4: POA Status */}
                   <Card className="border-2 border-blue-200 bg-blue-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-blue-600" />
-                        Aggregate Weighted
+                        <Calendar className="h-4 w-4 text-blue-600" />
+                        POA Status
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-xl font-bold mb-2 text-gray-800">
-                        ${(analytics.dashboard_blocks?.block_3_pipe_creation?.aggregate_weighted_pipe / 1000000).toFixed(1)}M
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        Cumul historique pondéré
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Card 5: Pipe du mois en cours */}
-                  <Card className="border-2 border-orange-200 bg-orange-50">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-orange-600" />
-                        Pipe Mois En Cours
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-xl font-bold mb-2 text-gray-800">
-                        ${(analytics.dashboard_blocks?.block_3_pipe_creation?.new_pipe_created / 1000000).toFixed(1)}M
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        Nouveau pipe créé ce mois
+                      <div className="grid grid-cols-2 gap-2 text-center">
+                        <div>
+                          <div className="text-lg font-bold text-green-600">
+                            {analytics.dashboard_blocks?.block_2_intro_poa?.poa_actual || 0}
+                          </div>
+                          <div className="text-xs text-gray-600">Completed</div>
+                        </div>
+                        <div>
+                          <div className="text-lg font-bold text-blue-600">
+                            {analytics.meetings_attended?.upcoming_poa?.filter(poa => new Date(poa.poa_date) > new Date()).length || 0}
+                          </div>
+                          <div className="text-xs text-gray-600">Upcoming</div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
