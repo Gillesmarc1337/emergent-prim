@@ -1394,16 +1394,193 @@ def test_meeting_targets_correction():
     
     return passed_tests == total_tests
 
+def test_meeting_generation_structure():
+    """Test meeting_generation structure in API responses for targets correction"""
+    print(f"\n{'='*80}")
+    print(f"🎯 TESTING MEETING GENERATION STRUCTURE FOR TARGETS CORRECTION")
+    print(f"{'='*80}")
+    
+    test_results = {
+        'monthly_meeting_generation': False,
+        'yearly_meeting_generation': False,
+        'custom_meeting_generation': False
+    }
+    
+    # Test 1: GET /api/analytics/monthly - Check meeting_generation structure
+    print(f"\n📊 Test 1: GET /api/analytics/monthly - Meeting Generation Structure")
+    print(f"{'='*60}")
+    
+    monthly_data = test_api_endpoint("/analytics/monthly")
+    if monthly_data and 'meeting_generation' in monthly_data:
+        meeting_gen = monthly_data['meeting_generation']
+        print(f"✅ meeting_generation found in monthly analytics")
+        
+        # Expected structure for monthly (50 total = 22+17+11)
+        expected_monthly = {
+            'target': 50,
+            'inbound_target': 22,
+            'outbound_target': 17,
+            'referral_target': 11
+        }
+        
+        success = True
+        print(f"📋 Verifying meeting_generation structure:")
+        for key, expected_value in expected_monthly.items():
+            actual_value = meeting_gen.get(key, 'NOT FOUND')
+            if actual_value == expected_value:
+                print(f"  ✅ {key}: {actual_value} (matches expected {expected_value})")
+            else:
+                print(f"  ❌ {key}: {actual_value} (expected {expected_value})")
+                success = False
+        
+        # Verify math adds up
+        inbound = meeting_gen.get('inbound_target', 0)
+        outbound = meeting_gen.get('outbound_target', 0)
+        referral = meeting_gen.get('referral_target', 0)
+        total = meeting_gen.get('target', 0)
+        calculated_total = inbound + outbound + referral
+        
+        if calculated_total == total == 50:
+            print(f"  ✅ Math verification: {inbound}+{outbound}+{referral}={calculated_total} = target({total})")
+        else:
+            print(f"  ❌ Math verification: {inbound}+{outbound}+{referral}={calculated_total} ≠ target({total})")
+            success = False
+        
+        test_results['monthly_meeting_generation'] = success
+    else:
+        print(f"❌ meeting_generation not found in monthly analytics response")
+        if monthly_data:
+            print(f"📋 Available keys: {list(monthly_data.keys())}")
+    
+    # Test 2: GET /api/analytics/yearly - Check meeting_generation structure (6 months)
+    print(f"\n📊 Test 2: GET /api/analytics/yearly - Meeting Generation Structure")
+    print(f"{'='*60}")
+    
+    yearly_data = test_api_endpoint("/analytics/yearly?year=2025")
+    if yearly_data and 'meeting_generation' in yearly_data:
+        meeting_gen = yearly_data['meeting_generation']
+        print(f"✅ meeting_generation found in yearly analytics")
+        
+        # Expected structure for yearly July-Dec (6 months × 50 = 300 total)
+        expected_yearly = {
+            'target': 300,  # 50 × 6 months
+            'inbound_target': 132,  # 22 × 6 months
+            'outbound_target': 102,  # 17 × 6 months
+            'referral_target': 66   # 11 × 6 months
+        }
+        
+        success = True
+        print(f"📋 Verifying meeting_generation structure for July-Dec period:")
+        for key, expected_value in expected_yearly.items():
+            actual_value = meeting_gen.get(key, 'NOT FOUND')
+            if actual_value == expected_value:
+                print(f"  ✅ {key}: {actual_value} (matches expected {expected_value} for 6 months)")
+            else:
+                print(f"  ❌ {key}: {actual_value} (expected {expected_value} for 6 months)")
+                success = False
+        
+        # Verify math adds up for yearly
+        inbound = meeting_gen.get('inbound_target', 0)
+        outbound = meeting_gen.get('outbound_target', 0)
+        referral = meeting_gen.get('referral_target', 0)
+        total = meeting_gen.get('target', 0)
+        calculated_total = inbound + outbound + referral
+        
+        if calculated_total == total == 300:
+            print(f"  ✅ Math verification: {inbound}+{outbound}+{referral}={calculated_total} = target({total})")
+        else:
+            print(f"  ❌ Math verification: {inbound}+{outbound}+{referral}={calculated_total} ≠ target({total})")
+            success = False
+        
+        test_results['yearly_meeting_generation'] = success
+    else:
+        print(f"❌ meeting_generation not found in yearly analytics response")
+        if yearly_data:
+            print(f"📋 Available keys: {list(yearly_data.keys())}")
+    
+    # Test 3: GET /api/analytics/custom - Check meeting_generation dynamic scaling (2 months)
+    print(f"\n📊 Test 3: GET /api/analytics/custom - Meeting Generation Dynamic Scaling")
+    print(f"{'='*60}")
+    
+    custom_data = test_api_endpoint("/analytics/custom?start_date=2025-10-01&end_date=2025-11-30")
+    if custom_data and 'meeting_generation' in custom_data:
+        meeting_gen = custom_data['meeting_generation']
+        print(f"✅ meeting_generation found in custom analytics (2-month period)")
+        
+        # Expected structure for 2-month custom period (2 × 50 = 100 total)
+        expected_custom = {
+            'target': 100,  # 50 × 2 months
+            'inbound_target': 44,  # 22 × 2 months
+            'outbound_target': 34,  # 17 × 2 months
+            'referral_target': 22   # 11 × 2 months
+        }
+        
+        success = True
+        print(f"📋 Verifying meeting_generation structure for 2-month period:")
+        for key, expected_value in expected_custom.items():
+            actual_value = meeting_gen.get(key, 'NOT FOUND')
+            if actual_value == expected_value:
+                print(f"  ✅ {key}: {actual_value} (matches expected {expected_value} for 2 months)")
+            else:
+                print(f"  ❌ {key}: {actual_value} (expected {expected_value} for 2 months)")
+                success = False
+        
+        # Verify math adds up for custom period
+        inbound = meeting_gen.get('inbound_target', 0)
+        outbound = meeting_gen.get('outbound_target', 0)
+        referral = meeting_gen.get('referral_target', 0)
+        total = meeting_gen.get('target', 0)
+        calculated_total = inbound + outbound + referral
+        
+        if calculated_total == total == 100:
+            print(f"  ✅ Math verification: {inbound}+{outbound}+{referral}={calculated_total} = target({total})")
+        else:
+            print(f"  ❌ Math verification: {inbound}+{outbound}+{referral}={calculated_total} ≠ target({total})")
+            success = False
+        
+        test_results['custom_meeting_generation'] = success
+    else:
+        print(f"❌ meeting_generation not found in custom analytics response")
+        if custom_data:
+            print(f"📋 Available keys: {list(custom_data.keys())}")
+    
+    # Summary
+    print(f"\n{'='*60}")
+    print(f"📋 MEETING GENERATION STRUCTURE TEST SUMMARY")
+    print(f"{'='*60}")
+    
+    total_tests = len(test_results)
+    passed_tests = sum(1 for result in test_results.values() if result)
+    
+    for test_name, result in test_results.items():
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"  {test_name}: {status}")
+    
+    print(f"\n📊 Overall Results: {passed_tests}/{total_tests} tests passed")
+    
+    if passed_tests == total_tests:
+        print(f"\n🎉 SUCCESS: Meeting generation structure is correctly implemented!")
+        print(f"   ✅ Monthly: target=50, inbound_target=22, outbound_target=17, referral_target=11")
+        print(f"   ✅ Yearly (July-Dec): target=300, inbound_target=132, outbound_target=102, referral_target=66")
+        print(f"   ✅ Custom (2-month): target=100, inbound_target=44, outbound_target=34, referral_target=22")
+        print(f"   ✅ All math adds up correctly and targets scale based on period duration")
+    else:
+        print(f"\n❌ ISSUES FOUND: Meeting generation structure needs correction")
+        print(f"   Please verify the calculate_meeting_generation function returns individual targets")
+    
+    return passed_tests == total_tests
+
 def main():
-    """Main testing function for meeting targets correction verification"""
-    print(f"🚀 Starting Meeting Targets Correction Testing")
+    """Main testing function for meeting generation targets correction verification"""
+    print(f"🚀 Starting Meeting Generation Targets Correction Testing")
     print(f"Base URL: {BASE_URL}")
     print(f"Test Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     # Track test results
     test_results = {
         'connectivity': False,
-        'meeting_targets': False
+        'meeting_generation_structure': False,
+        'meeting_targets_dashboard': False
     }
     
     # Test 1: Basic connectivity
@@ -1413,8 +1590,11 @@ def main():
         print(f"❌ Cannot proceed without API connectivity")
         return 1
     
-    # Test 2: Meeting targets correction verification
-    test_results['meeting_targets'] = test_meeting_targets_correction()
+    # Test 2: Meeting generation structure verification (main focus)
+    test_results['meeting_generation_structure'] = test_meeting_generation_structure()
+    
+    # Test 3: Meeting targets in dashboard blocks (secondary verification)
+    test_results['meeting_targets_dashboard'] = test_meeting_targets_correction()
     
     # Summary
     print(f"\n{'='*60}")
@@ -1429,6 +1609,15 @@ def main():
         print(f"{test_name}: {status}")
     
     print(f"\nOverall: {passed_tests}/{total_tests} tests passed")
+    
+    if test_results['meeting_generation_structure']:
+        print(f"\n🎯 MEETING GENERATION TARGETS CORRECTION: ✅ VERIFIED")
+        print(f"   The calculate_meeting_generation function correctly returns individual targets")
+        print(f"   Targets scale correctly based on period duration")
+        print(f"   All math adds up correctly (22+17+11=50 per month)")
+    else:
+        print(f"\n🎯 MEETING GENERATION TARGETS CORRECTION: ❌ NEEDS FIXING")
+        print(f"   Issues found in meeting_generation structure or target calculations")
     
     return 0 if passed_tests == total_tests else 1
 
