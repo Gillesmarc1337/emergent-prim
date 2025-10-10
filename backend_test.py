@@ -625,7 +625,7 @@ def explore_mongodb_data_structure():
         # Look for structured monthly data for 2025
         monthly_data_2025 = find_monthly_data_2025(data, endpoint)
         if monthly_data_2025:
-            master_data_found[endpoint] = monthly_data_2025
+            master_data_found[endpoint] = {'monthly_data': monthly_data_2025}
             
         # Look for specific metrics requested
         metrics_found = find_target_metrics(data, endpoint)
