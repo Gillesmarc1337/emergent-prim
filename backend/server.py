@@ -102,7 +102,11 @@ def clean_records(records):
             elif isinstance(value, np.bool_):
                 cleaned_record[key] = bool(value)
             else:
-                cleaned_record[key] = value
+                # Fix encoding for AE names (owner field)
+                if key == 'owner' and value:
+                    cleaned_record[key] = fix_ae_name_encoding(value)
+                else:
+                    cleaned_record[key] = value
         cleaned.append(cleaned_record)
     return cleaned
 
