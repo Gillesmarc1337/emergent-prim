@@ -216,13 +216,18 @@ def test_logout_endpoint(session_token):
     
     # Test that the session is actually invalidated
     print(f"\n📊 Verifying session invalidation...")
-    data, response = test_api_endpoint("/auth/me", cookies=cookies, expected_status=401)
+    result = test_api_endpoint("/auth/me", cookies=cookies, expected_status=401)
     
-    if response and response.status_code == 401:
-        print(f"✅ Session correctly invalidated - /auth/me returns 401")
-        return True
+    if result and len(result) == 2:
+        data, response = result
+        if response and response.status_code == 401:
+            print(f"✅ Session correctly invalidated - /auth/me returns 401")
+            return True
+        else:
+            print(f"❌ Session not invalidated - /auth/me should return 401, got {response.status_code if response else 'None'}")
+            return False
     else:
-        print(f"❌ Session not invalidated - /auth/me should return 401, got {response.status_code if response else 'None'}")
+        print(f"❌ Failed to test session invalidation")
         return False
 
 def test_views_endpoint_authentication():
