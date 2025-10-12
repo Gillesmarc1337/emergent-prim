@@ -2654,7 +2654,7 @@ function Dashboard() {
                   </Card>
                 </div>
 
-                {/* Partner Performance Table */}
+                {/* Partner Performance Table - Using BDR Performance data filtered for upsells */}
                 <Card className="mb-6">
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
@@ -2663,42 +2663,68 @@ function Dashboard() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {upsellRenewData.partner_performance && upsellRenewData.partner_performance.length > 0 ? (
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b">
-                              <th className="text-left p-2">PARTNER</th>
-                              <th className="text-center p-2">INTROS ATTENDED</th>
-                              <th className="text-center p-2">POA GENERATED</th>
-                              <th className="text-center p-2">UPSELLS</th>
-                              <th className="text-center p-2">RENEWALS</th>
-                              <th className="text-center p-2">CLOSING</th>
-                              <th className="text-right p-2">CLOSING VALUE</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {upsellRenewData.partner_performance.map((partner, index) => (
-                              <tr key={index} className="border-b hover:bg-gray-50">
-                                <td className="p-2 font-medium">{partner.partner_name}</td>
-                                <td className="text-center p-2">{partner.intros_attended}</td>
-                                <td className="text-center p-2">{partner.poa_generated}</td>
-                                <td className="text-center p-2">{partner.upsells}</td>
-                                <td className="text-center p-2">{partner.renewals}</td>
-                                <td className="text-center p-2">{partner.closing}</td>
-                                <td className="text-right p-2 font-medium">
-                                  ${(partner.closing_value / 1000).toFixed(0)}K
-                                </td>
+                    {(() => {
+                      // Use the same data as BDR Performance from analytics
+                      // Filter or show all as they work on upsells
+                      const partnerData = analytics?.meeting_generation?.bdr_performance || {};
+                      const hasData = Object.keys(partnerData).length > 0;
+                      
+                      return hasData ? (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b bg-gray-50">
+                                <th className="text-left p-2 font-semibold">PARTNER</th>
+                                <th className="text-center p-2 font-semibold">ROLE</th>
+                                <th className="text-right p-2 font-semibold">TOTAL MEETINGS</th>
+                                <th className="text-right p-2 font-semibold">RELEVANT MEETINGS</th>
+                                <th className="text-right p-2 font-semibold">MEETING GOAL</th>
+                                <th className="text-right p-2 font-semibold">RELEVANCE RATE</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-gray-500">
-                        No partner data available for this period
-                      </div>
-                    )}
+                            </thead>
+                            <tbody>
+                              {Object.entries(partnerData).map(([partner, stats]) => {
+                                // Monthly goal is always 6 meetings per month for BDR
+                                const monthlyGoal = stats.meeting_target || 6;
+                                const goalText = stats.role === 'BDR' ? `${stats.total_meetings}/${monthlyGoal}` : '-';
+                                const isOnTrack = stats.role === 'BDR' && stats.total_meetings >= monthlyGoal;
+                                
+                                return (
+                                  <tr key={partner} className="border-b hover:bg-gray-50">
+                                    <td className="p-2 font-medium">{partner}</td>
+                                    <td className="text-center p-2">
+                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                        stats.role === 'BDR' ? 'bg-blue-100 text-blue-800' : 
+                                        stats.role === 'AE' ? 'bg-purple-100 text-purple-800' : 
+                                        'bg-gray-100 text-gray-800'
+                                      }`}>
+                                        {stats.role || 'N/A'}
+                                      </span>
+                                    </td>
+                                    <td className="text-right p-2">{stats.total_meetings}</td>
+                                    <td className="text-right p-2">{stats.relevant_meetings}</td>
+                                    <td className={`text-right p-2 font-medium ${
+                                      stats.role === 'BDR' ? (isOnTrack ? 'text-green-600' : 'text-orange-600') : 'text-gray-500'
+                                    }`}>
+                                      {goalText}
+                                    </td>
+                                    <td className="text-right p-2">
+                                      {stats.total_meetings > 0 
+                                        ? ((stats.relevant_meetings / stats.total_meetings) * 100).toFixed(1) + '%'
+                                        : '0.0%'}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          No partner data available for this period
+                        </div>
+                      );
+                    })()}
                   </CardContent>
                 </Card>
 
