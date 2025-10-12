@@ -128,48 +128,60 @@ def test_auth_me_endpoint(session_token):
     print(f"\n📊 Test 1: Valid session token")
     if session_token:
         cookies = {'session_token': session_token}
-        data, response = test_api_endpoint("/auth/me", cookies=cookies, expected_status=200)
+        result = test_api_endpoint("/auth/me", cookies=cookies, expected_status=200)
         
-        if data:
-            print(f"✅ Valid token test passed")
-            required_fields = ['id', 'email', 'name', 'role']
-            
-            for field in required_fields:
-                if field in data:
-                    print(f"  ✅ {field}: {data[field]}")
+        if result and len(result) == 2:
+            data, response = result
+            if data:
+                print(f"✅ Valid token test passed")
+                required_fields = ['id', 'email', 'name', 'role']
+                
+                for field in required_fields:
+                    if field in data:
+                        print(f"  ✅ {field}: {data[field]}")
+                    else:
+                        print(f"  ❌ Missing field: {field}")
+                        
+                if data.get('email') == 'demo@primelis.com' and data.get('role') == 'viewer':
+                    test_results['valid_token'] = True
+                    print(f"  ✅ User data matches demo user")
                 else:
-                    print(f"  ❌ Missing field: {field}")
-                    
-            if data.get('email') == 'demo@primelis.com' and data.get('role') == 'viewer':
-                test_results['valid_token'] = True
-                print(f"  ✅ User data matches demo user")
+                    print(f"  ❌ User data doesn't match expected demo user")
             else:
-                print(f"  ❌ User data doesn't match expected demo user")
+                print(f"❌ Valid token test failed")
         else:
-            print(f"❌ Valid token test failed")
+            print(f"❌ Valid token test failed - no response")
     else:
         print(f"❌ No session token available for testing")
     
     # Test 2: Invalid session token
     print(f"\n📊 Test 2: Invalid session token")
     invalid_cookies = {'session_token': 'invalid_token_12345'}
-    data, response = test_api_endpoint("/auth/me", cookies=invalid_cookies, expected_status=401)
+    result = test_api_endpoint("/auth/me", cookies=invalid_cookies, expected_status=401)
     
-    if response and response.status_code == 401:
-        print(f"✅ Invalid token correctly returns 401")
-        test_results['invalid_token'] = True
+    if result and len(result) == 2:
+        data, response = result
+        if response and response.status_code == 401:
+            print(f"✅ Invalid token correctly returns 401")
+            test_results['invalid_token'] = True
+        else:
+            print(f"❌ Invalid token should return 401, got {response.status_code if response else 'None'}")
     else:
-        print(f"❌ Invalid token should return 401, got {response.status_code if response else 'None'}")
+        print(f"❌ Invalid token test failed - no response")
     
     # Test 3: No session token
     print(f"\n📊 Test 3: No session token")
-    data, response = test_api_endpoint("/auth/me", expected_status=401)
+    result = test_api_endpoint("/auth/me", expected_status=401)
     
-    if response and response.status_code == 401:
-        print(f"✅ No token correctly returns 401")
-        test_results['no_token'] = True
+    if result and len(result) == 2:
+        data, response = result
+        if response and response.status_code == 401:
+            print(f"✅ No token correctly returns 401")
+            test_results['no_token'] = True
+        else:
+            print(f"❌ No token should return 401, got {response.status_code if response else 'None'}")
     else:
-        print(f"❌ No token should return 401, got {response.status_code if response else 'None'}")
+        print(f"❌ No token test failed - no response")
     
     # Summary
     passed_tests = sum(1 for result in test_results.values() if result)
