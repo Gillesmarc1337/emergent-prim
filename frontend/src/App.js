@@ -2390,7 +2390,7 @@ function Dashboard() {
               </div>
 
               {/* Secondary Metrics Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                   <CardContent className="p-4">
                     <div className="text-center">
@@ -2404,6 +2404,22 @@ function Dashboard() {
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">{upsellData.renewals_actual}</div>
                       <div className="text-sm text-gray-600">Renewals</div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">{upsellData.show_actual}</div>
+                      <div className="text-sm text-gray-600">Show</div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-red-600">{upsellData.no_show_actual}</div>
+                      <div className="text-sm text-gray-600">No Show</div>
                     </div>
                   </CardContent>
                 </Card>
