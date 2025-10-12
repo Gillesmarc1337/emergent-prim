@@ -893,7 +893,7 @@ function MainDashboard({ analytics }) {
 
       {/* 4 Dashboard Blocks */}
       {analytics?.dashboard_blocks && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           {/* Block 1: Meetings Generation */}
           <Card>
             <CardHeader className="pb-3">
@@ -922,12 +922,6 @@ function MainDashboard({ analytics }) {
                   <div className="flex justify-between">
                     <span>Referral:</span>
                     <span className="font-medium">{analytics.dashboard_blocks.block_1_meetings.referral_actual}/{analytics.dashboard_blocks.block_1_meetings.referral_target}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Upsells / Cross-sell:</span>
-                    <span className="font-medium text-purple-600">
-                      {analytics.dashboard_blocks.block_1_meetings.upsells_actual}/{analytics.dashboard_blocks.block_1_meetings.upsells_target}
-                    </span>
                   </div>
                   {analytics.dashboard_blocks.block_1_meetings.unassigned_actual > 0 && (
                     <div className="flex justify-between">
