@@ -1140,6 +1140,9 @@ function Dashboard() {
   const [hiddenDeals, setHiddenDeals] = useState(new Set());
   const [hiddenLeads, setHiddenLeads] = useState(new Set());
   const [loadingProjections, setLoadingProjections] = useState(false);
+  
+  // State for Upsell & Renew tab
+  const [upsellRenewData, setUpsellRenewData] = useState(null);
 
   const loadAnalytics = async () => {
     setLoading(true);
