@@ -2187,12 +2187,13 @@ async def get_upsell_renewals_analytics(
         period_duration_months = max(1, round(period_duration_days / 30))
         
         # Base monthly targets for upsells/renewals
-        monthly_meetings_target = 15  # 15 upsell/renewal meetings per month
+        monthly_meetings_target = 11  # 11 intro upsell/renewal meetings per month
         monthly_business_partner_target = 9  # 60% from business partners
         monthly_consulting_partner_target = 6  # 40% from consulting partners
-        monthly_poa_target = 10  # 10 POA per month
-        monthly_closing_target = 6  # 6 closings per month (upsells/cross-sells)
-        monthly_closing_value_target = 200_000  # 200K per month for closing value
+        monthly_poa_target = 8  # 8 POA per month
+        monthly_closing_target = 4  # 4 closings per month (upsells/cross-sells)
+        monthly_closing_value_target = 200_000  # 200K per month for closing value (based on 4 closings × 60K avg deal size)
+        monthly_avg_deal_size = 60_000  # 60K average deal size target
         
         # Dynamic targets
         period_meetings_target = monthly_meetings_target * period_duration_months
