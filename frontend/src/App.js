@@ -2700,7 +2700,7 @@ function Dashboard() {
                               </tr>
                             </thead>
                             <tbody>
-                              {Object.entries(partnerData).map(([partner, stats]) => {
+                              {filteredPartners.map(([partner, stats]) => {
                                 // Monthly goal is always 6 meetings per month for BDR
                                 const monthlyGoal = stats.meeting_target || 6;
                                 const goalText = stats.role === 'BDR' ? `${stats.total_meetings}/${monthlyGoal}` : '-';
