@@ -1912,12 +1912,11 @@ async def get_upsell_renewals_analytics(
         period_poa_target = monthly_poa_target * period_duration_months
         period_closing_target = monthly_closing_target * period_duration_months
         
-        # Filter for Upsells/Renewals AND Partner sources
+        # Filter for Upsells/Renewals (column L: Type of deal)
         upsell_renewal_data = df[
             (df['discovery_date'] >= period_start) & 
             (df['discovery_date'] <= period_end) &
-            (df['type_of_deal'].apply(is_upsell) | df['type_of_deal'].apply(is_renewal)) &
-            df['type_of_source'].apply(is_partner_source)
+            (df['type_of_deal'].apply(is_upsell) | df['type_of_deal'].apply(is_renewal))
         ]
         
         # Meetings breakdown by partner type
