@@ -1087,6 +1087,47 @@ function MainDashboard({ analytics }) {
               </div>
             </CardContent>
           </Card>
+
+          {/* Block 5: Upsells / Cross-sell */}
+          {analytics.dashboard_blocks?.block_5_upsells && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg text-center">Upsells / Cross-sell</CardTitle>
+                <CardDescription className="text-center font-medium text-purple-600">
+                  {analytics.dashboard_blocks.block_5_upsells.period}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-purple-600">
+                      {analytics.dashboard_blocks.block_5_upsells.closing_actual}/{analytics.dashboard_blocks.block_5_upsells.closing_target}
+                    </div>
+                    <div className="text-sm text-gray-600">Closing</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-green-600">
+                      ${(analytics.dashboard_blocks.block_5_upsells.closing_value / 1000).toFixed(0)}K
+                    </div>
+                    <div className="text-xs text-gray-500">ARR Value</div>
+                  </div>
+                  <div className="mt-3">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="h-2 rounded-full bg-purple-500"
+                        style={{ 
+                          width: `${Math.min((analytics.dashboard_blocks.block_5_upsells.closing_actual / analytics.dashboard_blocks.block_5_upsells.closing_target * 100), 100)}%` 
+                        }}
+                      ></div>
+                    </div>
+                    <div className="text-center text-xs text-gray-600 mt-1">
+                      {((analytics.dashboard_blocks.block_5_upsells.closing_actual / analytics.dashboard_blocks.block_5_upsells.closing_target * 100).toFixed(1))}% of target
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
     </div>
