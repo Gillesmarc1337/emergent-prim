@@ -358,6 +358,18 @@ frontend:
         - working: true
           agent: "testing"
           comment: "🧮 EXCEL WEIGHTING IMPLEMENTATION VERIFIED: Comprehensive testing confirms Excel-based weighting logic (stage × source × recency) is successfully implemented and working correctly. MAJOR IMPROVEMENTS CONFIRMED: 1) Monthly analytics: Created pipe weighted_value ($819K) vs pipeline value ($3.07M) = 26.7% ratio, Total pipe weighted_value ($4.56M) vs pipeline value ($9.79M) = 46.6% ratio. 2) Yearly analytics: Consistent Excel weighting with different periods showing different weighted calculations. 3) Closing projections: Complex weighting ratios (66.2%) indicating Excel formula implementation beyond simple stage probabilities. 4) Individual deal analysis: High variance in weighting ratios within same stages confirms source and recency factors are working. ✅ KEY SUCCESS: Backend now implements exact Excel formula (stage × source × recency) instead of simple stage-only probabilities. Weighted values are significantly more realistic and nuanced compared to pipeline values. All analytics endpoints (monthly, yearly, closing_projections) consistently use Excel weighting logic. The centralized calculate_excel_weighted_value function correctly applies complex weighting based on stage, source type, and days since creation as per Excel specifications."
+  
+  - task: "AE Pipeline Breakdown API endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Created new /api/projections/ae-pipeline-breakdown endpoint that calculates pipeline, expected_arr, and weighted_value for all AEs across Next 14, 30, and 60-90 days periods. Returns comprehensive breakdown with totals for each AE. Uses Excel weighting formula for weighted_value calculation. Assigns deals to periods based on stage (B Legals -> next14, D POA Booked -> next30, C Proposal sent -> next60)."
 
 metadata:
   created_by: "main_agent"
