@@ -1727,10 +1727,15 @@ function Dashboard() {
                       </thead>
                       <tbody>
                         {Object.entries(analytics.meeting_generation.bdr_performance).map(([bdr, stats]) => {
-                          // Monthly goal is always 6 meetings per month
-                          const monthlyGoal = stats.meeting_target || 6;
-                          const goalText = `${stats.total_meetings}/${monthlyGoal}`;
-                          const isOnTrack = stats.total_meetings >= monthlyGoal;
+                          // Only BDR have meeting goals, not AE
+                          let goalText = '-';
+                          let isOnTrack = false;
+                          
+                          if (stats.role === 'BDR') {
+                            const monthlyGoal = stats.meeting_target || 6;
+                            goalText = `${stats.total_meetings}/${monthlyGoal}`;
+                            isOnTrack = stats.total_meetings >= monthlyGoal;
+                          }
                           
                           return (
                             <tr key={bdr} className="border-b">
@@ -1746,7 +1751,9 @@ function Dashboard() {
                               </td>
                               <td className="text-right p-2">{stats.total_meetings}</td>
                               <td className="text-right p-2">{stats.relevant_meetings}</td>
-                              <td className={`text-right p-2 font-medium ${isOnTrack ? 'text-green-600' : 'text-orange-600'}`}>
+                              <td className={`text-right p-2 font-medium ${
+                                stats.role === 'BDR' ? (isOnTrack ? 'text-green-600' : 'text-orange-600') : 'text-gray-500'
+                              }`}>
                                 {goalText}
                               </td>
                               <td className="text-right p-2">
