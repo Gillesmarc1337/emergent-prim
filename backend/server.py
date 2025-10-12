@@ -1215,11 +1215,11 @@ async def get_yearly_analytics(year: int = 2025):
         monthly_poa_target = 18
         july_dec_poa_target = monthly_poa_target * months_in_july_dec_period
         
-        # Upsells / Cross-sells for July-Dec period (Type of deal = "Up-sell")
+        # Upsells / Cross-sells for July-Dec period (Type of deal = "Upsell", "Up-sell", etc.)
         upsells_july_dec = len(df[
             (df['discovery_date'] >= july_dec_start) & 
             (df['discovery_date'] <= min(july_dec_end, current_date)) &
-            (df['type_of_deal'] == 'Up-sell')
+            df['type_of_deal'].apply(is_upsell)
         ])
         monthly_upsell_target = 5  # 5 upsells per month
         july_dec_upsell_target = monthly_upsell_target * months_in_july_dec_period
