@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://sales-analytics-69.preview.emergentagent.com/api"
+BASE_URL = "https://pipeline-view.preview.emergentagent.com/api"
 
 def test_july_dec_dashboard_blocks():
     """Test the July To Dec dashboard blocks corrections"""

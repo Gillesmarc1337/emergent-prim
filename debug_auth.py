@@ -6,7 +6,7 @@ Debug authentication issue
 import requests
 import json
 
-BASE_URL = "https://sales-analytics-69.preview.emergentagent.com/api"
+BASE_URL = "https://pipeline-view.preview.emergentagent.com/api"
 
 def debug_auth_flow():
     print("🔍 Debugging authentication flow...")
