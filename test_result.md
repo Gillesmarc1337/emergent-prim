@@ -103,22 +103,29 @@
 #====================================================================================================
 
 user_problem_statement: |
-  L'utilisateur a demandé d'ajouter de nouveaux blocs dans l'onglet "Projections":
+  Implement Google OAuth authentication and multi-view management system:
   
-  1. Nouveau bloc "Hot deals closing in the next 2 weeks to 30 days":
-     - Tous les deals en B Legals
-     - Fonctionnalité drag & drop pour réorganiser
-     - Boutons pour masquer temporairement de la vue
+  1. Google OAuth Authentication:
+     - Implement Google OAuth login via Emergent integration
+     - Support two authorized users: asher@primelis.com (viewer), remi@primelis.com (super admin)
+     - Session management with cookies
+     - Login page with Google Sign-In button
   
-  2. Nouveau bloc "Additional Hot leads that will most likely close within the next 3 months":
-     - Tous les deals sur C Proposal sent et D POA Booked
-     - Drag & drop capability
-     - Tableau avec MRR et ARR
-     - Bouton reset pour recharger les leads
+  2. Role-Based Access Control:
+     - Viewer role: read-only access to dashboards
+     - Super admin role: full access + view management capabilities
   
-  3. Corriger les blocs Performance Summary pour utiliser les mêmes données que le dashboard
+  3. Multi-View Management:
+     - Default "Organic" view
+     - Ability to create/duplicate views for different Google Sheets
+     - View isolation (each view has its own data source)
+     - Master view reunification for super admins
   
-  4. Améliorer les blocs Closing Projections pour mettre en évidence les upcoming meetings et weighted pipe
+  4. Frontend Authentication Flow:
+     - Conditional rendering (login page vs dashboard)
+     - Header with logout and view selector
+     - Session persistence and auto-login
+     - Protected routes
 
 backend:
   - task: "Hot Deals API endpoint"
