@@ -723,9 +723,11 @@ def calculate_deals_closed(df, start_date, end_date):
         target_deals = monthly_target_deals
         target_arr = monthly_target_arr
     else:  # Longer periods
-        months_in_period = period_days / 30.0
+        # Calculate exact months for better accuracy
+        months_diff = (end_date.year - start_date.year) * 12 + (end_date.month - start_date.month) + 1
+        months_in_period = months_diff
         target_deals = int(monthly_target_deals * months_in_period)
-        target_arr = monthly_target_arr * months_in_period
+        target_arr = int(monthly_target_arr * months_in_period)
 
     return {
         'deals_closed': deals_count,
