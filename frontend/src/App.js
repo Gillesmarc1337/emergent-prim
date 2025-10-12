@@ -2642,32 +2642,26 @@ function Dashboard() {
                 {/* 3 Large Metric Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <MetricCard
-                    title="Total Intro Meetings"
-                    value={upsellRenewData.total_meetings}
-                    target={upsellRenewData.total_target}
-                    icon={Users}
-                    color="blue"
-                  />
-                  <MetricCard
-                    title="Business Partners"
-                    value={upsellRenewData.business_partner_meetings}
-                    target={upsellRenewData.business_partner_target}
-                    icon={Users}
+                    title="Valeur Closing Upsells"
+                    value={upsellRenewData.closing_value}
+                    target={upsellRenewData.closing_value_target}
+                    unit="$"
+                    icon={DollarSign}
                     color="green"
                   />
                   <MetricCard
-                    title="Consulting Partners"
-                    value={upsellRenewData.consulting_partner_meetings}
-                    target={upsellRenewData.consulting_partner_target}
-                    icon={Users}
-                    color="purple"
-                  />
-                  <MetricCard
-                    title="POA Attended"
+                    title="POA Generated"
                     value={upsellRenewData.poa_actual}
                     target={upsellRenewData.poa_target}
                     icon={Target}
                     color="orange"
+                  />
+                  <MetricCard
+                    title="Closing"
+                    value={upsellRenewData.closing_actual}
+                    target={upsellRenewData.closing_target}
+                    icon={CheckCircle}
+                    color="green"
                   />
                 </div>
 
