@@ -978,31 +978,59 @@ function MainDashboard({ analytics }) {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
+                {/* New Pipe Created Value */}
                 <div className="text-center">
                   <div className="text-lg font-bold text-purple-600">
-                    ${(analytics.dashboard_blocks.block_3_pipe_creation.new_pipe_created / 1000000).toFixed(1)}M
+                    ${((analytics.pipe_metrics?.created_pipe?.value || 0) / 1000000).toFixed(1)}M
                   </div>
                   <div className="text-xs text-gray-600">Total New Pipe Generated</div>
                 </div>
+                {/* Target with Progress */}
                 <div className="text-center">
                   <div className="text-sm font-medium text-gray-700">
-                    {analytics.dashboard_blocks?.block_3_pipe_creation?.target_pipe_created 
-                      ? `Target: $${(analytics.dashboard_blocks.block_3_pipe_creation.target_pipe_created / 1000000).toFixed(1)}M` 
-                      : 'Target: $2M'}
+                    Target: ${((analytics.pipe_metrics?.created_pipe?.target || 0) / 1000000).toFixed(1)}M
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div 
+                      className="bg-purple-500 h-2 rounded-full transition-all" 
+                      style={{ 
+                        width: `${Math.min(
+                          ((analytics.pipe_metrics?.created_pipe?.value || 0) / 
+                          (analytics.pipe_metrics?.created_pipe?.target || 1)) * 100, 
+                          100
+                        )}%` 
+                      }}
+                    ></div>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {((analytics.pipe_metrics?.created_pipe?.value || 0) / 
+                      (analytics.pipe_metrics?.created_pipe?.target || 1) * 100).toFixed(1)}% of target
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-blue-600">
-                      ${(analytics.dashboard_blocks.block_3_pipe_creation.weighted_pipe_created / 1000000).toFixed(1)}M
-                    </div>
-                    <div className="text-xs text-gray-600">New Weighted Pipe</div>
+                {/* Created Weighted Pipe */}
+                <div className="text-center pt-2 border-t">
+                  <div className="text-sm font-bold text-blue-600">
+                    ${((analytics.pipe_metrics?.created_pipe?.weighted_value || 0) / 1000000).toFixed(1)}M
                   </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-teal-600">
-                      ${(analytics.dashboard_blocks.block_3_pipe_creation.aggregate_weighted_pipe / 1000000).toFixed(1)}M
-                    </div>
-                    <div className="text-xs text-gray-600">Aggregate Weighted Pipe</div>
+                  <div className="text-xs text-gray-600">Created Weighted Pipe</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Target: ${((analytics.pipe_metrics?.created_pipe?.target_weighted || 0) / 1000000).toFixed(1)}M
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
+                    <div 
+                      className="bg-blue-500 h-1 rounded-full transition-all" 
+                      style={{ 
+                        width: `${Math.min(
+                          ((analytics.pipe_metrics?.created_pipe?.weighted_value || 0) / 
+                          (analytics.pipe_metrics?.created_pipe?.target_weighted || 1)) * 100, 
+                          100
+                        )}%` 
+                      }}
+                    ></div>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {((analytics.pipe_metrics?.created_pipe?.weighted_value || 0) / 
+                      (analytics.pipe_metrics?.created_pipe?.target_weighted || 1) * 100).toFixed(1)}% of target
                   </div>
                 </div>
               </div>
