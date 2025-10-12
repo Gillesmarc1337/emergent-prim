@@ -1756,8 +1756,8 @@ async def get_custom_analytics(
         poa_data = period_data[period_data['stage'].isin(['D POA Booked', 'C Proposal sent', 'B Legals', 'A Closed', 'Closed Won', 'Won', 'Signed', 'Closed Lost', 'I Lost'])]
         actual_poa = len(poa_data)
         
-        # Upsells / Cross-sells calculations (Type of deal = "Up-sell")
-        upsells_data = period_data[period_data['type_of_deal'] == 'Up-sell']
+        # Upsells / Cross-sells calculations (Type of deal = "Upsell", "Up-sell", etc.)
+        upsells_data = period_data[period_data['type_of_deal'].apply(is_upsell)]
         actual_upsells = len(upsells_data)
         target_upsells = 5 * period_duration_months  # 5 upsells per month
         
