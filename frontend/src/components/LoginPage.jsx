@@ -40,9 +40,9 @@ const LoginPage = () => {
     setLoading(true);
     setError(null);
 
-    // Redirect to Emergent Auth
-    const redirectUrl = encodeURIComponent(window.location.origin + window.location.pathname);
-    window.location.href = `https://auth.emergentagent.com/?redirect_uri=${redirectUrl}`;
+    // Redirect to Emergent Auth with proper redirect_url parameter
+    const currentUrl = window.location.origin + window.location.pathname;
+    window.location.href = `https://auth.emergentagent.com/?redirect_url=${encodeURIComponent(currentUrl)}`;
   };
 
   const handleDemoAccess = async () => {
