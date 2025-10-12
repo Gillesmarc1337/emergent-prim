@@ -2330,12 +2330,13 @@ function Dashboard() {
               {/* Top KPI Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <MetricCard
-                  title="Total Upsells & Renewals"
-                  value={upsellData.total_meetings}
-                  target={upsellData.total_target}
-                  icon={TrendingUp}
+                  title="Valeur Closing Upsells"
+                  value={upsellData.closing_value}
+                  target={upsellData.closing_value_target}
+                  unit="$"
+                  icon={DollarSign}
                   color="purple"
-                  tooltip="Total meetings for upsells and renewals brought by partners"
+                  tooltip="Total value of closed upsells and renewals"
                 />
                 <MetricCard
                   title="POA Generated"
