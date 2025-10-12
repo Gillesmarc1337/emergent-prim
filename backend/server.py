@@ -735,7 +735,7 @@ def calculate_pipe_metrics(df, start_date, end_date):
         ae_new_pipe = new_pipe[new_pipe['owner'] == ae]
         
         ae_breakdown.append({
-            'ae': str(ae),
+            'ae': fix_ae_name_encoding(ae),
             'total_pipe': float(ae_deals['pipeline'].sum()),
             'weighted_pipe': float(ae_deals['weighted_value'].sum()),
             'new_pipe_created': float(ae_new_pipe['pipeline'].sum()),
