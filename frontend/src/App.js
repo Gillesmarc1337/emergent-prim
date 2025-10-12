@@ -988,42 +988,39 @@ function MainDashboard({ analytics }) {
           </Card>
 
           {/* Block 3: New Pipe Created */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-center">New Pipe Created</CardTitle>
-              <CardDescription className="text-center font-medium text-purple-600">
+          <Card className="border-2 border-purple-200 bg-purple-50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base text-center font-semibold">New Pipe Created</CardTitle>
+              <p className="text-center text-sm font-medium text-purple-600">
                 {analytics.dashboard_blocks?.block_3_pipe_creation?.period || 'Current Period'}
-              </CardDescription>
+              </p>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="text-center">
-                  <div className="text-lg font-bold text-purple-600">
-                    ${(analytics.dashboard_blocks.block_3_pipe_creation.new_pipe_created / 1000000).toFixed(1)}M
-                  </div>
-                  <div className="text-xs text-gray-600">Total New Pipe Generated</div>
+            <CardContent className="space-y-2">
+              {/* Total New Pipe Generated */}
+              <div className="text-center p-3 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-purple-600">
+                  ${(analytics.dashboard_blocks.block_3_pipe_creation.new_pipe_created / 1000000).toFixed(1)}M
                 </div>
-                <div className="text-center">
-                  <div className="text-sm font-medium text-gray-700">
-                    {analytics.dashboard_blocks?.block_3_pipe_creation?.target_pipe_created 
-                      ? `Target: $${(analytics.dashboard_blocks.block_3_pipe_creation.target_pipe_created / 1000000).toFixed(1)}M` 
-                      : 'Target: $2M'}
-                  </div>
+                <div className="text-xs text-gray-600 mt-1">Total New Pipe Generated</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  Target: $2.0M
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-blue-600">
-                      ${(analytics.dashboard_blocks.block_3_pipe_creation.weighted_pipe_created / 1000000).toFixed(1)}M
-                    </div>
-                    <div className="text-xs text-gray-600">New Weighted Pipe</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-teal-600">
-                      ${(analytics.dashboard_blocks.block_3_pipe_creation.aggregate_weighted_pipe / 1000000).toFixed(1)}M
-                    </div>
-                    <div className="text-xs text-gray-600">Aggregate Weighted Pipe</div>
-                  </div>
+              </div>
+              
+              {/* New Weighted Pipe */}
+              <div className="text-center p-2 bg-white rounded-lg">
+                <div className="text-xl font-bold text-blue-600">
+                  ${(analytics.dashboard_blocks.block_3_pipe_creation.weighted_pipe_created / 1000000).toFixed(1)}M
                 </div>
+                <div className="text-xs text-gray-600 mt-1">New Weighted Pipe</div>
+              </div>
+              
+              {/* Aggregate Weighted Pipe */}
+              <div className="text-center p-2 bg-white rounded-lg">
+                <div className="text-xl font-bold text-green-600">
+                  ${(analytics.dashboard_blocks.block_3_pipe_creation.aggregate_weighted_pipe / 1000000).toFixed(1)}M
+                </div>
+                <div className="text-xs text-gray-600 mt-1">Aggregate Weighted Pipe</div>
               </div>
             </CardContent>
           </Card>
