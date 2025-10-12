@@ -4653,123 +4653,122 @@ def test_ae_pipeline_breakdown():
     
     return success
 def main():
-    """Run backend tests with priority focus on raw pipeline values investigation"""
-    print(f"🚀 Starting Backend API Testing - RAW PIPELINE VALUES INVESTIGATION")
+    """Run comprehensive authentication system tests"""
+    print(f"🚀 Starting Backend API Testing - AUTHENTICATION SYSTEM COMPREHENSIVE TESTING")
     print(f"Backend URL: {BASE_URL}")
     print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     # Track overall success
     all_tests_passed = True
+    test_results = {}
     
     # Test 1: Basic connectivity
-    if not test_basic_connectivity():
+    print(f"\n🔌 Testing basic API connectivity...")
+    connectivity_success = test_basic_connectivity()
+    test_results['basic_connectivity'] = connectivity_success
+    
+    if not connectivity_success:
         all_tests_passed = False
         print(f"\n⚠️  Basic connectivity failed - other tests may not work properly")
     
-    # HIGHEST PRIORITY TEST: Raw Pipeline Values Investigation
-    print(f"\n🎯 HIGHEST PRIORITY TEST: Raw Pipeline Values Investigation")
-    investigation_results = test_raw_pipeline_values_investigation()
+    # Test 2: Demo Login Endpoint
+    print(f"\n🔐 Testing demo login endpoint...")
+    demo_data, session_token = test_demo_login()
+    demo_login_success = demo_data is not None and session_token is not None
+    test_results['demo_login'] = demo_login_success
     
-    # Supporting tests for validation
-    print(f"\n🎯 SUPPORTING TEST: Hot Deals Endpoint Validation")
-    hot_deals_success = test_projections_hot_deals()
+    if not demo_login_success:
+        all_tests_passed = False
+        print(f"\n❌ Demo login failed - cannot continue with session-dependent tests")
+        return 1
     
-    print(f"\n🎯 SUPPORTING TEST: Hot Leads Endpoint Validation") 
-    hot_leads_success = test_projections_hot_leads()
+    # Test 3: Auth/Me Endpoint
+    print(f"\n🔐 Testing auth/me endpoint...")
+    auth_me_success = test_auth_me_endpoint(session_token)
+    test_results['auth_me'] = auth_me_success
     
-    # SECONDARY TEST: Legals + Proposal Pipeline Values (previous priority test)
-    print(f"\n🎯 SECONDARY TEST: Legals + Proposal Pipeline Values Analysis")
-    if not test_legals_proposal_pipeline_values():
+    if not auth_me_success:
         all_tests_passed = False
     
-    # SECONDARY TEST: Dashboard Analytics Structure
-    print(f"\n🎯 SECONDARY TEST: Dashboard Analytics Structure Analysis")
-    if not test_dashboard_analytics_structure():
+    # Test 4: Views Endpoint Authentication
+    print(f"\n🔐 Testing views endpoint authentication...")
+    views_auth_success = test_views_endpoint_authentication()
+    test_results['views_authentication'] = views_auth_success
+    
+    if not views_auth_success:
         all_tests_passed = False
     
-    # SECONDARY TEST: Comprehensive Deals Count Analysis
-    print(f"\n🎯 PRIORITY TEST: Comprehensive Deals Count Analysis")
-    deals_analysis_result = test_deals_count_analysis()
-    if not deals_analysis_result.get('analysis_complete', False):
+    # Test 5: Session Expiration and Cookie Handling
+    print(f"\n🔐 Testing session expiration and cookie handling...")
+    session_validation_success = test_session_expiration_validation()
+    test_results['session_validation'] = session_validation_success
+    
+    if not session_validation_success:
         all_tests_passed = False
     
-    # SECONDARY TEST: Hot Deals Stage Analysis
-    print(f"\n🎯 SECONDARY TEST: Hot Deals Stage Analysis")
-    if not test_hot_deals_stage_analysis():
+    # Test 6: Logout Endpoint
+    print(f"\n🔐 Testing logout endpoint...")
+    logout_success = test_logout_endpoint(session_token)
+    test_results['logout'] = logout_success
+    
+    if not logout_success:
         all_tests_passed = False
     
-    # Test 3: Monthly analytics with different offsets
-    monthly_tests = [
-        (0, "Oct 2025"),
-        (-1, "Nov 2025"),
-        (1, "Sep 2025")
-    ]
+    # Test 7: End-to-End Authentication Flow
+    print(f"\n🔐 Testing complete authentication flow...")
+    e2e_flow_success = test_authentication_flow_end_to_end()
+    test_results['end_to_end_flow'] = e2e_flow_success
     
-    for offset, expected_period in monthly_tests:
-        if not test_monthly_analytics_with_offset(offset, expected_period):
-            all_tests_passed = False
-    
-    # Test 4: Projections endpoints
-    if not test_projections_hot_deals():
+    if not e2e_flow_success:
         all_tests_passed = False
     
-    if not test_projections_hot_leads():
-        all_tests_passed = False
-    
-    if not test_projections_performance_summary():
-        all_tests_passed = False
-    
-    # Test 5: Custom analytics dynamic targets
-    if not test_custom_analytics_dynamic_targets():
-        all_tests_passed = False
-    
-    # Test 6: MongoDB data structure exploration
-    if not explore_mongodb_data_structure():
-        print(f"\n⚠️  MongoDB data structure exploration completed - see results above")
-    
-    # Test 7: Master data access verification
-    if not test_master_data_access():
-        print(f"\n⚠️  Master data access verification completed - see results above")
-    
-    # Test 8: October 2025 analytics detailed analysis
-    if not test_october_2025_analytics_detailed():
-        all_tests_passed = False
-    
-    # Test 9: Dashboard blocks and deals_closed structure
-    if not test_dashboard_blocks_and_deals_closed():
-        all_tests_passed = False
-    
-    # Test 10: Meeting targets correction verification
-    if not test_meeting_targets_correction():
-        all_tests_passed = False
-    
-    # Test 11: Meeting generation structure verification
-    if not test_meeting_generation_structure():
-        all_tests_passed = False
-    
-    # Final summary focused on investigation results
+    # Final summary
     print(f"\n{'='*80}")
-    print(f"🏁 RAW PIPELINE VALUES INVESTIGATION COMPLETE")
+    print(f"🏁 AUTHENTICATION SYSTEM TESTING COMPLETE")
     print(f"{'='*80}")
     
-    print(f"\n🎯 INVESTIGATION SUMMARY:")
-    print(f"  • B Legals + C Proposal sent deals analyzed")
-    print(f"  • Target Excel total: $2,481,600")
-    print(f"  • Backend calculated total: ${investigation_results['combined_raw_total']:,.2f}")
+    passed_tests = sum(1 for result in test_results.values() if result)
+    total_tests = len(test_results)
     
-    if investigation_results['correct_field_name']:
-        print(f"  ✅ FIELD IDENTIFIED: '{investigation_results['correct_field_name']}'")
-        print(f"  📊 This field contains the raw pipeline values")
+    print(f"\n📊 COMPREHENSIVE TEST RESULTS:")
+    for test_name, result in test_results.items():
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"  • {test_name}: {status}")
+    
+    print(f"\n📋 OVERALL SUMMARY:")
+    print(f"  • Tests Passed: {passed_tests}/{total_tests}")
+    print(f"  • Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+    
+    if all_tests_passed:
+        print(f"\n🎉 SUCCESS: All authentication tests passed!")
+        print(f"\n✅ AUTHENTICATION SYSTEM VERIFICATION:")
+        print(f"  • Demo login creates user with is_demo: true")
+        print(f"  • Session cookie set with 24-hour expiration")
+        print(f"  • Session stored in MongoDB with correct expiration")
+        print(f"  • Auth/me works with valid tokens, returns 401 for invalid/missing tokens")
+        print(f"  • Views endpoint requires authentication")
+        print(f"  • Logout clears session and invalidates token")
+        print(f"  • Demo user has viewer role")
+        print(f"  • Complete authentication flow works end-to-end")
+        return 0
     else:
-        print(f"  ⚠️  NO EXACT FIELD MATCH - Backend uses different calculation")
-    
-    print(f"\n📊 Test Results:")
-    print(f"  • Basic Connectivity: ✅")
-    print(f"  • Hot Deals Endpoint: {'✅' if hot_deals_success else '❌'}")
-    print(f"  • Hot Leads Endpoint: {'✅' if hot_leads_success else '❌'}")
-    print(f"  • Raw Values Investigation: ✅ COMPLETED")
-    
-    return investigation_results
+        print(f"\n❌ ISSUES FOUND: {total_tests - passed_tests} authentication tests failed")
+        print(f"\n🔧 RECOMMENDATIONS:")
+        
+        if not test_results.get('demo_login'):
+            print(f"  • Fix demo login endpoint - check user creation and session management")
+        if not test_results.get('auth_me'):
+            print(f"  • Fix auth/me endpoint - check token validation logic")
+        if not test_results.get('views_authentication'):
+            print(f"  • Fix views endpoint authentication - ensure proper auth middleware")
+        if not test_results.get('logout'):
+            print(f"  • Fix logout endpoint - ensure session deletion and cookie clearing")
+        if not test_results.get('session_validation'):
+            print(f"  • Fix session validation - check MongoDB session management")
+        if not test_results.get('end_to_end_flow'):
+            print(f"  • Fix authentication flow - check integration between endpoints")
+        
+        return 1
 
 if __name__ == "__main__":
     exit_code = main()
