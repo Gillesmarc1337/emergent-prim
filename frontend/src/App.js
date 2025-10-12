@@ -2321,6 +2321,314 @@ function Dashboard() {
           </AnalyticsSection>
         </TabsContent>
 
+        {/* Upsell & Renewals */}
+        <TabsContent value="upsell">
+          {loadingUpsell ? (
+            <div className="text-center py-8">Loading Upsell & Renewals data...</div>
+          ) : upsellData ? (
+            <div className="space-y-6">
+              {/* Top KPI Cards - Mix of Meeting Generation style */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <MetricCard
+                  title="Total Upsells & Renewals"
+                  value={upsellData.total_meetings}
+                  target={upsellData.total_target}
+                  icon={TrendingUp}
+                  color="purple"
+                  tooltip="Total meetings for upsells and renewals brought by partners"
+                />
+                <MetricCard
+                  title="Business Partners"
+                  value={upsellData.business_partner_meetings}
+                  target={upsellData.business_partner_target}
+                  icon={Users}
+                  color="blue"
+                  tooltip="Meetings from Business Partners"
+                />
+                <MetricCard
+                  title="Consulting Partners"
+                  value={upsellData.consulting_partner_meetings}
+                  target={upsellData.consulting_partner_target}
+                  icon={Users}
+                  color="green"
+                  tooltip="Meetings from Consulting Partners"
+                />
+                <MetricCard
+                  title="POA Generated"
+                  value={upsellData.poa_actual}
+                  target={upsellData.poa_target}
+                  icon={Target}
+                  color="orange"
+                  tooltip="POA generated from upsells and renewals"
+                />
+              </div>
+
+              {/* Additional Metrics Row */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-purple-600">{upsellData.upsells_actual}</div>
+                      <div className="text-sm text-gray-600">Upsells / Cross-sell</div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">{upsellData.renewals_actual}</div>
+                      <div className="text-sm text-gray-600">Renewals</div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">{upsellData.show_actual}</div>
+                      <div className="text-sm text-gray-600">Show</div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-red-600">{upsellData.no_show_actual}</div>
+                      <div className="text-sm text-gray-600">No Show</div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Partner Performance Table (similar to BDR Performance) */}
+              <AnalyticsSection
+                title="Partner Performance"
+                description={`Performance by Business & Consulting Partners for ${upsellData.period}`}
+                icon={Users}
+              >
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Partner
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Intros Attended
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          POA Generated
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Upsells
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Renewals
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Closing
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Closing Value
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {upsellData.partner_performance.map((partner, index) => (
+                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {partner.partner}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {partner.intros_attended}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {partner.poa_generated}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-600 font-medium">
+                            {partner.upsells}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
+                            {partner.renewals}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {partner.closing}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            ${partner.closing_value.toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                      {upsellData.partner_performance.length === 0 && (
+                        <tr>
+                          <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
+                            No partner data available for this period
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </AnalyticsSection>
+
+              {/* Intros Details Table */}
+              <AnalyticsSection
+                title="Intros Attended Details"
+                description="Detailed list of all intros attended"
+                icon={Calendar}
+              >
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Client
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Partner
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Owner
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Type
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Stage
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Expected ARR
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {upsellData.intros_details.map((intro, index) => (
+                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {intro.date}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {intro.client}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {intro.partner}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {intro.owner}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              intro.type_of_deal.toLowerCase().includes('upsell') 
+                                ? 'bg-purple-100 text-purple-800' 
+                                : 'bg-green-100 text-green-800'
+                            }`}>
+                              {intro.type_of_deal}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {intro.stage}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            ${intro.expected_arr.toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                      {upsellData.intros_details.length === 0 && (
+                        <tr>
+                          <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
+                            No intros data available for this period
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </AnalyticsSection>
+
+              {/* POA Details Table */}
+              <AnalyticsSection
+                title="POA Generated Details"
+                description="Detailed list of all POA generated"
+                icon={Target}
+              >
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Client
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Partner
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Owner
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Type
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Stage
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Expected ARR
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {upsellData.poa_details.map((poa, index) => (
+                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {poa.date}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {poa.client}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {poa.partner}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {poa.owner}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              poa.type_of_deal.toLowerCase().includes('upsell') 
+                                ? 'bg-purple-100 text-purple-800' 
+                                : 'bg-green-100 text-green-800'
+                            }`}>
+                              {poa.type_of_deal}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {poa.stage}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            ${poa.expected_arr.toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                      {upsellData.poa_details.length === 0 && (
+                        <tr>
+                          <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
+                            No POA data available for this period
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </AnalyticsSection>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">No data available</div>
+          )}
+        </TabsContent>
+
         {/* Deals & Pipeline */}
         <TabsContent value="deals">
           <div className="space-y-6">
