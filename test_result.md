@@ -173,7 +173,7 @@ backend:
           agent: "testing"
           comment: "✅ TESTED SUCCESSFULLY: GET /api/projections/performance-summary returns correct YTD data (revenue: 1,129,596, target: 3,600,000, forecast_gap: true). Dashboard blocks structure validated with proper meeting targets. All data types correct (numeric for revenue/targets, boolean for forecast_gap)."
 
-  - task: "Google OAuth authentication endpoints"
+  - task: "Emergent Authentication with dual-mode login"
     implemented: true
     working: true
     file: "/app/backend/server.py, /app/backend/auth.py"
@@ -187,6 +187,9 @@ backend:
         - working: true
           agent: "main"
           comment: "✅ BACKEND AUTH WORKING: Fixed timezone comparison bug in get_user_from_session function. Created test users and sessions in MongoDB. Tested with curl: GET /api/auth/me returns correct user data for both test session tokens. Session management working correctly with 7-day expiration. Role-based access working (viewer vs super_admin)."
+        - working: true
+          agent: "main"
+          comment: "✅ DUAL-MODE AUTHENTICATION COMPLETE: Implemented two authentication methods: 1) Production Mode (ACCESS SECURED TERMINAL): Redirects to https://auth.emergentagent.com/ for Google OAuth, returns with session_id in URL fragment, backend validates via https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data. 2) Development Mode (DEMO ACCESS - SKIP AUTH): New endpoint POST /api/auth/demo-login creates instant demo session with demo@primelis.com (viewer role), 24-hour expiration. Added create_demo_user() function. Modified create_session() to accept custom expiration hours. Tested successfully: demo login creates session and redirects to dashboard."
 
   - task: "View management endpoints"
     implemented: true
