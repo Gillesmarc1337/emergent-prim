@@ -1685,22 +1685,44 @@ function Dashboard() {
                       <thead>
                         <tr className="border-b">
                           <th className="text-left p-2">BDR</th>
+                          <th className="text-center p-2">Role</th>
                           <th className="text-right p-2">Total Meetings</th>
                           <th className="text-right p-2">Relevant Meetings</th>
+                          <th className="text-right p-2">Meeting Goal</th>
                           <th className="text-right p-2">Relevance Rate</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {Object.entries(analytics.meeting_generation.bdr_performance).map(([bdr, stats]) => (
-                          <tr key={bdr} className="border-b">
-                            <td className="p-2 font-medium">{bdr}</td>
-                            <td className="text-right p-2">{stats.total_meetings}</td>
-                            <td className="text-right p-2">{stats.relevant_meetings}</td>
-                            <td className="text-right p-2">
-                              {((stats.relevant_meetings / stats.total_meetings) * 100).toFixed(1)}%
-                            </td>
-                          </tr>
-                        ))}
+                        {Object.entries(analytics.meeting_generation.bdr_performance).map(([bdr, stats]) => {
+                          // Calculate months in period for goal display
+                          const monthsInPeriod = analytics.period_type === 'monthly' ? 1 : 
+                                                analytics.period_type === 'yearly' ? 6 : 
+                                                analytics.dashboard_blocks?.block_1_meetings?.period?.includes('Jul-Dec') ? 6 : 1;
+                          const goalText = stats.meeting_target ? 
+                            `${stats.total_meetings}/${stats.meeting_target * monthsInPeriod}` : 
+                            'N/A';
+                          
+                          return (
+                            <tr key={bdr} className="border-b">
+                              <td className="p-2 font-medium">{bdr}</td>
+                              <td className="text-center p-2">
+                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                  stats.role === 'BDR' ? 'bg-blue-100 text-blue-800' : 
+                                  stats.role === 'AE' ? 'bg-purple-100 text-purple-800' : 
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {stats.role || 'N/A'}
+                                </span>
+                              </td>
+                              <td className="text-right p-2">{stats.total_meetings}</td>
+                              <td className="text-right p-2">{stats.relevant_meetings}</td>
+                              <td className="text-right p-2 font-medium">{goalText}</td>
+                              <td className="text-right p-2">
+                                {((stats.relevant_meetings / stats.total_meetings) * 100).toFixed(1)}%
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
