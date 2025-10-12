@@ -214,6 +214,18 @@ frontend:
         - working: true
           agent: "main"
           comment: "Enhanced Closing Projections with colored cards, weighted value highlighting, and upcoming high-priority meetings section."
+  
+  - task: "Double interactive board height and add AE breakdown table"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "1) Doubled the height of Closing Projections Interactive Board from min-h-96 max-h-96 (24rem) to min-h-[48rem] max-h-[48rem] (48rem) for all three columns (Next 14, 30, 60-90 Days). 2) Added comprehensive AE Pipeline Breakdown table below the interactive board showing: all AEs, pipeline/expected_arr/weighted_value for each time period (Next 14, 30, 60-90 Days), total columns for all metrics. 3) Implemented sortable columns - users can click any column header to sort ascending/descending. 4) Added state management for aeBreakdown data and sortConfig. 5) Integrated with new backend endpoint /api/projections/ae-pipeline-breakdown. Table displays properly formatted currency values with highlighted total columns."
 
   - task: "Replace Yearly button with July To Dec button"
     implemented: true
