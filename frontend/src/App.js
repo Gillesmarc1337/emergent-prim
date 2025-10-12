@@ -2749,11 +2749,14 @@ function Dashboard() {
                   </CardContent>
                 </Card>
 
-                {/* Intro Details Table */}
+                {/* Intros Attended Details Table */}
                 {upsellRenewData.intros_details && upsellRenewData.intros_details.length > 0 && (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Intro Meetings Details</CardTitle>
+                      <CardTitle className="flex items-center justify-between">
+                        <span>Intros Attended Details</span>
+                        <Badge variant="destructive">Needs Improvement</Badge>
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="overflow-x-auto">
