@@ -71,20 +71,49 @@ async def get_or_create_user(email: str, name: str, picture: Optional[str] = Non
     await db.users.insert_one(user_data)
     return user_data
 
-async def create_session(user_id: str, session_token: str):
+async def create_session(user_id: str, session_token: str, expires_hours: int = None):
     """
     Create a new session in database
+    expires_hours: Custom expiration in hours (default: 7 days for normal, 24 hours for demo)
     """
+    if expires_hours is None:
+        expires_hours = 7 * 24  # 7 days default
+    
     session_data = {
         "id": f"session-{int(datetime.now(timezone.utc).timestamp())}",
         "user_id": user_id,
         "session_token": session_token,
-        "expires_at": datetime.now(timezone.utc) + timedelta(days=7),
+        "expires_at": datetime.now(timezone.utc) + timedelta(hours=expires_hours),
         "created_at": datetime.now(timezone.utc)
     }
     
     await db.user_sessions.insert_one(session_data)
     return session_data
+
+async def create_demo_user():
+    """
+    Create or get demo user for development/testing
+    """
+    demo_email = "demo@primelis.com"
+    
+    # Check if demo user exists
+    existing_user = await db.users.find_one({"email": demo_email})
+    
+    if existing_user:
+        return existing_user
+    
+    # Create demo user
+    user_data = {
+        "id": f"user-demo-{int(datetime.now(timezone.utc).timestamp())}",
+        "email": demo_email,
+        "name": "Demo User",
+        "picture": None,
+        "role": ROLE_VIEWER,
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.users.insert_one(user_data)
+    return user_data
 
 async def get_user_from_session(session_token: str):
     """
