@@ -2473,20 +2473,12 @@ async def get_ae_pipeline_breakdown():
         # Get all unique AEs
         all_aes = sorted(df['owner'].dropna().unique())
         
-        # Fix encoding issues for AE names
-        def fix_ae_name(name):
-            name_fixes = {
-                'RÃ©mi': 'Rémi',
-                'FranÃ§ois': 'François'
-            }
-            return name_fixes.get(str(name), str(name))
-        
         # Build breakdown by AE
         ae_breakdown = []
         
         for ae in all_aes:
             ae_data = {
-                'ae': fix_ae_name(ae),
+                'ae': fix_ae_name_encoding(ae),
                 'next14': {
                     'pipeline': 0.0,
                     'expected_arr': 0.0,
