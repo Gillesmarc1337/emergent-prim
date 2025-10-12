@@ -2632,15 +2632,15 @@ function Dashboard() {
             <div className="space-y-6">
               <AnalyticsSection
                 title={`Upsells & Renewals - ${upsellRenewData.period}`}
-                isOnTrack={upsellRenewData.total_meetings >= upsellRenewData.total_target}
+                isOnTrack={upsellRenewData.closing_value >= upsellRenewData.closing_value_target}
                 conclusion={
-                  upsellRenewData.total_meetings >= upsellRenewData.total_target
+                  upsellRenewData.closing_value >= upsellRenewData.closing_value_target
                     ? "Great performance on upsell and renewal activities."
                     : "Need to increase upsell and renewal prospecting efforts."
                 }
               >
-                {/* Key Metrics */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                {/* 3 Large Metric Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <MetricCard
                     title="Total Intro Meetings"
                     value={upsellRenewData.total_meetings}
