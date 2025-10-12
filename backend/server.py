@@ -715,12 +715,8 @@ def calculate_deals_closed(df, start_date, end_date):
     period_days = (end_date - start_date).days
     monthly_target_deals = 6  # 6 deals per month target
     
-    # Use specific monthly targets based on the month
-    # October 2025 should be $1,080,000 as specified
-    if start_date.month == 10 and start_date.year == 2025:
-        monthly_target_arr = 1080000  # October 2025 specific target
-    else:
-        monthly_target_arr = 375000  # Default for other months (4.5M annual / 12 = 375K per month)
+    # Monthly ARR target: 750K per month
+    monthly_target_arr = 750000  # 750K per month base target
     
     # Adjust targets based on period length
     if period_days <= 31:  # Monthly or shorter
