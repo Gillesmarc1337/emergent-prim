@@ -389,7 +389,9 @@ def calculate_meeting_generation(df, start_date, end_date):
         },
         'bdr_performance': {k: {
             'total_meetings': int(v['total_meetings']),
-            'relevant_meetings': int(v['relevant_meetings'])
+            'relevant_meetings': int(v['relevant_meetings']),
+            'role': 'BDR' if k in bdr_list else 'AE',
+            'meeting_target': monthly_bdr_meeting_target * period_duration_months if k in bdr_list else None
         } for k, v in bdr_stats.to_dict('index').items()} if not bdr_stats.empty else {},
         'meetings_details': meetings_list,
         'target': total_target,
