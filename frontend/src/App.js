@@ -3360,7 +3360,7 @@ function Dashboard() {
             {Object.keys(analytics.closing_projections.ae_projections).length > 0 && (
               <Card className="mb-6">
                 <CardHeader>
-                  <CardTitle>Pipeline Breakdown by Account Executive</CardTitle>
+                  <CardTitle>Projections breakdown</CardTitle>
                   <p className="text-sm text-gray-600">Pipeline values for each AE across different time periods</p>
                 </CardHeader>
                 <CardContent>
