@@ -3544,7 +3544,8 @@ function Dashboard() {
                 </CardContent>
               </Card>
             )}
-          </TabsContent>
+          </div>
+        </TabsContent>
         </Tabs>
       </div>
 
