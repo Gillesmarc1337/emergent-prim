@@ -3498,24 +3498,6 @@ function Dashboard() {
                             <span className="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                           )}
                         </th>
-                        <th 
-                          className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('total.expected_arr')}
-                        >
-                          Pipeline {sortConfig.key === 'total.pipeline' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th 
-                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('total.expected_arr')}
-                        >
-                          Exp. ARR {sortConfig.key === 'total.expected_arr' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th 
-                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('total.weighted_value')}
-                        >
-                          Weighted {sortConfig.key === 'total.weighted_value' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
