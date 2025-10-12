@@ -476,8 +476,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "AE Pipeline Breakdown API endpoint"
-    - "Double interactive board height and add AE breakdown table"
+    - "Emergent Authentication with dual-mode login"
+    - "Dual-mode login page (Secured Terminal + Demo Access)"
+    - "View management endpoints"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
