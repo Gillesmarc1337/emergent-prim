@@ -2098,6 +2098,15 @@ async def get_dashboard_analytics():
         ]
         actual_poa = len(poa_data)
         
+        # Upsells / Cross-sells (Type of deal = "Up-sell") for the focus month
+        upsells_data = df[
+            (df['discovery_date'] >= focus_month_start) & 
+            (df['discovery_date'] <= focus_month_end) &
+            (df['type_of_deal'] == 'Up-sell')
+        ]
+        actual_upsells = len(upsells_data)
+        target_upsells = 5  # 5 upsells per month
+        
         # Block 3: Pipe creation (for focus month)
         new_pipe_focus_month = df[
             (df['discovery_date'] >= focus_month_start) & 
