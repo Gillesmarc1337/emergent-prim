@@ -1748,6 +1748,11 @@ async def get_custom_analytics(
         poa_data = period_data[period_data['stage'].isin(['D POA Booked', 'C Proposal sent', 'B Legals', 'A Closed', 'Closed Won', 'Won', 'Signed', 'Closed Lost', 'I Lost'])]
         actual_poa = len(poa_data)
         
+        # Upsells / Cross-sells calculations (Type of deal = "Up-sell")
+        upsells_data = period_data[period_data['type_of_deal'] == 'Up-sell']
+        actual_upsells = len(upsells_data)
+        target_upsells = 5 * period_duration_months  # 5 upsells per month
+        
         # New Pipe and Revenue calculations
         new_pipe_value = float(period_data['pipeline'].fillna(0).sum()) / 1000000  # Convert to millions
         closed_deals = period_data[period_data['stage'] == 'A Closed']
