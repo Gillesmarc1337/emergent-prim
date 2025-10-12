@@ -1774,7 +1774,9 @@ async def get_custom_analytics(
                 'unassigned_actual': unassigned_custom,
                 'unassigned_target': 0,  # No target for unassigned
                 'show_actual': actual_intro,  # Show count for this period
-                'no_show_actual': len(period_data[period_data['show_noshow'] == 'Noshow'])
+                'no_show_actual': len(period_data[period_data['show_noshow'] == 'Noshow']),
+                'upsells_actual': actual_upsells,
+                'upsells_target': target_upsells
             },
             'block_2_intro_poa': {
                 'title': 'Intro & POA',
@@ -1782,7 +1784,9 @@ async def get_custom_analytics(
                 'intro_actual': actual_intro,
                 'intro_target': dynamic_intro_target,
                 'poa_actual': actual_poa,
-                'poa_target': dynamic_poa_target
+                'poa_target': dynamic_poa_target,
+                'upsells_actual': actual_upsells,
+                'upsells_target': target_upsells
             },
             'block_3_new_pipe': {
                 'title': 'New Pipe Created',
