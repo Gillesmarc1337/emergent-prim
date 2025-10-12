@@ -3354,19 +3354,19 @@ function Dashboard() {
                       <div className="mb-4 text-center">
                         <div className="font-semibold text-yellow-800 mb-2">Next 30 Days</div>
                         <div className="text-2xl font-bold text-yellow-600">
-                          ${(hotDeals.filter(deal => deal.column === 'next30').reduce((sum, deal) => sum + (deal.pipeline || 0), 0) / 1000).toFixed(0)}K
+                          ${(next30Total / 1000).toFixed(0)}K
                         </div>
                         <div className="text-xs text-gray-600 mt-1">Target: 375K</div>
                         <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                           <div 
                             className="bg-yellow-500 h-2 rounded-full transition-all"
                             style={{ 
-                              width: `${Math.min((hotDeals.filter(deal => deal.column === 'next30').reduce((sum, deal) => sum + (deal.pipeline || 0), 0) / 375000) * 100, 100)}%` 
+                              width: `${Math.min((next30Total / target30) * 100, 100)}%` 
                             }}
                           ></div>
                         </div>
                         <div className="text-xs text-gray-600 mt-1">
-                          {((hotDeals.filter(deal => deal.column === 'next30').reduce((sum, deal) => sum + (deal.pipeline || 0), 0) / 375000) * 100).toFixed(1)}% of target
+                          {((next30Total / target30) * 100).toFixed(1)}% of target
                         </div>
                       </div>
                       <Droppable droppableId="next30">
