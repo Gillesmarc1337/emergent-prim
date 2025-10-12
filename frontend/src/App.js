@@ -725,9 +725,11 @@ function MainDashboard({ analytics }) {
         const monthlyNewPipeTarget = 2000000; // $2M per month
         const monthlyWeightedPipeTarget = 800000; // $800K per month
         
-        // Use data from pipe_metrics which updates with the selected period
-        const monthlyNewPipeCreated = dashboardData.pipe_metrics?.new_pipe_created || 0;
-        const monthlyWeightedPipe = dashboardData.pipe_metrics?.weighted_pipe_created || 0;
+        // Use data from dashboard_blocks which updates with the selected period
+        // New Pipe Created = sum of Expected ARR for deals created in the period
+        // Created Weighted Pipe = sum of weighted values for deals created in the period
+        const monthlyNewPipeCreated = dashboardData.dashboard_blocks?.block_3_pipe_creation?.new_pipe_created || 0;
+        const monthlyWeightedPipe = dashboardData.dashboard_blocks?.block_3_pipe_creation?.weighted_pipe_created || 0;
         
         return (
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
