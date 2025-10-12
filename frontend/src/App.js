@@ -16,9 +16,6 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { DateRangePicker } from '@/components/DateRangePicker';
 import { GoogleSheetsUpload } from '@/components/GoogleSheetsUpload';
 import { format } from 'date-fns';
-import { useAuth } from './contexts/AuthContext';
-import LoginPage from './components/LoginPage';
-import Header from './components/Header';
 import './App.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -1140,9 +1137,6 @@ function Dashboard() {
   const [hiddenDeals, setHiddenDeals] = useState(new Set());
   const [hiddenLeads, setHiddenLeads] = useState(new Set());
   const [loadingProjections, setLoadingProjections] = useState(false);
-  
-  // State for Upsell & Renew tab
-  const [upsellRenewData, setUpsellRenewData] = useState(null);
 
   const loadAnalytics = async () => {
     setLoading(true);
@@ -1182,36 +1176,11 @@ function Dashboard() {
   useEffect(() => {
     loadAnalytics();
     loadProjectionsData();
-    loadUpsellRenewData();
   }, [monthOffset, dateRange, useCustomDate, viewMode]);
 
   const handleUploadSuccess = () => {
     loadAnalytics();
     loadProjectionsData();
-    loadUpsellRenewData();
-  };
-
-  // Load Upsell & Renew data
-  const loadUpsellRenewData = async () => {
-    try {
-      let startDate, endDate;
-      
-      if (useCustomDate && dateRange?.from && dateRange?.to) {
-        startDate = format(dateRange.from, 'yyyy-MM-dd');
-        endDate = format(dateRange.to, 'yyyy-MM-dd');
-      } else {
-        // Calculate current month based on offset
-        const now = new Date();
-        const targetDate = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1);
-        startDate = format(new Date(targetDate.getFullYear(), targetDate.getMonth(), 1), 'yyyy-MM-dd');
-        endDate = format(new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0), 'yyyy-MM-dd');
-      }
-      
-      const response = await axios.get(`${API}/analytics/upsell-renewals?start_date=${startDate}&end_date=${endDate}`);
-      setUpsellRenewData(response.data);
-    } catch (error) {
-      console.error('Error loading upsell/renew data:', error);
-    }
   };
 
   // New functions for projections data
@@ -1523,12 +1492,11 @@ function Dashboard() {
       </div>
 
       <Tabs defaultValue="dashboard" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-          <TabsTrigger value="meetings">Meetings Generation</TabsTrigger>
+          <TabsTrigger value="meetings">Meeting Generation</TabsTrigger>
           <TabsTrigger value="attended">Meetings Attended</TabsTrigger>
           <TabsTrigger value="deals">Deals & Pipeline</TabsTrigger>
-          <TabsTrigger value="upsell">Upsell & Renew</TabsTrigger>
           <TabsTrigger value="projections">Projections</TabsTrigger>
         </TabsList>
 
@@ -1537,16 +1505,16 @@ function Dashboard() {
           <MainDashboard analytics={analytics} />
         </TabsContent>
 
-        {/* Meetings Generation */}
+        {/* Meeting Generation */}
         <TabsContent value="meetings">
           <AnalyticsSection 
-            title="Meetings Generation (Current Period)"
+            title="Meeting Generation (Current Period)"
             isOnTrack={analytics.meeting_generation.on_track}
             conclusion={analytics.meeting_generation.on_track 
-              ? "You are on track to meet your meetings generation targets." 
+              ? "You are on track to meet your meeting generation targets." 
               : "Need to increase prospecting efforts to reach targets."}
           >
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <MetricCard
                 title="Total New Intros"
                 value={analytics.meeting_generation.total_new_intros}
@@ -1574,13 +1542,6 @@ function Dashboard() {
                 target={analytics.meeting_generation.referral_target}
                 icon={Users}
                 color="purple"
-              />
-              <MetricCard
-                title="Upsells / Cross-sell"
-                value={analytics.dashboard_blocks?.block_1_meetings?.upsells_actual || 0}
-                target={analytics.dashboard_blocks?.block_1_meetings?.upsells_target || 0}
-                icon={TrendingUp}
-                color="indigo"
               />
             </div>
 
@@ -1714,44 +1675,22 @@ function Dashboard() {
                       <thead>
                         <tr className="border-b">
                           <th className="text-left p-2">BDR</th>
-                          <th className="text-center p-2">Role</th>
                           <th className="text-right p-2">Total Meetings</th>
                           <th className="text-right p-2">Relevant Meetings</th>
-                          <th className="text-right p-2">Meeting Goal</th>
                           <th className="text-right p-2">Relevance Rate</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {Object.entries(analytics.meeting_generation.bdr_performance).map(([bdr, stats]) => {
-                          // Calculate months in period for goal display
-                          const monthsInPeriod = analytics.period_type === 'monthly' ? 1 : 
-                                                analytics.period_type === 'yearly' ? 6 : 
-                                                analytics.dashboard_blocks?.block_1_meetings?.period?.includes('Jul-Dec') ? 6 : 1;
-                          const goalText = stats.meeting_target ? 
-                            `${stats.total_meetings}/${stats.meeting_target * monthsInPeriod}` : 
-                            'N/A';
-                          
-                          return (
-                            <tr key={bdr} className="border-b">
-                              <td className="p-2 font-medium">{bdr}</td>
-                              <td className="text-center p-2">
-                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                  stats.role === 'BDR' ? 'bg-blue-100 text-blue-800' : 
-                                  stats.role === 'AE' ? 'bg-purple-100 text-purple-800' : 
-                                  'bg-gray-100 text-gray-800'
-                                }`}>
-                                  {stats.role || 'N/A'}
-                                </span>
-                              </td>
-                              <td className="text-right p-2">{stats.total_meetings}</td>
-                              <td className="text-right p-2">{stats.relevant_meetings}</td>
-                              <td className="text-right p-2 font-medium">{goalText}</td>
-                              <td className="text-right p-2">
-                                {((stats.relevant_meetings / stats.total_meetings) * 100).toFixed(1)}%
-                              </td>
-                            </tr>
-                          );
-                        })}
+                        {Object.entries(analytics.meeting_generation.bdr_performance).map(([bdr, stats]) => (
+                          <tr key={bdr} className="border-b">
+                            <td className="p-2 font-medium">{bdr}</td>
+                            <td className="text-right p-2">{stats.total_meetings}</td>
+                            <td className="text-right p-2">{stats.relevant_meetings}</td>
+                            <td className="text-right p-2">
+                              {((stats.relevant_meetings / stats.total_meetings) * 100).toFixed(1)}%
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
@@ -2622,222 +2561,6 @@ function Dashboard() {
           </div>
         </TabsContent>
 
-        {/* Upsell & Renew */}
-        <TabsContent value="upsell">
-          {upsellRenewData ? (
-            <div className="space-y-6">
-              <AnalyticsSection
-                title={`Upsells & Renewals - ${upsellRenewData.period}`}
-                isOnTrack={upsellRenewData.total_meetings >= upsellRenewData.total_target}
-                conclusion={
-                  upsellRenewData.total_meetings >= upsellRenewData.total_target
-                    ? "Great performance on upsell and renewal activities."
-                    : "Need to increase upsell and renewal prospecting efforts."
-                }
-              >
-                {/* Key Metrics */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                  <MetricCard
-                    title="Total Intro Meetings"
-                    value={upsellRenewData.total_meetings}
-                    target={upsellRenewData.total_target}
-                    icon={Users}
-                    color="blue"
-                  />
-                  <MetricCard
-                    title="Business Partners"
-                    value={upsellRenewData.business_partner_meetings}
-                    target={upsellRenewData.business_partner_target}
-                    icon={Users}
-                    color="green"
-                  />
-                  <MetricCard
-                    title="Consulting Partners"
-                    value={upsellRenewData.consulting_partner_meetings}
-                    target={upsellRenewData.consulting_partner_target}
-                    icon={Users}
-                    color="purple"
-                  />
-                  <MetricCard
-                    title="POA Attended"
-                    value={upsellRenewData.poa_actual}
-                    target={upsellRenewData.poa_target}
-                    icon={Target}
-                    color="orange"
-                  />
-                </div>
-
-                {/* Upsells vs Renewals */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Upsells vs Renewals</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-                          <div>
-                            <div className="text-sm text-gray-600">Upsells</div>
-                            <div className="text-2xl font-bold text-blue-600">
-                              {upsellRenewData.upsells_actual}
-                            </div>
-                          </div>
-                          <TrendingUp className="h-8 w-8 text-blue-600" />
-                        </div>
-                        <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
-                          <div>
-                            <div className="text-sm text-gray-600">Renewals</div>
-                            <div className="text-2xl font-bold text-green-600">
-                              {upsellRenewData.renewals_actual}
-                            </div>
-                          </div>
-                          <RotateCcw className="h-8 w-8 text-green-600" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Closing Performance</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <MetricCard
-                          title="Deals Closed"
-                          value={upsellRenewData.closing_actual}
-                          target={upsellRenewData.closing_target}
-                          icon={CheckCircle}
-                          color="green"
-                        />
-                        <div className="p-4 bg-green-50 rounded-lg">
-                          <div className="text-sm text-gray-600 mb-1">Closing Value</div>
-                          <div className="text-2xl font-bold text-green-600">
-                            ${(upsellRenewData.closing_value / 1000).toFixed(0)}K
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            Target: ${(upsellRenewData.closing_value_target / 1000).toFixed(0)}K
-                          </div>
-                          <Progress 
-                            value={Math.min((upsellRenewData.closing_value / upsellRenewData.closing_value_target) * 100, 100)} 
-                            className="mt-2"
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Intro Details Table */}
-                {upsellRenewData.intros_details && upsellRenewData.intros_details.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Intro Meetings Details</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b">
-                              <th className="text-left p-2">Date</th>
-                              <th className="text-left p-2">Client</th>
-                              <th className="text-left p-2">Partner</th>
-                              <th className="text-left p-2">Owner (AE)</th>
-                              <th className="text-left p-2">Stage</th>
-                              <th className="text-left p-2">Type</th>
-                              <th className="text-right p-2">Expected ARR</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {upsellRenewData.intros_details.map((intro, index) => (
-                              <tr key={index} className="border-b hover:bg-gray-50">
-                                <td className="p-2">{intro.date}</td>
-                                <td className="p-2 font-medium">{intro.client}</td>
-                                <td className="p-2">{intro.partner || '-'}</td>
-                                <td className="p-2">{intro.owner}</td>
-                                <td className="p-2">
-                                  <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">
-                                    {intro.stage}
-                                  </span>
-                                </td>
-                                <td className="p-2">
-                                  <span className={`text-xs px-2 py-1 rounded-full ${
-                                    intro.type_of_deal === 'Upsell' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
-                                  }`}>
-                                    {intro.type_of_deal}
-                                  </span>
-                                </td>
-                                <td className="p-2 text-right font-medium">
-                                  ${(intro.expected_arr / 1000).toFixed(0)}K
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* POA Details Table */}
-                {upsellRenewData.poa_details && upsellRenewData.poa_details.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>POA Details</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b">
-                              <th className="text-left p-2">POA Date</th>
-                              <th className="text-left p-2">Client</th>
-                              <th className="text-left p-2">Partner</th>
-                              <th className="text-left p-2">Owner (AE)</th>
-                              <th className="text-left p-2">Stage</th>
-                              <th className="text-left p-2">Type</th>
-                              <th className="text-right p-2">Expected ARR</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {upsellRenewData.poa_details.map((poa, index) => (
-                              <tr key={index} className="border-b hover:bg-gray-50">
-                                <td className="p-2">{poa.date}</td>
-                                <td className="p-2 font-medium">{poa.client}</td>
-                                <td className="p-2">{poa.partner || '-'}</td>
-                                <td className="p-2">{poa.owner}</td>
-                                <td className="p-2">
-                                  <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">
-                                    {poa.stage}
-                                  </span>
-                                </td>
-                                <td className="p-2">
-                                  <span className={`text-xs px-2 py-1 rounded-full ${
-                                    poa.type_of_deal === 'Upsell' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
-                                  }`}>
-                                    {poa.type_of_deal}
-                                  </span>
-                                </td>
-                                <td className="p-2 text-right font-medium">
-                                  ${(poa.expected_arr / 1000).toFixed(0)}K
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </AnalyticsSection>
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-600">Loading Upsell & Renew data...</p>
-            </div>
-          )}
-        </TabsContent>
-
         {/* Projections */}
         <TabsContent value="projections">
           <div className="space-y-6">
@@ -2933,44 +2656,36 @@ function Dashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* Card 4: Upcoming POAs - Show count and total value */}
+                  {/* Card 4: POA Status - Use master data for upcoming count */}
                   <Card className="border-2 border-blue-200 bg-blue-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-blue-600" />
-                        Upcoming POAs
+                        POA Status
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {(() => {
-                        // Get upcoming POA from hot-leads with future poa_date
-                        const today = new Date();
-                        const upcomingPOAs = hotLeads.filter(deal => {
-                          const poaDate = deal.poa_date ? new Date(deal.poa_date) : null;
-                          return poaDate && poaDate > today;
-                        });
-                        const upcomingCount = upcomingPOAs.length;
-                        const upcomingValue = upcomingPOAs.reduce((sum, deal) => 
-                          sum + (parseFloat(deal.expected_arr) || 0), 0
-                        );
-                        
-                        return (
-                          <div className="space-y-2">
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-blue-600">
-                                {upcomingCount}
-                              </div>
-                              <div className="text-xs text-gray-600">Upcoming POAs</div>
-                            </div>
-                            <div className="text-center pt-2 border-t border-blue-200">
-                              <div className="text-lg font-bold text-green-600">
-                                ${(upcomingValue / 1000).toFixed(0)}K
-                              </div>
-                              <div className="text-xs text-gray-600">Total Value</div>
-                            </div>
+                      <div className="grid grid-cols-2 gap-2 text-center">
+                        <div>
+                          <div className="text-lg font-bold text-green-600">
+                            {analytics.dashboard_blocks?.block_2_intro_poa?.poa_actual || 0}
                           </div>
-                        );
-                      })()}
+                          <div className="text-xs text-gray-600">Completed</div>
+                        </div>
+                        <div>
+                          <div className="text-lg font-bold text-blue-600">
+                            {(() => {
+                              // Count upcoming POA from hot-leads with future poa_date
+                              const today = new Date();
+                              return hotLeads.filter(deal => {
+                                const poaDate = deal.poa_date ? new Date(deal.poa_date) : null;
+                                return poaDate && poaDate > today;
+                              }).length;
+                            })()}
+                          </div>
+                          <div className="text-xs text-gray-600">Upcoming</div>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -3099,6 +2814,79 @@ function Dashboard() {
               </CardContent>
             </Card>
 
+            {/* Performance Summary - Updated with Dashboard Data */}
+            {performanceSummary && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Performance Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                    <MetricCard
+                      title="YTD Revenue"
+                      value={performanceSummary.ytd_revenue}
+                      target={performanceSummary.ytd_target}
+                      unit="$"
+                      icon={DollarSign}
+                      color="green"
+                    />
+                    <MetricCard
+                      title="Remaining Target"
+                      value={performanceSummary.remaining_target}
+                      unit="$"
+                      icon={Target}
+                      color="orange"
+                    />
+                    <MetricCard
+                      title="Pipe Created"
+                      value={performanceSummary.pipe_created || 0}
+                      unit="$"
+                      icon={PieChart}
+                      color="purple"
+                    />
+                    <Card>
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Users className="h-5 w-5 text-blue-600" />
+                          <span className="text-sm font-medium text-gray-600">Active Deals</span>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-600">
+                          {performanceSummary.active_deals_count || 0}
+                        </div>
+                        <div className="text-xs text-gray-600">Open & Relevant</div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-2 mb-2">
+                          <AlertCircle className="h-5 w-5 text-blue-500" />
+                          <span className="text-sm font-medium text-gray-600">Target Status</span>
+                        </div>
+                        <Badge 
+                          variant={performanceSummary.forecast_gap ? 'destructive' : 'default'}
+                          className="text-sm"
+                        >
+                          {performanceSummary.forecast_gap 
+                            ? 'Forecast Gap Detected' 
+                            : 'On Track'}
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {performanceSummary.forecast_gap && (
+                    <Alert className="border-orange-500">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        <strong>Action Required:</strong> Need to intensify efforts to close the gap of 
+                        ${performanceSummary.remaining_target.toLocaleString()} and achieve annual targets.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Upcoming High-Priority Meetings (Next 7 Days) */}
             {analytics.meetings_attended?.upcoming_poa && analytics.meetings_attended.upcoming_poa.filter(poa => {
               const poaDate = new Date(poa.poa_date);
@@ -3163,36 +2951,11 @@ function Dashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Next 14 Days Column */}
                     <div className="bg-green-50 rounded-lg p-4">
-                      <div className="mb-4">
-                        <div className="font-semibold text-green-800 text-center mb-2">
-                          Next 14 Days
+                      <div className="font-semibold text-green-800 mb-4 text-center">
+                        Next 14 Days
+                        <div className="text-sm text-green-600">
+                          ${hotDeals.filter(deal => deal.column === 'next14').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
                         </div>
-                        {(() => {
-                          const columnValue = hotDeals.filter(deal => deal.column === 'next14').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
-                          const monthlyTarget = 750000; // $750K per month
-                          const columnTarget = Math.round(monthlyTarget / 3); // Divide by 3 columns
-                          const percentage = Math.round((columnValue / columnTarget) * 100);
-                          const isOnTrack = columnValue >= columnTarget;
-                          
-                          return (
-                            <Card className="bg-white">
-                              <CardContent className="p-3">
-                                <div className="text-2xl font-bold text-green-800 text-center">
-                                  ${(columnValue / 1000).toFixed(0)}K
-                                </div>
-                                <div className="text-xs text-gray-600 text-center mb-2">
-                                  Target: ${(columnTarget / 1000).toFixed(0)}K
-                                </div>
-                                <Progress value={Math.min(percentage, 100)} className="h-2" />
-                                <div className="text-xs text-center mt-1">
-                                  <span className={isOnTrack ? "text-green-600 font-medium" : "text-orange-600 font-medium"}>
-                                    {percentage}% of target
-                                  </span>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          );
-                        })()}
                       </div>
                       <Droppable droppableId="next14">
                         {(provided) => (
@@ -3218,36 +2981,11 @@ function Dashboard() {
 
                     {/* Next 30 Days Column */}
                     <div className="bg-yellow-50 rounded-lg p-4">
-                      <div className="mb-4">
-                        <div className="font-semibold text-yellow-800 text-center mb-2">
-                          Next 30 Days
+                      <div className="font-semibold text-yellow-800 mb-4 text-center">
+                        Next 30 Days
+                        <div className="text-sm text-yellow-600">
+                          ${hotDeals.filter(deal => deal.column === 'next30').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
                         </div>
-                        {(() => {
-                          const columnValue = hotDeals.filter(deal => deal.column === 'next30').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
-                          const monthlyTarget = 750000; // $750K per month
-                          const columnTarget = Math.round(monthlyTarget / 3); // Divide by 3 columns
-                          const percentage = Math.round((columnValue / columnTarget) * 100);
-                          const isOnTrack = columnValue >= columnTarget;
-                          
-                          return (
-                            <Card className="bg-white">
-                              <CardContent className="p-3">
-                                <div className="text-2xl font-bold text-yellow-800 text-center">
-                                  ${(columnValue / 1000).toFixed(0)}K
-                                </div>
-                                <div className="text-xs text-gray-600 text-center mb-2">
-                                  Target: ${(columnTarget / 1000).toFixed(0)}K
-                                </div>
-                                <Progress value={Math.min(percentage, 100)} className="h-2" />
-                                <div className="text-xs text-center mt-1">
-                                  <span className={isOnTrack ? "text-green-600 font-medium" : "text-orange-600 font-medium"}>
-                                    {percentage}% of target
-                                  </span>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          );
-                        })()}
                       </div>
                       <Droppable droppableId="next30">
                         {(provided) => (
@@ -3273,36 +3011,11 @@ function Dashboard() {
 
                     {/* Next 60-90 Days Column */}
                     <div className="bg-orange-50 rounded-lg p-4">
-                      <div className="mb-4">
-                        <div className="font-semibold text-orange-800 text-center mb-2">
-                          Next 60–90 Days
+                      <div className="font-semibold text-orange-800 mb-4 text-center">
+                        Next 60–90 Days
+                        <div className="text-sm text-orange-600">
+                          ${hotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
                         </div>
-                        {(() => {
-                          const columnValue = hotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
-                          const monthlyTarget = 750000; // $750K per month
-                          const columnTarget = Math.round(monthlyTarget / 3); // Divide by 3 columns
-                          const percentage = Math.round((columnValue / columnTarget) * 100);
-                          const isOnTrack = columnValue >= columnTarget;
-                          
-                          return (
-                            <Card className="bg-white">
-                              <CardContent className="p-3">
-                                <div className="text-2xl font-bold text-orange-800 text-center">
-                                  ${(columnValue / 1000).toFixed(0)}K
-                                </div>
-                                <div className="text-xs text-gray-600 text-center mb-2">
-                                  Target: ${(columnTarget / 1000).toFixed(0)}K
-                                </div>
-                                <Progress value={Math.min(percentage, 100)} className="h-2" />
-                                <div className="text-xs text-center mt-1">
-                                  <span className={isOnTrack ? "text-green-600 font-medium" : "text-orange-600 font-medium"}>
-                                    {percentage}% of target
-                                  </span>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          );
-                        })()}
                       </div>
                       <Droppable droppableId="next60">
                         {(provided) => (
@@ -3337,29 +3050,8 @@ function Dashboard() {
 }
 
 function App() {
-  const { user, loading } = useAuth();
-
-  // Show loading state while checking authentication
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show login page if not authenticated
-  if (!user) {
-    return <LoginPage />;
-  }
-
-  // Show dashboard with header if authenticated
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Dashboard />} />
