@@ -211,8 +211,13 @@ def test_logout_endpoint(session_token):
     
     # Test logout
     cookies = {'session_token': session_token}
-    data, response = test_api_endpoint("/auth/logout", method="POST", cookies=cookies, expected_status=200)
+    result = test_api_endpoint("/auth/logout", method="POST", cookies=cookies, expected_status=200)
     
+    if not result or len(result) != 2:
+        print(f"❌ Logout request failed - no response")
+        return False
+    
+    data, response = result
     if data is None or response is None:
         print(f"❌ Logout request failed")
         return False
