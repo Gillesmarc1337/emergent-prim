@@ -390,7 +390,9 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "AE Pipeline Breakdown API endpoint"
+    - "Double interactive board height and add AE breakdown table"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
