@@ -16,6 +16,8 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { DateRangePicker } from '@/components/DateRangePicker';
 import { GoogleSheetsUpload } from '@/components/GoogleSheetsUpload';
 import { format } from 'date-fns';
+import { useAuth } from './contexts/AuthContext';
+import LoginPage from './components/LoginPage';
 import './App.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
