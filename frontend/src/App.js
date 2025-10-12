@@ -10,14 +10,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { useDropzone } from 'react-dropzone';
-import { Upload, Download, TrendingUp, TrendingDown, Users, Target, Calendar, DollarSign, BarChart3, PieChart, AlertCircle, CheckCircle2, Sheet, CalendarDays, Search, X, RotateCcw, ChevronUp, ChevronDown, FileText, CheckCircle, LogOut } from 'lucide-react';
+import { Upload, Download, TrendingUp, TrendingDown, Users, Target, Calendar, DollarSign, BarChart3, PieChart, AlertCircle, CheckCircle2, Sheet, CalendarDays, Search, X, RotateCcw, ChevronUp, ChevronDown, FileText, CheckCircle } from 'lucide-react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, ComposedChart, Area, AreaChart } from 'recharts';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { DateRangePicker } from '@/components/DateRangePicker';
 import { GoogleSheetsUpload } from '@/components/GoogleSheetsUpload';
 import { format } from 'date-fns';
-import { useAuth } from '@/contexts/AuthContext';
-import LoginPage from '@/components/LoginPage';
 import './App.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -735,24 +733,86 @@ function MainDashboard({ analytics }) {
           icon={AlertCircle}
           color="orange"
         />
-        <MetricCard
-          title="New Pipe Created"
-          value={analytics.pipe_metrics?.created_pipe?.value || 0}
-          target={analytics.pipe_metrics?.created_pipe?.target || 0}
-          unit="$"
-          icon={TrendingUp}
-          color="green"
-          tooltip="Sum of ARR from all deals created this period, using same formula as Deals & Pipeline tab."
-        />
-        <MetricCard
-          title="Created Weighted Pipe"
-          value={analytics.pipe_metrics?.created_pipe?.weighted_value || 0}
-          target={analytics.pipe_metrics?.created_pipe?.target_weighted || 0}
-          unit="$"
-          icon={Target}
-          color="blue"
-          tooltip="ARR × stage-weight by source and recency, using Excel logic (Stage × Source × Recency)."
-        />
+        {(() => {
+          // Calculate period duration for dynamic targets
+          const monthlyData = dashboardData.monthly_revenue_chart || [];
+          const periodMonths = Math.max(1, monthlyData.length); // Number of months in period
+          
+          // Base monthly targets
+          const baseNewPipeTarget = 2000000; // $2M per month
+          const baseAggregateWeightedTarget = 800000; // $800K per month
+          
+          // Dynamic targets
+          const newPipeTarget = baseNewPipeTarget * periodMonths;
+          const aggregateWeightedTarget = baseAggregateWeightedTarget * periodMonths;
+          
+          // Period description
+          const periodDescription = periodMonths === 6 ? "Jul–Dec 2025 (6 months)" : 
+                                  periodMonths === 1 ? "Current Month (1 month)" :
+                                  `Selected Period (${periodMonths} months)`;
+          
+          return (
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <PieChart className="h-5 w-5 text-purple-500" />
+                    <span className="text-sm font-medium text-gray-600">New Pipe Created (Selected Period)</span>
+                  </div>
+                </div>
+                
+                <div className="text-xs text-gray-500 mb-3">{periodDescription}</div>
+                
+                <div className="space-y-4">
+                  {/* 1. Total New Pipe Generated */}
+                  <div>
+                    <div className="text-lg font-bold">
+                      ${(dashboardData.key_metrics.pipe_created / 1000000).toFixed(1)}M
+                    </div>
+                    <div className="text-xs text-gray-500">Total New Pipe Generated</div>
+                    <div className="text-xs text-gray-400">Target: ${(newPipeTarget / 1000000).toFixed(1)}M</div>
+                    <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
+                      <div 
+                        className="bg-purple-500 h-1 rounded-full" 
+                        style={{ width: `${Math.min((dashboardData.key_metrics.pipe_created / newPipeTarget) * 100, 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  
+                  {/* 2. New Weighted Pipe */}
+                  <div>
+                    <div className="text-sm font-bold text-blue-600">
+                      ${(dashboardData.dashboard_blocks?.block_3_pipe_creation?.weighted_pipe_created / 1000000 || 0).toFixed(1)}M
+                    </div>
+                    <div className="text-xs text-gray-500">New Weighted Pipe</div>
+                  </div>
+                  
+                  {/* 3. Aggregate Weighted Pipe */}
+                  <div>
+                    <div className="text-sm font-bold text-green-600">
+                      ${(dashboardData.key_metrics.weighted_pipeline / 1000000).toFixed(1)}M
+                    </div>
+                    <div className="text-xs text-gray-500">Aggregate Weighted Pipe</div>
+                    <div className="text-xs text-gray-400">Target: ${(aggregateWeightedTarget / 1000000).toFixed(1)}M</div>
+                    <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
+                      <div 
+                        className="bg-green-500 h-1 rounded-full" 
+                        style={{ width: `${Math.min((dashboardData.key_metrics.weighted_pipeline / aggregateWeightedTarget) * 100, 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Tooltip info */}
+                <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
+                  <div className="font-medium mb-1">📊 Includes all deals created in period</div>
+                  <div>• Weighted: Excel logic (Stage × Source × Recency)</div>
+                  <div>• Targets: 2M New Pipe + 800K Aggregate per month</div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })()}
         <MetricCard
           title="Active Deals"
           value={dashboardData.key_metrics.deals_count}
@@ -894,7 +954,7 @@ function MainDashboard({ analytics }) {
       {/* 4 Dashboard Blocks */}
       {analytics?.dashboard_blocks && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Block 1: Meetings Generation */}
+          {/* Block 1: Meeting Generation */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-center">Meetings Generation</CardTitle>
@@ -922,12 +982,6 @@ function MainDashboard({ analytics }) {
                   <div className="flex justify-between">
                     <span>Referral:</span>
                     <span className="font-medium">{analytics.dashboard_blocks.block_1_meetings.referral_actual}/{analytics.dashboard_blocks.block_1_meetings.referral_target}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Upsells / Cross-sell:</span>
-                    <span className="font-medium text-purple-600">
-                      {analytics.dashboard_blocks?.block_5_upsells?.closing_actual || 0}/{analytics.dashboard_blocks?.block_5_upsells?.closing_target || 6}
-                    </span>
                   </div>
                   {analytics.dashboard_blocks.block_1_meetings.unassigned_actual > 0 && (
                     <div className="flex justify-between">
@@ -986,59 +1040,31 @@ function MainDashboard({ analytics }) {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {/* New Pipe Created Value */}
                 <div className="text-center">
                   <div className="text-lg font-bold text-purple-600">
-                    ${((analytics.pipe_metrics?.created_pipe?.value || 0) / 1000000).toFixed(1)}M
+                    ${(analytics.dashboard_blocks.block_3_pipe_creation.new_pipe_created / 1000000).toFixed(1)}M
                   </div>
                   <div className="text-xs text-gray-600">Total New Pipe Generated</div>
                 </div>
-                {/* Target with Progress */}
                 <div className="text-center">
                   <div className="text-sm font-medium text-gray-700">
-                    Target: ${((analytics.pipe_metrics?.created_pipe?.target || 0) / 1000000).toFixed(1)}M
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div 
-                      className="bg-purple-500 h-2 rounded-full transition-all" 
-                      style={{ 
-                        width: `${Math.min(
-                          ((analytics.pipe_metrics?.created_pipe?.value || 0) / 
-                          (analytics.pipe_metrics?.created_pipe?.target || 1)) * 100, 
-                          100
-                        )}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {((analytics.pipe_metrics?.created_pipe?.value || 0) / 
-                      (analytics.pipe_metrics?.created_pipe?.target || 1) * 100).toFixed(1)}% of target
+                    {analytics.dashboard_blocks?.block_3_pipe_creation?.target_pipe_created 
+                      ? `Target: $${(analytics.dashboard_blocks.block_3_pipe_creation.target_pipe_created / 1000000).toFixed(1)}M` 
+                      : 'Target: $2M'}
                   </div>
                 </div>
-                {/* Created Weighted Pipe */}
-                <div className="text-center pt-2 border-t">
-                  <div className="text-sm font-bold text-blue-600">
-                    ${((analytics.pipe_metrics?.created_pipe?.weighted_value || 0) / 1000000).toFixed(1)}M
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center">
+                    <div className="text-sm font-bold text-blue-600">
+                      ${(analytics.dashboard_blocks.block_3_pipe_creation.weighted_pipe_created / 1000000).toFixed(1)}M
+                    </div>
+                    <div className="text-xs text-gray-600">New Weighted Pipe</div>
                   </div>
-                  <div className="text-xs text-gray-600">Created Weighted Pipe</div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    Target: ${((analytics.pipe_metrics?.created_pipe?.target_weighted || 0) / 1000000).toFixed(1)}M
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
-                    <div 
-                      className="bg-blue-500 h-1 rounded-full transition-all" 
-                      style={{ 
-                        width: `${Math.min(
-                          ((analytics.pipe_metrics?.created_pipe?.weighted_value || 0) / 
-                          (analytics.pipe_metrics?.created_pipe?.target_weighted || 1)) * 100, 
-                          100
-                        )}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {((analytics.pipe_metrics?.created_pipe?.weighted_value || 0) / 
-                      (analytics.pipe_metrics?.created_pipe?.target_weighted || 1) * 100).toFixed(1)}% of target
+                  <div className="text-center">
+                    <div className="text-sm font-bold text-teal-600">
+                      ${(analytics.dashboard_blocks.block_3_pipe_creation.aggregate_weighted_pipe / 1000000).toFixed(1)}M
+                    </div>
+                    <div className="text-xs text-gray-600">Aggregate Weighted Pipe</div>
                   </div>
                 </div>
               </div>
@@ -1111,12 +1137,6 @@ function Dashboard() {
   const [hiddenDeals, setHiddenDeals] = useState(new Set());
   const [hiddenLeads, setHiddenLeads] = useState(new Set());
   const [loadingProjections, setLoadingProjections] = useState(false);
-  const [aeBreakdown, setAeBreakdown] = useState([]);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
-  
-  // State for Upsell & Renewals
-  const [upsellData, setUpsellData] = useState(null);
-  const [loadingUpsell, setLoadingUpsell] = useState(false);
 
   const loadAnalytics = async () => {
     setLoading(true);
@@ -1156,24 +1176,21 @@ function Dashboard() {
   useEffect(() => {
     loadAnalytics();
     loadProjectionsData();
-    loadUpsellData();
   }, [monthOffset, dateRange, useCustomDate, viewMode]);
 
   const handleUploadSuccess = () => {
     loadAnalytics();
     loadProjectionsData();
-    loadUpsellData();
   };
 
   // New functions for projections data
   const loadProjectionsData = async () => {
     setLoadingProjections(true);
     try {
-      const [hotDealsResponse, hotLeadsResponse, performanceResponse, aeBreakdownResponse] = await Promise.all([
+      const [hotDealsResponse, hotLeadsResponse, performanceResponse] = await Promise.all([
         axios.get(`${API}/projections/hot-deals`),
         axios.get(`${API}/projections/hot-leads`),
-        axios.get(`${API}/projections/performance-summary`),
-        axios.get(`${API}/projections/ae-pipeline-breakdown`)
+        axios.get(`${API}/projections/performance-summary`)
       ]);
       
       // Combine hot deals (B Legals) and hot leads (POA Booked + Proposal sent) for the interactive board
@@ -1209,37 +1226,10 @@ function Dashboard() {
       setHotDeals(dealsWithColumns);
       setHotLeads(hotLeadsResponse.data);
       setPerformanceSummary(performanceResponse.data);
-      setAeBreakdown(aeBreakdownResponse.data);
     } catch (error) {
       console.error('Error loading projections data:', error);
     } finally {
       setLoadingProjections(false);
-    }
-  };
-  const loadUpsellData = async () => {
-    setLoadingUpsell(true);
-    try {
-      let url = `${API}/analytics/upsell-renewals`;
-      
-      // Add date parameters based on view mode
-      if (useCustomDate && dateRange?.from && dateRange?.to) {
-        // Custom date range
-        const startDate = format(dateRange.from, 'yyyy-MM-dd');
-        const endDate = format(dateRange.to, 'yyyy-MM-dd');
-        url += `?start_date=${startDate}&end_date=${endDate}`;
-      } else if (viewMode === 'yearly') {
-        // July to December 2025
-        const year = new Date().getFullYear();
-        url += `?start_date=${year}-07-01&end_date=${year}-12-31`;
-      }
-      // If monthly, no params needed (defaults to current month in backend)
-      
-      const response = await axios.get(url);
-      setUpsellData(response.data);
-    } catch (error) {
-      console.error('Error loading upsell data:', error);
-    } finally {
-      setLoadingUpsell(false);
     }
   };
 
@@ -1296,88 +1286,6 @@ function Dashboard() {
 
   const filteredHotDeals = hotDeals.filter(deal => !hiddenDeals.has(deal.id));
   const filteredHotLeads = hotLeads.filter(lead => !hiddenLeads.has(lead.id));
-
-  // Sorting handler for AE breakdown table
-  const handleSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
-  };
-
-  // Sort AE breakdown data
-  const sortedAeBreakdown = React.useMemo(() => {
-    if (!sortConfig.key) return aeBreakdown;
-    
-    const sortableData = [...aeBreakdown];
-    sortableData.sort((a, b) => {
-      let aValue, bValue;
-      
-      if (sortConfig.key === 'ae') {
-        aValue = a.ae;
-        bValue = b.ae;
-      } else if (sortConfig.key.includes('.')) {
-        // Handle nested keys like 'next14.pipeline'
-        const keys = sortConfig.key.split('.');
-        aValue = a[keys[0]][keys[1]];
-        bValue = b[keys[0]][keys[1]];
-      } else {
-        aValue = a[sortConfig.key];
-        bValue = b[sortConfig.key];
-      }
-      
-      if (aValue < bValue) {
-        return sortConfig.direction === 'asc' ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return sortConfig.direction === 'asc' ? 1 : -1;
-      }
-      return 0;
-    });
-    
-    return sortableData;
-  }, [aeBreakdown, sortConfig]);
-
-  // Calculate totals for AE breakdown table
-  const aeBreakdownTotals = React.useMemo(() => {
-    if (!aeBreakdown || aeBreakdown.length === 0) {
-      return {
-        next14: { pipeline: 0, expected_arr: 0, weighted_value: 0 },
-        next30: { pipeline: 0, expected_arr: 0, weighted_value: 0 },
-        next60: { pipeline: 0, expected_arr: 0, weighted_value: 0 },
-        total: { pipeline: 0, expected_arr: 0, weighted_value: 0 }
-      };
-    }
-
-    return aeBreakdown.reduce((acc, ae) => ({
-      next14: {
-        pipeline: acc.next14.pipeline + (ae.next14?.pipeline || 0),
-        expected_arr: acc.next14.expected_arr + (ae.next14?.expected_arr || 0),
-        weighted_value: acc.next14.weighted_value + (ae.next14?.weighted_value || 0)
-      },
-      next30: {
-        pipeline: acc.next30.pipeline + (ae.next30?.pipeline || 0),
-        expected_arr: acc.next30.expected_arr + (ae.next30?.expected_arr || 0),
-        weighted_value: acc.next30.weighted_value + (ae.next30?.weighted_value || 0)
-      },
-      next60: {
-        pipeline: acc.next60.pipeline + (ae.next60?.pipeline || 0),
-        expected_arr: acc.next60.expected_arr + (ae.next60?.expected_arr || 0),
-        weighted_value: acc.next60.weighted_value + (ae.next60?.weighted_value || 0)
-      },
-      total: {
-        pipeline: acc.total.pipeline + (ae.total?.pipeline || 0),
-        expected_arr: acc.total.expected_arr + (ae.total?.expected_arr || 0),
-        weighted_value: acc.total.weighted_value + (ae.total?.weighted_value || 0)
-      }
-    }), {
-      next14: { pipeline: 0, expected_arr: 0, weighted_value: 0 },
-      next30: { pipeline: 0, expected_arr: 0, weighted_value: 0 },
-      next60: { pipeline: 0, expected_arr: 0, weighted_value: 0 },
-      total: { pipeline: 0, expected_arr: 0, weighted_value: 0 }
-    });
-  }, [aeBreakdown]);
 
   // Sortable data hooks for AE Performance tables
   const { items: sortedAeIntros, requestSort: requestAeIntrosSort, sortConfig: aeIntrosSortConfig } = 
@@ -1584,11 +1492,10 @@ function Dashboard() {
       </div>
 
       <Tabs defaultValue="dashboard" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-          <TabsTrigger value="meetings">Meetings Generation</TabsTrigger>
+          <TabsTrigger value="meetings">Meeting Generation</TabsTrigger>
           <TabsTrigger value="attended">Meetings Attended</TabsTrigger>
-          <TabsTrigger value="upsell">Upsell & Renew</TabsTrigger>
           <TabsTrigger value="deals">Deals & Pipeline</TabsTrigger>
           <TabsTrigger value="projections">Projections</TabsTrigger>
         </TabsList>
@@ -1598,16 +1505,16 @@ function Dashboard() {
           <MainDashboard analytics={analytics} />
         </TabsContent>
 
-        {/* Meetings Generation */}
+        {/* Meeting Generation */}
         <TabsContent value="meetings">
           <AnalyticsSection 
-            title="Meetings Generation (Current Period)"
+            title="Meeting Generation (Current Period)"
             isOnTrack={analytics.meeting_generation.on_track}
             conclusion={analytics.meeting_generation.on_track 
               ? "You are on track to meet your meeting generation targets." 
               : "Need to increase prospecting efforts to reach targets."}
           >
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <MetricCard
                 title="Total New Intros"
                 value={analytics.meeting_generation.total_new_intros}
@@ -1634,13 +1541,6 @@ function Dashboard() {
                 value={analytics.meeting_generation.referrals}
                 target={analytics.meeting_generation.referral_target}
                 icon={Users}
-                color="purple"
-              />
-              <MetricCard
-                title="Upsells / Cross-sell"
-                value={analytics.dashboard_blocks?.block_5_upsells?.closing_actual || 0}
-                target={analytics.dashboard_blocks?.block_5_upsells?.closing_target || 6}
-                icon={TrendingUp}
                 color="purple"
               />
             </div>
@@ -1774,9 +1674,7 @@ function Dashboard() {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b">
-                          <th className="text-left p-2">Name</th>
-                          <th className="text-center p-2">Role</th>
-                          <th className="text-right p-2">Meeting Goal</th>
+                          <th className="text-left p-2">BDR</th>
                           <th className="text-right p-2">Total Meetings</th>
                           <th className="text-right p-2">Relevant Meetings</th>
                           <th className="text-right p-2">Relevance Rate</th>
@@ -1786,22 +1684,6 @@ function Dashboard() {
                         {Object.entries(analytics.meeting_generation.bdr_performance).map(([bdr, stats]) => (
                           <tr key={bdr} className="border-b">
                             <td className="p-2 font-medium">{bdr}</td>
-                            <td className="text-center p-2">
-                              {stats.role === 'BDR' && (
-                                <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
-                                  BDR
-                                </span>
-                              )}
-                            </td>
-                            <td className="text-right p-2">
-                              {stats.meeting_target ? (
-                                <span className={stats.total_meetings >= stats.meeting_target ? 'text-green-600 font-medium' : 'text-orange-600 font-medium'}>
-                                  {stats.total_meetings}/{stats.meeting_target}
-                                </span>
-                              ) : (
-                                <span className="text-gray-400">-</span>
-                              )}
-                            </td>
                             <td className="text-right p-2">{stats.total_meetings}</td>
                             <td className="text-right p-2">{stats.relevant_meetings}</td>
                             <td className="text-right p-2">
@@ -2354,307 +2236,6 @@ function Dashboard() {
           </AnalyticsSection>
         </TabsContent>
 
-        {/* Upsell & Renewals */}
-        <TabsContent value="upsell">
-          {loadingUpsell ? (
-            <div className="text-center py-8">Loading Upsell & Renewals data...</div>
-          ) : upsellData ? (
-            <div className="space-y-6">
-              {/* Top KPI Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <MetricCard
-                  title="Valeur Closing Upsells"
-                  value={upsellData.closing_value}
-                  target={upsellData.closing_value_target}
-                  unit="$"
-                  icon={DollarSign}
-                  color="purple"
-                  tooltip="Total value of closed upsells and renewals"
-                />
-                <MetricCard
-                  title="POA Generated"
-                  value={upsellData.poa_actual}
-                  target={upsellData.poa_target}
-                  icon={Target}
-                  color="orange"
-                  tooltip="POA generated from upsells and renewals"
-                />
-                <MetricCard
-                  title="Closing"
-                  value={upsellData.closing_actual}
-                  target={upsellData.closing_target}
-                  icon={CheckCircle}
-                  color="green"
-                  tooltip="Deals closed from upsells and renewals"
-                />
-              </div>
-
-              {/* Secondary Metrics Row */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-purple-600">{upsellData.upsells_actual}</div>
-                      <div className="text-sm text-gray-600">Upsells / Cross-sell</div>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">{upsellData.renewals_actual}</div>
-                      <div className="text-sm text-gray-600">Renewals</div>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">{upsellData.show_actual}</div>
-                      <div className="text-sm text-gray-600">Show</div>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-red-600">{upsellData.no_show_actual}</div>
-                      <div className="text-sm text-gray-600">No Show</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Partner Performance Table (similar to BDR Performance) */}
-              <AnalyticsSection
-                title="Partner Performance"
-                description={`Performance by Business & Consulting Partners for ${upsellData.period}`}
-                icon={Users}
-              >
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Partner
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Intros Attended
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          POA Generated
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Upsells
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Renewals
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Closing
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Closing Value
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {upsellData.partner_performance.map((partner, index) => (
-                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {partner.partner}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {partner.intros_attended}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {partner.poa_generated}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-600 font-medium">
-                            {partner.upsells}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
-                            {partner.renewals}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {partner.closing}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            ${partner.closing_value.toLocaleString()}
-                          </td>
-                        </tr>
-                      ))}
-                      {upsellData.partner_performance.length === 0 && (
-                        <tr>
-                          <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
-                            No partner data available for this period
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </AnalyticsSection>
-
-              {/* Intros Details Table */}
-              <AnalyticsSection
-                title="Intros Attended Details"
-                description="Detailed list of all intros attended"
-                icon={Calendar}
-              >
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Client
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Partner
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Owner
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Type
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Stage
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Expected ARR
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {upsellData.intros_details.map((intro, index) => (
-                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {intro.date}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {intro.client}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {intro.partner}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {intro.owner}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              intro.type_of_deal.toLowerCase().includes('upsell') 
-                                ? 'bg-purple-100 text-purple-800' 
-                                : 'bg-green-100 text-green-800'
-                            }`}>
-                              {intro.type_of_deal}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {intro.stage}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            ${intro.expected_arr.toLocaleString()}
-                          </td>
-                        </tr>
-                      ))}
-                      {upsellData.intros_details.length === 0 && (
-                        <tr>
-                          <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
-                            No intros data available for this period
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </AnalyticsSection>
-
-              {/* POA Details Table */}
-              <AnalyticsSection
-                title="POA Generated Details"
-                description="Detailed list of all POA generated"
-                icon={Target}
-              >
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Client
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Partner
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Owner
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Type
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Stage
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Expected ARR
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {upsellData.poa_details.map((poa, index) => (
-                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {poa.date}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {poa.client}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {poa.partner}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {poa.owner}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              poa.type_of_deal.toLowerCase().includes('upsell') 
-                                ? 'bg-purple-100 text-purple-800' 
-                                : 'bg-green-100 text-green-800'
-                            }`}>
-                              {poa.type_of_deal}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {poa.stage}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            ${poa.expected_arr.toLocaleString()}
-                          </td>
-                        </tr>
-                      ))}
-                      {upsellData.poa_details.length === 0 && (
-                        <tr>
-                          <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
-                            No POA data available for this period
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </AnalyticsSection>
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500">No data available</div>
-          )}
-        </TabsContent>
-
         {/* Deals & Pipeline */}
         <TabsContent value="deals">
           <div className="space-y-6">
@@ -3075,38 +2656,35 @@ function Dashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* Card 4: Upcoming POAs */}
+                  {/* Card 4: POA Status - Use master data for upcoming count */}
                   <Card className="border-2 border-blue-200 bg-blue-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-blue-600" />
-                        Upcoming POAs
+                        POA Status
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-600">
-                          {(() => {
-                            // Count upcoming POA from hot-leads with future poa_date
-                            const today = new Date();
-                            return hotLeads.filter(deal => {
-                              const poaDate = deal.poa_date ? new Date(deal.poa_date) : null;
-                              return poaDate && poaDate > today;
-                            }).length;
-                          })()}
+                      <div className="grid grid-cols-2 gap-2 text-center">
+                        <div>
+                          <div className="text-lg font-bold text-green-600">
+                            {analytics.dashboard_blocks?.block_2_intro_poa?.poa_actual || 0}
+                          </div>
+                          <div className="text-xs text-gray-600">Completed</div>
                         </div>
-                        <div className="text-xs text-gray-600 mb-2">Upcoming POAs</div>
-                        <div className="text-lg font-bold text-green-600">
-                          ${(() => {
-                            // Calculate total value of upcoming POAs
-                            const today = new Date();
-                            return (hotLeads.filter(deal => {
-                              const poaDate = deal.poa_date ? new Date(deal.poa_date) : null;
-                              return poaDate && poaDate > today;
-                            }).reduce((sum, deal) => sum + (deal.pipeline || 0), 0) / 1000).toFixed(0);
-                          })()}K
+                        <div>
+                          <div className="text-lg font-bold text-blue-600">
+                            {(() => {
+                              // Count upcoming POA from hot-leads with future poa_date
+                              const today = new Date();
+                              return hotLeads.filter(deal => {
+                                const poaDate = deal.poa_date ? new Date(deal.poa_date) : null;
+                                return poaDate && poaDate > today;
+                              }).length;
+                            })()}
+                          </div>
+                          <div className="text-xs text-gray-600">Upcoming</div>
                         </div>
-                        <div className="text-xs text-gray-600">Total Value</div>
                       </div>
                     </CardContent>
                   </Card>
@@ -3180,8 +2758,134 @@ function Dashboard() {
                   ) : null;
                 })()}
 
+                {/* Projection par AE */}
+                {Object.keys(analytics.closing_projections.ae_projections).length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Projections by AE</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b bg-gray-50">
+                              <th className="text-left p-2 font-semibold">AE</th>
+                              <th className="text-right p-2 font-semibold">
+                                Total Pipeline
+                                <div className="text-xs font-normal text-gray-500">Brut (sauf Lost)</div>
+                              </th>
+                              <th className="text-right p-2 font-semibold">
+                                Weighted Value
+                                <div className="text-xs font-normal text-gray-500">Pondéré période</div>
+                              </th>
+                              <th className="text-right p-2 font-semibold">
+                                Aggregate Pipe
+                                <div className="text-xs font-normal text-gray-500">Cumul historique</div>
+                              </th>
+                              <th className="text-right p-2 font-semibold">Proposal/Legals</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {Object.entries(analytics.closing_projections.ae_projections).map(([ae, stats]) => {
+                              // Find corresponding AE in pipe_metrics.ae_breakdown for aggregate data
+                              const aeBreakdown = analytics.pipe_metrics?.ae_breakdown?.find(item => item.ae === ae) || {};
+                              
+                              // Count deals in Proposal sent or Legals stage for this AE
+                              const proposalLegalsDeals = (analytics.closing_projections.current_month.deals || [])
+                                .concat(analytics.closing_projections.next_quarter.deals || [])
+                                .filter(deal => deal.owner === ae && (deal.stage === 'C Proposal sent' || deal.stage === 'B Legals')).length;
+                              
+                              return (
+                                <tr key={ae} className="border-b">
+                                  <td className="p-2 font-medium">{ae}</td>
+                                  <td className="text-right p-2">${stats.pipeline?.toLocaleString()}</td>
+                                  <td className="text-right p-2">${stats.weighted_value?.toLocaleString()}</td>
+                                  <td className="text-right p-2">${aeBreakdown.weighted_pipe?.toLocaleString() || 0}</td>
+                                  <td className="text-right p-2">{proposalLegalsDeals}</td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </CardContent>
             </Card>
+
+            {/* Performance Summary - Updated with Dashboard Data */}
+            {performanceSummary && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Performance Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                    <MetricCard
+                      title="YTD Revenue"
+                      value={performanceSummary.ytd_revenue}
+                      target={performanceSummary.ytd_target}
+                      unit="$"
+                      icon={DollarSign}
+                      color="green"
+                    />
+                    <MetricCard
+                      title="Remaining Target"
+                      value={performanceSummary.remaining_target}
+                      unit="$"
+                      icon={Target}
+                      color="orange"
+                    />
+                    <MetricCard
+                      title="Pipe Created"
+                      value={performanceSummary.pipe_created || 0}
+                      unit="$"
+                      icon={PieChart}
+                      color="purple"
+                    />
+                    <Card>
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Users className="h-5 w-5 text-blue-600" />
+                          <span className="text-sm font-medium text-gray-600">Active Deals</span>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-600">
+                          {performanceSummary.active_deals_count || 0}
+                        </div>
+                        <div className="text-xs text-gray-600">Open & Relevant</div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-2 mb-2">
+                          <AlertCircle className="h-5 w-5 text-blue-500" />
+                          <span className="text-sm font-medium text-gray-600">Target Status</span>
+                        </div>
+                        <Badge 
+                          variant={performanceSummary.forecast_gap ? 'destructive' : 'default'}
+                          className="text-sm"
+                        >
+                          {performanceSummary.forecast_gap 
+                            ? 'Forecast Gap Detected' 
+                            : 'On Track'}
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {performanceSummary.forecast_gap && (
+                    <Alert className="border-orange-500">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        <strong>Action Required:</strong> Need to intensify efforts to close the gap of 
+                        ${performanceSummary.remaining_target.toLocaleString()} and achieve annual targets.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             {/* Upcoming High-Priority Meetings (Next 7 Days) */}
             {analytics.meetings_attended?.upcoming_poa && analytics.meetings_attended.upcoming_poa.filter(poa => {
@@ -3243,39 +2947,14 @@ function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {(() => {
-                  // Calculate totals dynamically (updates when cards are dragged or hidden)
-                  // Use filteredHotDeals to exclude hidden deals from calculations
-                  const next14Total = filteredHotDeals.filter(deal => deal.column === 'next14').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
-                  const next30Total = filteredHotDeals.filter(deal => deal.column === 'next30').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
-                  const next60Total = filteredHotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
-                  
-                  const target14 = 375000;
-                  const target30 = 375000;
-                  const target60 = 1500000;
-                  
-                  return (
-                    <>
                 <DragDropContext onDragEnd={onDragEnd}>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Next 14 Days Column */}
                     <div className="bg-green-50 rounded-lg p-4">
-                      <div className="mb-4 text-center">
-                        <div className="font-semibold text-green-800 mb-2">Next 14 Days</div>
-                        <div className="text-2xl font-bold text-green-600">
-                          ${(next14Total / 1000).toFixed(0)}K
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1">Target: 375K</div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                          <div 
-                            className="bg-green-500 h-2 rounded-full transition-all"
-                            style={{ 
-                              width: `${Math.min((next14Total / target14) * 100, 100)}%` 
-                            }}
-                          ></div>
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1">
-                          {((next14Total / target14) * 100).toFixed(1)}% of target
+                      <div className="font-semibold text-green-800 mb-4 text-center">
+                        Next 14 Days
+                        <div className="text-sm text-green-600">
+                          ${hotDeals.filter(deal => deal.column === 'next14').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
                         </div>
                       </div>
                       <Droppable droppableId="next14">
@@ -3283,9 +2962,9 @@ function Dashboard() {
                           <div 
                             {...provided.droppableProps}
                             ref={provided.innerRef}
-                            className="space-y-2 min-h-[48rem] max-h-[48rem] overflow-y-auto"
+                            className="space-y-2 min-h-96 max-h-96 overflow-y-auto"
                           >
-                            {filteredHotDeals.filter(deal => deal.column === 'next14').map((deal, index) => (
+                            {hotDeals.filter(deal => deal.column === 'next14').map((deal, index) => (
                               <DraggableDealItem 
                                 key={deal.id}
                                 deal={deal} 
@@ -3302,22 +2981,10 @@ function Dashboard() {
 
                     {/* Next 30 Days Column */}
                     <div className="bg-yellow-50 rounded-lg p-4">
-                      <div className="mb-4 text-center">
-                        <div className="font-semibold text-yellow-800 mb-2">Next 30 Days</div>
-                        <div className="text-2xl font-bold text-yellow-600">
-                          ${(next30Total / 1000).toFixed(0)}K
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1">Target: 375K</div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                          <div 
-                            className="bg-yellow-500 h-2 rounded-full transition-all"
-                            style={{ 
-                              width: `${Math.min((next30Total / target30) * 100, 100)}%` 
-                            }}
-                          ></div>
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1">
-                          {((next30Total / target30) * 100).toFixed(1)}% of target
+                      <div className="font-semibold text-yellow-800 mb-4 text-center">
+                        Next 30 Days
+                        <div className="text-sm text-yellow-600">
+                          ${hotDeals.filter(deal => deal.column === 'next30').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
                         </div>
                       </div>
                       <Droppable droppableId="next30">
@@ -3325,9 +2992,9 @@ function Dashboard() {
                           <div 
                             {...provided.droppableProps}
                             ref={provided.innerRef}
-                            className="space-y-2 min-h-[48rem] max-h-[48rem] overflow-y-auto"
+                            className="space-y-2 min-h-96 max-h-96 overflow-y-auto"
                           >
-                            {filteredHotDeals.filter(deal => deal.column === 'next30').map((deal, index) => (
+                            {hotDeals.filter(deal => deal.column === 'next30').map((deal, index) => (
                               <DraggableDealItem 
                                 key={deal.id}
                                 deal={deal} 
@@ -3344,22 +3011,10 @@ function Dashboard() {
 
                     {/* Next 60-90 Days Column */}
                     <div className="bg-orange-50 rounded-lg p-4">
-                      <div className="mb-4 text-center">
-                        <div className="font-semibold text-orange-800 mb-2">Next 60–90 Days</div>
-                        <div className="text-2xl font-bold text-orange-600">
-                          ${(next60Total / 1000000).toFixed(1)}M
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1">Target: 1.5M</div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                          <div 
-                            className="bg-orange-500 h-2 rounded-full transition-all"
-                            style={{ 
-                              width: `${Math.min((next60Total / target60) * 100, 100)}%` 
-                            }}
-                          ></div>
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1">
-                          {((next60Total / target60) * 100).toFixed(1)}% of target
+                      <div className="font-semibold text-orange-800 mb-4 text-center">
+                        Next 60–90 Days
+                        <div className="text-sm text-orange-600">
+                          ${hotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
                         </div>
                       </div>
                       <Droppable droppableId="next60">
@@ -3367,9 +3022,9 @@ function Dashboard() {
                           <div 
                             {...provided.droppableProps}
                             ref={provided.innerRef}
-                            className="space-y-2 min-h-[48rem] max-h-[48rem] overflow-y-auto"
+                            className="space-y-2 min-h-96 max-h-96 overflow-y-auto"
                           >
-                            {filteredHotDeals.filter(deal => deal.column === 'next60').map((deal, index) => (
+                            {hotDeals.filter(deal => deal.column === 'next60').map((deal, index) => (
                               <DraggableDealItem 
                                 key={deal.id}
                                 deal={deal} 
@@ -3385,172 +3040,24 @@ function Dashboard() {
                     </div>
                   </div>
                 </DragDropContext>
-                    </>
-                  );
-                })()}
               </CardContent>
             </Card>
-
-            {/* AE Pipeline Breakdown Table */}
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle className="text-xl flex items-center gap-2">
-                  <Users className="h-6 w-6 text-blue-600" />
-                  Pipeline Breakdown by Account Executive
-                </CardTitle>
-                <CardDescription>
-                  Pipeline, Expected ARR, and Weighted values for each AE across different time periods
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th 
-                          className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('ae')}
-                        >
-                          <div className="flex items-center gap-1">
-                            Account Executive
-                            {sortConfig.key === 'ae' && (
-                              <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                            )}
-                          </div>
-                        </th>
-                        <th 
-                          className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('next14.expected_arr')}
-                        >
-                          Next 14 Days<br/>Expected ARR
-                          {sortConfig.key === 'next14.expected_arr' && (
-                            <span className="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                          )}
-                        </th>
-                        <th 
-                          className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('next30.expected_arr')}
-                        >
-                          Next 30 Days<br/>Expected ARR
-                          {sortConfig.key === 'next30.expected_arr' && (
-                            <span className="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                          )}
-                        </th>
-                        <th 
-                          className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('next60.weighted_value')}
-                        >
-                          Next 60-90 Days<br/>Weighted
-                          {sortConfig.key === 'next60.weighted_value' && (
-                            <span className="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                          )}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {sortedAeBreakdown.map((ae, index) => (
-                        <tr key={ae.ae} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {ae.ae}
-                          </td>
-                          {/* Next 14 Days - Expected ARR */}
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-700">
-                            ${ae.next14.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                          </td>
-                          {/* Next 30 Days - Expected ARR */}
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-700">
-                            ${ae.next30.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                          </td>
-                          {/* Next 60-90 Days - Weighted */}
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-700">
-                            ${ae.next60.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                          </td>
-                        </tr>
-                      ))}
-                      {/* Total Row */}
-                      <tr className="bg-blue-100 border-t-2 border-blue-300">
-                        <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900">
-                          TOTAL
-                        </td>
-                        {/* Next 14 Days - Expected ARR Total */}
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
-                          ${aeBreakdownTotals.next14.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                        </td>
-                        {/* Next 30 Days - Expected ARR Total */}
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
-                          ${aeBreakdownTotals.next30.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                        </td>
-                        {/* Next 60-90 Days - Weighted Total */}
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
-                          ${aeBreakdownTotals.next60.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Projections by AE - Moved to bottom */}
-            {Object.keys(analytics.closing_projections.ae_projections).length > 0 && (
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>Projections by AE</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b bg-gray-50">
-                          <th className="text-left p-2 font-semibold">AE</th>
-                          <th className="text-right p-2 font-semibold">
-                            Total Pipeline
-                            <div className="text-xs font-normal text-gray-500">Brut (sauf Lost)</div>
-                          </th>
-                          <th className="text-right p-2 font-semibold">
-                            Weighted Value
-                            <div className="text-xs font-normal text-gray-500">Pondéré période</div>
-                          </th>
-                          <th className="text-right p-2 font-semibold">
-                            Aggregate Pipe
-                            <div className="text-xs font-normal text-gray-500">Cumul historique</div>
-                          </th>
-                          <th className="text-right p-2 font-semibold">Proposal/Legals</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {Object.entries(analytics.closing_projections.ae_projections).map(([ae, stats]) => {
-                          // Find corresponding AE in pipe_metrics.ae_breakdown for aggregate data
-                          const aeBreakdown = analytics.pipe_metrics?.ae_breakdown?.find(item => item.ae === ae) || {};
-                          
-                          // Count deals in Proposal sent or Legals stage for this AE
-                          const proposalLegalsDeals = (analytics.closing_projections.current_month.deals || [])
-                            .concat(analytics.closing_projections.next_quarter.deals || [])
-                            .filter(deal => deal.owner === ae && (deal.stage === 'C Proposal sent' || deal.stage === 'B Legals')).length;
-                          
-                          return (
-                            <tr key={ae} className="border-b">
-                              <td className="p-2 font-medium">{ae}</td>
-                              <td className="text-right p-2">${stats.pipeline?.toLocaleString()}</td>
-                              <td className="text-right p-2">${stats.weighted_value?.toLocaleString()}</td>
-                              <td className="text-right p-2">${aeBreakdown.weighted_pipe?.toLocaleString() || 0}</td>
-                              <td className="text-right p-2">{proposalLegalsDeals}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
         </TabsContent>
-        </Tabs>
-      </div>
+      </Tabs>
+    </div>
+  );
+}
 
-      {/* Login Page */}
-      {!isAuthenticated && <LoginPage />}
+function App() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
