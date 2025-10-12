@@ -3330,7 +3330,7 @@ function Dashboard() {
                       <div className="font-semibold text-yellow-800 mb-4 text-center">
                         Next 30 Days
                         <div className="text-sm text-yellow-600">
-                          ${hotDeals.filter(deal => deal.column === 'next30').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
+                          ${(hotDeals.filter(deal => deal.column === 'next30').reduce((sum, deal) => sum + (deal.pipeline || 0), 0) / 1000).toFixed(0)}K / 375K
                         </div>
                       </div>
                       <Droppable droppableId="next30">
