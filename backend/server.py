@@ -1142,6 +1142,43 @@ async def logout(
     response.delete_cookie(key="session_token")
     return {"message": "Logged out successfully"}
 
+@api_router.post("/auth/demo-login")
+async def demo_login(response: Response):
+    """
+    Create demo session for development/testing
+    Demo sessions expire after 24 hours
+    """
+    try:
+        # Create or get demo user
+        demo_user = await create_demo_user()
+        
+        # Create demo session (24 hours expiration)
+        session_token = f"demo_session_{demo_user['id']}_{int(datetime.now(timezone.utc).timestamp())}"
+        session = await create_session(demo_user["id"], session_token, expires_hours=24)
+        
+        # Set cookie
+        response.set_cookie(
+            key="session_token",
+            value=session_token,
+            httponly=True,
+            secure=False,  # Set to True in production with HTTPS
+            samesite="lax",
+            max_age=24 * 60 * 60  # 24 hours
+        )
+        
+        return {
+            "id": demo_user["id"],
+            "email": demo_user["email"],
+            "name": demo_user["name"],
+            "picture": demo_user.get("picture"),
+            "role": demo_user["role"],
+            "session_token": session_token,
+            "is_demo": True
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Demo login error: {str(e)}")
+
 # ============= VIEW MANAGEMENT ENDPOINTS =============
 @api_router.get("/views")
 async def get_views(user: dict = Depends(get_current_user)):
