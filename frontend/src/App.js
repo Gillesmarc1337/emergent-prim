@@ -1219,12 +1219,18 @@ function Dashboard() {
     try {
       let url = `${API}/analytics/upsell-renewals`;
       
-      // Add date parameters if custom period is selected
+      // Add date parameters based on view mode
       if (useCustomDate && dateRange?.from && dateRange?.to) {
+        // Custom date range
         const startDate = format(dateRange.from, 'yyyy-MM-dd');
         const endDate = format(dateRange.to, 'yyyy-MM-dd');
         url += `?start_date=${startDate}&end_date=${endDate}`;
+      } else if (viewMode === 'yearly') {
+        // July to December 2025
+        const year = new Date().getFullYear();
+        url += `?start_date=${year}-07-01&end_date=${year}-12-31`;
       }
+      // If monthly, no params needed (defaults to current month in backend)
       
       const response = await axios.get(url);
       setUpsellData(response.data);
