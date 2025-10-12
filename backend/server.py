@@ -2410,6 +2410,106 @@ async def get_hot_leads():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting hot leads: {str(e)}")
 
+@api_router.get("/projections/ae-pipeline-breakdown")
+async def get_ae_pipeline_breakdown():
+    """Get pipeline breakdown by AE for Next 14, 30, and 60-90 days periods"""
+    try:
+        # Get data from MongoDB
+        records = await db.sales_records.find().to_list(10000)
+        if not records:
+            return []
+        
+        # Convert to DataFrame for analysis
+        df = pd.DataFrame(records)
+        
+        # Convert date strings back to datetime
+        date_columns = ['discovery_date', 'poa_date', 'billing_start', 'created_at']
+        for col in date_columns:
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors='coerce')
+        
+        # Apply Excel weighting formula
+        df['weighted_value'] = df.apply(calculate_excel_weighted_value, axis=1)
+        
+        # Get all hot deals and hot leads
+        hot_deals = df[df['stage'] == 'B Legals'].copy()
+        hot_leads = df[df['stage'].isin(['C Proposal sent', 'D POA Booked'])].copy()
+        
+        # Combine all deals
+        all_deals = pd.concat([hot_deals, hot_leads], ignore_index=True)
+        
+        if all_deals.empty:
+            return []
+        
+        # Assign deals to time periods based on stage
+        # Next 14 Days: B Legals
+        # Next 30 Days: Could be some other logic, but for now we'll use stage
+        # Next 60-90 Days: C Proposal sent, D POA Booked
+        
+        def assign_period(row):
+            stage = row['stage']
+            if stage == 'B Legals':
+                return 'next14'
+            elif stage == 'C Proposal sent':
+                return 'next60'
+            elif stage == 'D POA Booked':
+                return 'next30'
+            return 'other'
+        
+        all_deals['period'] = all_deals.apply(assign_period, axis=1)
+        
+        # Get all unique AEs
+        all_aes = sorted(df['owner'].dropna().unique())
+        
+        # Build breakdown by AE
+        ae_breakdown = []
+        
+        for ae in all_aes:
+            ae_data = {
+                'ae': str(ae),
+                'next14': {
+                    'pipeline': 0.0,
+                    'expected_arr': 0.0,
+                    'weighted_value': 0.0
+                },
+                'next30': {
+                    'pipeline': 0.0,
+                    'expected_arr': 0.0,
+                    'weighted_value': 0.0
+                },
+                'next60': {
+                    'pipeline': 0.0,
+                    'expected_arr': 0.0,
+                    'weighted_value': 0.0
+                },
+                'total': {
+                    'pipeline': 0.0,
+                    'expected_arr': 0.0,
+                    'weighted_value': 0.0
+                }
+            }
+            
+            # Calculate for each period
+            for period in ['next14', 'next30', 'next60']:
+                ae_period_deals = all_deals[(all_deals['owner'] == ae) & (all_deals['period'] == period)]
+                
+                if not ae_period_deals.empty:
+                    ae_data[period]['pipeline'] = float(ae_period_deals['pipeline'].fillna(0).sum())
+                    ae_data[period]['expected_arr'] = float(ae_period_deals['expected_arr'].fillna(0).sum())
+                    ae_data[period]['weighted_value'] = float(ae_period_deals['weighted_value'].fillna(0).sum())
+            
+            # Calculate totals
+            ae_data['total']['pipeline'] = ae_data['next14']['pipeline'] + ae_data['next30']['pipeline'] + ae_data['next60']['pipeline']
+            ae_data['total']['expected_arr'] = ae_data['next14']['expected_arr'] + ae_data['next30']['expected_arr'] + ae_data['next60']['expected_arr']
+            ae_data['total']['weighted_value'] = ae_data['next14']['weighted_value'] + ae_data['next30']['weighted_value'] + ae_data['next60']['weighted_value']
+            
+            ae_breakdown.append(ae_data)
+        
+        return ae_breakdown
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting AE pipeline breakdown: {str(e)}")
+
 @api_router.get("/debug/test-google-sheet-import")
 async def test_google_sheet_import():
     """Test what data is actually imported from Google Sheet"""
