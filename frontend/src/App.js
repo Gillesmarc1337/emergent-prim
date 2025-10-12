@@ -3293,6 +3293,18 @@ function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                {(() => {
+                  // Calculate totals dynamically (updates when cards are dragged)
+                  const next14Total = hotDeals.filter(deal => deal.column === 'next14').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                  const next30Total = hotDeals.filter(deal => deal.column === 'next30').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                  const next60Total = hotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                  
+                  const target14 = 375000;
+                  const target30 = 375000;
+                  const target60 = 1500000;
+                  
+                  return (
+                    <>
                 <DragDropContext onDragEnd={onDragEnd}>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Next 14 Days Column */}
@@ -3300,19 +3312,19 @@ function Dashboard() {
                       <div className="mb-4 text-center">
                         <div className="font-semibold text-green-800 mb-2">Next 14 Days</div>
                         <div className="text-2xl font-bold text-green-600">
-                          ${(hotDeals.filter(deal => deal.column === 'next14').reduce((sum, deal) => sum + (deal.pipeline || 0), 0) / 1000).toFixed(0)}K
+                          ${(next14Total / 1000).toFixed(0)}K
                         </div>
                         <div className="text-xs text-gray-600 mt-1">Target: 375K</div>
                         <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                           <div 
                             className="bg-green-500 h-2 rounded-full transition-all"
                             style={{ 
-                              width: `${Math.min((hotDeals.filter(deal => deal.column === 'next14').reduce((sum, deal) => sum + (deal.pipeline || 0), 0) / 375000) * 100, 100)}%` 
+                              width: `${Math.min((next14Total / target14) * 100, 100)}%` 
                             }}
                           ></div>
                         </div>
                         <div className="text-xs text-gray-600 mt-1">
-                          {((hotDeals.filter(deal => deal.column === 'next14').reduce((sum, deal) => sum + (deal.pipeline || 0), 0) / 375000) * 100).toFixed(1)}% of target
+                          {((next14Total / target14) * 100).toFixed(1)}% of target
                         </div>
                       </div>
                       <Droppable droppableId="next14">
