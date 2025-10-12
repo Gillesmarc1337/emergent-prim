@@ -2688,36 +2688,44 @@ function Dashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* Card 4: POA Status - Use master data for upcoming count */}
+                  {/* Card 4: Upcoming POAs - Show count and total value */}
                   <Card className="border-2 border-blue-200 bg-blue-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-blue-600" />
-                        POA Status
+                        Upcoming POAs
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-2 gap-2 text-center">
-                        <div>
-                          <div className="text-lg font-bold text-green-600">
-                            {analytics.dashboard_blocks?.block_2_intro_poa?.poa_actual || 0}
+                      {(() => {
+                        // Get upcoming POA from hot-leads with future poa_date
+                        const today = new Date();
+                        const upcomingPOAs = hotLeads.filter(deal => {
+                          const poaDate = deal.poa_date ? new Date(deal.poa_date) : null;
+                          return poaDate && poaDate > today;
+                        });
+                        const upcomingCount = upcomingPOAs.length;
+                        const upcomingValue = upcomingPOAs.reduce((sum, deal) => 
+                          sum + (parseFloat(deal.expected_arr) || 0), 0
+                        );
+                        
+                        return (
+                          <div className="space-y-2">
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-blue-600">
+                                {upcomingCount}
+                              </div>
+                              <div className="text-xs text-gray-600">Upcoming POAs</div>
+                            </div>
+                            <div className="text-center pt-2 border-t border-blue-200">
+                              <div className="text-lg font-bold text-green-600">
+                                ${(upcomingValue / 1000).toFixed(0)}K
+                              </div>
+                              <div className="text-xs text-gray-600">Total Value</div>
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-600">Completed</div>
-                        </div>
-                        <div>
-                          <div className="text-lg font-bold text-blue-600">
-                            {(() => {
-                              // Count upcoming POA from hot-leads with future poa_date
-                              const today = new Date();
-                              return hotLeads.filter(deal => {
-                                const poaDate = deal.poa_date ? new Date(deal.poa_date) : null;
-                                return poaDate && poaDate > today;
-                              }).length;
-                            })()}
-                          </div>
-                          <div className="text-xs text-gray-600">Upcoming</div>
-                        </div>
-                      </div>
+                        );
+                      })()}
                     </CardContent>
                   </Card>
                 </div>
