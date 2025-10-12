@@ -2136,7 +2136,7 @@ async def get_upsell_renewals_analytics(
         monthly_business_partner_target = 9  # 60% from business partners
         monthly_consulting_partner_target = 6  # 40% from consulting partners
         monthly_poa_target = 10  # 10 POA per month
-        monthly_closing_target = 4  # 4 closings per month
+        monthly_closing_target = 6  # 6 closings per month (upsells/cross-sells)
         monthly_closing_value_target = 200_000  # 200K per month for closing value
         
         # Dynamic targets
