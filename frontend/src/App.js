@@ -894,7 +894,7 @@ function MainDashboard({ analytics }) {
       {/* 4 Dashboard Blocks */}
       {analytics?.dashboard_blocks && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Block 1: Meeting Generation */}
+          {/* Block 1: Meetings Generation */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-center">Meetings Generation</CardTitle>
