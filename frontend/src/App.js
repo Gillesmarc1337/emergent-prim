@@ -1291,6 +1291,48 @@ function Dashboard() {
   const filteredHotDeals = hotDeals.filter(deal => !hiddenDeals.has(deal.id));
   const filteredHotLeads = hotLeads.filter(lead => !hiddenLeads.has(lead.id));
 
+  // Sorting handler for AE breakdown table
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // Sort AE breakdown data
+  const sortedAeBreakdown = React.useMemo(() => {
+    if (!sortConfig.key) return aeBreakdown;
+    
+    const sortableData = [...aeBreakdown];
+    sortableData.sort((a, b) => {
+      let aValue, bValue;
+      
+      if (sortConfig.key === 'ae') {
+        aValue = a.ae;
+        bValue = b.ae;
+      } else if (sortConfig.key.includes('.')) {
+        // Handle nested keys like 'next14.pipeline'
+        const keys = sortConfig.key.split('.');
+        aValue = a[keys[0]][keys[1]];
+        bValue = b[keys[0]][keys[1]];
+      } else {
+        aValue = a[sortConfig.key];
+        bValue = b[sortConfig.key];
+      }
+      
+      if (aValue < bValue) {
+        return sortConfig.direction === 'asc' ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return sortConfig.direction === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+    
+    return sortableData;
+  }, [aeBreakdown, sortConfig]);
+
   // Sortable data hooks for AE Performance tables
   const { items: sortedAeIntros, requestSort: requestAeIntrosSort, sortConfig: aeIntrosSortConfig } = 
     useSortableData(analytics?.ae_performance?.ae_performance || []);
