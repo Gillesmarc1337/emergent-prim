@@ -3664,8 +3664,95 @@ function Dashboard() {
 }
 
 function App() {
+  const { user, loading, logout, currentView, views, setCurrentView, isAdmin } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginPage />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Header with User Info and View Selector */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Left: View Selector */}
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <TrendingUp className="h-6 w-6 text-blue-600" />
+                <span className="text-xl font-bold text-gray-900">Sales Analytics</span>
+              </div>
+              
+              {views.length > 0 && (
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">View:</span>
+                  <select
+                    value={currentView?.id || ''}
+                    onChange={(e) => {
+                      const view = views.find(v => v.id === e.target.value);
+                      setCurrentView(view);
+                    }}
+                    className="text-sm border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {views.map(view => (
+                      <option key={view.id} value={view.id}>
+                        {view.name} {view.is_master ? '(Master)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {/* Right: User Info and Actions */}
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                {user.picture && (
+                  <img src={user.picture} alt={user.name} className="h-8 w-8 rounded-full" />
+                )}
+                <div className="text-sm">
+                  <div className="font-medium text-gray-900">{user.name}</div>
+                  <div className="text-gray-500 text-xs">{user.role === 'super_admin' ? 'Admin' : 'Viewer'}</div>
+                </div>
+              </div>
+              
+              {isAdmin && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    // TODO: Open Admin Panel
+                    alert('Admin Panel - Coming soon!');
+                  }}
+                >
+                  Manage Views
+                </Button>
+              )}
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={logout}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Dashboard />} />
