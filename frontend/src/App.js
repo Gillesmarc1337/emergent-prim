@@ -10,12 +10,14 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { useDropzone } from 'react-dropzone';
-import { Upload, Download, TrendingUp, TrendingDown, Users, Target, Calendar, DollarSign, BarChart3, PieChart, AlertCircle, CheckCircle2, Sheet, CalendarDays, Search, X, RotateCcw, ChevronUp, ChevronDown, FileText, CheckCircle } from 'lucide-react';
+import { Upload, Download, TrendingUp, TrendingDown, Users, Target, Calendar, DollarSign, BarChart3, PieChart, AlertCircle, CheckCircle2, Sheet, CalendarDays, Search, X, RotateCcw, ChevronUp, ChevronDown, FileText, CheckCircle, LogOut } from 'lucide-react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, ComposedChart, Area, AreaChart } from 'recharts';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { DateRangePicker } from '@/components/DateRangePicker';
 import { GoogleSheetsUpload } from '@/components/GoogleSheetsUpload';
 import { format } from 'date-fns';
+import { useAuth } from '@/contexts/AuthContext';
+import LoginPage from '@/components/LoginPage';
 import './App.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
