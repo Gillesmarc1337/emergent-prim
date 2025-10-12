@@ -1727,13 +1727,10 @@ function Dashboard() {
                       </thead>
                       <tbody>
                         {Object.entries(analytics.meeting_generation.bdr_performance).map(([bdr, stats]) => {
-                          // Calculate months in period for goal display
-                          const monthsInPeriod = analytics.period_type === 'monthly' ? 1 : 
-                                                analytics.period_type === 'yearly' ? 6 : 
-                                                analytics.dashboard_blocks?.block_1_meetings?.period?.includes('Jul-Dec') ? 6 : 1;
-                          const goalText = stats.meeting_target ? 
-                            `${stats.total_meetings}/${stats.meeting_target * monthsInPeriod}` : 
-                            'N/A';
+                          // Monthly goal is always 6 meetings per month
+                          const monthlyGoal = stats.meeting_target || 6;
+                          const goalText = `${stats.total_meetings}/${monthlyGoal}`;
+                          const isOnTrack = stats.total_meetings >= monthlyGoal;
                           
                           return (
                             <tr key={bdr} className="border-b">
@@ -1749,7 +1746,9 @@ function Dashboard() {
                               </td>
                               <td className="text-right p-2">{stats.total_meetings}</td>
                               <td className="text-right p-2">{stats.relevant_meetings}</td>
-                              <td className="text-right p-2 font-medium">{goalText}</td>
+                              <td className={`text-right p-2 font-medium ${isOnTrack ? 'text-green-600' : 'text-orange-600'}`}>
+                                {goalText}
+                              </td>
                               <td className="text-right p-2">
                                 {((stats.relevant_meetings / stats.total_meetings) * 100).toFixed(1)}%
                               </td>
