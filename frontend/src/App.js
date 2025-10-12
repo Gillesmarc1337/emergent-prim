@@ -3028,11 +3028,36 @@ function Dashboard() {
 
                     {/* Next 60-90 Days Column */}
                     <div className="bg-orange-50 rounded-lg p-4">
-                      <div className="font-semibold text-orange-800 mb-4 text-center">
-                        Next 60–90 Days
-                        <div className="text-sm text-orange-600">
-                          ${hotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
+                      <div className="mb-4">
+                        <div className="font-semibold text-orange-800 text-center mb-2">
+                          Next 60–90 Days
                         </div>
+                        {(() => {
+                          const columnValue = hotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                          const monthlyTarget = 750000; // $750K per month
+                          const columnTarget = Math.round(monthlyTarget / 3); // Divide by 3 columns
+                          const percentage = Math.round((columnValue / columnTarget) * 100);
+                          const isOnTrack = columnValue >= columnTarget;
+                          
+                          return (
+                            <Card className="bg-white">
+                              <CardContent className="p-3">
+                                <div className="text-2xl font-bold text-orange-800 text-center">
+                                  ${(columnValue / 1000).toFixed(0)}K
+                                </div>
+                                <div className="text-xs text-gray-600 text-center mb-2">
+                                  Target: ${(columnTarget / 1000).toFixed(0)}K
+                                </div>
+                                <Progress value={Math.min(percentage, 100)} className="h-2" />
+                                <div className="text-xs text-center mt-1">
+                                  <span className={isOnTrack ? "text-green-600 font-medium" : "text-orange-600 font-medium"}>
+                                    {percentage}% of target
+                                  </span>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })()}
                       </div>
                       <Droppable droppableId="next60">
                         {(provided) => (
