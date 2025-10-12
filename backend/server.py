@@ -1859,6 +1859,23 @@ async def get_monthly_analytics(month_offset: int = 0):
                 'closed_revenue': focus_month_closed,
                 'progress': (focus_month_closed / focus_month_target * 100) if focus_month_target > 0 else 0,
                 'period': focus_month_str
+            },
+            'block_5_upsells': {
+                'title': 'Upsells / Cross-sell',
+                'period': focus_month_str,
+                'closing_actual': len(df[
+                    (df['discovery_date'] >= month_start) & 
+                    (df['discovery_date'] <= month_end) &
+                    df['type_of_deal'].apply(is_upsell) &
+                    (df['stage'] == 'A Closed')
+                ]),
+                'closing_target': 6,  # 6 closing upsells per month
+                'closing_value': float(df[
+                    (df['discovery_date'] >= month_start) & 
+                    (df['discovery_date'] <= month_end) &
+                    df['type_of_deal'].apply(is_upsell) &
+                    (df['stage'] == 'A Closed')
+                ]['expected_arr'].fillna(0).sum())
             }
         }
 
