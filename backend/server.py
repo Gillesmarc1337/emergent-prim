@@ -237,6 +237,22 @@ def is_upsell(deal_type):
     # Match: "upsell", "up-sell", "up sell", "cross-sell", "crosssell"
     return 'upsell' in deal_type_str or 'up-sell' in deal_type_str or 'up sell' in deal_type_str
 
+def is_renewal(deal_type):
+    """Check if a deal type is a renewal (case-insensitive)"""
+    if pd.isna(deal_type):
+        return False
+    deal_type_str = str(deal_type).lower().strip()
+    # Match: "renew", "renewal", "re-new"
+    return 'renew' in deal_type_str
+
+def is_partner_source(source_type):
+    """Check if source is a business or consulting partner"""
+    if pd.isna(source_type):
+        return False
+    source_str = str(source_type).lower().strip()
+    # Match: "business partner", "consulting partner", "partner"
+    return 'partner' in source_str
+
 def calculate_meeting_generation(df, start_date, end_date):
     """Calculate meeting generation metrics for specified period"""
     period_data = df[
