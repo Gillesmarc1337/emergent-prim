@@ -30,7 +30,7 @@ def test_api_endpoint(endpoint, method="GET", data=None, cookies=None, expected_
         if response.status_code != expected_status:
             print(f"❌ Expected status {expected_status}, got {response.status_code}")
             print(f"Response: {response.text}")
-            return None
+            return None, response
             
         if response.status_code in [200, 201]:
             try:
