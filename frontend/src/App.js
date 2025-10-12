@@ -1189,10 +1189,11 @@ function Dashboard() {
   const loadProjectionsData = async () => {
     setLoadingProjections(true);
     try {
-      const [hotDealsResponse, hotLeadsResponse, performanceResponse] = await Promise.all([
+      const [hotDealsResponse, hotLeadsResponse, performanceResponse, aeBreakdownResponse] = await Promise.all([
         axios.get(`${API}/projections/hot-deals`),
         axios.get(`${API}/projections/hot-leads`),
-        axios.get(`${API}/projections/performance-summary`)
+        axios.get(`${API}/projections/performance-summary`),
+        axios.get(`${API}/projections/ae-pipeline-breakdown`)
       ]);
       
       // Combine hot deals (B Legals) and hot leads (POA Booked + Proposal sent) for the interactive board
