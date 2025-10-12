@@ -1904,6 +1904,7 @@ async def get_upsell_renewals_analytics(
         monthly_consulting_partner_target = 6  # 40% from consulting partners
         monthly_poa_target = 10  # 10 POA per month
         monthly_closing_target = 4  # 4 closings per month
+        monthly_closing_value_target = 200_000  # 200K per month for closing value
         
         # Dynamic targets
         period_meetings_target = monthly_meetings_target * period_duration_months
@@ -1911,6 +1912,7 @@ async def get_upsell_renewals_analytics(
         period_consulting_target = monthly_consulting_partner_target * period_duration_months
         period_poa_target = monthly_poa_target * period_duration_months
         period_closing_target = monthly_closing_target * period_duration_months
+        period_closing_value_target = monthly_closing_value_target * period_duration_months
         
         # Filter for Upsells/Renewals (column L: Type of deal)
         upsell_renewal_data = df[
