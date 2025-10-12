@@ -13,11 +13,18 @@ import time
 # Use the production URL from frontend/.env
 BASE_URL = "https://sales-analytics-69.preview.emergentagent.com/api"
 
-def test_api_endpoint(endpoint, expected_status=200):
+def test_api_endpoint(endpoint, method="GET", data=None, cookies=None, expected_status=200):
     """Test an API endpoint and return response"""
     try:
-        print(f"\n🔍 Testing: {endpoint}")
-        response = requests.get(f"{BASE_URL}{endpoint}", timeout=30)
+        print(f"\n🔍 Testing: {method} {endpoint}")
+        
+        if method == "GET":
+            response = requests.get(f"{BASE_URL}{endpoint}", cookies=cookies, timeout=30)
+        elif method == "POST":
+            response = requests.post(f"{BASE_URL}{endpoint}", json=data, cookies=cookies, timeout=30)
+        else:
+            raise ValueError(f"Unsupported method: {method}")
+            
         print(f"Status Code: {response.status_code}")
         
         if response.status_code != expected_status:
@@ -25,21 +32,21 @@ def test_api_endpoint(endpoint, expected_status=200):
             print(f"Response: {response.text}")
             return None
             
-        if response.status_code == 200:
+        if response.status_code in [200, 201]:
             try:
                 data = response.json()
                 print(f"✅ Response received successfully")
-                return data
+                return data, response
             except json.JSONDecodeError:
                 print(f"❌ Invalid JSON response")
                 print(f"Response text: {response.text}")
-                return None
+                return None, response
         else:
-            return response.text
+            return response.text, response
             
     except requests.exceptions.RequestException as e:
         print(f"❌ Request failed: {str(e)}")
-        return None
+        return None, None
 
 def validate_dashboard_blocks(data, expected_period):
     """Validate dashboard blocks structure and content"""
