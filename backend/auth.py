@@ -99,9 +99,14 @@ async def get_user_from_session(session_token: str):
         return None
     
     # Check if expired
-    if session.get("expires_at") < datetime.now(timezone.utc):
-        await db.user_sessions.delete_one({"session_token": session_token})
-        return None
+    expires_at = session.get("expires_at")
+    if expires_at:
+        # Handle both timezone-aware and naive datetimes
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if expires_at < datetime.now(timezone.utc):
+            await db.user_sessions.delete_one({"session_token": session_token})
+            return None
     
     # Get user
     user = await db.users.find_one({"id": session["user_id"]})
