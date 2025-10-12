@@ -10,7 +10,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import pandas as pd
 import numpy as np
 import io
@@ -948,7 +948,7 @@ def calculate_hot_leads(df):
 
 def calculate_aggregate_weighted_pipe(df, target_date):
     """Calculate aggregate weighted pipe using the complex Z17 formula"""
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     
     # Filter data for the target month and year
     target_month = target_date.month
