@@ -3356,6 +3356,92 @@ function Dashboard() {
               </CardContent>
             </Card>
 
+            {/* Projection by 14/30/60-90 days - Pipeline by AE per period */}
+            {Object.keys(analytics.closing_projections.ae_projections).length > 0 && (
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle>Pipeline Breakdown by Account Executive</CardTitle>
+                  <p className="text-sm text-gray-600">Pipeline values for each AE across different time periods</p>
+                </CardHeader>
+                <CardContent>
+                  {(() => {
+                    // Calculate pipeline by AE for each time period from hotDeals
+                    const aeBreakdown = {};
+                    
+                    // Initialize AE breakdown
+                    Object.keys(analytics.closing_projections.ae_projections).forEach(ae => {
+                      aeBreakdown[ae] = {
+                        next14: 0,
+                        next30: 0,
+                        next60: 0
+                      };
+                    });
+                    
+                    // Sum pipeline by AE and period (excluding hidden deals)
+                    hotDeals.forEach(deal => {
+                      if (!hiddenDeals.has(deal.id) && deal.owner && aeBreakdown[deal.owner]) {
+                        if (deal.column === 'next14') {
+                          aeBreakdown[deal.owner].next14 += deal.pipeline || 0;
+                        } else if (deal.column === 'next30') {
+                          aeBreakdown[deal.owner].next30 += deal.pipeline || 0;
+                        } else if (deal.column === 'next60') {
+                          aeBreakdown[deal.owner].next60 += deal.pipeline || 0;
+                        }
+                      }
+                    });
+                    
+                    // Calculate totals
+                    const totals = {
+                      next14: Object.values(aeBreakdown).reduce((sum, ae) => sum + ae.next14, 0),
+                      next30: Object.values(aeBreakdown).reduce((sum, ae) => sum + ae.next30, 0),
+                      next60: Object.values(aeBreakdown).reduce((sum, ae) => sum + ae.next60, 0)
+                    };
+                    
+                    // Format value with K/M
+                    const formatValue = (value) => {
+                      if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+                      if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
+                      return `$${value.toFixed(0)}`;
+                    };
+                    
+                    return (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b bg-gray-50">
+                              <th className="text-left p-3 font-semibold">ACCOUNT EXECUTIVE</th>
+                              <th className="text-right p-3 font-semibold">NEXT 14 DAYS<br /><span className="text-xs font-normal text-gray-600">Pipeline</span></th>
+                              <th className="text-right p-3 font-semibold">NEXT 30 DAYS<br /><span className="text-xs font-normal text-gray-600">Pipeline</span></th>
+                              <th className="text-right p-3 font-semibold">NEXT 60-90 DAYS<br /><span className="text-xs font-normal text-gray-600">Pipeline</span></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {Object.entries(aeBreakdown)
+                              .sort(([, a], [, b]) => (b.next14 + b.next30 + b.next60) - (a.next14 + a.next30 + a.next60)) // Sort by total pipeline
+                              .map(([ae, values]) => (
+                                <tr key={ae} className="border-b hover:bg-gray-50">
+                                  <td className="p-3 font-medium">{ae}</td>
+                                  <td className="text-right p-3">{formatValue(values.next14)}</td>
+                                  <td className="text-right p-3">{formatValue(values.next30)}</td>
+                                  <td className="text-right p-3">{formatValue(values.next60)}</td>
+                                </tr>
+                              ))
+                            }
+                            <tr className="border-t-2 bg-blue-50 font-bold">
+                              <td className="p-3">TOTAL</td>
+                              <td className="text-right p-3">{formatValue(totals.next14)}</td>
+                              <td className="text-right p-3">{formatValue(totals.next30)}</td>
+                              <td className="text-right p-3">{formatValue(totals.next60)}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Projections by AE - Moved after Interactive Board */}
             {Object.keys(analytics.closing_projections.ae_projections).length > 0 && (
               <Card>
