@@ -2092,6 +2092,19 @@ async def get_custom_analytics(
                 'target_revenue': dynamic_revenue_target,
                 'closed_revenue': actual_revenue,
                 'progress': (actual_revenue / dynamic_revenue_target * 100) if dynamic_revenue_target > 0 else 0
+            },
+            'block_5_upsells': {
+                'title': 'Upsells / Cross-sell',
+                'period': f"{custom_start.strftime('%b %d')} - {custom_end.strftime('%b %d %Y')}",
+                'closing_actual': len(period_data[
+                    period_data['type_of_deal'].apply(is_upsell) &
+                    (period_data['stage'] == 'A Closed')
+                ]),
+                'closing_target': 6 * period_duration_months,  # 6 closing upsells per month × months
+                'closing_value': float(period_data[
+                    period_data['type_of_deal'].apply(is_upsell) &
+                    (period_data['stage'] == 'A Closed')
+                ]['expected_arr'].fillna(0).sum())
             }
         }
         
