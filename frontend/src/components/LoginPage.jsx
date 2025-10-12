@@ -40,9 +40,10 @@ const LoginPage = () => {
     setLoading(true);
     setError(null);
 
-    // Redirect to Emergent Auth with proper redirect_url parameter
-    const currentUrl = window.location.origin + window.location.pathname;
-    window.location.href = `https://auth.emergentagent.com/?redirect_url=${encodeURIComponent(currentUrl)}`;
+    // Redirect to Emergent Auth - redirect parameter should point to MAIN APP (dashboard), not login page
+    // After auth, user will land at: {redirect}#session_id={session_id}
+    const redirectUrl = window.location.origin + '/';  // Main app URL
+    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
   const handleDemoAccess = async () => {
