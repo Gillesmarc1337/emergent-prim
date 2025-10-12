@@ -55,8 +55,13 @@ def test_demo_login():
     print(f"{'='*80}")
     
     # Test demo login
-    data, response = test_api_endpoint("/auth/demo-login", method="POST", expected_status=200)
+    result = test_api_endpoint("/auth/demo-login", method="POST", expected_status=200)
     
+    if not result or len(result) != 2:
+        print(f"❌ Demo login failed - no response")
+        return None, None
+    
+    data, response = result
     if data is None or response is None:
         print(f"❌ Demo login failed")
         return None, None
