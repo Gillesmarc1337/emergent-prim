@@ -1063,6 +1063,142 @@ def calculate_cumulative_aggregate_weighted_pipe(df, target_date):
 async def root():
     return {"message": "Sales Analytics API", "version": "1.0.0"}
 
+# ============= AUTH ENDPOINTS =============
+@api_router.post("/auth/session-data")
+async def auth_session_data(request: Request, response: Response):
+    """
+    Handle Emergent OAuth callback - exchange session ID for user session
+    """
+    try:
+        body = await request.json()
+        session_id = body.get("sessionId")
+        
+        if not session_id:
+            raise HTTPException(status_code=400, detail="Session ID required")
+        
+        # Get user data from Emergent
+        emergent_data = await get_session_data_from_emergent(session_id)
+        
+        email = emergent_data.get("email")
+        name = emergent_data.get("name", email.split("@")[0])
+        picture = emergent_data.get("picture")
+        
+        # Get or create user (checks authorization)
+        user = await get_or_create_user(email, name, picture)
+        
+        # Create session
+        session_token = f"session_{user['id']}_{int(datetime.now(timezone.utc).timestamp())}"
+        session = await create_session(user["id"], session_token)
+        
+        # Set cookie
+        response.set_cookie(
+            key="session_token",
+            value=session_token,
+            httponly=True,
+            secure=False,  # Set to True in production with HTTPS
+            samesite="lax",
+            max_age=7 * 24 * 60 * 60  # 7 days
+        )
+        
+        return {
+            "id": user["id"],
+            "email": user["email"],
+            "name": user["name"],
+            "picture": user.get("picture"),
+            "role": user["role"],
+            "session_token": session_token
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Authentication error: {str(e)}")
+
+@api_router.get("/auth/me")
+async def get_current_user_info(user: dict = Depends(get_current_user)):
+    """
+    Get current authenticated user
+    """
+    return {
+        "id": user["id"],
+        "email": user["email"],
+        "name": user["name"],
+        "picture": user.get("picture"),
+        "role": user["role"]
+    }
+
+@api_router.post("/auth/logout")
+async def logout(
+    response: Response,
+    session_token: Optional[str] = Cookie(None)
+):
+    """
+    Logout user and clear session
+    """
+    if session_token:
+        await delete_session(session_token)
+    
+    response.delete_cookie(key="session_token")
+    return {"message": "Logged out successfully"}
+
+# ============= VIEW MANAGEMENT ENDPOINTS =============
+@api_router.get("/views")
+async def get_views(user: dict = Depends(get_current_user)):
+    """
+    Get all views (accessible to all authenticated users)
+    """
+    views = await db.views.find().to_list(100)
+    
+    # Clean MongoDB _id for JSON
+    for view in views:
+        if '_id' in view:
+            view['id'] = str(view['_id'])
+            del view['_id']
+    
+    return views
+
+@api_router.post("/views")
+async def create_view(
+    view_request: ViewCreateRequest,
+    user: dict = Depends(require_super_admin)
+):
+    """
+    Create a new view (super admin only)
+    """
+    view_data = {
+        "id": f"view-{int(datetime.now(timezone.utc).timestamp())}",
+        "name": view_request.name,
+        "sheet_url": view_request.sheet_url,
+        "sheet_name": view_request.sheet_name,
+        "is_master": view_request.is_master,
+        "is_default": False,
+        "created_by": user["id"],
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.views.insert_one(view_data)
+    
+    # Remove _id for response
+    if '_id' in view_data:
+        del view_data['_id']
+    
+    return view_data
+
+@api_router.delete("/views/{view_id}")
+async def delete_view(
+    view_id: str,
+    user: dict = Depends(require_super_admin)
+):
+    """
+    Delete a view (super admin only)
+    """
+    result = await db.views.delete_one({"id": view_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="View not found")
+    
+    return {"message": "View deleted successfully"}
+
 @api_router.post("/upload-data", response_model=UploadResponse)
 async def upload_sales_data(file: UploadFile = File(...)):
     """Upload and process sales data CSV file"""
