@@ -719,21 +719,15 @@ function MainDashboard({ analytics }) {
       {/* Data Management Section */}
       <DataManagementSection onDataUpdated={handleDataUpdated} />
       
-      {/* Key Metrics - 5 Simple Cards with Dynamic Targets */}
+      {/* Key Metrics - 5 Simple Cards */}
       {(() => {
-        // Calculate period duration for dynamic targets
-        const monthlyData = dashboardData.monthly_revenue_chart || [];
-        const periodMonths = Math.max(1, monthlyData.length); // Number of months in period
-        
-        // Monthly targets
-        const monthlyRevenueTarget = 750000; // $750K per month
+        // Monthly targets (fixed)
         const monthlyNewPipeTarget = 2000000; // $2M per month
         const monthlyWeightedPipeTarget = 800000; // $800K per month
         
-        // Dynamic targets based on period
-        const periodRevenueTarget = monthlyRevenueTarget * periodMonths;
-        const periodNewPipeTarget = monthlyNewPipeTarget * periodMonths;
-        const periodWeightedPipeTarget = monthlyWeightedPipeTarget * periodMonths;
+        // Use monthly data from dashboard_blocks for New Pipe and Weighted Pipe
+        const monthlyNewPipeCreated = dashboardData.dashboard_blocks?.block_3_pipe_creation?.new_pipe_created || 0;
+        const monthlyWeightedPipe = dashboardData.dashboard_blocks?.block_3_pipe_creation?.weighted_pipe_created || 0;
         
         return (
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -754,16 +748,16 @@ function MainDashboard({ analytics }) {
             />
             <MetricCard
               title="New Pipe Created"
-              value={dashboardData.key_metrics.pipe_created}
-              target={periodNewPipeTarget}
+              value={monthlyNewPipeCreated}
+              target={monthlyNewPipeTarget}
               unit="$"
               icon={TrendingUp}
               color="purple"
             />
             <MetricCard
               title="Created Weighted Pipe"
-              value={dashboardData.key_metrics.weighted_pipeline}
-              target={periodWeightedPipeTarget}
+              value={monthlyWeightedPipe}
+              target={monthlyWeightedPipeTarget}
               unit="$"
               icon={Target}
               color="blue"
