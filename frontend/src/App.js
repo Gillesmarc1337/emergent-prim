@@ -2327,8 +2327,8 @@ function Dashboard() {
             <div className="text-center py-8">Loading Upsell & Renewals data...</div>
           ) : upsellData ? (
             <div className="space-y-6">
-              {/* Top KPI Cards - Mix of Meeting Generation style */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {/* Top KPI Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <MetricCard
                   title="Total Upsells & Renewals"
                   value={upsellData.total_meetings}
@@ -2338,22 +2338,6 @@ function Dashboard() {
                   tooltip="Total meetings for upsells and renewals brought by partners"
                 />
                 <MetricCard
-                  title="Business Partners"
-                  value={upsellData.business_partner_meetings}
-                  target={upsellData.business_partner_target}
-                  icon={Users}
-                  color="blue"
-                  tooltip="Meetings from Business Partners"
-                />
-                <MetricCard
-                  title="Consulting Partners"
-                  value={upsellData.consulting_partner_meetings}
-                  target={upsellData.consulting_partner_target}
-                  icon={Users}
-                  color="green"
-                  tooltip="Meetings from Consulting Partners"
-                />
-                <MetricCard
                   title="POA Generated"
                   value={upsellData.poa_actual}
                   target={upsellData.poa_target}
@@ -2361,9 +2345,17 @@ function Dashboard() {
                   color="orange"
                   tooltip="POA generated from upsells and renewals"
                 />
+                <MetricCard
+                  title="Closing"
+                  value={upsellData.closing_actual}
+                  target={upsellData.closing_target}
+                  icon={CheckCircle}
+                  color="green"
+                  tooltip="Deals closed from upsells and renewals"
+                />
               </div>
 
-              {/* Additional Metrics Row */}
+              {/* Secondary Metrics Row */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                   <CardContent className="p-4">
