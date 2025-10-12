@@ -1142,16 +1142,21 @@ function Dashboard() {
     loadUpsellRenewData();
   };
 
-  // Load Upsell & Renew data
+  // Load Upsell & Renew data - synchronized with loadAnalytics
   const loadUpsellRenewData = async () => {
     try {
       let startDate, endDate;
       
       if (useCustomDate && dateRange?.from && dateRange?.to) {
+        // Custom date range
         startDate = format(dateRange.from, 'yyyy-MM-dd');
         endDate = format(dateRange.to, 'yyyy-MM-dd');
+      } else if (viewMode === 'yearly') {
+        // July To Dec view (H2 2025)
+        startDate = '2025-07-01';
+        endDate = '2025-12-31';
       } else {
-        // Calculate current month based on offset
+        // Monthly view with offset
         const now = new Date();
         const targetDate = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1);
         startDate = format(new Date(targetDate.getFullYear(), targetDate.getMonth(), 1), 'yyyy-MM-dd');
