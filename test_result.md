@@ -453,6 +453,21 @@ frontend:
           agent: "testing"
           comment: "✅ TESTED SUCCESSFULLY: GET /api/projections/ae-pipeline-breakdown returns comprehensive AE breakdown with 6 AEs. All required fields present (ae, next14, next30, next60, total) with proper structure. Each period object contains pipeline, expected_arr, and weighted_value as floats. Calculations verified: totals = sum of all periods for all metrics. Data validation passed: no null/NaN values, all numeric values properly formatted. Stage assignment logic working correctly (B Legals→next14, D POA Booked→next30, C Proposal sent→next60). Integration test confirmed: pipeline totals match hot-deals + hot-leads endpoints ($5,623,200). Excel weighting formula properly applied (weighted values differ from pipeline values). Response time acceptable (0.06s). Error handling verified. All review request requirements met."
 
+  - task: "Dual-mode login page (Secured Terminal + Demo Access)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/LoginPage.jsx, /app/frontend/src/contexts/AuthContext.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Completely redesigned LoginPage with two authentication modes: 1) ACCESS SECURED TERMINAL button (primary) - redirects to https://auth.emergentagent.com/ with return URL, extracts session_id from URL fragment on return. 2) DEMO ACCESS - SKIP AUTH button (secondary) - instant login via /api/auth/demo-login endpoint. Modern UI with gradient background (slate-900 to blue-900), Shield icon for secured access, Zap icon for demo. Added useEffect to handle session_id extraction from URL fragment. Clear visual distinction between production and development modes."
+        - working: true
+          agent: "main"
+          comment: "✅ FRONTEND AUTH WORKING: Added loginDemo() function to AuthContext. Demo login successfully creates session, sets user state, loads views, and displays dashboard. Screenshot verified: clicking DEMO ACCESS button authenticates as 'Demo User (Viewer)' and displays full dashboard with data. Header shows user info and logout button. Both authentication modes functional from UI perspective. Session persistence working with cookies."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
