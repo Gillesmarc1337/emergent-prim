@@ -1154,11 +1154,13 @@ function Dashboard() {
   useEffect(() => {
     loadAnalytics();
     loadProjectionsData();
+    loadUpsellData();
   }, [monthOffset, dateRange, useCustomDate, viewMode]);
 
   const handleUploadSuccess = () => {
     loadAnalytics();
     loadProjectionsData();
+    loadUpsellData();
   };
 
   // New functions for projections data
