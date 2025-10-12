@@ -1286,6 +1286,8 @@ async def get_yearly_analytics(year: int = 2025):
                 'unassigned_target': 0,  # No target for unassigned as it indicates data issue
                 'show_actual': actual_show_july_dec,
                 'no_show_actual': actual_no_show_july_dec,
+                'upsells_actual': upsells_july_dec,
+                'upsells_target': july_dec_upsell_target,
                 'debug_info': {
                     'months_elapsed': months_in_july_dec_period,
                     'current_month': 12,  # December (end of July-Dec period)
@@ -1300,7 +1302,9 @@ async def get_yearly_analytics(year: int = 2025):
                 'intro_actual': intro_july_dec,
                 'intro_target': july_dec_intro_target,
                 'poa_actual': poa_july_dec,
-                'poa_target': july_dec_poa_target
+                'poa_target': july_dec_poa_target,
+                'upsells_actual': upsells_july_dec,
+                'upsells_target': july_dec_upsell_target
             },
             'block_3_pipe_creation': {
                 'title': 'New Pipe Created',
