@@ -229,6 +229,14 @@ def fix_ae_name_encoding(name):
     }
     return name_fixes.get(name_str, name_str)
 
+def is_upsell(deal_type):
+    """Check if a deal type is an upsell/cross-sell (case-insensitive, handles variations)"""
+    if pd.isna(deal_type):
+        return False
+    deal_type_str = str(deal_type).lower().strip()
+    # Match: "upsell", "up-sell", "up sell", "cross-sell", "crosssell"
+    return 'upsell' in deal_type_str or 'up-sell' in deal_type_str or 'up sell' in deal_type_str
+
 def calculate_meeting_generation(df, start_date, end_date):
     """Calculate meeting generation metrics for specified period"""
     period_data = df[
