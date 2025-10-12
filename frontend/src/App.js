@@ -3088,6 +3088,180 @@ function Dashboard() {
                 </DragDropContext>
               </CardContent>
             </Card>
+
+            {/* AE Pipeline Breakdown Table */}
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <Users className="h-6 w-6 text-blue-600" />
+                  Pipeline Breakdown by Account Executive
+                </CardTitle>
+                <CardDescription>
+                  Pipeline, Expected ARR, and Weighted values for each AE across different time periods
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th 
+                          className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('ae')}
+                        >
+                          <div className="flex items-center gap-1">
+                            Account Executive
+                            {sortConfig.key === 'ae' && (
+                              <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                            )}
+                          </div>
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="3">
+                          Next 14 Days
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="3">
+                          Next 30 Days
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="3">
+                          Next 60-90 Days
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="3">
+                          Total Pipeline
+                        </th>
+                      </tr>
+                      <tr>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-400"></th>
+                        {/* Next 14 Days sub-headers */}
+                        <th 
+                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('next14.pipeline')}
+                        >
+                          Pipeline {sortConfig.key === 'next14.pipeline' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th 
+                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('next14.expected_arr')}
+                        >
+                          Exp. ARR {sortConfig.key === 'next14.expected_arr' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th 
+                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('next14.weighted_value')}
+                        >
+                          Weighted {sortConfig.key === 'next14.weighted_value' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </th>
+                        {/* Next 30 Days sub-headers */}
+                        <th 
+                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('next30.pipeline')}
+                        >
+                          Pipeline {sortConfig.key === 'next30.pipeline' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th 
+                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('next30.expected_arr')}
+                        >
+                          Exp. ARR {sortConfig.key === 'next30.expected_arr' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th 
+                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('next30.weighted_value')}
+                        >
+                          Weighted {sortConfig.key === 'next30.weighted_value' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </th>
+                        {/* Next 60-90 Days sub-headers */}
+                        <th 
+                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('next60.pipeline')}
+                        >
+                          Pipeline {sortConfig.key === 'next60.pipeline' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th 
+                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('next60.expected_arr')}
+                        >
+                          Exp. ARR {sortConfig.key === 'next60.expected_arr' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th 
+                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('next60.weighted_value')}
+                        >
+                          Weighted {sortConfig.key === 'next60.weighted_value' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </th>
+                        {/* Total sub-headers */}
+                        <th 
+                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('total.pipeline')}
+                        >
+                          Pipeline {sortConfig.key === 'total.pipeline' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th 
+                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('total.expected_arr')}
+                        >
+                          Exp. ARR {sortConfig.key === 'total.expected_arr' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th 
+                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('total.weighted_value')}
+                        >
+                          Weighted {sortConfig.key === 'total.weighted_value' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {sortedAeBreakdown.map((ae, index) => (
+                        <tr key={ae.ae} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {ae.ae}
+                          </td>
+                          {/* Next 14 Days */}
+                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
+                            ${ae.next14.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                          </td>
+                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
+                            ${ae.next14.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                          </td>
+                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
+                            ${ae.next14.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                          </td>
+                          {/* Next 30 Days */}
+                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
+                            ${ae.next30.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                          </td>
+                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
+                            ${ae.next30.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                          </td>
+                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
+                            ${ae.next30.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                          </td>
+                          {/* Next 60-90 Days */}
+                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
+                            ${ae.next60.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                          </td>
+                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
+                            ${ae.next60.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                          </td>
+                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
+                            ${ae.next60.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                          </td>
+                          {/* Total */}
+                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-semibold text-gray-900 bg-blue-50">
+                            ${ae.total.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                          </td>
+                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-semibold text-gray-900 bg-blue-50">
+                            ${ae.total.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                          </td>
+                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-semibold text-gray-900 bg-blue-50">
+                            ${ae.total.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
       </Tabs>
