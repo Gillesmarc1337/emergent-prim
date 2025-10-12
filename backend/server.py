@@ -213,6 +213,18 @@ def read_google_sheet(sheet_url: str, sheet_name: str = None):
             detail=f"Error reading Google Sheet: {str(e)}. Make sure the sheet is publicly accessible."
         )
 
+def fix_ae_name_encoding(name):
+    """Fix encoding issues for French characters in AE names"""
+    if not name:
+        return name
+    name_str = str(name)
+    name_fixes = {
+        'RÃ©mi': 'Rémi',
+        'FranÃ§ois': 'François',
+        'FranÃ§oise': 'Françoise'
+    }
+    return name_fixes.get(name_str, name_str)
+
 def calculate_meeting_generation(df, start_date, end_date):
     """Calculate meeting generation metrics for specified period"""
     period_data = df[
