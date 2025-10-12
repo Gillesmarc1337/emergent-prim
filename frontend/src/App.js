@@ -3335,7 +3335,7 @@ function Dashboard() {
                             ref={provided.innerRef}
                             className="space-y-2 min-h-[48rem] max-h-[48rem] overflow-y-auto"
                           >
-                            {hotDeals.filter(deal => deal.column === 'next14').map((deal, index) => (
+                            {filteredHotDeals.filter(deal => deal.column === 'next14').map((deal, index) => (
                               <DraggableDealItem 
                                 key={deal.id}
                                 deal={deal} 
