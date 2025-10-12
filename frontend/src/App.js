@@ -1598,10 +1598,10 @@ function Dashboard() {
           <MainDashboard analytics={analytics} />
         </TabsContent>
 
-        {/* Meeting Generation */}
+        {/* Meetings Generation */}
         <TabsContent value="meetings">
           <AnalyticsSection 
-            title="Meeting Generation (Current Period)"
+            title="Meetings Generation (Current Period)"
             isOnTrack={analytics.meeting_generation.on_track}
             conclusion={analytics.meeting_generation.on_track 
               ? "You are on track to meet your meeting generation targets." 
