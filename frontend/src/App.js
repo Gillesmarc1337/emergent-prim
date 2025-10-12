@@ -3506,45 +3506,17 @@ function Dashboard() {
                           <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
                             {ae.ae}
                           </td>
-                          {/* Next 14 Days */}
-                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
-                            ${ae.next14.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                          </td>
-                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
+                          {/* Next 14 Days - Expected ARR */}
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-700">
                             ${ae.next14.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                           </td>
-                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
-                            ${ae.next14.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                          </td>
-                          {/* Next 30 Days */}
-                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
-                            ${ae.next30.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                          </td>
-                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
+                          {/* Next 30 Days - Expected ARR */}
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-700">
                             ${ae.next30.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                           </td>
-                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
-                            ${ae.next30.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                          </td>
-                          {/* Next 60-90 Days */}
-                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
-                            ${ae.next60.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                          </td>
-                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
-                            ${ae.next60.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                          </td>
-                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-700">
+                          {/* Next 60-90 Days - Weighted */}
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-700">
                             ${ae.next60.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                          </td>
-                          {/* Total */}
-                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-semibold text-gray-900 bg-blue-50">
-                            ${ae.total.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                          </td>
-                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-semibold text-gray-900 bg-blue-50">
-                            ${ae.total.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                          </td>
-                          <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-semibold text-gray-900 bg-blue-50">
-                            ${ae.total.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                           </td>
                         </tr>
                       ))}
