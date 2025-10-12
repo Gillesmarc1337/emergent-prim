@@ -722,6 +722,20 @@ def calculate_pipe_metrics(df, start_date, end_date):
     # Apply centralized Excel weighting formula to each row
     df['weighted_value'] = df.apply(calculate_excel_weighted_value, axis=1)
     
+    # Calculate dynamic targets based on period duration
+    period_duration_days = (end_date - start_date).days + 1
+    period_duration_months = max(1, round(period_duration_days / 30))
+    
+    # Base monthly targets
+    monthly_new_pipe_target = 2_000_000  # $2M per month
+    monthly_weighted_pipe_target = 600_000  # $600K per month
+    monthly_total_pipe_target = 5_000_000  # $5M (this is overall, not scaled by period)
+    monthly_total_weighted_target = 1_500_000  # $1.5M (this is overall, not scaled by period)
+    
+    # Dynamic targets for created pipe (scales with period)
+    created_pipe_target = monthly_new_pipe_target * period_duration_months
+    created_weighted_target = monthly_weighted_pipe_target * period_duration_months
+    
     # New pipe created in period (Excel logic: ALL deals created in period, including Closed/Lost/Not Relevant)
     new_pipe = df[
         (df['discovery_date'] >= start_date) & 
@@ -761,17 +775,17 @@ def calculate_pipe_metrics(df, start_date, end_date):
             'value': new_pipe_value,
             'weighted_value': new_weighted_pipe,
             'count': int(len(new_pipe)),
-            'target': 2000000,  # Monthly target for new pipe
-            'target_weighted': 600000,  # Monthly target for weighted pipe
-            'on_track': bool(new_pipe_value >= 2000000)
+            'target': created_pipe_target,  # Dynamic target based on period
+            'target_weighted': created_weighted_target,  # Dynamic target based on period
+            'on_track': bool(new_pipe_value >= created_pipe_target)
         },
         'total_pipe': {
             'value': total_pipe_value,
             'weighted_value': total_weighted_pipe,
             'count': int(len(active_pipe)),
-            'target': 5000000,  # Total pipeline target
-            'target_weighted': 1500000,  # Total weighted pipeline target
-            'on_track': bool(total_pipe_value >= 5000000)
+            'target': monthly_total_pipe_target,  # Total pipeline target (not period-dependent)
+            'target_weighted': monthly_total_weighted_target,  # Total weighted pipeline target (not period-dependent)
+            'on_track': bool(total_pipe_value >= monthly_total_pipe_target)
         },
         'ae_breakdown': ae_breakdown,
         'pipe_details': clean_records(active_pipe[['client', 'pipeline', 'weighted_value', 'stage', 'owner']].to_dict('records'))
