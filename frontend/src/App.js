@@ -1531,8 +1531,8 @@ function Dashboard() {
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="meetings">Meetings Generation</TabsTrigger>
           <TabsTrigger value="attended">Meetings Attended</TabsTrigger>
-          <TabsTrigger value="deals">Deals & Pipeline</TabsTrigger>
           <TabsTrigger value="upsell">Upsell & Renew</TabsTrigger>
+          <TabsTrigger value="deals">Deals & Pipeline</TabsTrigger>
           <TabsTrigger value="projections">Projections</TabsTrigger>
         </TabsList>
 
