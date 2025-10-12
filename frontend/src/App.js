@@ -3434,6 +3434,9 @@ function Dashboard() {
                     </div>
                   </div>
                 </DragDropContext>
+                    </>
+                  );
+                })()}
               </CardContent>
             </Card>
 
