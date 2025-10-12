@@ -538,7 +538,7 @@ def test_basic_connectivity():
     print(f"{'='*60}")
     
     # Test root endpoint
-    data = test_api_endpoint("/")
+    data, response = test_api_endpoint("/")
     if data and isinstance(data, dict) and 'message' in data:
         print(f"✅ API is accessible: {data['message']}")
         return True
