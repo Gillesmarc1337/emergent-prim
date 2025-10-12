@@ -3282,7 +3282,20 @@ function Dashboard() {
                           Next 60–90 Days
                         </div>
                         {(() => {
-                          const columnValue = hotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                          // Format number with K (thousands) or M (millions)
+                          const formatValue = (value) => {
+                            if (value >= 1000000) {
+                              return `$${(value / 1000000).toFixed(1)}M`;
+                            } else if (value >= 1000) {
+                              return `$${(value / 1000).toFixed(0)}K`;
+                            }
+                            return `$${value.toFixed(0)}`;
+                          };
+                          
+                          // Calculate sum excluding hidden deals
+                          const columnValue = hotDeals
+                            .filter(deal => deal.column === 'next60' && !hiddenDeals.has(deal.id))
+                            .reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
                           const monthlyTarget = 750000; // $750K per month
                           const columnTarget = Math.round(monthlyTarget / 3); // Divide by 3 columns
                           const percentage = Math.round((columnValue / columnTarget) * 100);
@@ -3292,10 +3305,10 @@ function Dashboard() {
                             <Card className="bg-white">
                               <CardContent className="p-3">
                                 <div className="text-2xl font-bold text-orange-800 text-center">
-                                  ${(columnValue / 1000).toFixed(0)}K
+                                  {formatValue(columnValue)}
                                 </div>
                                 <div className="text-xs text-gray-600 text-center mb-2">
-                                  Target: ${(columnTarget / 1000).toFixed(0)}K
+                                  Target: {formatValue(columnTarget)}
                                 </div>
                                 <Progress value={Math.min(percentage, 100)} className="h-2" />
                                 <div className="text-xs text-center mt-1">
