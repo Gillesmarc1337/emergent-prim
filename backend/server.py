@@ -2161,7 +2161,9 @@ async def get_dashboard_analytics():
                 'intro_actual': actual_intro,
                 'intro_target': target_intro,
                 'poa_actual': actual_poa,
-                'poa_target': target_poa
+                'poa_target': target_poa,
+                'upsells_actual': actual_upsells,
+                'upsells_target': target_upsells
             },
             'block_3_pipe_creation': {
                 'title': 'New Pipe Created',
