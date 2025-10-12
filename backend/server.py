@@ -1582,6 +1582,23 @@ async def get_yearly_analytics(year: int = 2025):
                 'closed_revenue': actual_closed_july_dec,
                 'progress': (actual_closed_july_dec / total_july_dec_target * 100) if total_july_dec_target > 0 else 0,
                 'period': 'Jul-Dec 2025'
+            },
+            'block_5_upsells': {
+                'title': 'Upsells / Cross-sell',
+                'period': 'Jul-Dec 2025',
+                'closing_actual': len(df[
+                    (df['discovery_date'] >= july_dec_start) & 
+                    (df['discovery_date'] <= july_dec_end) &
+                    df['type_of_deal'].apply(is_upsell) &
+                    (df['stage'] == 'A Closed')
+                ]),
+                'closing_target': 6 * 6,  # 6 closing upsells per month × 6 months
+                'closing_value': float(df[
+                    (df['discovery_date'] >= july_dec_start) & 
+                    (df['discovery_date'] <= july_dec_end) &
+                    df['type_of_deal'].apply(is_upsell) &
+                    (df['stage'] == 'A Closed')
+                ]['expected_arr'].fillna(0).sum())
             }
         }
 
