@@ -488,7 +488,7 @@ def calculate_ae_performance(df, start_date, end_date):
         closing_value = float(closed_won['expected_arr'].fillna(0).sum())
         
         ae_performance.append({
-            'ae': str(ae),
+            'ae': fix_ae_name_encoding(ae),
             'intros_attended': len(ae_intros),
             'relevant_intro': len(relevant_intros),
             'poa_fait': len(ae_poas),
@@ -498,7 +498,7 @@ def calculate_ae_performance(df, start_date, end_date):
         
         # POA Performance metrics
         ae_poa_performance.append({
-            'ae': str(ae),
+            'ae': fix_ae_name_encoding(ae),
             'poa_attended': len(ae_poa_attended),
             'poa_closed': len(ae_poa_closed)
         })
