@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
 Backend API Testing for Sales Analytics Dashboard
-Testing MongoDB data structure and available endpoints for master data verification
+Comprehensive Authentication System Testing
 """
 
 import requests
 import json
 import sys
 from datetime import datetime
+import time
 
 # Use the production URL from frontend/.env
 BASE_URL = "https://sales-analytics-69.preview.emergentagent.com/api"
