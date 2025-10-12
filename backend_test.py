@@ -354,43 +354,59 @@ def test_authentication_flow_end_to_end():
     # Step 2: Verify auth/me works after login
     print(f"\n🔄 Step 2: Verify auth/me after login")
     cookies = {'session_token': session_token}
-    data, response = test_api_endpoint("/auth/me", cookies=cookies, expected_status=200)
+    result = test_api_endpoint("/auth/me", cookies=cookies, expected_status=200)
     
-    if data and data.get('email') == 'demo@primelis.com':
-        flow_steps['auth_me_after_login'] = True
-        print(f"✅ Auth/me works after login")
+    if result and len(result) == 2:
+        data, response = result
+        if data and data.get('email') == 'demo@primelis.com':
+            flow_steps['auth_me_after_login'] = True
+            print(f"✅ Auth/me works after login")
+        else:
+            print(f"❌ Auth/me failed after login")
     else:
-        print(f"❌ Auth/me failed after login")
+        print(f"❌ Auth/me failed after login - no response")
     
     # Step 3: Access views endpoint
     print(f"\n🔄 Step 3: Access views endpoint")
-    data, response = test_api_endpoint("/views", cookies=cookies, expected_status=200)
+    result = test_api_endpoint("/views", cookies=cookies, expected_status=200)
     
-    if data and isinstance(data, list):
-        flow_steps['views_access'] = True
-        print(f"✅ Views access successful ({len(data)} views)")
+    if result and len(result) == 2:
+        data, response = result
+        if data and isinstance(data, list):
+            flow_steps['views_access'] = True
+            print(f"✅ Views access successful ({len(data)} views)")
+        else:
+            print(f"❌ Views access failed")
     else:
-        print(f"❌ Views access failed")
+        print(f"❌ Views access failed - no response")
     
     # Step 4: Logout
     print(f"\n🔄 Step 4: Logout")
-    data, response = test_api_endpoint("/auth/logout", method="POST", cookies=cookies, expected_status=200)
+    result = test_api_endpoint("/auth/logout", method="POST", cookies=cookies, expected_status=200)
     
-    if data and isinstance(data, dict) and data.get('message'):
-        flow_steps['logout'] = True
-        print(f"✅ Logout successful: {data['message']}")
+    if result and len(result) == 2:
+        data, response = result
+        if data and isinstance(data, dict) and data.get('message'):
+            flow_steps['logout'] = True
+            print(f"✅ Logout successful: {data['message']}")
+        else:
+            print(f"❌ Logout failed")
     else:
-        print(f"❌ Logout failed")
+        print(f"❌ Logout failed - no response")
     
     # Step 5: Verify auth/me fails after logout
     print(f"\n🔄 Step 5: Verify auth/me fails after logout")
-    data, response = test_api_endpoint("/auth/me", cookies=cookies, expected_status=401)
+    result = test_api_endpoint("/auth/me", cookies=cookies, expected_status=401)
     
-    if response and response.status_code == 401:
-        flow_steps['auth_me_after_logout'] = True
-        print(f"✅ Auth/me correctly returns 401 after logout")
+    if result and len(result) == 2:
+        data, response = result
+        if response and response.status_code == 401:
+            flow_steps['auth_me_after_logout'] = True
+            print(f"✅ Auth/me correctly returns 401 after logout")
+        else:
+            print(f"❌ Auth/me should return 401 after logout")
     else:
-        print(f"❌ Auth/me should return 401 after logout")
+        print(f"❌ Auth/me after logout test failed - no response")
     
     # Summary
     passed_steps = sum(1 for result in flow_steps.values() if result)
