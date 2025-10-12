@@ -1,69 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Alert, AlertDescription } from './ui/alert';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, Shield, Zap } from 'lucide-react';
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, loginDemo } = useAuth();
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingDemo, setLoadingDemo] = useState(false);
 
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Open Emergent OAuth popup
-      const width = 500;
-      const height = 600;
-      const left = window.screen.width / 2 - width / 2;
-      const top = window.screen.height / 2 - height / 2;
-
-      const popup = window.open(
-        'https://demobackend.emergentagent.com/auth/v1/env/oauth/google',
-        'Google Sign In',
-        `width=${width},height=${height},left=${left},top=${top}`
-      );
-
-      // Listen for message from popup
-      const handleMessage = async (event) => {
-        if (event.origin !== 'https://demobackend.emergentagent.com') return;
-
-        const { sessionId, error: authError } = event.data;
-
-        if (authError) {
-          setError(authError);
-          setLoading(false);
-          return;
-        }
-
+  // Check for session_id in URL fragment on mount
+  useEffect(() => {
+    const handleSessionFromUrl = async () => {
+      const hash = window.location.hash;
+      if (hash && hash.includes('session_id=')) {
+        const sessionId = hash.split('session_id=')[1].split('&')[0];
+        
         if (sessionId) {
+          setLoading(true);
           try {
             await login(sessionId);
-            window.removeEventListener('message', handleMessage);
-            if (popup) popup.close();
+            // Clear the hash from URL
+            window.history.replaceState(null, '', window.location.pathname);
           } catch (err) {
             setError(err.response?.data?.detail || 'Authentication failed. Please check if you are authorized.');
+          } finally {
             setLoading(false);
           }
         }
-      };
+      }
+    };
 
-      window.addEventListener('message', handleMessage);
+    handleSessionFromUrl();
+  }, [login]);
 
-      // Check if popup was closed
-      const checkPopup = setInterval(() => {
-        if (popup && popup.closed) {
-          clearInterval(checkPopup);
-          window.removeEventListener('message', handleMessage);
-          setLoading(false);
-        }
-      }, 1000);
+  const handleSecuredAccess = () => {
+    setLoading(true);
+    setError(null);
+
+    // Redirect to Emergent Auth
+    const redirectUrl = encodeURIComponent(window.location.origin + window.location.pathname);
+    window.location.href = `https://auth.emergentagent.com/?redirect_uri=${redirectUrl}`;
+  };
+
+  const handleDemoAccess = async () => {
+    setLoadingDemo(true);
+    setError(null);
+
+    try {
+      await loginDemo();
     } catch (err) {
-      setError('Failed to open login window');
-      setLoading(false);
+      setError(err.response?.data?.detail || 'Demo login failed. Please try again.');
+    } finally {
+      setLoadingDemo(false);
     }
   };
 
