@@ -921,6 +921,12 @@ function MainDashboard({ analytics }) {
                     <span>Referral:</span>
                     <span className="font-medium">{analytics.dashboard_blocks.block_1_meetings.referral_actual}/{analytics.dashboard_blocks.block_1_meetings.referral_target}</span>
                   </div>
+                  <div className="flex justify-between">
+                    <span>Upsells / Cross-sell:</span>
+                    <span className="font-medium text-purple-600">
+                      {analytics.dashboard_blocks.block_1_meetings.upsells_actual}/{analytics.dashboard_blocks.block_1_meetings.upsells_target}
+                    </span>
+                  </div>
                   {analytics.dashboard_blocks.block_1_meetings.unassigned_actual > 0 && (
                     <div className="flex justify-between">
                       <span>Unassigned:</span>
@@ -935,12 +941,6 @@ function MainDashboard({ analytics }) {
                     <div className="flex justify-between">
                       <span>No Show:</span>
                       <span className="font-medium text-red-600">{analytics.dashboard_blocks.block_1_meetings.no_show_actual}</span>
-                    </div>
-                    <div className="flex justify-between pt-2 border-t">
-                      <span>Upsells / Cross-sell:</span>
-                      <span className="font-medium text-purple-600">
-                        {analytics.dashboard_blocks.block_1_meetings.upsells_actual}/{analytics.dashboard_blocks.block_1_meetings.upsells_target}
-                      </span>
                     </div>
                   </div>
                 </div>
