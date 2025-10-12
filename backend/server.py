@@ -817,7 +817,7 @@ def calculate_closing_projections(df):
             'total_value': float(projections_quarter['pipeline'].sum()),
             'weighted_value': float(projections_quarter['weighted_value'].sum())
         },
-        'ae_projections': {k: {
+        'ae_projections': {fix_ae_name_encoding(k): {
             'weighted_value': float(v['weighted_value']),
             'pipeline': float(v['pipeline'])
         } for k, v in ae_projections.to_dict('index').items()} if not ae_projections.empty else {}
