@@ -3326,7 +3326,7 @@ function Dashboard() {
                           <div 
                             {...provided.droppableProps}
                             ref={provided.innerRef}
-                            className="space-y-2 min-h-96 max-h-96 overflow-y-auto"
+                            className="space-y-2 min-h-[600px] max-h-[600px] overflow-y-auto"
                           >
                             {hotDeals.filter(deal => deal.column === 'next60').map((deal, index) => (
                               <DraggableDealItem 
