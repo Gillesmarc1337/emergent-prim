@@ -1776,10 +1776,10 @@ function Dashboard() {
                         <tr className="border-b">
                           <th className="text-left p-2">Name</th>
                           <th className="text-center p-2">Role</th>
+                          <th className="text-right p-2">Meeting Goal</th>
                           <th className="text-right p-2">Total Meetings</th>
                           <th className="text-right p-2">Relevant Meetings</th>
                           <th className="text-right p-2">Relevance Rate</th>
-                          <th className="text-right p-2">Meeting Goal</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1793,11 +1793,6 @@ function Dashboard() {
                                 </span>
                               )}
                             </td>
-                            <td className="text-right p-2">{stats.total_meetings}</td>
-                            <td className="text-right p-2">{stats.relevant_meetings}</td>
-                            <td className="text-right p-2">
-                              {((stats.relevant_meetings / stats.total_meetings) * 100).toFixed(1)}%
-                            </td>
                             <td className="text-right p-2">
                               {stats.meeting_target ? (
                                 <span className={stats.total_meetings >= stats.meeting_target ? 'text-green-600 font-medium' : 'text-orange-600 font-medium'}>
@@ -1806,6 +1801,11 @@ function Dashboard() {
                               ) : (
                                 <span className="text-gray-400">-</span>
                               )}
+                            </td>
+                            <td className="text-right p-2">{stats.total_meetings}</td>
+                            <td className="text-right p-2">{stats.relevant_meetings}</td>
+                            <td className="text-right p-2">
+                              {((stats.relevant_meetings / stats.total_meetings) * 100).toFixed(1)}%
                             </td>
                           </tr>
                         ))}
