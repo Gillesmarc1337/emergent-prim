@@ -1517,7 +1517,7 @@ function Dashboard() {
               ? "You are on track to meet your meetings generation targets." 
               : "Need to increase prospecting efforts to reach targets."}
           >
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
               <MetricCard
                 title="Total New Intros"
                 value={analytics.meeting_generation.total_new_intros}
@@ -1545,6 +1545,13 @@ function Dashboard() {
                 target={analytics.meeting_generation.referral_target}
                 icon={Users}
                 color="purple"
+              />
+              <MetricCard
+                title="Upsells / Cross-sell"
+                value={analytics.dashboard_blocks?.block_1_meetings?.upsells_actual || 0}
+                target={analytics.dashboard_blocks?.block_1_meetings?.upsells_target || 0}
+                icon={TrendingUp}
+                color="indigo"
               />
             </div>
 
