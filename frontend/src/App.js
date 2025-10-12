@@ -970,6 +970,12 @@ function MainDashboard({ analytics }) {
                   </div>
                   <div className="text-sm text-gray-600">POA</div>
                 </div>
+                <div className="text-center border-t pt-3">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {analytics.dashboard_blocks.block_2_intro_poa.upsells_actual}/{analytics.dashboard_blocks.block_2_intro_poa.upsells_target}
+                  </div>
+                  <div className="text-sm text-gray-600">Upsells / Cross-sell</div>
+                </div>
               </div>
             </CardContent>
           </Card>
