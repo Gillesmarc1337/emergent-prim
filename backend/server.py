@@ -2035,6 +2035,8 @@ async def get_upsell_renewals_analytics(
             'poa_target': period_poa_target,
             'closing_actual': len(upsell_renewal_data[upsell_renewal_data['stage'] == 'A Closed']),
             'closing_target': period_closing_target,
+            'closing_value': float(upsell_renewal_data[upsell_renewal_data['stage'] == 'A Closed']['expected_arr'].fillna(0).sum()),
+            'closing_value_target': period_closing_value_target,
             
             # Performance data
             'partner_performance': partner_performance,
