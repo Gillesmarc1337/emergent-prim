@@ -41,6 +41,10 @@ def test_api_endpoint(endpoint, method="GET", data=None, cookies=None, expected_
                 print(f"❌ Invalid JSON response")
                 print(f"Response text: {response.text}")
                 return None, response
+        elif response.status_code == expected_status:
+            # For expected non-200 status codes (like 401), return the response
+            print(f"✅ Expected status {expected_status} received")
+            return None, response
         else:
             return response.text, response
             
