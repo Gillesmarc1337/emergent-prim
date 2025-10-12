@@ -448,12 +448,17 @@ def test_session_expiration_validation():
     
     # Verify session works initially
     cookies = {'session_token': session_token}
-    data, response = test_api_endpoint("/auth/me", cookies=cookies, expected_status=200)
+    result = test_api_endpoint("/auth/me", cookies=cookies, expected_status=200)
     
-    if data and data.get('email') == 'demo@primelis.com':
-        print(f"✅ Session works initially")
+    if result and len(result) == 2:
+        data, response = result
+        if data and data.get('email') == 'demo@primelis.com':
+            print(f"✅ Session works initially")
+        else:
+            print(f"❌ Session doesn't work initially")
+            return False
     else:
-        print(f"❌ Session doesn't work initially")
+        print(f"❌ Session doesn't work initially - no response")
         return False
     
     # Note: We can't easily test 24-hour expiration in a test script
