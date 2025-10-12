@@ -2665,66 +2665,89 @@ function Dashboard() {
                   />
                 </div>
 
-                {/* Upsells vs Renewals */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Upsells vs Renewals</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-                          <div>
-                            <div className="text-sm text-gray-600">Upsells</div>
-                            <div className="text-2xl font-bold text-blue-600">
-                              {upsellRenewData.upsells_actual}
-                            </div>
-                          </div>
-                          <TrendingUp className="h-8 w-8 text-blue-600" />
-                        </div>
-                        <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
-                          <div>
-                            <div className="text-sm text-gray-600">Renewals</div>
-                            <div className="text-2xl font-bold text-green-600">
-                              {upsellRenewData.renewals_actual}
-                            </div>
-                          </div>
-                          <RotateCcw className="h-8 w-8 text-green-600" />
-                        </div>
+                {/* 4 Small Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  <Card className="border-2 border-purple-200 bg-purple-50">
+                    <CardContent className="p-6 text-center">
+                      <div className="text-3xl font-bold text-purple-600 mb-1">
+                        {upsellRenewData.upsells_actual}
                       </div>
+                      <div className="text-sm text-gray-600">Upsells / Cross-sell</div>
                     </CardContent>
                   </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Closing Performance</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <MetricCard
-                          title="Deals Closed"
-                          value={upsellRenewData.closing_actual}
-                          target={upsellRenewData.closing_target}
-                          icon={CheckCircle}
-                          color="green"
-                        />
-                        <div className="p-4 bg-green-50 rounded-lg">
-                          <div className="text-sm text-gray-600 mb-1">Closing Value</div>
-                          <div className="text-2xl font-bold text-green-600">
-                            ${(upsellRenewData.closing_value / 1000).toFixed(0)}K
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            Target: ${(upsellRenewData.closing_value_target / 1000).toFixed(0)}K
-                          </div>
-                          <Progress 
-                            value={Math.min((upsellRenewData.closing_value / upsellRenewData.closing_value_target) * 100, 100)} 
-                            className="mt-2"
-                          />
-                        </div>
+                  <Card className="border-2 border-green-200 bg-green-50">
+                    <CardContent className="p-6 text-center">
+                      <div className="text-3xl font-bold text-green-600 mb-1">
+                        {upsellRenewData.renewals_actual}
                       </div>
+                      <div className="text-sm text-gray-600">Renewals</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-2 border-green-200 bg-green-50">
+                    <CardContent className="p-6 text-center">
+                      <div className="text-3xl font-bold text-green-600 mb-1">
+                        {upsellRenewData.intros_details?.filter(i => i.status === 'Show').length || 0}
+                      </div>
+                      <div className="text-sm text-gray-600">Show</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-2 border-red-200 bg-red-50">
+                    <CardContent className="p-6 text-center">
+                      <div className="text-3xl font-bold text-red-600 mb-1">
+                        {upsellRenewData.intros_details?.filter(i => i.status === 'No Show').length || 0}
+                      </div>
+                      <div className="text-sm text-gray-600">No Show</div>
                     </CardContent>
                   </Card>
                 </div>
+
+                {/* Partner Performance Table */}
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>Partner Performance</span>
+                      <Badge variant="destructive">Needs Improvement</Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {upsellRenewData.partner_performance && upsellRenewData.partner_performance.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b">
+                              <th className="text-left p-2">PARTNER</th>
+                              <th className="text-center p-2">INTROS ATTENDED</th>
+                              <th className="text-center p-2">POA GENERATED</th>
+                              <th className="text-center p-2">UPSELLS</th>
+                              <th className="text-center p-2">RENEWALS</th>
+                              <th className="text-center p-2">CLOSING</th>
+                              <th className="text-right p-2">CLOSING VALUE</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {upsellRenewData.partner_performance.map((partner, index) => (
+                              <tr key={index} className="border-b hover:bg-gray-50">
+                                <td className="p-2 font-medium">{partner.partner_name}</td>
+                                <td className="text-center p-2">{partner.intros_attended}</td>
+                                <td className="text-center p-2">{partner.poa_generated}</td>
+                                <td className="text-center p-2">{partner.upsells}</td>
+                                <td className="text-center p-2">{partner.renewals}</td>
+                                <td className="text-center p-2">{partner.closing}</td>
+                                <td className="text-right p-2 font-medium">
+                                  ${(partner.closing_value / 1000).toFixed(0)}K
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        No partner data available for this period
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
 
                 {/* Intro Details Table */}
                 {upsellRenewData.intros_details && upsellRenewData.intros_details.length > 0 && (
