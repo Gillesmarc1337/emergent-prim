@@ -3192,7 +3192,10 @@ function Dashboard() {
                             ref={provided.innerRef}
                             className="space-y-2 min-h-[600px] max-h-[600px] overflow-y-auto"
                           >
-                            {hotDeals.filter(deal => deal.column === 'next14').map((deal, index) => (
+                            {hotDeals
+                              .filter(deal => deal.column === 'next14')
+                              .sort((a, b) => (b.pipeline || 0) - (a.pipeline || 0)) // Sort by pipeline descending
+                              .map((deal, index) => (
                               <DraggableDealItem 
                                 key={deal.id}
                                 deal={deal} 
