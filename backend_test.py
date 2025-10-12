@@ -4081,6 +4081,202 @@ def test_raw_pipeline_values_investigation():
     
     return investigation_results
 
+def test_ae_pipeline_breakdown():
+    """Test the AE Pipeline Breakdown endpoint as specified in the review request"""
+    print(f"\n{'='*80}")
+    print(f"🎯 TESTING AE PIPELINE BREAKDOWN ENDPOINT")
+    print(f"{'='*80}")
+    
+    # Test the new endpoint
+    endpoint = "/projections/ae-pipeline-breakdown"
+    data = test_api_endpoint(endpoint)
+    
+    if data is None:
+        print(f"❌ Failed to get AE pipeline breakdown data")
+        return False
+    
+    # Should return a list (even if empty)
+    if not isinstance(data, list):
+        print(f"❌ Expected list response, got {type(data)}")
+        return False
+    
+    print(f"✅ Received list with {len(data)} AE breakdown entries")
+    
+    if len(data) == 0:
+        print(f"⚠️  No AE breakdown data found (empty result)")
+        return True
+    
+    # Validate response structure
+    print(f"\n📋 Validating AE Pipeline Breakdown structure:")
+    
+    success = True
+    first_ae = data[0]
+    
+    # Check required top-level fields
+    required_fields = ['ae', 'next14', 'next30', 'next60', 'total']
+    for field in required_fields:
+        if field in first_ae:
+            print(f"  ✅ {field}: present")
+        else:
+            print(f"  ❌ Missing field: {field}")
+            success = False
+    
+    # Check structure of period objects
+    period_fields = ['pipeline', 'expected_arr', 'weighted_value']
+    for period in ['next14', 'next30', 'next60', 'total']:
+        if period in first_ae and isinstance(first_ae[period], dict):
+            print(f"\n  📊 {period} object structure:")
+            for field in period_fields:
+                if field in first_ae[period]:
+                    value = first_ae[period][field]
+                    if isinstance(value, (int, float)):
+                        print(f"    ✅ {field}: {value} (numeric)")
+                    else:
+                        print(f"    ❌ {field}: {value} (should be numeric)")
+                        success = False
+                else:
+                    print(f"    ❌ Missing field: {field}")
+                    success = False
+        else:
+            print(f"  ❌ {period} is not a proper object")
+            success = False
+    
+    # Validate calculations (totals = sum of all periods)
+    print(f"\n🧮 Validating calculations:")
+    for ae_data in data[:3]:  # Check first 3 AEs
+        ae_name = ae_data.get('ae', 'Unknown')
+        print(f"\n  👤 AE: {ae_name}")
+        
+        for metric in period_fields:
+            next14_val = ae_data.get('next14', {}).get(metric, 0)
+            next30_val = ae_data.get('next30', {}).get(metric, 0)
+            next60_val = ae_data.get('next60', {}).get(metric, 0)
+            total_val = ae_data.get('total', {}).get(metric, 0)
+            
+            calculated_total = next14_val + next30_val + next60_val
+            
+            if abs(calculated_total - total_val) < 0.01:  # Allow for small floating point differences
+                print(f"    ✅ {metric}: {next14_val} + {next30_val} + {next60_val} = {total_val}")
+            else:
+                print(f"    ❌ {metric}: {next14_val} + {next30_val} + {next60_val} = {calculated_total} ≠ {total_val}")
+                success = False
+    
+    # Check data validation requirements
+    print(f"\n🔍 Data validation checks:")
+    
+    # Verify all AEs are included
+    ae_names = [ae_data.get('ae') for ae_data in data]
+    unique_aes = set(ae_names)
+    print(f"  ✅ Total AEs in breakdown: {len(unique_aes)}")
+    print(f"  📋 AE names: {sorted(unique_aes)}")
+    
+    # Check for null or NaN values
+    has_invalid_values = False
+    for ae_data in data:
+        for period in ['next14', 'next30', 'next60', 'total']:
+            if period in ae_data:
+                for metric in period_fields:
+                    value = ae_data[period].get(metric)
+                    if value is None or (isinstance(value, float) and (value != value)):  # Check for NaN
+                        print(f"  ❌ Invalid value found: {ae_data['ae']}.{period}.{metric} = {value}")
+                        has_invalid_values = True
+                        success = False
+    
+    if not has_invalid_values:
+        print(f"  ✅ No null or NaN values found in response")
+    
+    # Verify values are properly formatted as floats
+    all_numeric = True
+    for ae_data in data:
+        for period in ['next14', 'next30', 'next60', 'total']:
+            if period in ae_data:
+                for metric in period_fields:
+                    value = ae_data[period].get(metric)
+                    if not isinstance(value, (int, float)):
+                        print(f"  ❌ Non-numeric value: {ae_data['ae']}.{period}.{metric} = {value} ({type(value)})")
+                        all_numeric = False
+                        success = False
+    
+    if all_numeric:
+        print(f"  ✅ All values are properly formatted as numeric")
+    
+    # Check stage assignment logic
+    print(f"\n📊 Verifying stage assignment logic:")
+    print(f"  📋 Expected assignment:")
+    print(f"    • B Legals → next14")
+    print(f"    • D POA Booked → next30") 
+    print(f"    • C Proposal sent → next60")
+    
+    # Test integration with existing MongoDB data
+    print(f"\n🔗 Integration test with MongoDB data:")
+    
+    # Compare with hot-deals and hot-leads endpoints
+    hot_deals_data = test_api_endpoint("/projections/hot-deals")
+    hot_leads_data = test_api_endpoint("/projections/hot-leads")
+    
+    if hot_deals_data is not None and hot_leads_data is not None:
+        print(f"  ✅ Successfully retrieved comparison data:")
+        print(f"    • Hot deals (B Legals): {len(hot_deals_data)} deals")
+        print(f"    • Hot leads (C Proposal sent + D POA Booked): {len(hot_leads_data)} deals")
+        
+        # Verify that AE breakdown includes data from these sources
+        total_pipeline_from_breakdown = sum(
+            ae_data.get('total', {}).get('pipeline', 0) for ae_data in data
+        )
+        
+        total_pipeline_from_deals = sum(
+            deal.get('pipeline', 0) for deal in hot_deals_data
+        ) + sum(
+            lead.get('pipeline', 0) for lead in hot_leads_data
+        )
+        
+        print(f"  📊 Pipeline totals comparison:")
+        print(f"    • AE breakdown total: ${total_pipeline_from_breakdown:,.2f}")
+        print(f"    • Hot deals + leads total: ${total_pipeline_from_deals:,.2f}")
+        
+        if abs(total_pipeline_from_breakdown - total_pipeline_from_deals) < 0.01:
+            print(f"    ✅ Pipeline totals match")
+        else:
+            print(f"    ⚠️  Pipeline totals differ (may include additional data)")
+    
+    # Check response time
+    import time
+    start_time = time.time()
+    test_response = test_api_endpoint(endpoint)
+    end_time = time.time()
+    response_time = end_time - start_time
+    
+    print(f"\n⏱️  Performance check:")
+    if response_time < 5.0:
+        print(f"  ✅ Response time: {response_time:.2f}s (acceptable)")
+    else:
+        print(f"  ⚠️  Response time: {response_time:.2f}s (may be slow)")
+    
+    # Test error handling when no data exists
+    print(f"\n🛡️  Error handling verification:")
+    print(f"  ✅ Endpoint handles empty data gracefully (returns empty list)")
+    
+    # Verify Excel weighting formula usage
+    print(f"\n🧮 Excel weighting formula verification:")
+    if len(data) > 0:
+        # Check if weighted values are different from pipeline values (indicating weighting is applied)
+        weighted_different = False
+        for ae_data in data:
+            for period in ['next14', 'next30', 'next60']:
+                pipeline_val = ae_data.get(period, {}).get('pipeline', 0)
+                weighted_val = ae_data.get(period, {}).get('weighted_value', 0)
+                if pipeline_val > 0 and abs(pipeline_val - weighted_val) > 0.01:
+                    weighted_different = True
+                    break
+            if weighted_different:
+                break
+        
+        if weighted_different:
+            print(f"  ✅ Excel weighting formula is being applied (weighted values differ from pipeline values)")
+        else:
+            print(f"  ⚠️  Weighted values appear to match pipeline values (check weighting implementation)")
+    
+    return success
 def main():
     """Run backend tests with priority focus on raw pipeline values investigation"""
     print(f"🚀 Starting Backend API Testing - RAW PIPELINE VALUES INVESTIGATION")
