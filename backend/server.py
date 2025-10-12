@@ -1518,11 +1518,11 @@ async def get_monthly_analytics(month_offset: int = 0):
         ]
         actual_poa = len(poa_data)
         
-        # Upsells / Cross-sells (Type of deal = "Up-sell") for the focus month
+        # Upsells / Cross-sells (Type of deal = "Upsell", "Up-sell", etc.) for the focus month
         upsells_data = df[
             (df['discovery_date'] >= month_start) & 
             (df['discovery_date'] <= month_end) &
-            (df['type_of_deal'] == 'Up-sell')
+            df['type_of_deal'].apply(is_upsell)
         ]
         actual_upsells = len(upsells_data)
         target_upsells = 5  # 5 upsells per month
