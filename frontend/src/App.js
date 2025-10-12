@@ -2622,6 +2622,222 @@ function Dashboard() {
           </div>
         </TabsContent>
 
+        {/* Upsell & Renew */}
+        <TabsContent value="upsell">
+          {upsellRenewData ? (
+            <div className="space-y-6">
+              <AnalyticsSection
+                title={`Upsells & Renewals - ${upsellRenewData.period}`}
+                isOnTrack={upsellRenewData.total_meetings >= upsellRenewData.total_target}
+                conclusion={
+                  upsellRenewData.total_meetings >= upsellRenewData.total_target
+                    ? "Great performance on upsell and renewal activities."
+                    : "Need to increase upsell and renewal prospecting efforts."
+                }
+              >
+                {/* Key Metrics */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  <MetricCard
+                    title="Total Intro Meetings"
+                    value={upsellRenewData.total_meetings}
+                    target={upsellRenewData.total_target}
+                    icon={Users}
+                    color="blue"
+                  />
+                  <MetricCard
+                    title="Business Partners"
+                    value={upsellRenewData.business_partner_meetings}
+                    target={upsellRenewData.business_partner_target}
+                    icon={Users}
+                    color="green"
+                  />
+                  <MetricCard
+                    title="Consulting Partners"
+                    value={upsellRenewData.consulting_partner_meetings}
+                    target={upsellRenewData.consulting_partner_target}
+                    icon={Users}
+                    color="purple"
+                  />
+                  <MetricCard
+                    title="POA Attended"
+                    value={upsellRenewData.poa_actual}
+                    target={upsellRenewData.poa_target}
+                    icon={Target}
+                    color="orange"
+                  />
+                </div>
+
+                {/* Upsells vs Renewals */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Upsells vs Renewals</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                          <div>
+                            <div className="text-sm text-gray-600">Upsells</div>
+                            <div className="text-2xl font-bold text-blue-600">
+                              {upsellRenewData.upsells_actual}
+                            </div>
+                          </div>
+                          <TrendingUp className="h-8 w-8 text-blue-600" />
+                        </div>
+                        <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+                          <div>
+                            <div className="text-sm text-gray-600">Renewals</div>
+                            <div className="text-2xl font-bold text-green-600">
+                              {upsellRenewData.renewals_actual}
+                            </div>
+                          </div>
+                          <RotateCcw className="h-8 w-8 text-green-600" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Closing Performance</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <MetricCard
+                          title="Deals Closed"
+                          value={upsellRenewData.closing_actual}
+                          target={upsellRenewData.closing_target}
+                          icon={CheckCircle}
+                          color="green"
+                        />
+                        <div className="p-4 bg-green-50 rounded-lg">
+                          <div className="text-sm text-gray-600 mb-1">Closing Value</div>
+                          <div className="text-2xl font-bold text-green-600">
+                            ${(upsellRenewData.closing_value / 1000).toFixed(0)}K
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            Target: ${(upsellRenewData.closing_value_target / 1000).toFixed(0)}K
+                          </div>
+                          <Progress 
+                            value={Math.min((upsellRenewData.closing_value / upsellRenewData.closing_value_target) * 100, 100)} 
+                            className="mt-2"
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Intro Details Table */}
+                {upsellRenewData.intros_details && upsellRenewData.intros_details.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Intro Meetings Details</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b">
+                              <th className="text-left p-2">Date</th>
+                              <th className="text-left p-2">Client</th>
+                              <th className="text-left p-2">Partner</th>
+                              <th className="text-left p-2">Owner (AE)</th>
+                              <th className="text-left p-2">Stage</th>
+                              <th className="text-left p-2">Type</th>
+                              <th className="text-right p-2">Expected ARR</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {upsellRenewData.intros_details.map((intro, index) => (
+                              <tr key={index} className="border-b hover:bg-gray-50">
+                                <td className="p-2">{intro.date}</td>
+                                <td className="p-2 font-medium">{intro.client}</td>
+                                <td className="p-2">{intro.partner || '-'}</td>
+                                <td className="p-2">{intro.owner}</td>
+                                <td className="p-2">
+                                  <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">
+                                    {intro.stage}
+                                  </span>
+                                </td>
+                                <td className="p-2">
+                                  <span className={`text-xs px-2 py-1 rounded-full ${
+                                    intro.type_of_deal === 'Upsell' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
+                                  }`}>
+                                    {intro.type_of_deal}
+                                  </span>
+                                </td>
+                                <td className="p-2 text-right font-medium">
+                                  ${(intro.expected_arr / 1000).toFixed(0)}K
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* POA Details Table */}
+                {upsellRenewData.poa_details && upsellRenewData.poa_details.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>POA Details</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b">
+                              <th className="text-left p-2">POA Date</th>
+                              <th className="text-left p-2">Client</th>
+                              <th className="text-left p-2">Partner</th>
+                              <th className="text-left p-2">Owner (AE)</th>
+                              <th className="text-left p-2">Stage</th>
+                              <th className="text-left p-2">Type</th>
+                              <th className="text-right p-2">Expected ARR</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {upsellRenewData.poa_details.map((poa, index) => (
+                              <tr key={index} className="border-b hover:bg-gray-50">
+                                <td className="p-2">{poa.date}</td>
+                                <td className="p-2 font-medium">{poa.client}</td>
+                                <td className="p-2">{poa.partner || '-'}</td>
+                                <td className="p-2">{poa.owner}</td>
+                                <td className="p-2">
+                                  <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">
+                                    {poa.stage}
+                                  </span>
+                                </td>
+                                <td className="p-2">
+                                  <span className={`text-xs px-2 py-1 rounded-full ${
+                                    poa.type_of_deal === 'Upsell' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
+                                  }`}>
+                                    {poa.type_of_deal}
+                                  </span>
+                                </td>
+                                <td className="p-2 text-right font-medium">
+                                  ${(poa.expected_arr / 1000).toFixed(0)}K
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </AnalyticsSection>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600">Loading Upsell & Renew data...</p>
+            </div>
+          )}
+        </TabsContent>
+
         {/* Projections */}
         <TabsContent value="projections">
           <div className="space-y-6">
