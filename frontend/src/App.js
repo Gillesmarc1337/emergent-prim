@@ -1333,6 +1333,46 @@ function Dashboard() {
     return sortableData;
   }, [aeBreakdown, sortConfig]);
 
+  // Calculate totals for AE breakdown table
+  const aeBreakdownTotals = React.useMemo(() => {
+    if (!aeBreakdown || aeBreakdown.length === 0) {
+      return {
+        next14: { pipeline: 0, expected_arr: 0, weighted_value: 0 },
+        next30: { pipeline: 0, expected_arr: 0, weighted_value: 0 },
+        next60: { pipeline: 0, expected_arr: 0, weighted_value: 0 },
+        total: { pipeline: 0, expected_arr: 0, weighted_value: 0 }
+      };
+    }
+
+    return aeBreakdown.reduce((acc, ae) => ({
+      next14: {
+        pipeline: acc.next14.pipeline + (ae.next14?.pipeline || 0),
+        expected_arr: acc.next14.expected_arr + (ae.next14?.expected_arr || 0),
+        weighted_value: acc.next14.weighted_value + (ae.next14?.weighted_value || 0)
+      },
+      next30: {
+        pipeline: acc.next30.pipeline + (ae.next30?.pipeline || 0),
+        expected_arr: acc.next30.expected_arr + (ae.next30?.expected_arr || 0),
+        weighted_value: acc.next30.weighted_value + (ae.next30?.weighted_value || 0)
+      },
+      next60: {
+        pipeline: acc.next60.pipeline + (ae.next60?.pipeline || 0),
+        expected_arr: acc.next60.expected_arr + (ae.next60?.expected_arr || 0),
+        weighted_value: acc.next60.weighted_value + (ae.next60?.weighted_value || 0)
+      },
+      total: {
+        pipeline: acc.total.pipeline + (ae.total?.pipeline || 0),
+        expected_arr: acc.total.expected_arr + (ae.total?.expected_arr || 0),
+        weighted_value: acc.total.weighted_value + (ae.total?.weighted_value || 0)
+      }
+    }), {
+      next14: { pipeline: 0, expected_arr: 0, weighted_value: 0 },
+      next30: { pipeline: 0, expected_arr: 0, weighted_value: 0 },
+      next60: { pipeline: 0, expected_arr: 0, weighted_value: 0 },
+      total: { pipeline: 0, expected_arr: 0, weighted_value: 0 }
+    });
+  }, [aeBreakdown]);
+
   // Sortable data hooks for AE Performance tables
   const { items: sortedAeIntros, requestSort: requestAeIntrosSort, sortConfig: aeIntrosSortConfig } = 
     useSortableData(analytics?.ae_performance?.ae_performance || []);
