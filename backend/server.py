@@ -1574,7 +1574,9 @@ async def get_monthly_analytics(month_offset: int = 0):
                 'unassigned_actual': unassigned_monthly,
                 'unassigned_target': 0,  # No target for unassigned
                 'show_actual': actual_show,
-                'no_show_actual': actual_no_show
+                'no_show_actual': actual_no_show,
+                'upsells_actual': actual_upsells,
+                'upsells_target': target_upsells
             },
             'block_2_intro_poa': {
                 'title': 'Intro & POA',
