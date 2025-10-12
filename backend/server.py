@@ -86,6 +86,57 @@ class DateRangeRequest(BaseModel):
     start_date: datetime
     end_date: datetime
 
+# Auth Models
+class User(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), alias="_id")
+    email: str
+    name: str
+    picture: Optional[str] = None
+    role: str = "viewer"  # viewer or super_admin
+    created_at: datetime = Field(default_factory=lambda: datetime.now())
+    
+    class Config:
+        populate_by_name = True
+        json_encoders = {datetime: lambda v: v.isoformat()}
+
+class UserSession(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), alias="_id")
+    user_id: str
+    session_token: str
+    expires_at: datetime
+    created_at: datetime = Field(default_factory=lambda: datetime.now())
+    
+    class Config:
+        populate_by_name = True
+        json_encoders = {datetime: lambda v: v.isoformat()}
+
+class View(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), alias="_id")
+    name: str
+    sheet_url: Optional[str] = None
+    sheet_name: Optional[str] = None
+    is_master: bool = False
+    is_default: bool = False
+    created_by: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now())
+    
+    class Config:
+        populate_by_name = True
+        json_encoders = {datetime: lambda v: v.isoformat()}
+
+class ViewCreateRequest(BaseModel):
+    name: str
+    sheet_url: Optional[str] = None
+    sheet_name: Optional[str] = None
+    is_master: bool = False
+
+class SessionDataResponse(BaseModel):
+    id: str
+    email: str
+    name: str
+    picture: Optional[str]
+    session_token: str
+
 # Utility functions
 def clean_records(records):
     """Clean records to ensure all values are JSON serializable"""
