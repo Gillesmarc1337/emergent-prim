@@ -2803,11 +2803,14 @@ function Dashboard() {
                   </Card>
                 )}
 
-                {/* POA Details Table */}
+                {/* POA Generated Details Table */}
                 {upsellRenewData.poa_details && upsellRenewData.poa_details.length > 0 && (
                   <Card>
                     <CardHeader>
-                      <CardTitle>POA Details</CardTitle>
+                      <CardTitle className="flex items-center justify-between">
+                        <span>POA Generated Details</span>
+                        <Badge variant="destructive">Needs Improvement</Badge>
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="overflow-x-auto">
