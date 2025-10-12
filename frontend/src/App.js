@@ -734,7 +734,7 @@ function MainDashboard({ analytics }) {
           color="orange"
         />
         <MetricCard
-          title={`New Pipe Created (${viewMode === 'yearly' ? 'Jul-Dec' : useCustomDate && dateRange?.from ? 'Period' : 'Month'})`}
+          title="New Pipe Created"
           value={analytics.pipe_metrics?.created_pipe?.value || 0}
           target={analytics.pipe_metrics?.created_pipe?.target || 0}
           unit="$"
@@ -743,7 +743,7 @@ function MainDashboard({ analytics }) {
           tooltip="Sum of ARR from all deals created this period, using same formula as Deals & Pipeline tab."
         />
         <MetricCard
-          title={`Created Weighted Pipe (${viewMode === 'yearly' ? 'Jul-Dec' : useCustomDate && dateRange?.from ? 'Period' : 'Month'})`}
+          title="Created Weighted Pipe"
           value={analytics.pipe_metrics?.created_pipe?.weighted_value || 0}
           target={analytics.pipe_metrics?.created_pipe?.target_weighted || 0}
           unit="$"
