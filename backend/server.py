@@ -522,7 +522,7 @@ def calculate_ae_performance(df, start_date, end_date):
         intros_list.append({
             'date': row['discovery_date'].strftime('%b %d') if pd.notna(row['discovery_date']) else 'N/A',
             'client': str(row.get('client', 'N/A')),
-            'ae': str(row.get('owner', 'N/A')),
+            'ae': fix_ae_name_encoding(row.get('owner', 'N/A')),
             'stage': str(row.get('stage', 'N/A')),
             'relevance': str(row.get('relevance', 'N/A')),
             'expected_arr': float(row.get('expected_arr', 0)) if pd.notna(row.get('expected_arr', 0)) else 0
@@ -534,7 +534,7 @@ def calculate_ae_performance(df, start_date, end_date):
         poa_attended_list.append({
             'date': row['discovery_date'].strftime('%b %d') if pd.notna(row['discovery_date']) else 'N/A',
             'client': str(row.get('client', 'N/A')),
-            'ae': str(row.get('owner', 'N/A')),
+            'ae': fix_ae_name_encoding(row.get('owner', 'N/A')),
             'stage': str(row.get('stage', 'N/A')),
             'relevance': str(row.get('relevance', 'N/A')),
             'expected_arr': float(row.get('expected_arr', 0)) if pd.notna(row.get('expected_arr', 0)) else 0
