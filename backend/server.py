@@ -340,7 +340,13 @@ def calculate_meeting_generation(df, start_date, end_date):
     
     # Calculate dynamic targets based on period duration
     period_duration_days = (end_date - start_date).days + 1
-    period_duration_months = max(1, round(period_duration_days / 30))  # At least 1 month
+    # Calculate exact months for better accuracy
+    months_diff = (end_date.year - start_date.year) * 12 + (end_date.month - start_date.month) + 1
+    period_duration_months = max(1, months_diff)
+    
+    # List of BDRs (Business Development Representatives)
+    bdr_list = ['Xavier', 'Selma', 'Kenny', 'Marie']
+    monthly_bdr_meeting_target = 6  # 6 meetings per month per BDR
     
     # Base monthly targets (50 total = 22 inbound + 17 outbound + 11 referrals)
     monthly_inbound_target = 22
