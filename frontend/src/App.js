@@ -3471,82 +3471,36 @@ function Dashboard() {
                             )}
                           </div>
                         </th>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="3">
-                          Next 14 Days
-                        </th>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="3">
-                          Next 30 Days
-                        </th>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="3">
-                          Next 60-90 Days
-                        </th>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="3">
-                          Total Pipeline
-                        </th>
-                      </tr>
-                      <tr>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-400"></th>
-                        {/* Next 14 Days sub-headers */}
                         <th 
-                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('next14.pipeline')}
-                        >
-                          Pipeline {sortConfig.key === 'next14.pipeline' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th 
-                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                           onClick={() => handleSort('next14.expected_arr')}
                         >
-                          Exp. ARR {sortConfig.key === 'next14.expected_arr' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          Next 14 Days<br/>Expected ARR
+                          {sortConfig.key === 'next14.expected_arr' && (
+                            <span className="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                          )}
                         </th>
                         <th 
-                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('next14.weighted_value')}
-                        >
-                          Weighted {sortConfig.key === 'next14.weighted_value' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        {/* Next 30 Days sub-headers */}
-                        <th 
-                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('next30.pipeline')}
-                        >
-                          Pipeline {sortConfig.key === 'next30.pipeline' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th 
-                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                           onClick={() => handleSort('next30.expected_arr')}
                         >
-                          Exp. ARR {sortConfig.key === 'next30.expected_arr' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          Next 30 Days<br/>Expected ARR
+                          {sortConfig.key === 'next30.expected_arr' && (
+                            <span className="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                          )}
                         </th>
                         <th 
-                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('next30.weighted_value')}
-                        >
-                          Weighted {sortConfig.key === 'next30.weighted_value' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        {/* Next 60-90 Days sub-headers */}
-                        <th 
-                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('next60.pipeline')}
-                        >
-                          Pipeline {sortConfig.key === 'next60.pipeline' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th 
-                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('next60.expected_arr')}
-                        >
-                          Exp. ARR {sortConfig.key === 'next60.expected_arr' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th 
-                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
+                          className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                           onClick={() => handleSort('next60.weighted_value')}
                         >
-                          Weighted {sortConfig.key === 'next60.weighted_value' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          Next 60-90 Days<br/>Weighted
+                          {sortConfig.key === 'next60.weighted_value' && (
+                            <span className="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                          )}
                         </th>
-                        {/* Total sub-headers */}
                         <th 
-                          className="px-2 py-2 text-center text-xs font-medium text-gray-400 cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleSort('total.pipeline')}
+                          className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleSort('total.expected_arr')}
                         >
                           Pipeline {sortConfig.key === 'total.pipeline' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                         </th>
