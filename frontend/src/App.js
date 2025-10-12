@@ -1137,6 +1137,8 @@ function Dashboard() {
   const [hiddenDeals, setHiddenDeals] = useState(new Set());
   const [hiddenLeads, setHiddenLeads] = useState(new Set());
   const [loadingProjections, setLoadingProjections] = useState(false);
+  const [aeBreakdown, setAeBreakdown] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
   const loadAnalytics = async () => {
     setLoading(true);
