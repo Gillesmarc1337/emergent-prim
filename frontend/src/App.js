@@ -2654,7 +2654,7 @@ function Dashboard() {
                   </Card>
                 </div>
 
-                {/* Partner Performance Table - Using BDR Performance data filtered for upsells */}
+                {/* Partner Performance Table - BDR/AE filtered for those with Upsell deals */}
                 <Card className="mb-6">
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
@@ -2664,10 +2664,27 @@ function Dashboard() {
                   </CardHeader>
                   <CardContent>
                     {(() => {
-                      // Use the same data as BDR Performance from analytics
-                      // Filter or show all as they work on upsells
-                      const partnerData = analytics?.meeting_generation?.bdr_performance || {};
-                      const hasData = Object.keys(partnerData).length > 0;
+                      // Get BDR/AE who have upsell deals
+                      const introsDetails = upsellRenewData?.intros_details || [];
+                      const poaDetails = upsellRenewData?.poa_details || [];
+                      
+                      // Get unique owners (BDR/AE) who worked on Upsell deals
+                      const upsellOwners = new Set();
+                      [...introsDetails, ...poaDetails].forEach(deal => {
+                        if (deal.type_of_deal === 'Upsell' && deal.owner) {
+                          upsellOwners.add(deal.owner);
+                        }
+                      });
+                      
+                      // Get BDR performance data from analytics
+                      const bdrPerformance = analytics?.meeting_generation?.bdr_performance || {};
+                      
+                      // Filter to only show BDR/AE who have upsell deals
+                      const filteredPartners = Object.entries(bdrPerformance).filter(([name, _]) => 
+                        upsellOwners.has(name)
+                      );
+                      
+                      const hasData = filteredPartners.length > 0;
                       
                       return hasData ? (
                         <div className="overflow-x-auto">
