@@ -1229,6 +1229,7 @@ function Dashboard() {
       setHotDeals(dealsWithColumns);
       setHotLeads(hotLeadsResponse.data);
       setPerformanceSummary(performanceResponse.data);
+      setAeBreakdown(aeBreakdownResponse.data);
     } catch (error) {
       console.error('Error loading projections data:', error);
     } finally {
