@@ -3297,6 +3297,52 @@ function Dashboard() {
                           </td>
                         </tr>
                       ))}
+                      {/* Total Row */}
+                      <tr className="bg-blue-100 border-t-2 border-blue-300">
+                        <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900">
+                          TOTAL
+                        </td>
+                        {/* Next 14 Days Totals */}
+                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
+                          ${aeBreakdownTotals.next14.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                        </td>
+                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
+                          ${aeBreakdownTotals.next14.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                        </td>
+                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
+                          ${aeBreakdownTotals.next14.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                        </td>
+                        {/* Next 30 Days Totals */}
+                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
+                          ${aeBreakdownTotals.next30.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                        </td>
+                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
+                          ${aeBreakdownTotals.next30.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                        </td>
+                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
+                          ${aeBreakdownTotals.next30.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                        </td>
+                        {/* Next 60-90 Days Totals */}
+                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
+                          ${aeBreakdownTotals.next60.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                        </td>
+                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
+                          ${aeBreakdownTotals.next60.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                        </td>
+                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
+                          ${aeBreakdownTotals.next60.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                        </td>
+                        {/* Grand Totals */}
+                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-white bg-blue-600">
+                          ${aeBreakdownTotals.total.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                        </td>
+                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-white bg-blue-600">
+                          ${aeBreakdownTotals.total.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                        </td>
+                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-white bg-blue-600">
+                          ${aeBreakdownTotals.total.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
