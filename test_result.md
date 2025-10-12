@@ -173,6 +173,48 @@ backend:
           agent: "testing"
           comment: "✅ TESTED SUCCESSFULLY: GET /api/projections/performance-summary returns correct YTD data (revenue: 1,129,596, target: 3,600,000, forecast_gap: true). Dashboard blocks structure validated with proper meeting targets. All data types correct (numeric for revenue/targets, boolean for forecast_gap)."
 
+  - task: "Google OAuth authentication endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py, /app/backend/auth.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Created authentication system with Google OAuth via Emergent integration. Implemented three main endpoints: POST /api/auth/session-data (exchange session ID for user session), GET /api/auth/me (get current authenticated user), POST /api/auth/logout (logout and clear session). Created auth.py module with helper functions for session management, user creation, and role-based access control. Supports two authorized users: asher@primelis.com (viewer), remi@primelis.com (super_admin)."
+        - working: true
+          agent: "main"
+          comment: "✅ BACKEND AUTH WORKING: Fixed timezone comparison bug in get_user_from_session function. Created test users and sessions in MongoDB. Tested with curl: GET /api/auth/me returns correct user data for both test session tokens. Session management working correctly with 7-day expiration. Role-based access working (viewer vs super_admin)."
+
+  - task: "View management endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented view management endpoints: GET /api/views (list all views, authenticated users), POST /api/views (create new view, super admin only), DELETE /api/views/{view_id} (delete view, super admin only). Created default 'Organic' view in MongoDB. Views support sheet_url, sheet_name, is_master, is_default flags for multi-view management."
+        - working: true
+          agent: "main"
+          comment: "✅ VIEW ENDPOINTS WORKING: Tested GET /api/views with authenticated session token. Returns default 'Organic' view correctly. View structure includes id, name, sheet_url, sheet_name, is_master, is_default, created_by, created_at fields."
+
+  - task: "Database setup for authentication"
+    implemented: true
+    working: true
+    file: "/app/backend/setup_auth_test.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Created setup script to initialize authentication test data. Script creates: 1) Test users (remi@primelis.com as super_admin, asher@primelis.com as viewer), 2) Test sessions with 7-day expiration, 3) Default 'Organic' view. MongoDB collections: users, user_sessions, views. All test data created successfully."
+
 frontend:
   - task: "Hot Deals drag & drop interface"
     implemented: true
