@@ -256,13 +256,17 @@ def test_views_endpoint_authentication():
     
     # Test 1: No authentication should return 401
     print(f"\n📊 Test 1: No authentication")
-    data, response = test_api_endpoint("/views", expected_status=401)
+    result = test_api_endpoint("/views", expected_status=401)
     
-    if response and response.status_code == 401:
-        print(f"✅ Views endpoint correctly requires authentication (401)")
-        test_results['no_auth_returns_401'] = True
+    if result and len(result) == 2:
+        data, response = result
+        if response and response.status_code == 401:
+            print(f"✅ Views endpoint correctly requires authentication (401)")
+            test_results['no_auth_returns_401'] = True
+        else:
+            print(f"❌ Views endpoint should require authentication, got {response.status_code if response else 'None'}")
     else:
-        print(f"❌ Views endpoint should require authentication, got {response.status_code if response else 'None'}")
+        print(f"❌ Views endpoint test failed - no response")
     
     # Test 2: Create new demo session and test authenticated access
     print(f"\n📊 Test 2: Authenticated access")
@@ -270,22 +274,26 @@ def test_views_endpoint_authentication():
     
     if session_token:
         cookies = {'session_token': session_token}
-        data, response = test_api_endpoint("/views", cookies=cookies, expected_status=200)
+        result = test_api_endpoint("/views", cookies=cookies, expected_status=200)
         
-        if data and isinstance(data, list):
-            print(f"✅ Views endpoint returns data when authenticated")
-            print(f"  📋 Found {len(data)} views")
-            test_results['with_auth_returns_views'] = True
-            
-            # Display view details
-            for i, view in enumerate(data[:3]):  # Show first 3 views
-                print(f"    View {i+1}: {view.get('name', 'No name')} (id: {view.get('id', 'No id')})")
-            
-            if len(data) > 3:
-                print(f"    ... and {len(data) - 3} more views")
+        if result and len(result) == 2:
+            data, response = result
+            if data and isinstance(data, list):
+                print(f"✅ Views endpoint returns data when authenticated")
+                print(f"  📋 Found {len(data)} views")
+                test_results['with_auth_returns_views'] = True
                 
+                # Display view details
+                for i, view in enumerate(data[:3]):  # Show first 3 views
+                    print(f"    View {i+1}: {view.get('name', 'No name')} (id: {view.get('id', 'No id')})")
+                
+                if len(data) > 3:
+                    print(f"    ... and {len(data) - 3} more views")
+                    
+            else:
+                print(f"❌ Views endpoint should return list of views, got {type(data)}")
         else:
-            print(f"❌ Views endpoint should return list of views, got {type(data)}")
+            print(f"❌ Views endpoint authenticated test failed - no response")
     else:
         print(f"❌ Could not get session token for authenticated test")
     
