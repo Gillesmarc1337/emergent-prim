@@ -3360,7 +3360,7 @@ function Dashboard() {
                       <div className="font-semibold text-orange-800 mb-4 text-center">
                         Next 60–90 Days
                         <div className="text-sm text-orange-600">
-                          ${hotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0).toLocaleString()}
+                          ${(hotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0) / 1000000).toFixed(1)}M / 1.5M
                         </div>
                       </div>
                       <Droppable droppableId="next60">
