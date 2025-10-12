@@ -1212,6 +1212,26 @@ function Dashboard() {
       setLoadingProjections(false);
     }
   };
+  const loadUpsellData = async () => {
+    setLoadingUpsell(true);
+    try {
+      let url = `${API}/analytics/upsell-renewals`;
+      
+      // Add date parameters if custom period is selected
+      if (useCustomDate && dateRange?.from && dateRange?.to) {
+        const startDate = format(dateRange.from, 'yyyy-MM-dd');
+        const endDate = format(dateRange.to, 'yyyy-MM-dd');
+        url += `?start_date=${startDate}&end_date=${endDate}`;
+      }
+      
+      const response = await axios.get(url);
+      setUpsellData(response.data);
+    } catch (error) {
+      console.error('Error loading upsell data:', error);
+    } finally {
+      setLoadingUpsell(false);
+    }
+  };
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
