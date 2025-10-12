@@ -810,7 +810,7 @@ def calculate_pipe_metrics(df, start_date, end_date):
     
     # Base monthly targets
     monthly_new_pipe_target = 2_000_000  # $2M per month
-    monthly_weighted_pipe_target = 600_000  # $600K per month
+    monthly_weighted_pipe_target = 800_000  # $800K per month
     monthly_total_pipe_target = 5_000_000  # $5M (this is overall, not scaled by period)
     monthly_total_weighted_target = 1_500_000  # $1.5M (this is overall, not scaled by period)
     
