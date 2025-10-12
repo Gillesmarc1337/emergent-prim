@@ -721,9 +721,17 @@ function MainDashboard({ analytics }) {
       
       {/* Key Metrics - 5 Simple Cards */}
       {(() => {
-        // Monthly targets (fixed)
+        // Calculate period duration for dynamic targets
+        const monthlyData = dashboardData.monthly_revenue_chart || [];
+        const periodMonths = Math.max(1, monthlyData.length); // Number of months in period
+        
+        // Monthly targets (fixed per month)
         const monthlyNewPipeTarget = 2000000; // $2M per month
         const monthlyWeightedPipeTarget = 800000; // $800K per month
+        
+        // Dynamic targets based on period
+        const periodNewPipeTarget = monthlyNewPipeTarget * periodMonths;
+        const periodWeightedPipeTarget = monthlyWeightedPipeTarget * periodMonths;
         
         // Use data from analytics prop which updates with the selected period
         // New Pipe Created = sum of Expected ARR for deals created in the period
@@ -751,7 +759,7 @@ function MainDashboard({ analytics }) {
             <MetricCard
               title="New Pipe Created"
               value={monthlyNewPipeCreated}
-              target={monthlyNewPipeTarget}
+              target={periodNewPipeTarget}
               unit="$"
               icon={TrendingUp}
               color="purple"
@@ -759,7 +767,7 @@ function MainDashboard({ analytics }) {
             <MetricCard
               title="Created Weighted Pipe"
               value={monthlyWeightedPipe}
-              target={monthlyWeightedPipeTarget}
+              target={periodWeightedPipeTarget}
               unit="$"
               icon={Target}
               color="blue"
