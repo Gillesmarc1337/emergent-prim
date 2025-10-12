@@ -1111,6 +1111,10 @@ function Dashboard() {
   const [loadingProjections, setLoadingProjections] = useState(false);
   const [aeBreakdown, setAeBreakdown] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  
+  // State for Upsell & Renewals
+  const [upsellData, setUpsellData] = useState(null);
+  const [loadingUpsell, setLoadingUpsell] = useState(false);
 
   const loadAnalytics = async () => {
     setLoading(true);
