@@ -3294,10 +3294,11 @@ function Dashboard() {
               </CardHeader>
               <CardContent>
                 {(() => {
-                  // Calculate totals dynamically (updates when cards are dragged)
-                  const next14Total = hotDeals.filter(deal => deal.column === 'next14').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
-                  const next30Total = hotDeals.filter(deal => deal.column === 'next30').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
-                  const next60Total = hotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                  // Calculate totals dynamically (updates when cards are dragged or hidden)
+                  // Use filteredHotDeals to exclude hidden deals from calculations
+                  const next14Total = filteredHotDeals.filter(deal => deal.column === 'next14').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                  const next30Total = filteredHotDeals.filter(deal => deal.column === 'next30').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                  const next60Total = filteredHotDeals.filter(deal => deal.column === 'next60').reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
                   
                   const target14 = 375000;
                   const target30 = 375000;
