@@ -1182,11 +1182,36 @@ function Dashboard() {
   useEffect(() => {
     loadAnalytics();
     loadProjectionsData();
+    loadUpsellRenewData();
   }, [monthOffset, dateRange, useCustomDate, viewMode]);
 
   const handleUploadSuccess = () => {
     loadAnalytics();
     loadProjectionsData();
+    loadUpsellRenewData();
+  };
+
+  // Load Upsell & Renew data
+  const loadUpsellRenewData = async () => {
+    try {
+      let startDate, endDate;
+      
+      if (useCustomDate && dateRange?.from && dateRange?.to) {
+        startDate = format(dateRange.from, 'yyyy-MM-dd');
+        endDate = format(dateRange.to, 'yyyy-MM-dd');
+      } else {
+        // Calculate current month based on offset
+        const now = new Date();
+        const targetDate = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1);
+        startDate = format(new Date(targetDate.getFullYear(), targetDate.getMonth(), 1), 'yyyy-MM-dd');
+        endDate = format(new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0), 'yyyy-MM-dd');
+      }
+      
+      const response = await axios.get(`${API}/analytics/upsell-renewals?start_date=${startDate}&end_date=${endDate}`);
+      setUpsellRenewData(response.data);
+    } catch (error) {
+      console.error('Error loading upsell/renew data:', error);
+    }
   };
 
   // New functions for projections data
