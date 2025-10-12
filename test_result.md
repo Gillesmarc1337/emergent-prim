@@ -229,6 +229,18 @@ frontend:
         - working: true
           agent: "main"
           comment: "✅ ENHANCEMENTS COMPLETE: 1) Added TOTAL row at bottom of AE Pipeline Breakdown table with blue background showing sum of all AEs for each metric across all time periods. Grand total columns highlighted with darker blue (bg-blue-600). 2) Fixed encoding issues for French characters - implemented name mapping in backend to convert 'RÃ©mi' → 'Rémi' and 'FranÃ§ois' → 'François'. 3) Added React.useMemo hook to calculate totals efficiently. Screenshot verification confirms: François and Rémi display correctly, TOTAL row visible with proper formatting and calculations ($3.6M total pipeline across all periods)."
+  
+  - task: "Replace Dashboard boxes with Deals & Pipeline metrics"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "✅ DASHBOARD BOXES UPDATED: Replaced the single complex 'New Pipe Created (Selected Period)' card with TWO separate MetricCard components using exact same data source as 'Deals & Pipeline' tab. New boxes: 1) 'New Pipe Created' using analytics.pipe_metrics.created_pipe.value with target. 2) 'Created Weighted Pipe' using analytics.pipe_metrics.created_pipe.weighted_value with target_weighted. Both cards update dynamically based on selected period (Monthly, July-Dec, Custom). VERIFICATION: Values match exactly between Dashboard and Deals & Pipeline tab - Monthly: New Pipe Created $2,335,200 (target $2M), Created Weighted Pipe $541,800 (target $600K). Same formulas, same data source, perfect alignment."
 
   - task: "Replace Yearly button with July To Dec button"
     implemented: true
