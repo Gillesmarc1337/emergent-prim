@@ -1851,6 +1851,199 @@ async def get_custom_analytics(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating custom analytics: {str(e)}")
 
+@api_router.get("/analytics/upsell-renewals")
+async def get_upsell_renewals_analytics(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None
+):
+    """
+    Generate analytics for Upsells/Cross-sells and Renewals brought by Partners.
+    Combines Meeting Generation metrics with Partner Performance tables.
+    """
+    try:
+        # Get data from MongoDB
+        records = await db.sales_records.find().to_list(10000)
+        if not records:
+            return {
+                "period": "No data",
+                "total_meetings": 0,
+                "business_partner_meetings": 0,
+                "consulting_partner_meetings": 0,
+                "partner_performance": [],
+                "intros_details": [],
+                "poa_details": []
+            }
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(records)
+        
+        # Convert date columns
+        date_columns = ['discovery_date', 'poa_date', 'billing_start', 'created_at']
+        for col in date_columns:
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors='coerce')
+        
+        # Determine date range
+        if start_date and end_date:
+            period_start = datetime.strptime(start_date, '%Y-%m-%d')
+            period_end = datetime.strptime(end_date, '%Y-%m-%d')
+            period_str = f"{period_start.strftime('%b %d')} - {period_end.strftime('%b %d %Y')}"
+        else:
+            # Default to current month
+            today = datetime.now()
+            period_start, period_end = get_month_range(today, 0)
+            period_str = period_start.strftime('%b %Y')
+        
+        # Calculate period duration for dynamic targets
+        period_duration_days = (period_end - period_start).days + 1
+        period_duration_months = max(1, round(period_duration_days / 30))
+        
+        # Base monthly targets for upsells/renewals
+        monthly_meetings_target = 15  # 15 upsell/renewal meetings per month
+        monthly_business_partner_target = 9  # 60% from business partners
+        monthly_consulting_partner_target = 6  # 40% from consulting partners
+        monthly_poa_target = 10  # 10 POA per month
+        monthly_closing_target = 4  # 4 closings per month
+        
+        # Dynamic targets
+        period_meetings_target = monthly_meetings_target * period_duration_months
+        period_business_target = monthly_business_partner_target * period_duration_months
+        period_consulting_target = monthly_consulting_partner_target * period_duration_months
+        period_poa_target = monthly_poa_target * period_duration_months
+        period_closing_target = monthly_closing_target * period_duration_months
+        
+        # Filter for Upsells/Renewals AND Partner sources
+        upsell_renewal_data = df[
+            (df['discovery_date'] >= period_start) & 
+            (df['discovery_date'] <= period_end) &
+            (df['type_of_deal'].apply(is_upsell) | df['type_of_deal'].apply(is_renewal)) &
+            df['type_of_source'].apply(is_partner_source)
+        ]
+        
+        # Meetings breakdown by partner type
+        business_partner_meetings = upsell_renewal_data[
+            upsell_renewal_data['type_of_source'].str.lower().str.contains('business', na=False)
+        ]
+        consulting_partner_meetings = upsell_renewal_data[
+            upsell_renewal_data['type_of_source'].str.lower().str.contains('consulting', na=False)
+        ]
+        
+        # Show/No Show breakdown
+        show_meetings = upsell_renewal_data[
+            upsell_renewal_data['show_noshow'].notna() & 
+            upsell_renewal_data['show_noshow'].str.strip().str.lower().str.contains('show', na=False) &
+            ~upsell_renewal_data['show_noshow'].str.strip().str.lower().str.contains('noshow|no show', na=False)
+        ]
+        no_show_meetings = upsell_renewal_data[
+            upsell_renewal_data['show_noshow'].notna() & 
+            upsell_renewal_data['show_noshow'].str.strip().str.lower().str.contains('noshow|no show', na=False)
+        ]
+        
+        # Upsells vs Renewals breakdown
+        upsells_only = upsell_renewal_data[upsell_renewal_data['type_of_deal'].apply(is_upsell)]
+        renewals_only = upsell_renewal_data[upsell_renewal_data['type_of_deal'].apply(is_renewal)]
+        
+        # Partner Performance (equivalent to BDR performance)
+        partner_performance = []
+        
+        # Get unique partners (from BDR field - assuming partners are tracked there)
+        unique_partners = upsell_renewal_data['bdr'].dropna().unique()
+        
+        for partner in unique_partners:
+            partner_deals = upsell_renewal_data[upsell_renewal_data['bdr'] == partner]
+            
+            # Intros attended (Show meetings)
+            partner_intros = partner_deals[
+                partner_deals['show_noshow'].notna() & 
+                partner_deals['show_noshow'].str.strip().str.lower().str.contains('show', na=False) &
+                ~partner_deals['show_noshow'].str.strip().str.lower().str.contains('noshow|no show', na=False)
+            ]
+            
+            # POA generated (advanced stages)
+            poa_stages = ['D POA Booked', 'C Proposal sent', 'B Legals', 'A Closed']
+            partner_poa = partner_deals[partner_deals['stage'].isin(poa_stages)]
+            
+            # Closed deals
+            closed_deals = partner_deals[partner_deals['stage'] == 'A Closed']
+            closing_value = float(closed_deals['expected_arr'].fillna(0).sum())
+            
+            partner_performance.append({
+                'partner': fix_ae_name_encoding(partner),
+                'intros_attended': len(partner_intros),
+                'poa_generated': len(partner_poa),
+                'closing': len(closed_deals),
+                'closing_value': closing_value,
+                'upsells': len(partner_deals[partner_deals['type_of_deal'].apply(is_upsell)]),
+                'renewals': len(partner_deals[partner_deals['type_of_deal'].apply(is_renewal)])
+            })
+        
+        # Sort by closing value
+        partner_performance.sort(key=lambda x: x['closing_value'], reverse=True)
+        
+        # Intros details
+        intros_list = []
+        for _, row in show_meetings.iterrows():
+            intros_list.append({
+                'date': row['discovery_date'].strftime('%b %d') if pd.notna(row['discovery_date']) else 'N/A',
+                'client': str(row.get('client', 'N/A')),
+                'partner': fix_ae_name_encoding(row.get('bdr', 'N/A')),
+                'owner': fix_ae_name_encoding(row.get('owner', 'N/A')),
+                'stage': str(row.get('stage', 'N/A')),
+                'type_of_deal': str(row.get('type_of_deal', 'N/A')),
+                'expected_arr': float(row.get('expected_arr', 0)) if pd.notna(row.get('expected_arr', 0)) else 0
+            })
+        
+        # POA details (advanced stages)
+        poa_stages = ['D POA Booked', 'C Proposal sent', 'B Legals', 'A Closed']
+        poa_attended_data = upsell_renewal_data[upsell_renewal_data['stage'].isin(poa_stages)]
+        
+        poa_attended_list = []
+        for _, row in poa_attended_data.iterrows():
+            poa_attended_list.append({
+                'date': row['poa_date'].strftime('%b %d') if pd.notna(row.get('poa_date')) else 'N/A',
+                'client': str(row.get('client', 'N/A')),
+                'partner': fix_ae_name_encoding(row.get('bdr', 'N/A')),
+                'owner': fix_ae_name_encoding(row.get('owner', 'N/A')),
+                'stage': str(row.get('stage', 'N/A')),
+                'type_of_deal': str(row.get('type_of_deal', 'N/A')),
+                'expected_arr': float(row.get('expected_arr', 0)) if pd.notna(row.get('expected_arr', 0)) else 0
+            })
+        
+        return {
+            'period': period_str,
+            'period_duration_months': period_duration_months,
+            
+            # Meeting metrics
+            'total_meetings': len(upsell_renewal_data),
+            'total_target': period_meetings_target,
+            'business_partner_meetings': len(business_partner_meetings),
+            'business_partner_target': period_business_target,
+            'consulting_partner_meetings': len(consulting_partner_meetings),
+            'consulting_partner_target': period_consulting_target,
+            
+            # Show/No Show
+            'show_actual': len(show_meetings),
+            'no_show_actual': len(no_show_meetings),
+            
+            # Upsells vs Renewals
+            'upsells_actual': len(upsells_only),
+            'renewals_actual': len(renewals_only),
+            
+            # POA and Closing
+            'poa_actual': len(poa_attended_data),
+            'poa_target': period_poa_target,
+            'closing_actual': len(upsell_renewal_data[upsell_renewal_data['stage'] == 'A Closed']),
+            'closing_target': period_closing_target,
+            
+            # Performance data
+            'partner_performance': partner_performance,
+            'intros_details': intros_list,
+            'poa_details': poa_attended_list
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating upsell/renewal analytics: {str(e)}")
+
 @api_router.get("/analytics/dashboard")
 async def get_dashboard_analytics():
     """Generate main dashboard with revenue charts"""
