@@ -481,10 +481,7 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "Emergent Authentication with dual-mode login"
-    - "Dual-mode login page (Secured Terminal + Demo Access)"
-    - "View management endpoints"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
