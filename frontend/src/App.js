@@ -2962,7 +2962,7 @@ function Dashboard() {
                           <div 
                             {...provided.droppableProps}
                             ref={provided.innerRef}
-                            className="space-y-2 min-h-96 max-h-96 overflow-y-auto"
+                            className="space-y-2 min-h-[48rem] max-h-[48rem] overflow-y-auto"
                           >
                             {hotDeals.filter(deal => deal.column === 'next14').map((deal, index) => (
                               <DraggableDealItem 
@@ -2992,7 +2992,7 @@ function Dashboard() {
                           <div 
                             {...provided.droppableProps}
                             ref={provided.innerRef}
-                            className="space-y-2 min-h-96 max-h-96 overflow-y-auto"
+                            className="space-y-2 min-h-[48rem] max-h-[48rem] overflow-y-auto"
                           >
                             {hotDeals.filter(deal => deal.column === 'next30').map((deal, index) => (
                               <DraggableDealItem 
@@ -3022,7 +3022,7 @@ function Dashboard() {
                           <div 
                             {...provided.droppableProps}
                             ref={provided.innerRef}
-                            className="space-y-2 min-h-96 max-h-96 overflow-y-auto"
+                            className="space-y-2 min-h-[48rem] max-h-[48rem] overflow-y-auto"
                           >
                             {hotDeals.filter(deal => deal.column === 'next60').map((deal, index) => (
                               <DraggableDealItem 
