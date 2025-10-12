@@ -1774,20 +1774,38 @@ function Dashboard() {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b">
-                          <th className="text-left p-2">BDR</th>
+                          <th className="text-left p-2">Name</th>
+                          <th className="text-center p-2">Role</th>
                           <th className="text-right p-2">Total Meetings</th>
                           <th className="text-right p-2">Relevant Meetings</th>
                           <th className="text-right p-2">Relevance Rate</th>
+                          <th className="text-right p-2">Meeting Goal</th>
                         </tr>
                       </thead>
                       <tbody>
                         {Object.entries(analytics.meeting_generation.bdr_performance).map(([bdr, stats]) => (
                           <tr key={bdr} className="border-b">
                             <td className="p-2 font-medium">{bdr}</td>
+                            <td className="text-center p-2">
+                              {stats.role === 'BDR' && (
+                                <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                                  BDR
+                                </span>
+                              )}
+                            </td>
                             <td className="text-right p-2">{stats.total_meetings}</td>
                             <td className="text-right p-2">{stats.relevant_meetings}</td>
                             <td className="text-right p-2">
                               {((stats.relevant_meetings / stats.total_meetings) * 100).toFixed(1)}%
+                            </td>
+                            <td className="text-right p-2">
+                              {stats.meeting_target ? (
+                                <span className={stats.total_meetings >= stats.meeting_target ? 'text-green-600 font-medium' : 'text-orange-600 font-medium'}>
+                                  {stats.total_meetings}/{stats.meeting_target}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
                             </td>
                           </tr>
                         ))}
