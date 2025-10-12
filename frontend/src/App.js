@@ -2597,31 +2597,50 @@ function Dashboard() {
                     : "Need to increase upsell and renewal prospecting efforts."
                 }
               >
-                {/* 3 Large Metric Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <MetricCard
-                    title="Valeur Closing Upsells"
-                    value={upsellRenewData.closing_value}
-                    target={upsellRenewData.closing_value_target}
-                    unit="$"
-                    icon={DollarSign}
-                    color="green"
-                  />
-                  <MetricCard
-                    title="POA Generated"
-                    value={upsellRenewData.poa_actual}
-                    target={upsellRenewData.poa_target}
-                    icon={Target}
-                    color="orange"
-                  />
-                  <MetricCard
-                    title="Closing"
-                    value={upsellRenewData.closing_actual}
-                    target={upsellRenewData.closing_target}
-                    icon={CheckCircle}
-                    color="green"
-                  />
-                </div>
+                {/* 3 Large Metric Cards with Fixed Targets */}
+                {(() => {
+                  // Fixed monthly targets for Upsell & Cross-sell
+                  const monthlyIntroTarget = 11; // 11 intros per month
+                  const monthlyPOATarget = 8; // 8 POA per month
+                  const monthlyClosingTarget = 4; // 4 closing per month
+                  const avgDealValue = 60000; // 60K average deal value
+                  const monthlyClosingValueTarget = monthlyClosingTarget * avgDealValue; // 4 × 60K = 240K
+                  
+                  // Calculate period multiplier
+                  const periodMonths = upsellRenewData.period_duration_months || 1;
+                  
+                  // Dynamic targets based on period
+                  const periodIntroTarget = monthlyIntroTarget * periodMonths;
+                  const periodPOATarget = monthlyPOATarget * periodMonths;
+                  const periodClosingTarget = monthlyClosingTarget * periodMonths;
+                  const periodClosingValueTarget = monthlyClosingValueTarget * periodMonths;
+                  
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <MetricCard
+                        title="Total Intro Meetings"
+                        value={upsellRenewData.total_meetings}
+                        target={periodIntroTarget}
+                        icon={Users}
+                        color="blue"
+                      />
+                      <MetricCard
+                        title="POA Generated"
+                        value={upsellRenewData.poa_actual}
+                        target={periodPOATarget}
+                        icon={Target}
+                        color="orange"
+                      />
+                      <MetricCard
+                        title="Closing Upsells"
+                        value={upsellRenewData.closing_actual}
+                        target={periodClosingTarget}
+                        icon={CheckCircle}
+                        color="green"
+                      />
+                    </div>
+                  );
+                })()}
 
                 {/* 4 Small Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
