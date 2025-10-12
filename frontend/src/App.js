@@ -3525,41 +3525,90 @@ function Dashboard() {
                         <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900">
                           TOTAL
                         </td>
-                        {/* Next 14 Days Totals */}
-                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
-                          ${aeBreakdownTotals.next14.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                        </td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
+                        {/* Next 14 Days - Expected ARR Total */}
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
                           ${aeBreakdownTotals.next14.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                         </td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
-                          ${aeBreakdownTotals.next14.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                        </td>
-                        {/* Next 30 Days Totals */}
-                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
-                          ${aeBreakdownTotals.next30.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                        </td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
+                        {/* Next 30 Days - Expected ARR Total */}
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
                           ${aeBreakdownTotals.next30.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                         </td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
-                          ${aeBreakdownTotals.next30.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                        </td>
-                        {/* Next 60-90 Days Totals */}
-                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
-                          ${aeBreakdownTotals.next60.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                        </td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
-                          ${aeBreakdownTotals.next60.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                        </td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
+                        {/* Next 60-90 Days - Weighted Total */}
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-center font-bold text-gray-900">
                           ${aeBreakdownTotals.next60.weighted_value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                         </td>
-                        {/* Grand Totals */}
-                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-white bg-blue-600">
-                          ${aeBreakdownTotals.total.pipeline.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                        </td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-white bg-blue-600">
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Projections by AE - Moved to bottom */}
+            {Object.keys(analytics.closing_projections.ae_projections).length > 0 && (
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle>Projections by AE</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b bg-gray-50">
+                          <th className="text-left p-2 font-semibold">AE</th>
+                          <th className="text-right p-2 font-semibold">
+                            Total Pipeline
+                            <div className="text-xs font-normal text-gray-500">Brut (sauf Lost)</div>
+                          </th>
+                          <th className="text-right p-2 font-semibold">
+                            Weighted Value
+                            <div className="text-xs font-normal text-gray-500">Pondéré période</div>
+                          </th>
+                          <th className="text-right p-2 font-semibold">
+                            Aggregate Pipe
+                            <div className="text-xs font-normal text-gray-500">Cumul historique</div>
+                          </th>
+                          <th className="text-right p-2 font-semibold">Proposal/Legals</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(analytics.closing_projections.ae_projections).map(([ae, stats]) => {
+                          // Find corresponding AE in pipe_metrics.ae_breakdown for aggregate data
+                          const aeBreakdown = analytics.pipe_metrics?.ae_breakdown?.find(item => item.ae === ae) || {};
+                          
+                          // Count deals in Proposal sent or Legals stage for this AE
+                          const proposalLegalsDeals = (analytics.closing_projections.current_month.deals || [])
+                            .concat(analytics.closing_projections.next_quarter.deals || [])
+                            .filter(deal => deal.owner === ae && (deal.stage === 'C Proposal sent' || deal.stage === 'B Legals')).length;
+                          
+                          return (
+                            <tr key={ae} className="border-b">
+                              <td className="p-2 font-medium">{ae}</td>
+                              <td className="text-right p-2">${stats.pipeline?.toLocaleString()}</td>
+                              <td className="text-right p-2">${stats.weighted_value?.toLocaleString()}</td>
+                              <td className="text-right p-2">${aeBreakdown.weighted_pipe?.toLocaleString() || 0}</td>
+                              <td className="text-right p-2">{proposalLegalsDeals}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Login Page */}
+      {!isAuthenticated && <LoginPage />}
+    </div>
+  );
+}
+
+export default App;
                           ${aeBreakdownTotals.total.expected_arr.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                         </td>
                         <td className="px-2 py-3 whitespace-nowrap text-sm text-center font-bold text-white bg-blue-600">
