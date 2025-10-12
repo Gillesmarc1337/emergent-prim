@@ -2642,8 +2642,8 @@ function Dashboard() {
                   );
                 })()}
 
-                {/* 4 Small Summary Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                {/* 2 Summary Cards - Upsells and Renewals only */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <Card className="border-2 border-purple-200 bg-purple-50">
                     <CardContent className="p-6 text-center">
                       <div className="text-3xl font-bold text-purple-600 mb-1">
@@ -2658,22 +2658,6 @@ function Dashboard() {
                         {upsellRenewData.renewals_actual}
                       </div>
                       <div className="text-sm text-gray-600">Renewals</div>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-2 border-green-200 bg-green-50">
-                    <CardContent className="p-6 text-center">
-                      <div className="text-3xl font-bold text-green-600 mb-1">
-                        {upsellRenewData.intros_details?.filter(i => i.status === 'Show').length || 0}
-                      </div>
-                      <div className="text-sm text-gray-600">Show</div>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-2 border-red-200 bg-red-50">
-                    <CardContent className="p-6 text-center">
-                      <div className="text-3xl font-bold text-red-600 mb-1">
-                        {upsellRenewData.intros_details?.filter(i => i.status === 'No Show').length || 0}
-                      </div>
-                      <div className="text-sm text-gray-600">No Show</div>
                     </CardContent>
                   </Card>
                 </div>
