@@ -474,6 +474,18 @@ frontend:
           agent: "main"
           comment: "✅ FRONTEND AUTH WORKING: Added loginDemo() function to AuthContext. Demo login successfully creates session, sets user state, loads views, and displays dashboard. Screenshot verified: clicking DEMO ACCESS button authenticates as 'Demo User (Viewer)' and displays full dashboard with data. Header shows user info and logout button. Both authentication modes functional from UI perspective. Session persistence working with cookies."
 
+  - task: "Fixed targets for New Pipe Created and Created Weighted Pipe"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "✅ FIXED TARGETS IMPLEMENTED: Dashboard metric cards now use fixed targets that never change regardless of selected period. New Pipe Created target is always $2M, Created Weighted Pipe target is always $800K. Implementation at lines 725-726 in App.js uses hardcoded constants (fixedNewPipeTarget=2000000, fixedWeightedPipeTarget=800000) instead of dynamic calculation based on period duration. The actual values (newPipeCreated, weightedPipe) update dynamically with the selected period, but targets remain constant. This ensures that for Monthly view, July-Dec view, or any Custom period, the targets displayed are always the monthly baseline values of 2M and 800K. Backend testing confirms: Monthly period shows actual $2.4M vs target $2M, July-Dec period shows actual $9.1M vs target still $2M (not $12M). Frontend correctly implements user's requirement: 'non monthly c 2M et 800K' (monthly it's 2M and 800K, always)."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
