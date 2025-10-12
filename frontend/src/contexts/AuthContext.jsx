@@ -63,6 +63,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginDemo = async () => {
+    try {
+      const response = await axios.post(
+        `${API}/api/auth/demo-login`,
+        {},
+        { withCredentials: true }
+      );
+      setUser(response.data);
+      await loadViews();
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const logout = async () => {
     try {
       await axios.post(`${API}/api/auth/logout`, {}, {
@@ -80,13 +95,15 @@ export const AuthProvider = ({ children }) => {
     user,
     loading,
     login,
+    loginDemo,
     logout,
     checkAuth,
     currentView,
     setCurrentView,
     views,
     loadViews,
-    isAdmin: user?.role === 'super_admin'
+    isAdmin: user?.role === 'super_admin',
+    isDemo: user?.is_demo || user?.email === 'demo@primelis.com'
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
