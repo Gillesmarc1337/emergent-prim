@@ -28,7 +28,8 @@ from auth import (
     get_current_user,
     get_user_from_session,
     require_super_admin,
-    delete_session
+    delete_session,
+    create_demo_user
 )
 
 ROOT_DIR = Path(__file__).parent
