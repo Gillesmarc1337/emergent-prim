@@ -2990,9 +2990,28 @@ async def clear_data():
     return {"message": f"Deleted {result.deleted_count} records"}
 
 @api_router.post("/upload-google-sheets", response_model=UploadResponse)
-async def upload_google_sheets_data(request: GoogleSheetsRequest):
+async def upload_google_sheets_data(
+    request: GoogleSheetsRequest,
+    view_id: str = Query(None, description="View ID to associate data with"),
+    user: dict = Depends(get_current_user)
+):
     """Upload and process sales data from Google Sheets"""
     try:
+        # Determine which collection to use
+        collection_name = "sales_records"  # Default to Organic
+        
+        if view_id:
+            view = await db.views.find_one({"id": view_id})
+            if not view:
+                raise HTTPException(status_code=404, detail="View not found")
+            
+            view_name = view.get("name")
+            # Master view cannot upload data (it aggregates from others)
+            if view.get("is_master"):
+                raise HTTPException(status_code=400, detail="Cannot upload data to Master view. Master aggregates data from other views.")
+            
+            collection_name = get_collection_for_view(view_name)
+        
         # Read data from Google Sheets
         df = read_google_sheet(request.sheet_url, request.sheet_name)
         
