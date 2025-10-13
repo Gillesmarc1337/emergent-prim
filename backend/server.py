@@ -1332,9 +1332,28 @@ async def get_user_accessible_views(user: dict = Depends(get_current_user)):
     return views
 
 @api_router.post("/upload-data", response_model=UploadResponse)
-async def upload_sales_data(file: UploadFile = File(...)):
+async def upload_sales_data(
+    file: UploadFile = File(...),
+    view_id: str = Query(None, description="View ID to associate data with"),
+    user: dict = Depends(get_current_user)
+):
     """Upload and process sales data CSV file"""
     try:
+        # Determine which collection to use
+        collection_name = "sales_records"  # Default to Organic
+        
+        if view_id:
+            view = await db.views.find_one({"id": view_id})
+            if not view:
+                raise HTTPException(status_code=404, detail="View not found")
+            
+            view_name = view.get("name")
+            # Master view cannot upload data (it aggregates from others)
+            if view.get("is_master"):
+                raise HTTPException(status_code=400, detail="Cannot upload data to Master view. Master aggregates data from other views.")
+            
+            collection_name = get_collection_for_view(view_name)
+        
         # Read the uploaded file
         contents = await file.read()
         
