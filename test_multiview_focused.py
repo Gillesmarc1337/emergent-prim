@@ -94,6 +94,9 @@ def test_multi_view_endpoints_focused():
     
     cookies = {'session_token': session_token}
     
+    # Initialize view_ids dictionary
+    view_ids = {}
+    
     # Test 1: GET /api/views/user/accessible
     print(f"\n📊 Test 1: GET /api/views/user/accessible")
     print(f"{'='*60}")
@@ -108,7 +111,6 @@ def test_multi_view_endpoints_focused():
             test_results['user_accessible_views'] = True
             
             # Store view IDs for later testing
-            view_ids = {}
             for view in data:
                 view_name = view.get('name', 'Unknown')
                 view_id = view.get('id', 'No ID')
