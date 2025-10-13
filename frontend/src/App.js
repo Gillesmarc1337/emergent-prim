@@ -2514,16 +2514,16 @@ function Dashboard() {
                 <div className="font-semibold text-blue-800 mb-2">📋 Pipeline Logic Summary</div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-700">
                   <div>
-                    <span className="font-medium">Created Metrics:</span> All deals created in selected period (includes Closed/Lost/Not Relevant)
+                    <span className="font-medium">Blocks 1 & 2 (Period-Based):</span> New Pipe Created and Created Weighted Pipe for selected period. Targets multiply by period duration (Monthly: 2M/800K, July-Dec: 12M/4.8M).
                   </div>
                   <div>
-                    <span className="font-medium">Total Metrics:</span> All active deals (excludes Closed/Lost/Not Relevant)
+                    <span className="font-medium">Blocks 3 & 4 (YTD Cumulative):</span> YTD Aggregate Pipeline (excl. Closed/Lost/Not Relevant) and YTD Weighted Pipe (excl. Wins/Lost/Not Relevant). Fixed targets: 7.5M and 2.5M.
                   </div>
                   <div>
                     <span className="font-medium">Weighted Value:</span> Uses Excel formula with stage × source × recency factors
                   </div>
                   <div>
-                    <span className="font-medium">Dynamic Targets:</span> Scaled by selected period duration
+                    <span className="font-medium">Target Logic:</span> Blocks 1-2 dynamic (scale with period), Blocks 3-4 fixed (never change)
                   </div>
                 </div>
               </div>
