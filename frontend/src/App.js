@@ -2431,45 +2431,83 @@ function Dashboard() {
                   <strong>Sources:</strong> Outbound, Inbound, Client referral, Internal referral, Partnership
                 </div>
               </div>
-              {/* Pipeline Overview - 4 blocks uniformisées avec Dashboard */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <MetricCard
-                  title="New Pipe Created (month)"
-                  value={analytics.pipe_metrics.created_pipe.value}
-                  target={analytics.pipe_metrics.created_pipe.target}
-                  unit="$"
-                  icon={TrendingUp}
-                  color="green"
-                  tooltip="Sum of ARR from all deals created this period, including Closed, Lost, and Not Relevant."
-                />
-                <MetricCard
-                  title="Created Weighted Pipe (month)"
-                  value={analytics.pipe_metrics.created_pipe.weighted_value}
-                  target={analytics.pipe_metrics.created_pipe.target_weighted}
-                  unit="$"
-                  icon={Target}
-                  color="blue"
-                  tooltip="ARR × stage-weight by source and recency, includes all deals created this period."
-                />
-                <MetricCard
-                  title="Total Pipe (period)"
-                  value={analytics.pipe_metrics.total_pipe.value}
-                  target={analytics.pipe_metrics.total_pipe.target}
-                  unit="$"
-                  icon={BarChart3}
-                  color="purple"
-                  tooltip="Sum of ARR for all active deals (excluding Closed, Lost, and Not Relevant)."
-                />
-                <MetricCard
-                  title="Total Weighted Pipe (period)"
-                  value={analytics.pipe_metrics.total_pipe.weighted_value}
-                  target={analytics.pipe_metrics.total_pipe.target_weighted}
-                  unit="$"
-                  icon={DollarSign}
-                  color="orange"
-                  tooltip="ARR × stage-weight for all active deals."
-                />
-              </div>
+              {/* Pipeline Overview - 4 blocks matching Dashboard logic */}
+              {(() => {
+                // Calculate period duration for dynamic targets (Blocks 1 & 2)
+                const baseNewPipeMonthlyTarget = 2000000; // $2M per month
+                const baseWeightedPipeMonthlyTarget = 800000; // $800K per month
+                
+                let periodMonths = 1; // Default to 1 month
+                
+                if (useCustomDate && dateRange?.from && dateRange?.to) {
+                  // Custom date range
+                  const startDate = new Date(dateRange.from);
+                  const endDate = new Date(dateRange.to);
+                  const diffTime = Math.abs(endDate - startDate);
+                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                  periodMonths = Math.max(1, Math.round(diffDays / 30.44));
+                } else if (viewMode === 'yearly') {
+                  periodMonths = 6; // July to December
+                } else {
+                  periodMonths = 1; // Monthly view
+                }
+                
+                // Dynamic targets for blocks 1 & 2 (multiply by period)
+                const dynamicNewPipeTarget = baseNewPipeMonthlyTarget * periodMonths;
+                const dynamicWeightedPipeTarget = baseWeightedPipeMonthlyTarget * periodMonths;
+                
+                // Fixed targets for blocks 3 & 4 (YTD cumulative, never change)
+                const fixedYTDPipelineTarget = 7500000; // $7.5M fixed
+                const fixedYTDWeightedTarget = 2500000; // $2.5M fixed
+                
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    {/* Block 1: New Pipe Created - Dynamic Target */}
+                    <MetricCard
+                      title="New Pipe Created"
+                      value={analytics.pipe_metrics.created_pipe.value}
+                      target={dynamicNewPipeTarget}
+                      unit="$"
+                      icon={TrendingUp}
+                      color="purple"
+                      tooltip="Sum of ARR from all deals created this period. Target adjusts with period duration."
+                    />
+                    
+                    {/* Block 2: Created Weighted Pipe - Dynamic Target */}
+                    <MetricCard
+                      title="Created Weighted Pipe"
+                      value={analytics.pipe_metrics.created_pipe.weighted_value}
+                      target={dynamicWeightedPipeTarget}
+                      unit="$"
+                      icon={Target}
+                      color="blue"
+                      tooltip="Weighted ARR for deals created this period. Target adjusts with period duration."
+                    />
+                    
+                    {/* Block 3: YTD Aggregate Pipeline - Fixed Target 7.5M */}
+                    <MetricCard
+                      title="YTD Aggregate Pipeline"
+                      value={analytics.pipe_metrics.total_pipe.value}
+                      target={fixedYTDPipelineTarget}
+                      unit="$"
+                      icon={BarChart3}
+                      color="green"
+                      tooltip="YTD cumulative pipeline excluding Closed, Lost, and Not Relevant. Fixed target: $7.5M."
+                    />
+                    
+                    {/* Block 4: YTD Cumulative Weighted Pipe - Fixed Target 2.5M */}
+                    <MetricCard
+                      title="YTD Cumulative Weighted"
+                      value={analytics.pipe_metrics.total_pipe.weighted_value}
+                      target={fixedYTDWeightedTarget}
+                      unit="$"
+                      icon={DollarSign}
+                      color="orange"
+                      tooltip="YTD cumulative weighted pipe excluding Wins, Lost, and Not Relevant. Fixed target: $2.5M."
+                    />
+                  </div>
+                );
+              })()}
               
               {/* Pipeline Logic Explanation */}
               <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
