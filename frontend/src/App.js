@@ -1181,7 +1181,7 @@ function Dashboard() {
     loadAnalytics();
     loadProjectionsData();
     loadUpsellRenewData();
-  }, [monthOffset, dateRange, useCustomDate, viewMode]);
+  }, [monthOffset, dateRange, useCustomDate, viewMode, currentView]); // Added currentView to reload when view changes
 
   const handleUploadSuccess = () => {
     loadAnalytics();
