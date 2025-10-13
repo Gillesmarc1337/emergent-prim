@@ -1434,15 +1434,20 @@ def get_month_range(date=None, month_offset=0):
     return month_start, month_end
 
 @api_router.get("/analytics/yearly")
-async def get_yearly_analytics(year: int = 2025):
+async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
     """Generate yearly analytics report"""
     try:
         # Calculate year range (January 1 to December 31)
         year_start = datetime(year, 1, 1, 0, 0, 0, 0)
         year_end = datetime(year, 12, 31, 23, 59, 59, 999999)
         
-        # Get data from MongoDB
-        records = await db.sales_records.find().to_list(10000)
+        # Get data from MongoDB based on view
+        if view_id:
+            records = await get_sales_data_for_view(view_id)
+        else:
+            # Fallback to default Organic collection
+            records = await db.sales_records.find().to_list(10000)
+            
         if not records:
             raise HTTPException(status_code=404, detail="No sales data found. Please upload data first.")
         
