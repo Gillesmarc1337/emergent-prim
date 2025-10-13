@@ -1007,32 +1007,33 @@ function MainDashboard({ analytics }) {
               </p>
             </CardHeader>
             <CardContent className="space-y-2">
-              {/* Total New Pipe Generated */}
-              <div className="text-center p-3 bg-white rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">
-                  ${(analytics.dashboard_blocks.block_3_pipe_creation.new_pipe_created / 1000000).toFixed(1)}M
-                </div>
-                <div className="text-xs text-gray-600 mt-1">Total New Pipe Generated</div>
-                <div className="text-xs text-gray-500 mt-1">
-                  Target: $2.0M
-                </div>
-              </div>
-              
-              {/* New Weighted Pipe */}
-              <div className="text-center p-2 bg-white rounded-lg">
-                <div className="text-xl font-bold text-blue-600">
-                  ${(analytics.dashboard_blocks.block_3_pipe_creation.weighted_pipe_created / 1000000).toFixed(1)}M
-                </div>
-                <div className="text-xs text-gray-600 mt-1">New Weighted Pipe</div>
-              </div>
-              
-              {/* Aggregate Weighted Pipe */}
-              <div className="text-center p-2 bg-white rounded-lg">
-                <div className="text-xl font-bold text-green-600">
-                  ${(analytics.dashboard_blocks.block_3_pipe_creation.aggregate_weighted_pipe / 1000000).toFixed(1)}M
-                </div>
-                <div className="text-xs text-gray-600 mt-1">Aggregate Weighted Pipe</div>
-              </div>
+              {(() => {
+                // Calculate number of months for the period
+                const baseMonthlyTarget = 2000000;
+                const backendTarget = analytics.dashboard_blocks?.block_3_pipe_creation?.target_pipe_created || baseMonthlyTarget;
+                const periodMonths = Math.round(backendTarget / baseMonthlyTarget);
+                const monthsText = periodMonths === 1 ? '1 mois' : `${periodMonths} mois`;
+                
+                return (
+                  <>
+                    {/* Total Pipe Generation by X mois */}
+                    <div className="text-center p-3 bg-white rounded-lg">
+                      <div className="text-2xl font-bold text-purple-600">
+                        ${(analytics.dashboard_blocks.block_3_pipe_creation.new_pipe_created / 1000000).toFixed(1)}M
+                      </div>
+                      <div className="text-xs text-gray-600 mt-1">Total Pipe Generation by {monthsText}</div>
+                    </div>
+                    
+                    {/* Aggregate Weighted Pipe Generated X mois */}
+                    <div className="text-center p-3 bg-white rounded-lg">
+                      <div className="text-2xl font-bold text-purple-600">
+                        ${(analytics.dashboard_blocks.block_3_pipe_creation.aggregate_weighted_pipe / 1000000).toFixed(1)}M
+                      </div>
+                      <div className="text-xs text-gray-600 mt-1">Aggregate Weighted Pipe Generated {monthsText}</div>
+                    </div>
+                  </>
+                );
+              })()}
             </CardContent>
           </Card>
 
