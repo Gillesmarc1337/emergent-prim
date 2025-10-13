@@ -2803,43 +2803,30 @@ function Dashboard() {
                             <thead>
                               <tr className="border-b bg-gray-50">
                                 <th className="text-left p-2 font-semibold">PARTNER</th>
-                                <th className="text-center p-2 font-semibold">ROLE</th>
-                                <th className="text-right p-2 font-semibold">TOTAL MEETINGS</th>
-                                <th className="text-right p-2 font-semibold">RELEVANT MEETINGS</th>
-                                <th className="text-right p-2 font-semibold">MEETING GOAL</th>
-                                <th className="text-right p-2 font-semibold">RELEVANCE RATE</th>
+                                <th className="text-right p-2 font-semibold">DEALS COUNT</th>
+                                <th className="text-right p-2 font-semibold">TOTAL ARR</th>
+                                <th className="text-center p-2 font-semibold">STAGES</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {filteredPartners.map(([partner, stats]) => {
-                                // Monthly goal is always 6 meetings per month for BDR
-                                const monthlyGoal = stats.meeting_target || 6;
-                                const goalText = stats.role === 'BDR' ? `${stats.total_meetings}/${monthlyGoal}` : '-';
-                                const isOnTrack = stats.role === 'BDR' && stats.total_meetings >= monthlyGoal;
+                              {partnerList.map((partnerData) => {
+                                // Get unique stages for this partner
+                                const stages = [...new Set(partnerData.deals.map(d => d.stage))];
+                                const stagesSummary = stages.length > 3 
+                                  ? `${stages.slice(0, 3).join(', ')}...` 
+                                  : stages.join(', ');
                                 
                                 return (
-                                  <tr key={partner} className="border-b hover:bg-gray-50">
-                                    <td className="p-2 font-medium">{partner}</td>
+                                  <tr key={partnerData.partner} className="border-b hover:bg-gray-50">
+                                    <td className="p-2 font-medium">{partnerData.partner}</td>
+                                    <td className="text-right p-2">{partnerData.deal_count}</td>
+                                    <td className="text-right p-2 font-semibold text-green-600">
+                                      ${(partnerData.total_arr / 1000).toFixed(0)}K
+                                    </td>
                                     <td className="text-center p-2">
-                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                        stats.role === 'BDR' ? 'bg-blue-100 text-blue-800' : 
-                                        stats.role === 'AE' ? 'bg-purple-100 text-purple-800' : 
-                                        'bg-gray-100 text-gray-800'
-                                      }`}>
-                                        {stats.role || 'N/A'}
+                                      <span className="text-xs text-gray-600">
+                                        {stagesSummary || 'N/A'}
                                       </span>
-                                    </td>
-                                    <td className="text-right p-2">{stats.total_meetings}</td>
-                                    <td className="text-right p-2">{stats.relevant_meetings}</td>
-                                    <td className={`text-right p-2 font-medium ${
-                                      stats.role === 'BDR' ? (isOnTrack ? 'text-green-600' : 'text-orange-600') : 'text-gray-500'
-                                    }`}>
-                                      {goalText}
-                                    </td>
-                                    <td className="text-right p-2">
-                                      {stats.total_meetings > 0 
-                                        ? ((stats.relevant_meetings / stats.total_meetings) * 100).toFixed(1) + '%'
-                                        : '0.0%'}
                                     </td>
                                   </tr>
                                 );
