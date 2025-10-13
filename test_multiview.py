@@ -145,7 +145,7 @@ def test_multi_view_endpoints():
         print(f"❌ Views endpoint test failed - no response")
     
     # Test 3: GET /api/views/{view_id}/config for found views
-    print(f"\n📊 Test 3: GET /api/views/{view_id}/config - View Configuration")
+    print(f"\n📊 Test 3: GET /api/views/{{view_id}}/config - View Configuration")
     print(f"{'='*60}")
     
     config_tests_passed = 0
