@@ -40,6 +40,22 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# View to collection mapping
+VIEW_COLLECTION_MAP = {
+    "Organic": "sales_records",
+    "Signal": "sales_records_signal",
+    "Full Funnel": "sales_records_fullfunnel",
+    "Market": "sales_records_market"
+}
+
+def get_collection_for_view(view_name: str):
+    """Get MongoDB collection name for a specific view"""
+    return VIEW_COLLECTION_MAP.get(view_name, "sales_records")
+
+def get_collections_for_master():
+    """Get all collections to aggregate for Master view"""
+    return ["sales_records_signal", "sales_records_fullfunnel", "sales_records_market"]
+
 # Create the main app without a prefix
 app = FastAPI(title="Sales Analytics Dashboard", description="Weekly Sales Reports Analysis", version="1.0.0")
 
