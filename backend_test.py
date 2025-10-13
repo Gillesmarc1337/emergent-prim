@@ -11,7 +11,7 @@ from datetime import datetime
 import time
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://metricview-1.preview.emergentagent.com/api"
+BASE_URL = "https://sales-intel-hub.preview.emergentagent.com/api"
 
 def test_api_endpoint(endpoint, method="GET", data=None, cookies=None, expected_status=200):
     """Test an API endpoint and return response"""

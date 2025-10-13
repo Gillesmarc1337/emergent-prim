@@ -6,7 +6,7 @@ Simple authentication test to verify all endpoints work correctly
 import requests
 import json
 
-BASE_URL = "https://metricview-1.preview.emergentagent.com/api"
+BASE_URL = "https://sales-intel-hub.preview.emergentagent.com/api"
 
 def test_auth_endpoints():
     print("🔐 Testing Authentication System Endpoints")
