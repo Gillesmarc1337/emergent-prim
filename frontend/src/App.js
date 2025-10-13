@@ -1710,19 +1710,24 @@ function Dashboard() {
                         </thead>
                         <tbody>
                           {Object.entries(analytics.meeting_generation.bdr_performance).map(([bdr, stats]) => {
+                            // Determine if this is Fady (Referrals Manager)
+                            const isFady = bdr.toLowerCase().includes('fady');
+                            
                             // Determine monthly target based on role and person
                             let monthlyGoal = 0;
                             let goalText = '-';
                             let isOnTrack = false;
+                            let displayRole = stats.role || 'N/A';
                             
-                            if (stats.role === 'BDR') {
+                            if (isFady) {
+                              monthlyGoal = 4; // Fady (Referrals Manager): 4 per month
+                              displayRole = 'Referrals Manager';
+                            } else if (stats.role === 'BDR') {
                               monthlyGoal = 6; // BDR: 6 per month
                             } else if (stats.role === 'AE') {
                               monthlyGoal = 1; // AE (Rémi, Sadie, Guillaume, François): 1 per month
                             } else if (stats.role === 'Partner') {
                               monthlyGoal = 1; // Partner: 1 per month
-                            } else if (bdr.toLowerCase().includes('fady')) {
-                              monthlyGoal = 4; // Fady (Lead Referrals): 4 per month
                             }
                             
                             // Calculate period target (monthly × months)
@@ -1740,9 +1745,10 @@ function Dashboard() {
                                     stats.role === 'BDR' ? 'bg-blue-100 text-blue-800' : 
                                     stats.role === 'AE' ? 'bg-purple-100 text-purple-800' : 
                                     stats.role === 'Partner' ? 'bg-green-100 text-green-800' :
+                                    isFady ? 'bg-orange-100 text-orange-800' :
                                     'bg-gray-100 text-gray-800'
                                   }`}>
-                                    {stats.role || 'N/A'}
+                                    {displayRole}
                                   </span>
                                 </td>
                                 <td className="text-right p-2">{stats.total_meetings}</td>
