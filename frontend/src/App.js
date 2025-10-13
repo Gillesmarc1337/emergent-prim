@@ -721,9 +721,20 @@ function MainDashboard({ analytics }) {
       
       {/* Key Metrics - 5 Simple Cards */}
       {(() => {
-        // Fixed targets - always 2M and 800K regardless of period
-        const fixedNewPipeTarget = 2000000; // $2M fixed
-        const fixedWeightedPipeTarget = 800000; // $800K fixed
+        // Dynamic targets - multiply by number of months in the period
+        // Base monthly targets: 2M for New Pipe Created, 800K for Created Weighted Pipe
+        const baseNewPipeMonthlyTarget = 2000000; // $2M per month
+        const baseWeightedPipeMonthlyTarget = 800000; // $800K per month
+        
+        // Get backend target which is already multiplied by period months
+        const backendPipeTarget = analytics.dashboard_blocks?.block_3_pipe_creation?.target_pipe_created || baseNewPipeMonthlyTarget;
+        
+        // Calculate number of months from backend target (target / 2M base)
+        const periodMonths = backendPipeTarget / baseNewPipeMonthlyTarget;
+        
+        // Calculate dynamic targets based on period
+        const dynamicNewPipeTarget = backendPipeTarget; // Use backend's dynamic target
+        const dynamicWeightedPipeTarget = baseWeightedPipeMonthlyTarget * periodMonths; // 800K × months
         
         // Use data from analytics prop which updates with the selected period
         // New Pipe Created = sum of Expected ARR for deals created in the period
@@ -751,7 +762,7 @@ function MainDashboard({ analytics }) {
             <MetricCard
               title="New Pipe Created"
               value={newPipeCreated}
-              target={fixedNewPipeTarget}
+              target={dynamicNewPipeTarget}
               unit="$"
               icon={TrendingUp}
               color="purple"
@@ -759,7 +770,7 @@ function MainDashboard({ analytics }) {
             <MetricCard
               title="Created Weighted Pipe"
               value={weightedPipe}
-              target={fixedWeightedPipeTarget}
+              target={dynamicWeightedPipeTarget}
               unit="$"
               icon={Target}
               color="blue"
