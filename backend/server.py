@@ -1271,12 +1271,15 @@ async def get_user_accessible_views(user: dict = Depends(get_current_user)):
     view_access = user.get("view_access", [])
     role = user.get("role")
     
-    # Super admins and remi/asher can see all views
+    # Super admins and specific emails can see all views
     if role == "super_admin" or user_email in ["remi@primelis.com", "asher@primelis.com", "philippe@primelis.com"]:
         views = await db.views.find().to_list(100)
-    else:
-        # Regular users see only their assigned views
+    elif view_access:
+        # Users with view_access see only their assigned views
         views = await db.views.find({"name": {"$in": view_access}}).to_list(100)
+    else:
+        # Users without view_access see only default/Organic view
+        views = await db.views.find({"$or": [{"is_default": True}, {"name": "Organic"}]}).to_list(100)
     
     # Clean MongoDB _id for JSON (keep custom id field)
     for view in views:
