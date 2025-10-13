@@ -1194,10 +1194,9 @@ async def get_views(user: dict = Depends(get_current_user)):
     """
     views = await db.views.find().to_list(100)
     
-    # Clean MongoDB _id for JSON
+    # Clean MongoDB _id for JSON (keep custom id field)
     for view in views:
         if '_id' in view:
-            view['id'] = str(view['_id'])
             del view['_id']
     
     return views
