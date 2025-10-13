@@ -474,7 +474,7 @@ frontend:
           agent: "main"
           comment: "✅ FRONTEND AUTH WORKING: Added loginDemo() function to AuthContext. Demo login successfully creates session, sets user state, loads views, and displays dashboard. Screenshot verified: clicking DEMO ACCESS button authenticates as 'Demo User (Viewer)' and displays full dashboard with data. Header shows user info and logout button. Both authentication modes functional from UI perspective. Session persistence working with cookies."
 
-  - task: "Fixed targets for New Pipe Created and Created Weighted Pipe"
+  - task: "Dynamic targets for New Pipe Created and Created Weighted Pipe"
     implemented: true
     working: true
     file: "/app/frontend/src/App.js"
@@ -482,9 +482,12 @@ frontend:
     priority: "high"
     needs_retesting: true
     status_history:
+        - working: false
+          agent: "main"
+          comment: "❌ MISUNDERSTOOD REQUIREMENT: Initially implemented fixed targets ($2M and $800K always) based on misinterpretation of user's French message 'non monthly c 2M et 800K'. This was incorrect."
         - working: true
           agent: "main"
-          comment: "✅ FIXED TARGETS IMPLEMENTED: Dashboard metric cards now use fixed targets that never change regardless of selected period. New Pipe Created target is always $2M, Created Weighted Pipe target is always $800K. Implementation at lines 725-726 in App.js uses hardcoded constants (fixedNewPipeTarget=2000000, fixedWeightedPipeTarget=800000) instead of dynamic calculation based on period duration. The actual values (newPipeCreated, weightedPipe) update dynamically with the selected period, but targets remain constant. This ensures that for Monthly view, July-Dec view, or any Custom period, the targets displayed are always the monthly baseline values of 2M and 800K. Backend testing confirms: Monthly period shows actual $2.4M vs target $2M, July-Dec period shows actual $9.1M vs target still $2M (not $12M). Frontend correctly implements user's requirement: 'non monthly c 2M et 800K' (monthly it's 2M and 800K, always)."
+          comment: "✅ DYNAMIC TARGETS CORRECTED: User clarified that targets MUST multiply by number of months in selected period. Implemented dynamic calculation at lines 722-777 in App.js. Logic: 1) New Pipe Created uses backend's target_pipe_created which is already multiplied (Monthly: 2M, July-Dec: 12M). 2) Created Weighted Pipe calculates dynamically as 800K × period_months. 3) Period months detected by dividing backend target by 2M base. EXPECTED BEHAVIOR: Monthly view → 2M and 800K targets, July-Dec view (6 months) → 12M and 4.8M targets. Uses baseNewPipeMonthlyTarget=2000000 and baseWeightedPipeMonthlyTarget=800000 as base values, then multiplies by detected period duration."
 
 metadata:
   created_by: "main_agent"
