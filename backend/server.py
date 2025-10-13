@@ -1314,8 +1314,9 @@ async def get_user_accessible_views(user: dict = Depends(get_current_user)):
     view_access = user.get("view_access", [])
     role = user.get("role")
     
-    # Super admins and specific emails can see all views
-    if role == "super_admin" or user_email in ["remi@primelis.com", "asher@primelis.com", "philippe@primelis.com"]:
+    # Super admins, demo user, and specific emails can see all views
+    if (role == "super_admin" or 
+        user_email in ["remi@primelis.com", "asher@primelis.com", "philippe@primelis.com", "demo@primelis.com"]):
         views = await db.views.find().to_list(100)
     elif view_access:
         # Users with view_access see only their assigned views
