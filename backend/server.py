@@ -56,6 +56,33 @@ def get_collections_for_master():
     """Get all collections to aggregate for Master view"""
     return ["sales_records_signal", "sales_records_fullfunnel", "sales_records_market"]
 
+async def get_sales_data_for_view(view_id: str):
+    """
+    Get sales data for a specific view
+    - For Master view: aggregates data from Signal, Full Funnel, Market
+    - For other views: returns data from view-specific collection
+    """
+    # Get view from database
+    view = await db.views.find_one({"id": view_id})
+    if not view:
+        raise HTTPException(status_code=404, detail="View not found")
+    
+    view_name = view.get("name")
+    is_master = view.get("is_master", False)
+    
+    if is_master:
+        # Master view: aggregate from multiple collections
+        all_records = []
+        for collection_name in get_collections_for_master():
+            records = await db[collection_name].find().to_list(10000)
+            all_records.extend(records)
+        return all_records
+    else:
+        # Regular view: get from specific collection
+        collection_name = get_collection_for_view(view_name)
+        records = await db[collection_name].find().to_list(10000)
+        return records
+
 # Create the main app without a prefix
 app = FastAPI(title="Sales Analytics Dashboard", description="Weekly Sales Reports Analysis", version="1.0.0")
 
