@@ -1147,22 +1147,25 @@ function Dashboard() {
       let response;
       let yearlyResponse;
       
+      // Build view_id parameter if available
+      const viewParam = currentView?.id ? `&view_id=${currentView.id}` : '';
+      
       if (useCustomDate && dateRange?.from && dateRange?.to) {
         // Use custom date range
         const startDate = format(dateRange.from, 'yyyy-MM-dd');
         const endDate = format(dateRange.to, 'yyyy-MM-dd');
-        response = await axios.get(`${API}/analytics/custom?start_date=${startDate}&end_date=${endDate}`);
+        response = await axios.get(`${API}/analytics/custom?start_date=${startDate}&end_date=${endDate}${viewParam}`);
         // Also load yearly data for comparison
-        yearlyResponse = await axios.get(`${API}/analytics/yearly?year=2025`);
+        yearlyResponse = await axios.get(`${API}/analytics/yearly?year=2025${viewParam}`);
       } else if (viewMode === 'yearly') {
         // Use yearly view
-        response = await axios.get(`${API}/analytics/yearly?year=2025`);
+        response = await axios.get(`${API}/analytics/yearly?year=2025${viewParam}`);
         yearlyResponse = response; // Same data
       } else {
         // Use monthly offset
-        response = await axios.get(`${API}/analytics/monthly?month_offset=${monthOffset}`);
+        response = await axios.get(`${API}/analytics/monthly?month_offset=${monthOffset}${viewParam}`);
         // Also load yearly data for Deals & Pipeline comparison
-        yearlyResponse = await axios.get(`${API}/analytics/yearly?year=2025`);
+        yearlyResponse = await axios.get(`${API}/analytics/yearly?year=2025${viewParam}`);
       }
       
       setAnalytics(response.data);
