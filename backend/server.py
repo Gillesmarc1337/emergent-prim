@@ -2025,7 +2025,8 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
 @api_router.get("/analytics/custom")
 async def get_custom_analytics(
     start_date: str = Query(..., description="Start date in YYYY-MM-DD format"),
-    end_date: str = Query(..., description="End date in YYYY-MM-DD format")
+    end_date: str = Query(..., description="End date in YYYY-MM-DD format"),
+    view_id: str = Query(None)
 ):
     """Generate analytics report for custom date range"""
     try:
@@ -2036,8 +2037,13 @@ async def get_custom_analytics(
         except ValueError:
             raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
         
-        # Get data from MongoDB
-        records = await db.sales_records.find().to_list(10000)
+        # Get data from MongoDB based on view
+        if view_id:
+            records = await get_sales_data_for_view(view_id)
+        else:
+            # Fallback to default Organic collection
+            records = await db.sales_records.find().to_list(10000)
+            
         if not records:
             raise HTTPException(status_code=404, detail="No sales data found. Please upload data first.")
         
