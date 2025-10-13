@@ -1671,67 +1671,100 @@ function Dashboard() {
             )}
 
             {/* BDR Performance */}
-            {Object.keys(analytics.meeting_generation.bdr_performance).length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>BDR Performance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left p-2">BDR</th>
-                          <th className="text-center p-2">Role</th>
-                          <th className="text-right p-2">Total Meetings</th>
-                          <th className="text-right p-2">Relevant Meetings</th>
-                          <th className="text-right p-2">Meeting Goal</th>
-                          <th className="text-right p-2">Relevance Rate</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {Object.entries(analytics.meeting_generation.bdr_performance).map(([bdr, stats]) => {
-                          // Only BDR have meeting goals, not AE
-                          let goalText = '-';
-                          let isOnTrack = false;
-                          
-                          if (stats.role === 'BDR') {
-                            const monthlyGoal = stats.meeting_target || 6;
-                            goalText = `${stats.total_meetings}/${monthlyGoal}`;
-                            isOnTrack = stats.total_meetings >= monthlyGoal;
-                          }
-                          
-                          return (
-                            <tr key={bdr} className="border-b">
-                              <td className="p-2 font-medium">{bdr}</td>
-                              <td className="text-center p-2">
-                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                  stats.role === 'BDR' ? 'bg-blue-100 text-blue-800' : 
-                                  stats.role === 'AE' ? 'bg-purple-100 text-purple-800' : 
-                                  'bg-gray-100 text-gray-800'
+            {Object.keys(analytics.meeting_generation.bdr_performance).length > 0 && (() => {
+              // Calculate period duration in months for dynamic targets
+              let periodMonths = 1; // Default to 1 month
+              
+              if (useCustomDate && dateRange?.from && dateRange?.to) {
+                // Custom date range
+                const startDate = new Date(dateRange.from);
+                const endDate = new Date(dateRange.to);
+                const diffTime = Math.abs(endDate - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                periodMonths = Math.max(1, Math.round(diffDays / 30.44)); // Convert days to months
+              } else if (viewMode === 'yearly') {
+                // July to December = 6 months
+                periodMonths = 6;
+              } else {
+                // Monthly view = 1 month
+                periodMonths = 1;
+              }
+              
+              return (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>BDR Performance</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left p-2">BDR</th>
+                            <th className="text-center p-2">Role</th>
+                            <th className="text-right p-2">Total Meetings</th>
+                            <th className="text-right p-2">Relevant Meetings</th>
+                            <th className="text-right p-2">Meeting Goal</th>
+                            <th className="text-right p-2">Relevance Rate</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Object.entries(analytics.meeting_generation.bdr_performance).map(([bdr, stats]) => {
+                            // Determine monthly target based on role and person
+                            let monthlyGoal = 0;
+                            let goalText = '-';
+                            let isOnTrack = false;
+                            
+                            if (stats.role === 'BDR') {
+                              monthlyGoal = 6; // BDR: 6 per month
+                            } else if (stats.role === 'AE') {
+                              monthlyGoal = 1; // AE (Rémi, Sadie, Guillaume, François): 1 per month
+                            } else if (stats.role === 'Partner') {
+                              monthlyGoal = 1; // Partner: 1 per month
+                            } else if (bdr.toLowerCase().includes('fady')) {
+                              monthlyGoal = 4; // Fady (Lead Referrals): 4 per month
+                            }
+                            
+                            // Calculate period target (monthly × months)
+                            if (monthlyGoal > 0) {
+                              const periodGoal = monthlyGoal * periodMonths;
+                              goalText = `${stats.total_meetings}/${periodGoal}`;
+                              isOnTrack = stats.total_meetings >= periodGoal;
+                            }
+                            
+                            return (
+                              <tr key={bdr} className="border-b">
+                                <td className="p-2 font-medium">{bdr}</td>
+                                <td className="text-center p-2">
+                                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                    stats.role === 'BDR' ? 'bg-blue-100 text-blue-800' : 
+                                    stats.role === 'AE' ? 'bg-purple-100 text-purple-800' : 
+                                    stats.role === 'Partner' ? 'bg-green-100 text-green-800' :
+                                    'bg-gray-100 text-gray-800'
+                                  }`}>
+                                    {stats.role || 'N/A'}
+                                  </span>
+                                </td>
+                                <td className="text-right p-2">{stats.total_meetings}</td>
+                                <td className="text-right p-2">{stats.relevant_meetings}</td>
+                                <td className={`text-right p-2 font-medium ${
+                                  monthlyGoal > 0 ? (isOnTrack ? 'text-green-600' : 'text-orange-600') : 'text-gray-500'
                                 }`}>
-                                  {stats.role || 'N/A'}
-                                </span>
-                              </td>
-                              <td className="text-right p-2">{stats.total_meetings}</td>
-                              <td className="text-right p-2">{stats.relevant_meetings}</td>
-                              <td className={`text-right p-2 font-medium ${
-                                stats.role === 'BDR' ? (isOnTrack ? 'text-green-600' : 'text-orange-600') : 'text-gray-500'
-                              }`}>
-                                {goalText}
-                              </td>
-                              <td className="text-right p-2">
-                                {((stats.relevant_meetings / stats.total_meetings) * 100).toFixed(1)}%
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                                  {goalText}
+                                </td>
+                                <td className="text-right p-2">
+                                  {stats.total_meetings > 0 ? ((stats.relevant_meetings / stats.total_meetings) * 100).toFixed(1) : '0.0'}%
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })()}
           </AnalyticsSection>
         </TabsContent>
 
