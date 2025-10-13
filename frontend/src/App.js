@@ -2541,47 +2541,52 @@ function Dashboard() {
                         <thead>
                           <tr className="border-b">
                             <th className="text-left p-3 font-semibold">AE</th>
-                            <th className="text-right p-3 font-semibold">Total Pipe</th>
-                            <th className="text-right p-3 font-semibold">Weighted Pipe</th>
                             <th className="text-right p-3 font-semibold">New Pipe Created</th>
-                            <th className="text-right p-3 font-semibold">Deals Count</th>
-                            <th className="text-right p-3 font-semibold">New Deals</th>
+                            <th className="text-right p-3 font-semibold">Created Weighted Pipe</th>
+                            <th className="text-right p-3 font-semibold">Total Pipe</th>
+                            <th className="text-right p-3 font-semibold">Total Weighted Pipe</th>
                           </tr>
                         </thead>
                         <tbody>
                           {analytics.pipe_metrics.ae_breakdown.map((ae, index) => (
                             <tr key={index} className="border-b hover:bg-gray-50">
                               <td className="p-3 font-medium">{ae.ae}</td>
+                              {/* Block 1: New Pipe Created */}
                               <td className="text-right p-3 font-semibold text-purple-600">
+                                ${ae.new_pipe_created.toLocaleString()}
+                              </td>
+                              {/* Block 2: Created Weighted Pipe */}
+                              <td className="text-right p-3 font-semibold text-blue-600">
+                                ${(ae.new_weighted_pipe || 0).toLocaleString()}
+                              </td>
+                              {/* Block 3: Total Pipe (excl. Closed/Lost/Not Relevant) */}
+                              <td className="text-right p-3 font-semibold text-green-600">
                                 ${ae.total_pipe.toLocaleString()}
                               </td>
+                              {/* Block 4: Total Weighted Pipe (excl. Wins/Lost/Not Relevant) */}
                               <td className="text-right p-3 font-semibold text-orange-600">
                                 ${ae.weighted_pipe.toLocaleString()}
                               </td>
-                              <td className="text-right p-3 font-semibold text-green-600">
-                                ${ae.new_pipe_created.toLocaleString()}
-                              </td>
-                              <td className="text-right p-3">{ae.deals_count}</td>
-                              <td className="text-right p-3">{ae.new_deals_count}</td>
                             </tr>
                           ))}
                           {/* Total Row */}
                           <tr className="border-t-2 font-bold bg-gray-50">
                             <td className="p-3">Total</td>
+                            {/* Block 1: New Pipe Created Total */}
                             <td className="text-right p-3 text-purple-600">
-                              ${analytics.pipe_metrics.total_pipe.value.toLocaleString()}
-                            </td>
-                            <td className="text-right p-3 text-orange-600">
-                              ${analytics.pipe_metrics.total_pipe.weighted_value.toLocaleString()}
-                            </td>
-                            <td className="text-right p-3 text-green-600">
                               ${analytics.pipe_metrics.created_pipe.value.toLocaleString()}
                             </td>
-                            <td className="text-right p-3">
-                              {analytics.pipe_metrics.total_pipe.count}
+                            {/* Block 2: Created Weighted Pipe Total */}
+                            <td className="text-right p-3 text-blue-600">
+                              ${analytics.pipe_metrics.created_pipe.weighted_value.toLocaleString()}
                             </td>
-                            <td className="text-right p-3">
-                              {analytics.pipe_metrics.created_pipe.count}
+                            {/* Block 3: Total Pipe Total */}
+                            <td className="text-right p-3 text-green-600">
+                              ${analytics.pipe_metrics.total_pipe.value.toLocaleString()}
+                            </td>
+                            {/* Block 4: Total Weighted Pipe Total */}
+                            <td className="text-right p-3 text-orange-600">
+                              ${analytics.pipe_metrics.total_pipe.weighted_value.toLocaleString()}
                             </td>
                           </tr>
                         </tbody>
