@@ -2756,7 +2756,7 @@ function Dashboard() {
                   </Card>
                 </div>
 
-                {/* Partner Performance Table - BDR/AE filtered for those with Upsell deals */}
+                {/* Partner Performance Table - All partners who generated Upsell/Cross-sell at any stage */}
                 <Card className="mb-6">
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
@@ -2766,27 +2766,36 @@ function Dashboard() {
                   </CardHeader>
                   <CardContent>
                     {(() => {
-                      // Get BDR/AE who have upsell deals
+                      // Get all deals with Upsell/Cross-sell type
                       const introsDetails = upsellRenewData?.intros_details || [];
                       const poaDetails = upsellRenewData?.poa_details || [];
                       
-                      // Get unique owners (BDR/AE) who worked on Upsell deals
-                      const upsellOwners = new Set();
+                      // Aggregate data by partner from both intros and POA details
+                      const partnerStats = {};
+                      
                       [...introsDetails, ...poaDetails].forEach(deal => {
-                        if (deal.type_of_deal === 'Upsell' && deal.owner) {
-                          upsellOwners.add(deal.owner);
+                        // Only count Upsell/Cross-sell deals
+                        if ((deal.type_of_deal === 'Upsell' || deal.type_of_deal === 'Cross-sell') && deal.partner) {
+                          const partnerName = deal.partner;
+                          
+                          if (!partnerStats[partnerName]) {
+                            partnerStats[partnerName] = {
+                              partner: partnerName,
+                              deals: [],
+                              total_arr: 0,
+                              deal_count: 0
+                            };
+                          }
+                          
+                          partnerStats[partnerName].deals.push(deal);
+                          partnerStats[partnerName].total_arr += deal.expected_arr || 0;
+                          partnerStats[partnerName].deal_count += 1;
                         }
                       });
                       
-                      // Get BDR performance data from analytics
-                      const bdrPerformance = analytics?.meeting_generation?.bdr_performance || {};
-                      
-                      // Filter to only show BDR/AE who have upsell deals
-                      const filteredPartners = Object.entries(bdrPerformance).filter(([name, _]) => 
-                        upsellOwners.has(name)
-                      );
-                      
-                      const hasData = filteredPartners.length > 0;
+                      // Convert to array and sort by total ARR descending
+                      const partnerList = Object.values(partnerStats).sort((a, b) => b.total_arr - a.total_arr);
+                      const hasData = partnerList.length > 0;
                       
                       return hasData ? (
                         <div className="overflow-x-auto">
