@@ -20,6 +20,9 @@ const Header = () => {
     }
   };
 
+  // Debug: Log views state
+  console.log('Header - Views:', views, 'CurrentView:', currentView);
+
   return (
     <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -31,26 +34,31 @@ const Header = () => {
 
           {/* Right side - User info, View selector, Logout */}
           <div className="flex items-center gap-4">
-            {/* View Selector (only for authenticated users with views) */}
-            {views.length > 0 && (
+            {/* View Selector - Always show if user is authenticated */}
+            {user && (
               <div className="flex items-center gap-2">
                 <Eye className="h-4 w-4 text-gray-500" />
-                <Select
-                  value={currentView?.id || ''}
-                  onValueChange={handleViewChange}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select view" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {views.map((view) => (
-                      <SelectItem key={view.id} value={view.id}>
-                        {view.name}
-                        {view.is_default && ' (Default)'}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {views.length > 0 ? (
+                  <Select
+                    value={currentView?.id || ''}
+                    onValueChange={handleViewChange}
+                  >
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Select view" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {views.map((view) => (
+                        <SelectItem key={view.id} value={view.id}>
+                          {view.name}
+                          {view.is_default && ' (Default)'}
+                          {view.is_master && ' (Master)'}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <span className="text-sm text-gray-500">Loading views...</span>
+                )}
               </div>
             )}
 
