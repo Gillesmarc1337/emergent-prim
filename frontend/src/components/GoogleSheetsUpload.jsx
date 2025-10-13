@@ -6,11 +6,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, AlertCircle, CheckCircle2, Link as LinkIcon } from 'lucide-react';
 import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 function GoogleSheetsUpload({ onUploadSuccess }) {
+  const { currentView } = useAuth(); // Get current view
   const [sheetUrl, setSheetUrl] = useState('');
   const [sheetName, setSheetName] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -32,10 +34,16 @@ function GoogleSheetsUpload({ onUploadSuccess }) {
     setUploadStatus(null);
 
     try {
-      const response = await axios.post(`${API}/upload-google-sheets`, {
+      // Add view_id to the request
+      const payload = {
         sheet_url: sheetUrl,
         sheet_name: sheetName || null
-      });
+      };
+      
+      // Build URL with view_id parameter
+      const viewParam = currentView?.id ? `?view_id=${currentView.id}` : '';
+      
+      const response = await axios.post(`${API}/upload-google-sheets${viewParam}`, payload);
 
       setUploadStatus({ 
         type: 'success', 
