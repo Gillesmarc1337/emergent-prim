@@ -1256,9 +1256,8 @@ async def get_view_config(
     if not view:
         raise HTTPException(status_code=404, detail="View not found")
     
-    # Clean MongoDB _id for JSON
+    # Clean MongoDB _id for JSON (keep custom id field)
     if '_id' in view:
-        view['id'] = str(view['_id'])
         del view['_id']
     
     return view
