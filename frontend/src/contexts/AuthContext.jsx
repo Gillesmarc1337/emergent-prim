@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState(null);
   const [views, setViews] = useState([]);
+  const [viewConfig, setViewConfig] = useState(null); // Store current view's config/targets
 
   // Check if user is authenticated on mount
   useEffect(() => {
