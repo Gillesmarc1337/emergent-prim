@@ -1719,7 +1719,7 @@ async def get_yearly_analytics(year: int = 2025):
         raise HTTPException(status_code=500, detail=f"Error generating yearly analytics: {str(e)}")
 
 @api_router.get("/analytics/monthly")
-async def get_monthly_analytics(month_offset: int = 0):
+async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None)):
     """Generate monthly analytics report"""
     try:
         # Calculate month range based on offset
@@ -1738,8 +1738,13 @@ async def get_monthly_analytics(month_offset: int = 0):
         
         month_start, month_end = get_month_range(target_date, 0)
         
-        # Get data from MongoDB
-        records = await db.sales_records.find().to_list(10000)
+        # Get data from MongoDB based on view
+        if view_id:
+            records = await get_sales_data_for_view(view_id)
+        else:
+            # Fallback to default Organic collection
+            records = await db.sales_records.find().to_list(10000)
+            
         if not records:
             raise HTTPException(status_code=404, detail="No sales data found. Please upload data first.")
         
