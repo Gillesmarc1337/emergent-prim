@@ -3060,21 +3060,22 @@ async def upload_google_sheets_data(
         
         # Store in MongoDB
         if records:
-            # Clear existing data
-            await db.sales_records.delete_many({})
+            # Clear existing data for this view's collection
+            await db[collection_name].delete_many({})
             # Insert new data
-            await db.sales_records.insert_many(records)
+            await db[collection_name].insert_many(records)
             
             # Save metadata for future refresh
             await db.data_metadata.update_one(
-                {"type": "last_update"},
+                {"type": "last_update", "view_id": view_id if view_id else "organic"},
                 {
                     "$set": {
                         "last_update": datetime.utcnow(),
                         "source_type": "google_sheets",
                         "source_url": request.sheet_url,
                         "sheet_name": request.sheet_name,
-                        "records_count": valid_records
+                        "records_count": valid_records,
+                        "collection": collection_name
                     }
                 },
                 upsert=True
