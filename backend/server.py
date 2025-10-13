@@ -1520,9 +1520,10 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
         # Calculate pipe created (YTD)
         current_year = datetime.now().year
         year_start = datetime(current_year, 1, 1)
+        year_end = datetime(current_year, 12, 31, 23, 59, 59)
         ytd_pipe_created = df[
             (df['discovery_date'] >= year_start) &
-            (df['discovery_date'] <= datetime.now())
+            (df['discovery_date'] <= year_end)
         ]
         total_pipe_created = float(ytd_pipe_created['pipeline'].sum())
         
