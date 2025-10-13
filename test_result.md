@@ -489,6 +489,18 @@ frontend:
           agent: "main"
           comment: "✅ DYNAMIC TARGETS CORRECTED: User clarified that targets MUST multiply by number of months in selected period. Implemented dynamic calculation at lines 722-777 in App.js. Logic: 1) New Pipe Created uses backend's target_pipe_created which is already multiplied (Monthly: 2M, July-Dec: 12M). 2) Created Weighted Pipe calculates dynamically as 800K × period_months. 3) Period months detected by dividing backend target by 2M base. EXPECTED BEHAVIOR: Monthly view → 2M and 800K targets, July-Dec view (6 months) → 12M and 4.8M targets. Uses baseNewPipeMonthlyTarget=2000000 and baseWeightedPipeMonthlyTarget=800000 as base values, then multiplies by detected period duration."
 
+  - task: "Block 3 dashboard modification - 2 metrics with uniform CSS"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "✅ BLOCK 3 MODIFIED: Changed the 3rd dashboard block 'New Pipe Created' (lines 1001-1040) from 3 metrics to 2 metrics with uniform CSS styling. NEW METRICS: 1) 'Total Pipe Generation by X mois' displays new_pipe_created value ($2.4M for monthly, $9.1M for July-Dec). 2) 'Aggregate Weighted Pipe Generated X mois' displays aggregate_weighted_pipe value ($2.7M for monthly, $1.9M for July-Dec). Both use identical CSS: text-2xl font-bold text-purple-600, p-3 bg-white rounded-lg, text-xs text-gray-600 mt-1 for labels. Dynamic months text: '1 mois' for monthly view, '6 mois' for July-Dec view. Removed middle metric 'New Weighted Pipe'. Code compiles successfully without errors."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
