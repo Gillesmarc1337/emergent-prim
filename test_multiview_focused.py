@@ -105,6 +105,8 @@ def test_multi_view_endpoints_focused():
     
     if result and len(result) == 2:
         data, response = result
+        print(f"🔍 DEBUG: Response data type: {type(data)}")
+        print(f"🔍 DEBUG: Response data: {data}")
         if data and isinstance(data, list):
             print(f"✅ User accessible views endpoint working")
             print(f"📋 Found {len(data)} accessible views for demo user")
