@@ -1108,6 +1108,37 @@ function Dashboard() {
   // State for Upsell & Renew tab
   const [upsellRenewData, setUpsellRenewData] = useState(null);
 
+  // Helper function to get view-specific targets or fall back to defaults
+  const getViewTargets = () => {
+    if (viewConfig && viewConfig.targets) {
+      return {
+        dashboard: viewConfig.targets.dashboard || {},
+        meeting_generation: viewConfig.targets.meeting_generation || {},
+        meeting_attended: viewConfig.targets.meeting_attended || {}
+      };
+    }
+    // Default targets for Organic view (existing behavior)
+    return {
+      dashboard: {
+        objectif_6_mois: 4500000,
+        deals: 25,
+        new_pipe_created: 2000000,
+        weighted_pipe: 800000
+      },
+      meeting_generation: {
+        intro: 45,
+        inbound: 22,
+        outbound: 17,
+        referrals: 11,
+        upsells_x: 0
+      },
+      meeting_attended: {
+        poa: 18,
+        deals_closed: 6
+      }
+    };
+  };
+
   const loadAnalytics = async () => {
     setLoading(true);
     setError(null);
