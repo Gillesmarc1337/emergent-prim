@@ -3394,8 +3394,7 @@ function Dashboard() {
                           const columnValue = hotDeals
                             .filter(deal => deal.column === 'next60' && !hiddenDeals.has(deal.id))
                             .reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
-                          const monthlyTarget = 750000; // $750K per month
-                          const columnTarget = Math.round(monthlyTarget / 3); // Divide by 3 columns
+                          const columnTarget = 750000; // Fixed target: $750K for next 60-90 days
                           const percentage = Math.round((columnValue / columnTarget) * 100);
                           const isOnTrack = columnValue >= columnTarget;
                           
