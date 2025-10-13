@@ -21,7 +21,12 @@ ROLE_SUPER_ADMIN = "super_admin"
 AUTHORIZED_USERS = {
     "asher@primelis.com": ROLE_VIEWER,
     "remi@primelis.com": ROLE_SUPER_ADMIN,
-    "demo@primelis.com": ROLE_VIEWER  # Demo mode user
+    "demo@primelis.com": ROLE_VIEWER,  # Demo mode user
+    # New multi-view users
+    "oren@primelis.com": ROLE_VIEWER,  # Signal view
+    "maxime.toubia@primelis.com": ROLE_VIEWER,  # Full Funnel view
+    "coralie.truffy@primelis.com": ROLE_VIEWER,  # Market view
+    "philippe@primelis.com": ROLE_SUPER_ADMIN  # Master view + all views access
 }
 
 async def get_session_data_from_emergent(session_id: str):
