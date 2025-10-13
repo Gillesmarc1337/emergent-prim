@@ -116,8 +116,9 @@ export const AuthProvider = ({ children }) => {
     logout,
     checkAuth,
     currentView,
-    setCurrentView,
+    setCurrentView: switchView, // Use switchView instead of setCurrentView directly
     views,
+    viewConfig, // Current view's configuration/targets
     loadViews,
     isAdmin: user?.role === 'super_admin',
     isDemo: user?.is_demo || user?.email === 'demo@primelis.com'
