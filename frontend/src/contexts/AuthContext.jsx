@@ -34,18 +34,34 @@ export const AuthProvider = ({ children }) => {
 
   const loadViews = async () => {
     try {
-      const response = await axios.get(`${API}/api/views`, {
+      // Use the new user-accessible views endpoint
+      const response = await axios.get(`${API}/api/views/user/accessible`, {
         withCredentials: true
       });
       setViews(response.data);
       
-      // Set default view (Organic)
-      const defaultView = response.data.find(v => v.is_default);
-      if (defaultView) {
-        setCurrentView(defaultView);
+      // Set first view as default or find Organic view
+      if (response.data.length > 0) {
+        const defaultView = response.data.find(v => v.is_default || v.name === 'Organic') || response.data[0];
+        await switchView(defaultView);
       }
     } catch (error) {
       console.error('Error loading views:', error);
+    }
+  };
+
+  const switchView = async (view) => {
+    try {
+      setCurrentView(view);
+      
+      // Load view configuration/targets
+      const configResponse = await axios.get(`${API}/api/views/${view.id}/config`, {
+        withCredentials: true
+      });
+      setViewConfig(configResponse.data);
+    } catch (error) {
+      console.error('Error loading view config:', error);
+      setViewConfig(null);
     }
   };
 
