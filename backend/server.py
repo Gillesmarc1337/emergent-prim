@@ -849,6 +849,7 @@ def calculate_pipe_metrics(df, start_date, end_date):
             'total_pipe': float(ae_deals['pipeline'].sum()),
             'weighted_pipe': float(ae_deals['weighted_value'].sum()),
             'new_pipe_created': float(ae_new_pipe['pipeline'].sum()),
+            'new_weighted_pipe': float(ae_new_pipe['weighted_value'].sum()),  # Add weighted value for new pipe
             'deals_count': len(ae_deals),
             'new_deals_count': len(ae_new_pipe)
         })
