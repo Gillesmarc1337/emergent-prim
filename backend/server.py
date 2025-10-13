@@ -1244,6 +1244,50 @@ async def delete_view(
     
     return {"message": "View deleted successfully"}
 
+@api_router.get("/views/{view_id}/config")
+async def get_view_config(
+    view_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """
+    Get view configuration including targets
+    """
+    view = await db.views.find_one({"id": view_id})
+    
+    if not view:
+        raise HTTPException(status_code=404, detail="View not found")
+    
+    # Clean MongoDB _id for JSON
+    if '_id' in view:
+        view['id'] = str(view['_id'])
+        del view['_id']
+    
+    return view
+
+@api_router.get("/views/user/accessible")
+async def get_user_accessible_views(user: dict = Depends(get_current_user)):
+    """
+    Get views accessible to the current user based on their view_access
+    """
+    user_email = user.get("email")
+    view_access = user.get("view_access", [])
+    role = user.get("role")
+    
+    # Super admins and remi/asher can see all views
+    if role == "super_admin" or user_email in ["remi@primelis.com", "asher@primelis.com", "philippe@primelis.com"]:
+        views = await db.views.find().to_list(100)
+    else:
+        # Regular users see only their assigned views
+        views = await db.views.find({"name": {"$in": view_access}}).to_list(100)
+    
+    # Clean MongoDB _id for JSON
+    for view in views:
+        if '_id' in view:
+            view['id'] = str(view['_id'])
+            del view['_id']
+    
+    return views
+
 @api_router.post("/upload-data", response_model=UploadResponse)
 async def upload_sales_data(file: UploadFile = File(...)):
     """Upload and process sales data CSV file"""
