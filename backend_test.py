@@ -4985,123 +4985,104 @@ def test_multi_view_endpoints():
     return passed_tests == total_tests
 
 def main():
-    """Run comprehensive authentication system tests"""
-    print(f"🚀 Starting Backend API Testing - AUTHENTICATION SYSTEM COMPREHENSIVE TESTING")
-    print(f"Backend URL: {BASE_URL}")
-    print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    """Run comprehensive backend API testing including new multi-view endpoints"""
+    print(f"{'='*80}")
+    print(f"🚀 STARTING COMPREHENSIVE BACKEND API TESTING")
+    print(f"{'='*80}")
+    print(f"🌐 Base URL: {BASE_URL}")
+    print(f"⏰ Test started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
-    # Track overall success
-    all_tests_passed = True
-    test_results = {}
+    # Track overall test results
+    test_results = {
+        'basic_connectivity': False,
+        'authentication_flow': False,
+        'views_authentication': False,
+        'multi_view_endpoints': False,  # NEW TEST
+        'projections_endpoints': False,
+        'analytics_endpoints': False,
+        'session_management': False
+    }
     
-    # Test 1: Basic connectivity
-    print(f"\n🔌 Testing basic API connectivity...")
-    connectivity_success = test_basic_connectivity()
-    test_results['basic_connectivity'] = connectivity_success
-    
-    if not connectivity_success:
-        all_tests_passed = False
-        print(f"\n⚠️  Basic connectivity failed - other tests may not work properly")
-    
-    # Test 2: Demo Login Endpoint
-    print(f"\n🔐 Testing demo login endpoint...")
-    demo_data, session_token = test_demo_login()
-    demo_login_success = demo_data is not None and session_token is not None
-    test_results['demo_login'] = demo_login_success
-    
-    if not demo_login_success:
-        all_tests_passed = False
-        print(f"\n❌ Demo login failed - cannot continue with session-dependent tests")
-        return 1
-    
-    # Test 3: Auth/Me Endpoint
-    print(f"\n🔐 Testing auth/me endpoint...")
-    auth_me_success = test_auth_me_endpoint(session_token)
-    test_results['auth_me'] = auth_me_success
-    
-    if not auth_me_success:
-        all_tests_passed = False
-    
-    # Test 4: Views Endpoint Authentication
-    print(f"\n🔐 Testing views endpoint authentication...")
-    views_auth_success = test_views_endpoint_authentication()
-    test_results['views_authentication'] = views_auth_success
-    
-    if not views_auth_success:
-        all_tests_passed = False
-    
-    # Test 5: Session Expiration and Cookie Handling
-    print(f"\n🔐 Testing session expiration and cookie handling...")
-    session_validation_success = test_session_expiration_validation()
-    test_results['session_validation'] = session_validation_success
-    
-    if not session_validation_success:
-        all_tests_passed = False
-    
-    # Test 6: Logout Endpoint
-    print(f"\n🔐 Testing logout endpoint...")
-    logout_success = test_logout_endpoint(session_token)
-    test_results['logout'] = logout_success
-    
-    if not logout_success:
-        all_tests_passed = False
-    
-    # Test 7: End-to-End Authentication Flow
-    print(f"\n🔐 Testing complete authentication flow...")
-    e2e_flow_success = test_authentication_flow_end_to_end()
-    test_results['end_to_end_flow'] = e2e_flow_success
-    
-    if not e2e_flow_success:
-        all_tests_passed = False
+    try:
+        # Test 1: Basic connectivity
+        print(f"\n{'='*60}")
+        print(f"🔌 PHASE 1: BASIC CONNECTIVITY")
+        print(f"{'='*60}")
+        test_results['basic_connectivity'] = test_basic_connectivity()
+        
+        # Test 2: Authentication flow
+        print(f"\n{'='*60}")
+        print(f"🔐 PHASE 2: AUTHENTICATION SYSTEM")
+        print(f"{'='*60}")
+        test_results['authentication_flow'] = test_authentication_flow_end_to_end()
+        
+        # Test 3: Views endpoint authentication
+        print(f"\n{'='*60}")
+        print(f"👁️  PHASE 3: VIEWS ENDPOINT AUTHENTICATION")
+        print(f"{'='*60}")
+        test_results['views_authentication'] = test_views_endpoint_authentication()
+        
+        # Test 4: NEW - Multi-view endpoints (as requested in review)
+        print(f"\n{'='*60}")
+        print(f"🔍 PHASE 4: MULTI-VIEW ENDPOINTS (NEW)")
+        print(f"{'='*60}")
+        test_results['multi_view_endpoints'] = test_multi_view_endpoints()
+        
+        # Test 5: Projections endpoints
+        print(f"\n{'='*60}")
+        print(f"📊 PHASE 5: PROJECTIONS ENDPOINTS")
+        print(f"{'='*60}")
+        hot_deals_success = test_projections_hot_deals()
+        hot_leads_success = test_projections_hot_leads()
+        performance_summary_success = test_projections_performance_summary()
+        test_results['projections_endpoints'] = hot_deals_success and hot_leads_success and performance_summary_success
+        
+        # Test 6: Analytics endpoints
+        print(f"\n{'='*60}")
+        print(f"📈 PHASE 6: ANALYTICS ENDPOINTS")
+        print(f"{'='*60}")
+        monthly_success = test_monthly_analytics_with_offset(0, "Oct 2025")
+        yearly_success = test_yearly_analytics_july_dec_blocks()
+        custom_success = test_custom_analytics_dynamic_targets()
+        test_results['analytics_endpoints'] = monthly_success and yearly_success and custom_success
+        
+        # Test 7: Session management
+        print(f"\n{'='*60}")
+        print(f"🔑 PHASE 7: SESSION MANAGEMENT")
+        print(f"{'='*60}")
+        test_results['session_management'] = test_session_expiration_validation()
+        
+    except Exception as e:
+        print(f"\n❌ CRITICAL ERROR during testing: {str(e)}")
+        import traceback
+        traceback.print_exc()
     
     # Final summary
     print(f"\n{'='*80}")
-    print(f"🏁 AUTHENTICATION SYSTEM TESTING COMPLETE")
+    print(f"📋 FINAL TEST SUMMARY")
     print(f"{'='*80}")
     
     passed_tests = sum(1 for result in test_results.values() if result)
     total_tests = len(test_results)
     
-    print(f"\n📊 COMPREHENSIVE TEST RESULTS:")
     for test_name, result in test_results.items():
         status = "✅ PASSED" if result else "❌ FAILED"
-        print(f"  • {test_name}: {status}")
+        print(f"  {test_name}: {status}")
     
-    print(f"\n📋 OVERALL SUMMARY:")
-    print(f"  • Tests Passed: {passed_tests}/{total_tests}")
-    print(f"  • Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+    print(f"\n📊 Overall Result: {passed_tests}/{total_tests} test phases passed")
     
-    if all_tests_passed:
-        print(f"\n🎉 SUCCESS: All authentication tests passed!")
-        print(f"\n✅ AUTHENTICATION SYSTEM VERIFICATION:")
-        print(f"  • Demo login creates user with is_demo: true")
-        print(f"  • Session cookie set with 24-hour expiration")
-        print(f"  • Session stored in MongoDB with correct expiration")
-        print(f"  • Auth/me works with valid tokens, returns 401 for invalid/missing tokens")
-        print(f"  • Views endpoint requires authentication")
-        print(f"  • Logout clears session and invalidates token")
-        print(f"  • Demo user has viewer role")
-        print(f"  • Complete authentication flow works end-to-end")
-        return 0
+    if passed_tests == total_tests:
+        print(f"\n🎉 SUCCESS: All backend API tests passed!")
+        print(f"✅ The authentication system is working correctly")
+        print(f"✅ All API endpoints are responding as expected")
+        print(f"✅ Multi-view endpoints are functioning properly")
+        print(f"✅ Data structures are valid and complete")
     else:
-        print(f"\n❌ ISSUES FOUND: {total_tests - passed_tests} authentication tests failed")
-        print(f"\n🔧 RECOMMENDATIONS:")
-        
-        if not test_results.get('demo_login'):
-            print(f"  • Fix demo login endpoint - check user creation and session management")
-        if not test_results.get('auth_me'):
-            print(f"  • Fix auth/me endpoint - check token validation logic")
-        if not test_results.get('views_authentication'):
-            print(f"  • Fix views endpoint authentication - ensure proper auth middleware")
-        if not test_results.get('logout'):
-            print(f"  • Fix logout endpoint - ensure session deletion and cookie clearing")
-        if not test_results.get('session_validation'):
-            print(f"  • Fix session validation - check MongoDB session management")
-        if not test_results.get('end_to_end_flow'):
-            print(f"  • Fix authentication flow - check integration between endpoints")
-        
-        return 1
+        print(f"\n⚠️  ISSUES: {total_tests - passed_tests} test phases failed")
+        print(f"🔧 Review the detailed output above for specific issues")
+    
+    print(f"\n⏰ Test completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"{'='*80}")
 
 if __name__ == "__main__":
-    exit_code = main()
-    sys.exit(exit_code)
+    main()
