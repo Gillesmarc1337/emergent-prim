@@ -1086,6 +1086,7 @@ function MainDashboard({ analytics }) {
 }
 
 function Dashboard() {
+  const { viewConfig } = useAuth(); // Get current view configuration
   const [analytics, setAnalytics] = useState(null);
   const [yearlyData, setYearlyData] = useState(null);
   const [loading, setLoading] = useState(false);
