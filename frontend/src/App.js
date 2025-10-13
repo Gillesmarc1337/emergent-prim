@@ -1058,11 +1058,11 @@ function MainDashboard({ analytics }) {
                 </div>
                 <div className="text-center">
                   <div className="text-sm font-bold text-green-600">
-                    ${analytics.deals_closed?.arr_closed ? (analytics.deals_closed.arr_closed / 1000).toFixed(0) + 'K' : '0'}
+                    ${analytics.deals_closed?.arr_closed ? (analytics.deals_closed.arr_closed / 1000000).toFixed(1) + 'M' : '0'}
                   </div>
                   <div className="text-xs text-gray-500">ARR Closed</div>
                   <div className="text-xs text-gray-400">
-                    Target: ${analytics.deals_closed?.target_arr ? (analytics.deals_closed.target_arr / 1000).toFixed(0) + 'K' : '0'}
+                    Target: ${analytics.deals_closed?.target_arr ? (analytics.deals_closed.target_arr / 1000000).toFixed(1) + 'M' : '0'}
                   </div>
                 </div>
               </div>
