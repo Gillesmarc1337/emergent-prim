@@ -2433,28 +2433,24 @@ function Dashboard() {
               </div>
               {/* Pipeline Overview - 4 blocks matching Dashboard logic */}
               {(() => {
-                // Calculate period duration for dynamic targets (Blocks 1 & 2)
+                // BLOCKS 1 & 2: Use EXACT same logic and data as Dashboard
+                // Dynamic targets - multiply by number of months in the period
                 const baseNewPipeMonthlyTarget = 2000000; // $2M per month
                 const baseWeightedPipeMonthlyTarget = 800000; // $800K per month
                 
-                let periodMonths = 1; // Default to 1 month
+                // Get backend target which is already multiplied by period months
+                const backendPipeTarget = analytics.dashboard_blocks?.block_3_pipe_creation?.target_pipe_created || baseNewPipeMonthlyTarget;
                 
-                if (useCustomDate && dateRange?.from && dateRange?.to) {
-                  // Custom date range
-                  const startDate = new Date(dateRange.from);
-                  const endDate = new Date(dateRange.to);
-                  const diffTime = Math.abs(endDate - startDate);
-                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                  periodMonths = Math.max(1, Math.round(diffDays / 30.44));
-                } else if (viewMode === 'yearly') {
-                  periodMonths = 6; // July to December
-                } else {
-                  periodMonths = 1; // Monthly view
-                }
+                // Calculate number of months from backend target (target / 2M base)
+                const periodMonths = backendPipeTarget / baseNewPipeMonthlyTarget;
                 
-                // Dynamic targets for blocks 1 & 2 (multiply by period)
-                const dynamicNewPipeTarget = baseNewPipeMonthlyTarget * periodMonths;
-                const dynamicWeightedPipeTarget = baseWeightedPipeMonthlyTarget * periodMonths;
+                // Calculate dynamic targets based on period (same as dashboard)
+                const dynamicNewPipeTarget = backendPipeTarget; // Use backend's dynamic target
+                const dynamicWeightedPipeTarget = baseWeightedPipeMonthlyTarget * periodMonths; // 800K × months
+                
+                // Use SAME data source as Dashboard
+                const newPipeCreated = analytics.dashboard_blocks?.block_3_pipe_creation?.new_pipe_created || 0;
+                const weightedPipe = analytics.dashboard_blocks?.block_3_pipe_creation?.weighted_pipe_created || 0;
                 
                 // Fixed targets for blocks 3 & 4 (YTD cumulative, never change)
                 const fixedYTDPipelineTarget = 7500000; // $7.5M fixed
@@ -2462,26 +2458,26 @@ function Dashboard() {
                 
                 return (
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    {/* Block 1: New Pipe Created - Dynamic Target */}
+                    {/* Block 1: New Pipe Created - SAME AS DASHBOARD */}
                     <MetricCard
                       title="New Pipe Created"
-                      value={analytics.pipe_metrics.created_pipe.value}
+                      value={newPipeCreated}
                       target={dynamicNewPipeTarget}
                       unit="$"
                       icon={TrendingUp}
                       color="purple"
-                      tooltip="Sum of ARR from all deals created this period. Target adjusts with period duration."
+                      tooltip="Sum of ARR from all deals created this period. Target adjusts with period duration. (Same as Dashboard)"
                     />
                     
-                    {/* Block 2: Created Weighted Pipe - Dynamic Target */}
+                    {/* Block 2: Created Weighted Pipe - SAME AS DASHBOARD */}
                     <MetricCard
                       title="Created Weighted Pipe"
-                      value={analytics.pipe_metrics.created_pipe.weighted_value}
+                      value={weightedPipe}
                       target={dynamicWeightedPipeTarget}
                       unit="$"
                       icon={Target}
                       color="blue"
-                      tooltip="Weighted ARR for deals created this period. Target adjusts with period duration."
+                      tooltip="Weighted ARR for deals created this period. Target adjusts with period duration. (Same as Dashboard)"
                     />
                     
                     {/* Block 3: YTD Aggregate Pipeline - Fixed Target 7.5M */}
