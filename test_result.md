@@ -501,6 +501,18 @@ frontend:
           agent: "main"
           comment: "✅ BLOCK 3 MODIFIED: Changed the 3rd dashboard block 'New Pipe Created' (lines 1001-1040) from 3 metrics to 2 metrics with uniform CSS styling. NEW METRICS: 1) 'Total Pipe Generation by X mois' displays new_pipe_created value ($2.4M for monthly, $9.1M for July-Dec). 2) 'Aggregate Weighted Pipe Generated X mois' displays aggregate_weighted_pipe value ($2.7M for monthly, $1.9M for July-Dec). Both use identical CSS: text-2xl font-bold text-purple-600, p-3 bg-white rounded-lg, text-xs text-gray-600 mt-1 for labels. Dynamic months text: '1 mois' for monthly view, '6 mois' for July-Dec view. Removed middle metric 'New Weighted Pipe'. Code compiles successfully without errors."
 
+  - task: "Multi-view endpoints implementation"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "🔍 MULTI-VIEW ENDPOINTS TESTING COMPLETE: Comprehensive testing of new multi-view endpoints as requested in review. FINDINGS: 1) GET /api/views/user/accessible - ✅ WORKING: Returns list of accessible views for demo user (5 views found), properly respects user permissions, demo user has viewer role access. 2) Expected views found: ✅ Full Funnel, ✅ Signal, ✅ Market, ✅ Master views all present in system. 3) GET /api/views/{view_id}/config - ❌ CRITICAL BUG: All requests return 404 'View not found'. ROOT CAUSE IDENTIFIED: Backend bug in view ID handling - GET /api/views endpoint overwrites custom 'id' field with MongoDB '_id' (converted to string), but GET /api/views/{view_id}/config searches for custom 'id' field in database. TECHNICAL DETAILS: Views created with custom id like 'view-1234567890' but retrieved with MongoDB ObjectId like '68ece6fc4c667ca086ce5d48'. Config endpoint searches for {id: view_id} but should search for {_id: ObjectId(view_id)} or maintain consistent ID handling. VERIFICATION: Tested with curl - all config endpoints return 404, backend logs confirm 404 responses. IMPACT: View configuration and targets cannot be retrieved, blocking Excel target validation (4.5M objectif, 25 deals, 2M new pipe, 800K weighted pipe). RECOMMENDATION: Fix backend ID consistency - either use custom IDs throughout or use MongoDB ObjectIds consistently."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
