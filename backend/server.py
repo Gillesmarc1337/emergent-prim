@@ -1278,10 +1278,9 @@ async def get_user_accessible_views(user: dict = Depends(get_current_user)):
         # Regular users see only their assigned views
         views = await db.views.find({"name": {"$in": view_access}}).to_list(100)
     
-    # Clean MongoDB _id for JSON
+    # Clean MongoDB _id for JSON (keep custom id field)
     for view in views:
         if '_id' in view:
-            view['id'] = str(view['_id'])
             del view['_id']
     
     return views
