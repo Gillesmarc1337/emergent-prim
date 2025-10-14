@@ -163,6 +163,16 @@ function AdminTargetsPage() {
     }));
   };
 
+  const updateDashboardBottomCard = (field, value) => {
+    setTargets(prev => ({
+      ...prev,
+      dashboard_bottom_cards: {
+        ...prev.dashboard_bottom_cards,
+        [field]: parseFloat(value) || 0
+      }
+    }));
+  };
+
   if (!isAdmin) {
     return (
       <div className="container mx-auto p-6">
