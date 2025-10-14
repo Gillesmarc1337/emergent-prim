@@ -2974,14 +2974,23 @@ async def get_sales_records(limit: int = 100):
     return {"records": records, "count": len(records)}
 
 @api_router.get("/data/status")
-async def get_data_status():
+async def get_data_status(view_id: str = Query(None)):
     """Get current data status and last update info"""
     try:
-        # Get total records count
-        total_records = await db.sales_records.count_documents({})
+        # Determine collection based on view_id
+        if view_id:
+            records = await get_sales_data_for_view(view_id)
+            total_records = len(records)
+        else:
+            # Fallback to Organic
+            total_records = await db.sales_records.count_documents({})
         
-        # Get last update info from a metadata collection
-        last_update_info = await db.data_metadata.find_one({"type": "last_update"})
+        # Get last update info from metadata
+        query = {"type": "last_update"}
+        if view_id:
+            query["view_id"] = view_id
+        
+        last_update_info = await db.data_metadata.find_one(query)
         
         if not last_update_info:
             last_update_info = {
