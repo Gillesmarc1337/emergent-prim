@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
-import { LogOut, User, Eye } from 'lucide-react';
+import { LogOut, User, Eye, Settings } from 'lucide-react';
 import {
   Select,
   SelectContent,
