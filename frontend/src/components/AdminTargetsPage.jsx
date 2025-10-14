@@ -492,6 +492,9 @@ function AdminTargetsPage() {
         </p>
       </div>
 
+      {/* Formula Explanation */}
+      <FormulaExplanation />
+
       {/* Message Alert */}
       {message && (
         <Alert variant={message.type === 'success' ? 'default' : 'destructive'} className="mb-4">
