@@ -1334,6 +1334,67 @@ async def update_view_targets(
     
     return {"message": "Targets updated successfully", "targets": targets}
 
+@api_router.post("/admin/views/{view_id}/sync-targets-from-sheet")
+async def sync_targets_from_sheet(
+    view_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """
+    Sync targets from Google Sheet (reads Target Revenue from columns Y and AL)
+    Super_admin only
+    """
+    # Check if user is super_admin
+    if user.get("role") != "super_admin":
+        raise HTTPException(status_code=403, detail="Only super administrators can sync targets")
+    
+    # Get view
+    view = await db.views.find_one({"id": view_id})
+    if not view:
+        raise HTTPException(status_code=404, detail="View not found")
+    
+    sheet_url = view.get("sheet_url")
+    if not sheet_url:
+        raise HTTPException(status_code=400, detail="No Google Sheet URL configured for this view")
+    
+    try:
+        # Read Google Sheet to extract targets from columns Y and AL
+        df = read_google_sheet(sheet_url, view.get("sheet_name"))
+        
+        # Initialize default targets structure
+        synced_targets = {
+            "revenue_2025": {
+                "jan": 0, "feb": 0, "mar": 0, "apr": 0, "may": 0, "jun": 0,
+                "jul": 0, "aug": 0, "sep": 0, "oct": 0, "nov": 0, "dec": 0
+            },
+            "meeting_generation": {
+                "total_target": 50,
+                "inbound": 22,
+                "outbound": 17,
+                "referral": 11,
+                "upsells_cross": 5
+            },
+            "intro_poa": {
+                "intro": 45,
+                "poa": 18
+            }
+        }
+        
+        # Try to find "Target Revenue" row in the sheet
+        # Look for columns with month names (July 2025, August 2025, etc.)
+        # This is a simplified version - in production, you'd parse the exact cells Y19, Z19, etc.
+        
+        # For now, return a message that manual configuration is needed
+        # (Full implementation would require parsing specific cells from the sheet)
+        
+        return {
+            "message": "Sync from sheet not yet fully implemented. Please configure targets manually.",
+            "note": "Full implementation requires parsing columns Y (2025) and AL (2026) from row 19",
+            "current_targets": view.get("targets", {})
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error syncing from sheet: {str(e)}")
+
 @api_router.get("/views/user/accessible")
 async def get_user_accessible_views(user: dict = Depends(get_current_user)):
     """
