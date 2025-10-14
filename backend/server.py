@@ -3110,11 +3110,16 @@ async def upload_google_sheets_data(
         raise HTTPException(status_code=500, detail=f"Error processing Google Sheets data: {str(e)}")
 
 @api_router.get("/projections/hot-deals")
-async def get_hot_deals_closing():
+async def get_hot_deals_closing(view_id: str = Query(None)):
     """Get hot deals closing in next 2 weeks to 30 days (legals stage)"""
     try:
-        # Get data from MongoDB
-        records = await db.sales_records.find().to_list(10000)
+        # Get data from MongoDB based on view
+        if view_id:
+            records = await get_sales_data_for_view(view_id)
+        else:
+            # Fallback to default Organic collection
+            records = await db.sales_records.find().to_list(10000)
+            
         if not records:
             return []
         
