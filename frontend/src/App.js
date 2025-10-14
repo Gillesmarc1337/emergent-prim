@@ -691,7 +691,10 @@ function MainDashboard({ analytics, currentView }) {
   };
 
   useEffect(() => {
-    loadDashboard();
+    // Only load if currentView is defined
+    if (currentView) {
+      loadDashboard();
+    }
   }, [currentView]); // Reload when view changes
 
   if (loading) {
