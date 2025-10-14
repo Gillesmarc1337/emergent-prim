@@ -2270,15 +2270,21 @@ async def get_custom_analytics(
 @api_router.get("/analytics/upsell-renewals")
 async def get_upsell_renewals_analytics(
     start_date: Optional[str] = None,
-    end_date: Optional[str] = None
+    end_date: Optional[str] = None,
+    view_id: str = Query(None)
 ):
     """
     Generate analytics for Upsells/Cross-sells and Renewals brought by Partners.
     Combines Meeting Generation metrics with Partner Performance tables.
     """
     try:
-        # Get data from MongoDB
-        records = await db.sales_records.find().to_list(10000)
+        # Get data from MongoDB based on view
+        if view_id:
+            records = await get_sales_data_for_view(view_id)
+        else:
+            # Fallback to default Organic collection
+            records = await db.sales_records.find().to_list(10000)
+            
         if not records:
             return {
                 "period": "No data",
