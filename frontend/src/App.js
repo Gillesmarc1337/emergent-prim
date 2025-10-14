@@ -742,11 +742,10 @@ function MainDashboard({ analytics, currentView }) {
         const dynamicNewPipeTarget = backendPipeTarget; // Use backend's dynamic target
         const dynamicWeightedPipeTarget = baseWeightedPipeMonthlyTarget * periodMonths; // 800K × months
         
-        // Use data from analytics prop which updates with the selected period
-        // New Pipe Created = sum of Expected ARR for deals created in the period
-        // Created Weighted Pipe = sum of weighted values for deals created in the period
-        const newPipeCreated = analytics.dashboard_blocks?.block_3_pipe_creation?.new_pipe_created || 0;
-        const weightedPipe = analytics.dashboard_blocks?.block_3_pipe_creation?.weighted_pipe_created || 0;
+        // Use data from dashboardData which is loaded with view_id
+        // New Pipe Created and Weighted Pipe should come from dashboardData, not analytics prop
+        const newPipeCreated = dashboardData.key_metrics?.new_pipe_created || 0;
+        const weightedPipe = dashboardData.key_metrics?.created_weighted_pipe || 0;
         
         return (
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
