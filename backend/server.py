@@ -1305,6 +1305,35 @@ async def get_view_config(
     
     return view
 
+@api_router.put("/admin/views/{view_id}/targets")
+async def update_view_targets(
+    view_id: str,
+    targets: dict,
+    user: dict = Depends(get_current_user)
+):
+    """
+    Update targets for a specific view (super_admin only)
+    """
+    # Check if user is super_admin
+    if user.get("role") != "super_admin":
+        raise HTTPException(status_code=403, detail="Only super administrators can update targets")
+    
+    # Get view
+    view = await db.views.find_one({"id": view_id})
+    if not view:
+        raise HTTPException(status_code=404, detail="View not found")
+    
+    # Update targets
+    result = await db.views.update_one(
+        {"id": view_id},
+        {"$set": {"targets": targets}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="Failed to update targets")
+    
+    return {"message": "Targets updated successfully", "targets": targets}
+
 @api_router.get("/views/user/accessible")
 async def get_user_accessible_views(user: dict = Depends(get_current_user)):
     """
