@@ -62,6 +62,17 @@ const Header = () => {
               </div>
             )}
 
+            {/* Admin Link (super_admin only) */}
+            {isAdmin && (
+              <a
+                href="/admin/targets"
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+              >
+                <Settings className="h-4 w-4" />
+                Admin
+              </a>
+            )}
+
             {/* User Info */}
             {user && (
               <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
