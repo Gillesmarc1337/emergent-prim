@@ -572,8 +572,10 @@ function DataManagementSection({ onDataUpdated, currentView }) {
   };
 
   useEffect(() => {
-    loadDataStatus();
-  }, []);
+    if (currentView) {
+      loadDataStatus();
+    }
+  }, [currentView]);
 
   if (!dataStatus) return null;
 
