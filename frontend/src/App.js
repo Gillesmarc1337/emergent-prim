@@ -648,7 +648,7 @@ function DataManagementSection({ onDataUpdated }) {
   );
 }
 
-function MainDashboard({ analytics }) {
+function MainDashboard({ analytics, currentView }) {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -664,7 +664,9 @@ function MainDashboard({ analytics }) {
   const loadDashboard = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/analytics/dashboard`);
+      // Build view_id parameter if available
+      const viewParam = currentView?.id ? `?view_id=${currentView.id}` : '';
+      const response = await axios.get(`${API}/analytics/dashboard${viewParam}`);
       setDashboardData(response.data);
       setError(null);
     } catch (error) {
