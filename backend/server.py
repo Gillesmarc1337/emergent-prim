@@ -3168,11 +3168,16 @@ async def get_hot_leads(view_id: str = Query(None)):
         raise HTTPException(status_code=500, detail=f"Error getting hot leads: {str(e)}")
 
 @api_router.get("/projections/ae-pipeline-breakdown")
-async def get_ae_pipeline_breakdown():
+async def get_ae_pipeline_breakdown(view_id: str = Query(None)):
     """Get pipeline breakdown by AE for Next 14, 30, and 60-90 days periods"""
     try:
-        # Get data from MongoDB
-        records = await db.sales_records.find().to_list(10000)
+        # Get data from MongoDB based on view
+        if view_id:
+            records = await get_sales_data_for_view(view_id)
+        else:
+            # Fallback to default Organic collection
+            records = await db.sales_records.find().to_list(10000)
+            
         if not records:
             return []
         
