@@ -310,6 +310,91 @@ function AdminTargetsPage() {
                 </CardContent>
               </Card>
 
+              {/* DASHBOARD TAB - Bottom Cards Targets */}
+              <Card className="border-pink-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-pink-100 text-pink-700 text-xs font-semibold rounded">DASHBOARD TAB</span>
+                    Dashboard Bottom Cards - Targets
+                  </CardTitle>
+                  <CardDescription>
+                    Configure targets for the 4 bottom cards displayed on the dashboard (period-based calculations)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="new_pipe_created">New Pipe Created Target ($)</Label>
+                      <Input
+                        id="new_pipe_created"
+                        type="number"
+                        value={targets?.dashboard_bottom_cards?.new_pipe_created || 0}
+                        onChange={(e) => updateDashboardBottomCard('new_pipe_created', e.target.value)}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Total pipeline to create in selected period</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="created_weighted_pipe">Created Weighted Pipe Target ($)</Label>
+                      <Input
+                        id="created_weighted_pipe"
+                        type="number"
+                        value={targets?.dashboard_bottom_cards?.created_weighted_pipe || 0}
+                        onChange={(e) => updateDashboardBottomCard('created_weighted_pipe', e.target.value)}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Weighted pipeline target for period</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="ytd_revenue">YTD Revenue 2025 Target ($)</Label>
+                      <Input
+                        id="ytd_revenue"
+                        type="number"
+                        value={targets?.dashboard_bottom_cards?.ytd_revenue || 0}
+                        onChange={(e) => updateDashboardBottomCard('ytd_revenue', e.target.value)}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Year-to-date revenue target (usually H2 total)</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-pink-50 rounded">
+                    <div className="text-sm font-semibold mb-2">Preview Cards:</div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                      <div className="border p-3 rounded bg-white">
+                        <div className="text-gray-600 mb-1">New Pipe Created</div>
+                        <div className="font-bold text-lg">$_._M</div>
+                        <div className="text-gray-500">Target: ${(targets?.dashboard_bottom_cards?.new_pipe_created || 0).toLocaleString()}</div>
+                      </div>
+                      <div className="border p-3 rounded bg-white">
+                        <div className="text-gray-600 mb-1">Created Weighted Pipe</div>
+                        <div className="font-bold text-lg">$_._M</div>
+                        <div className="text-gray-500">Target: ${(targets?.dashboard_bottom_cards?.created_weighted_pipe || 0).toLocaleString()}</div>
+                      </div>
+                      <div className="border p-3 rounded bg-white">
+                        <div className="text-gray-600 mb-1">YTD Revenue 2025</div>
+                        <div className="font-bold text-lg">$_._M</div>
+                        <div className="text-gray-500">Target: ${(targets?.dashboard_bottom_cards?.ytd_revenue || 0).toLocaleString()}</div>
+                      </div>
+                      <div className="border p-3 rounded bg-white">
+                        <div className="text-gray-600 mb-1">YTD Remaining 2025</div>
+                        <div className="font-bold text-lg">$_._M</div>
+                        <div className="text-gray-500 text-xs">Auto-calculated</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Alert className="mt-4 bg-amber-50 border-amber-300">
+                    <Info className="h-4 w-4 text-amber-600" />
+                    <AlertDescription className="text-amber-900 text-xs">
+                      <strong>Note:</strong> These targets are typically period-based (monthly or 6-month H2). 
+                      The actual values displayed are calculated from your Google Sheet data. 
+                      "YTD Remaining" is auto-calculated as: YTD Target - YTD Revenue Achieved.
+                    </AlertDescription>
+                  </Alert>
+                </CardContent>
+              </Card>
+
               {/* MEETINGS GENERATION TAB - Banner Targets */}
               <Card className="border-green-200">
                 <CardHeader>
