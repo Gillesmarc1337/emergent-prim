@@ -2933,6 +2933,9 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
         ]
         total_pipe_created = float(ytd_pipe_created['pipeline'].sum())
         
+        # Calculate weighted pipe created (YTD)
+        total_weighted_pipe_created = float(ytd_pipe_created['weighted_value'].sum()) if 'weighted_value' in ytd_pipe_created.columns else 0
+        
         # Calculate active deals count (not lost, not inbox, show and relevant)
         active_deals_count_data = df[
             ~df['stage'].isin(['I Lost', 'H Lost - can be revived', 'F Inbox']) &
@@ -2953,7 +2956,8 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
                 'total_pipeline': total_pipeline,
                 'weighted_pipeline': total_weighted_pipeline,
                 'deals_count': active_deals_count,
-                'pipe_created': total_pipe_created,
+                'new_pipe_created': total_pipe_created,  # Renamed from pipe_created
+                'created_weighted_pipe': total_weighted_pipe_created,  # Added
                 'avg_deal_size': float(active_pipeline['pipeline'].mean()) if len(active_pipeline) > 0 else 0,
                 'annual_target_2025': cumulative_target,
                 'ytd_closed_2025': cumulative_closed
