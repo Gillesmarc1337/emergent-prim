@@ -49,6 +49,11 @@ function AdminTargetsPage() {
           jan: 0, feb: 0, mar: 0, apr: 0, may: 0, jun: 0,
           jul: 120000, aug: 744000, sep: 1344000, oct: 528000, nov: 1068000, dec: 744000
         },
+        dashboard_bottom_cards: {
+          new_pipe_created: 2000000,
+          created_weighted_pipe: 800000,
+          ytd_revenue: 4500000
+        },
         meeting_generation: {
           total_target: 50,
           inbound: 22,
