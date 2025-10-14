@@ -537,14 +537,15 @@ function MeetingsTable({ meetings, title }) {
   );
 }
 
-function DataManagementSection({ onDataUpdated }) {
+function DataManagementSection({ onDataUpdated, currentView }) {
   const [dataStatus, setDataStatus] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
 
   const loadDataStatus = async () => {
     try {
-      const response = await axios.get(`${API}/data/status`);
+      const viewParam = currentView?.id ? `?view_id=${currentView.id}` : '';
+      const response = await axios.get(`${API}/data/status${viewParam}`);
       setDataStatus(response.data);
     } catch (error) {
       console.error('Error loading data status:', error);
