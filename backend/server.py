@@ -3303,11 +3303,16 @@ async def test_google_sheet_import():
         raise HTTPException(status_code=500, detail=f"Error testing Google Sheet import: {str(e)}")
 
 @api_router.get("/projections/performance-summary")
-async def get_projections_performance_summary():
+async def get_projections_performance_summary(view_id: str = Query(None)):
     """Get performance summary data for projections tab (same as dashboard)"""
     try:
-        # Get data from MongoDB
-        records = await db.sales_records.find().to_list(10000)
+        # Get data from MongoDB based on view
+        if view_id:
+            records = await get_sales_data_for_view(view_id)
+        else:
+            # Fallback to default Organic collection
+            records = await db.sales_records.find().to_list(10000)
+            
         if not records:
             raise HTTPException(status_code=404, detail="No sales data found")
         
