@@ -691,7 +691,7 @@ function MainDashboard({ analytics, currentView }) {
 
   useEffect(() => {
     loadDashboard();
-  }, []);
+  }, [currentView]); // Reload when view changes
 
   if (loading) {
     return (
