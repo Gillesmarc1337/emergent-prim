@@ -2465,11 +2465,16 @@ async def get_upsell_renewals_analytics(
         raise HTTPException(status_code=500, detail=f"Error generating upsell/renewal analytics: {str(e)}")
 
 @api_router.get("/analytics/dashboard")
-async def get_dashboard_analytics():
+async def get_dashboard_analytics(view_id: str = Query(None)):
     """Generate main dashboard with revenue charts"""
     try:
-        # Get data from MongoDB
-        records = await db.sales_records.find().to_list(10000)
+        # Get data from MongoDB based on view
+        if view_id:
+            records = await get_sales_data_for_view(view_id)
+        else:
+            # Fallback to default Organic collection
+            records = await db.sales_records.find().to_list(10000)
+            
         if not records:
             raise HTTPException(status_code=404, detail="No sales data found. Please upload data first.")
         
