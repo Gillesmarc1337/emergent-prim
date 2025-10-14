@@ -723,7 +723,7 @@ function MainDashboard({ analytics, currentView }) {
   return (
     <div className="space-y-6">
       {/* Data Management Section */}
-      <DataManagementSection onDataUpdated={handleDataUpdated} />
+      <DataManagementSection onDataUpdated={handleDataUpdated} currentView={currentView} />
       
       {/* Key Metrics - 5 Simple Cards */}
       {(() => {
