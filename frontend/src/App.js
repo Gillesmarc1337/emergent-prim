@@ -1224,10 +1224,13 @@ function Dashboard() {
   const loadProjectionsData = async () => {
     setLoadingProjections(true);
     try {
+      // Build view_id parameter if available
+      const viewParam = currentView?.id ? `?view_id=${currentView.id}` : '';
+      
       const [hotDealsResponse, hotLeadsResponse, performanceResponse] = await Promise.all([
-        axios.get(`${API}/projections/hot-deals`),
-        axios.get(`${API}/projections/hot-leads`),
-        axios.get(`${API}/projections/performance-summary`)
+        axios.get(`${API}/projections/hot-deals${viewParam}`),
+        axios.get(`${API}/projections/hot-leads${viewParam}`),
+        axios.get(`${API}/projections/performance-summary${viewParam}`)
       ]);
       
       // Combine hot deals (B Legals) and hot leads (POA Booked + Proposal sent) for the interactive board
