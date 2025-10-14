@@ -2711,10 +2711,18 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
                 'deals_count': len(closed_deals_clean)
             })
         
-        # Calculate YTD metrics for 2025 (correct values)
-        # YTD closed revenue from actual data (Jul-Sep 2025)
-        ytd_closed_revenue = 492396 + 454800 + 182400  # Jul + Aug + Sep 2025
-        ytd_revenue = float(ytd_closed_revenue)
+        # Calculate YTD metrics for 2025 (from actual data)
+        # YTD closed revenue = sum of expected_arr for all deals with stage "A Closed" in 2025
+        current_year = datetime.now().year
+        year_start = datetime(current_year, 1, 1)
+        year_end = datetime(current_year, 12, 31, 23, 59, 59)
+        
+        ytd_closed_deals = df[
+            (df['stage'] == 'A Closed') &
+            (df['discovery_date'] >= year_start) &
+            (df['discovery_date'] <= year_end)
+        ]
+        ytd_revenue = float(ytd_closed_deals['expected_arr'].fillna(0).sum())
         
         # Annual target 2025 (corrected target)
         annual_target_2025 = 4500000.0  # Correct annual target for 2025
