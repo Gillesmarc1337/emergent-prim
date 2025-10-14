@@ -1210,7 +1210,10 @@ function Dashboard() {
         endDate = format(new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0), 'yyyy-MM-dd');
       }
       
-      const response = await axios.get(`${API}/analytics/upsell-renewals?start_date=${startDate}&end_date=${endDate}`);
+      // Build view_id parameter if available
+      const viewParam = currentView?.id ? `&view_id=${currentView.id}` : '';
+      
+      const response = await axios.get(`${API}/analytics/upsell-renewals?start_date=${startDate}&end_date=${endDate}${viewParam}`);
       setUpsellRenewData(response.data);
     } catch (error) {
       console.error('Error loading upsell/renew data:', error);
