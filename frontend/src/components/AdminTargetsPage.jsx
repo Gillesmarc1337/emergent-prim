@@ -345,7 +345,17 @@ function FormulaExplanation() {
     </Card>
   );
 }
+
+function AdminTargetsPage() {
   const { user, views } = useAuth();
+  const [selectedView, setSelectedView] = useState(null);
+  const [targets, setTargets] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState(null);
+
+  // Check if user is super_admin
+  const isAdmin = user?.role === 'super_admin';
   const [selectedView, setSelectedView] = useState(null);
   const [targets, setTargets] = useState(null);
   const [loading, setLoading] = useState(false);
