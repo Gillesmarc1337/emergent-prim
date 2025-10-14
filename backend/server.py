@@ -3139,11 +3139,16 @@ async def get_hot_deals_closing(view_id: str = Query(None)):
         raise HTTPException(status_code=500, detail=f"Error getting hot deals: {str(e)}")
 
 @api_router.get("/projections/hot-leads")
-async def get_hot_leads():
+async def get_hot_leads(view_id: str = Query(None)):
     """Get additional hot leads for next 3 months (Proposal sent + PoA booked)"""
     try:
-        # Get data from MongoDB
-        records = await db.sales_records.find().to_list(10000)
+        # Get data from MongoDB based on view
+        if view_id:
+            records = await get_sales_data_for_view(view_id)
+        else:
+            # Fallback to default Organic collection
+            records = await db.sales_records.find().to_list(10000)
+            
         if not records:
             return []
         
