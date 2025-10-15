@@ -95,7 +95,11 @@ def test_user_management_endpoints():
     # Test 1: GET /api/admin/users (should return 403)
     print(f"\n📊 Test 1: GET /api/admin/users")
     response = test_endpoint("/admin/users", cookies=cookies)
-    if response:
+    print(f"DEBUG: response = {response}")
+    print(f"DEBUG: response is None = {response is None}")
+    print(f"DEBUG: bool(response) = {bool(response) if response is not None else 'N/A'}")
+    if response is not None:
+        print(f"DEBUG: response.status_code = {response.status_code}")
         if response.status_code == 403:
             test_results['get_users_403'] = True
             print(f"✅ Demo user correctly denied access (403)")
