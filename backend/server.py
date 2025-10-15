@@ -1994,7 +1994,7 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
         print(f"Records in date range: {len(df[(df['discovery_date'] >= month_start) & (df['discovery_date'] <= month_end)])}")
         
         # Generate all analytics sections
-        meeting_generation = calculate_meeting_generation(df, month_start, month_end)
+        meeting_generation = calculate_meeting_generation(df, month_start, month_end, view_targets)
         meetings_attended = calculate_meetings_attended(df, month_start, month_end)
         ae_performance = calculate_ae_performance(df, month_start, month_end)
         deals_closed = calculate_deals_closed(df, month_start, month_end)
