@@ -1536,6 +1536,192 @@ async def get_user_accessible_views(user: dict = Depends(get_current_user)):
     
     return views
 
+# ============= USER MANAGEMENT ENDPOINTS =============
+@api_router.get("/admin/users")
+async def get_all_users(user: dict = Depends(require_super_admin)):
+    """
+    Get all users (super admin only)
+    Returns list of users with their roles and view access
+    """
+    users = await db.users.find().to_list(1000)
+    
+    # Clean MongoDB _id for JSON and format response
+    result = []
+    for u in users:
+        user_data = {
+            "id": u.get("id"),
+            "email": u.get("email"),
+            "name": u.get("name"),
+            "role": u.get("role", "viewer"),
+            "view_access": u.get("view_access", []),
+            "picture": u.get("picture"),
+            "created_at": u.get("created_at").isoformat() if u.get("created_at") else None
+        }
+        result.append(user_data)
+    
+    return result
+
+@api_router.post("/admin/users")
+async def create_or_update_user(
+    user_request: UserCreateRequest,
+    user: dict = Depends(require_super_admin)
+):
+    """
+    Create or update a user (super admin only)
+    """
+    # Check if user exists
+    existing_user = await db.users.find_one({"email": user_request.email})
+    
+    if existing_user:
+        # Update existing user
+        update_data = {}
+        if user_request.name:
+            update_data["name"] = user_request.name
+        if user_request.role:
+            update_data["role"] = user_request.role
+        if user_request.view_access is not None:
+            update_data["view_access"] = user_request.view_access
+        if user_request.picture:
+            update_data["picture"] = user_request.picture
+        
+        await db.users.update_one(
+            {"email": user_request.email},
+            {"$set": update_data}
+        )
+        
+        # Get updated user
+        updated_user = await db.users.find_one({"email": user_request.email})
+        return {
+            "message": "User updated successfully",
+            "user": {
+                "id": updated_user.get("id"),
+                "email": updated_user.get("email"),
+                "name": updated_user.get("name"),
+                "role": updated_user.get("role"),
+                "view_access": updated_user.get("view_access", [])
+            }
+        }
+    else:
+        # Create new user
+        user_data = {
+            "id": f"user-{user_request.email.split('@')[0]}-{int(datetime.now(timezone.utc).timestamp())}",
+            "email": user_request.email,
+            "name": user_request.name,
+            "picture": user_request.picture,
+            "role": user_request.role,
+            "view_access": user_request.view_access,
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        await db.users.insert_one(user_data)
+        
+        return {
+            "message": "User created successfully",
+            "user": {
+                "id": user_data.get("id"),
+                "email": user_data.get("email"),
+                "name": user_data.get("name"),
+                "role": user_data.get("role"),
+                "view_access": user_data.get("view_access", [])
+            }
+        }
+
+@api_router.put("/admin/users/{user_id}/role")
+async def update_user_role(
+    user_id: str,
+    role_request: UserRoleUpdateRequest,
+    user: dict = Depends(require_super_admin)
+):
+    """
+    Update user role (super admin only)
+    """
+    # Validate role
+    if role_request.role not in ["viewer", "super_admin"]:
+        raise HTTPException(status_code=400, detail="Invalid role. Must be 'viewer' or 'super_admin'")
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"role": role_request.role}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": f"User role updated to {role_request.role}"}
+
+@api_router.get("/admin/users/{user_id}/views")
+async def get_user_view_access(
+    user_id: str,
+    user: dict = Depends(require_super_admin)
+):
+    """
+    Get user's view access (super admin only)
+    """
+    target_user = await db.users.find_one({"id": user_id})
+    
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {
+        "user_id": user_id,
+        "email": target_user.get("email"),
+        "view_access": target_user.get("view_access", [])
+    }
+
+@api_router.put("/admin/users/{user_id}/views")
+async def update_user_view_access(
+    user_id: str,
+    view_access_request: UserViewAccessRequest,
+    user: dict = Depends(require_super_admin)
+):
+    """
+    Update user's view access (super admin only)
+    """
+    # Verify all views exist
+    for view_name in view_access_request.view_access:
+        view_exists = await db.views.find_one({"name": view_name})
+        if not view_exists:
+            raise HTTPException(status_code=400, detail=f"View '{view_name}' not found")
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"view_access": view_access_request.view_access}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {
+        "message": "User view access updated successfully",
+        "view_access": view_access_request.view_access
+    }
+
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user(
+    user_id: str,
+    user: dict = Depends(require_super_admin)
+):
+    """
+    Delete a user (super admin only)
+    Note: This will also delete all associated sessions
+    """
+    # Check if user exists
+    target_user = await db.users.find_one({"id": user_id})
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Prevent deleting self
+    if user.get("id") == user_id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    
+    # Delete user's sessions
+    await db.user_sessions.delete_many({"user_id": user_id})
+    
+    # Delete user
+    await db.users.delete_one({"id": user_id})
+    
+    return {"message": f"User {target_user.get('email')} and all associated sessions deleted successfully"}
+
 @api_router.post("/upload-data", response_model=UploadResponse)
 async def upload_sales_data(
     file: UploadFile = File(...),
