@@ -3533,11 +3533,11 @@ function Dashboard() {
                       </Droppable>
                     </div>
 
-                    {/* Next 60-90 Days Column */}
+                    {/* Next 90 Days Column */}
                     <div className="bg-orange-50 rounded-lg p-4">
                       <div className="mb-4">
                         <div className="font-semibold text-orange-800 text-center mb-2">
-                          Next 60–90 Days
+                          Next 90 Days
                         </div>
                         {(() => {
                           // Format number with K (thousands) or M (millions)
