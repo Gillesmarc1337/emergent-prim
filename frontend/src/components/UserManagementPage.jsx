@@ -62,7 +62,14 @@ function UserManagementPage() {
     }
 
     try {
-      await axios.post(`${API}/admin/users`, newUser, {
+      const payload = {
+        email: newUser.email,
+        name: newUser.email.split('@')[0], // Default name from email
+        role: newUser.role,
+        view_access: newUser.view_access
+      };
+      
+      await axios.post(`${API}/admin/users`, payload, {
         withCredentials: true
       });
       
@@ -75,13 +82,13 @@ function UserManagementPage() {
     }
   };
 
-  const handleDeleteUser = async (email) => {
+  const handleDeleteUser = async (userId, email) => {
     if (!window.confirm(`Are you sure you want to delete user ${email}?`)) {
       return;
     }
 
     try {
-      await axios.delete(`${API}/admin/users/${encodeURIComponent(email)}`, {
+      await axios.delete(`${API}/admin/users/${userId}`, {
         withCredentials: true
       });
       
@@ -93,9 +100,9 @@ function UserManagementPage() {
     }
   };
 
-  const handleUpdateUserViews = async (email, viewName, action) => {
+  const handleUpdateUserViews = async (userId, viewName, action) => {
     try {
-      const targetUser = users.find(u => u.email === email);
+      const targetUser = users.find(u => u.id === userId);
       let newViewAccess = [...(targetUser.view_access || [])];
       
       if (action === 'add') {
@@ -106,24 +113,25 @@ function UserManagementPage() {
         newViewAccess = newViewAccess.filter(v => v !== viewName);
       }
 
-      await axios.put(`${API}/admin/users/${encodeURIComponent(email)}`, {
+      await axios.put(`${API}/admin/users/${userId}/views`, {
         view_access: newViewAccess
       }, {
         withCredentials: true
       });
       
+      setMessage({ type: 'success', text: 'View access updated successfully!' });
       loadUsers();
     } catch (error) {
       console.error('Error updating user views:', error);
-      setMessage({ type: 'error', text: 'Failed to update user views' });
+      setMessage({ type: 'error', text: error.response?.data?.detail || 'Failed to update user views' });
     }
   };
 
-  const handleToggleRole = async (email, currentRole) => {
+  const handleToggleRole = async (userId, email, currentRole) => {
     const newRole = currentRole === 'super_admin' ? 'viewer' : 'super_admin';
     
     try {
-      await axios.put(`${API}/admin/users/${encodeURIComponent(email)}`, {
+      await axios.put(`${API}/admin/users/${userId}/role`, {
         role: newRole
       }, {
         withCredentials: true
@@ -133,7 +141,7 @@ function UserManagementPage() {
       loadUsers();
     } catch (error) {
       console.error('Error updating role:', error);
-      setMessage({ type: 'error', text: 'Failed to update user role' });
+      setMessage({ type: 'error', text: error.response?.data?.detail || 'Failed to update user role' });
     }
   };
 
