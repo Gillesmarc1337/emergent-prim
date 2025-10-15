@@ -547,8 +547,7 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "User Management Backend API Endpoints"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
