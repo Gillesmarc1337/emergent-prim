@@ -300,6 +300,7 @@ class UserViewAccessRequest(BaseModel):
 class ProjectionDeal(BaseModel):
     id: str
     hidden: bool = False
+    order: int = 0  # Position in the column
 
 class ProjectionsPreferencesRequest(BaseModel):
     view_id: str
