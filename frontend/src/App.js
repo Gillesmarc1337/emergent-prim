@@ -320,24 +320,6 @@ function DraggableDealItem({ deal, index, onHide, showActions = false }) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleStatusChange('won')}
-                  className="text-green-600 hover:text-green-700"
-                  title="Mark as Won"
-                >
-                  ✓
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleStatusChange('lost')}
-                  className="text-red-600 hover:text-red-700"
-                  title="Mark as Lost"
-                >
-                  ✗
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
                   onClick={handleDelete}
                   className="text-gray-600 hover:text-gray-700"
                   title="Remove from board"
