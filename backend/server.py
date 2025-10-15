@@ -91,9 +91,13 @@ def convert_numpy_types(obj):
         return [convert_numpy_types(item) for item in obj]
     elif isinstance(obj, tuple):
         return tuple(convert_numpy_types(item) for item in obj)
-    elif hasattr(obj, 'item'):  # numpy scalar types
-        return obj.item()
-    elif isinstance(obj, (np.integer, np.floating)):
+    elif isinstance(obj, (np.integer, np.int64, np.int32, np.int16, np.int8)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float64, np.float32, np.float16)):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif hasattr(obj, 'item'):  # other numpy scalar types
         return obj.item()
     elif pd.isna(obj):  # pandas NaN
         return None
