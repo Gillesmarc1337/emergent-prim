@@ -2883,15 +2883,18 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
             })
         
         # Calculate YTD metrics for 2025 (July-December period)
-        # YTD closed revenue = sum of expected_arr for all deals with stage "A Closed" from July to December 2025
+        # YTD closed revenue = sum of expected_arr (colonne J) for deals with stage "A Closed" 
+        # with billing_start (colonne R) from July to December 2025
         current_year = datetime.now().year
         year_start = datetime(current_year, 7, 1)  # July 1st
         year_end = datetime(current_year, 12, 31, 23, 59, 59)  # December 31st
         
         ytd_closed_deals = df[
             (df['stage'] == 'A Closed') &
-            (df['discovery_date'] >= year_start) &
-            (df['discovery_date'] <= year_end)
+            (df['billing_start'] >= year_start) &
+            (df['billing_start'] <= year_end) &
+            (df['expected_arr'].notna()) &
+            (df['expected_arr'] > 0)
         ]
         ytd_revenue = float(ytd_closed_deals['expected_arr'].fillna(0).sum())
         
