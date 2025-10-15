@@ -1391,7 +1391,7 @@ function Dashboard() {
           const hiddenSet = new Set();
           
           // Process each column from saved preferences
-          ['next30', 'next60', 'next90'].forEach(columnKey => {
+          ['next14', 'next30', 'next60'].forEach(columnKey => {
             const savedColumn = savedPreferences[columnKey] || [];
             savedColumn.forEach(savedDeal => {
               // Find the deal in our fresh data
