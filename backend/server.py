@@ -2761,18 +2761,18 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
         if revenue_2025 and any(revenue_2025.values()):
             # Back office has specific monthly targets - use them!
             monthly_targets_2025 = {
-                'Jan 2025': int(revenue_2025.get('jan', 0)),
-                'Feb 2025': int(revenue_2025.get('feb', 0)),
-                'Mar 2025': int(revenue_2025.get('mar', 0)),
-                'Apr 2025': int(revenue_2025.get('apr', 0)),
-                'May 2025': int(revenue_2025.get('may', 0)),
-                'Jun 2025': int(revenue_2025.get('jun', 0)),
-                'Jul 2025': int(revenue_2025.get('jul', 0)),
-                'Aug 2025': int(revenue_2025.get('aug', 0)),
-                'Sep 2025': int(revenue_2025.get('sep', 0)),
-                'Oct 2025': int(revenue_2025.get('oct', 0)),
-                'Nov 2025': int(revenue_2025.get('nov', 0)),
-                'Dec 2025': int(revenue_2025.get('dec', 0))
+                'Jan 2025': safe_int(revenue_2025.get('jan', 0)),
+                'Feb 2025': safe_int(revenue_2025.get('feb', 0)),
+                'Mar 2025': safe_int(revenue_2025.get('mar', 0)),
+                'Apr 2025': safe_int(revenue_2025.get('apr', 0)),
+                'May 2025': safe_int(revenue_2025.get('may', 0)),
+                'Jun 2025': safe_int(revenue_2025.get('jun', 0)),
+                'Jul 2025': safe_int(revenue_2025.get('jul', 0)),
+                'Aug 2025': safe_int(revenue_2025.get('aug', 0)),
+                'Sep 2025': safe_int(revenue_2025.get('sep', 0)),
+                'Oct 2025': safe_int(revenue_2025.get('oct', 0)),
+                'Nov 2025': safe_int(revenue_2025.get('nov', 0)),
+                'Dec 2025': safe_int(revenue_2025.get('dec', 0))
             }
         else:
             # Fallback: Calculate from distribution if back office targets not set
