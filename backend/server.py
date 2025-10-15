@@ -1783,23 +1783,16 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
         monthly_pipe_target = view_targets.get("dashboard", {}).get("new_pipe_created", 2000000)
         target_pipe_july_dec = monthly_pipe_target * months_in_july_dec_period
         
-        # Calculate weighted pipe properly for July-Dec period
-        stage_probabilities = {
-            'E Verbal commit': 90, 'D Negotiation': 70, 'C Proposal sent': 50,
-            'B Discovery completed': 30, 'A Discovery scheduled': 10,
-            'D POA Booked': 30, 'B Legals': 70, 'A Closed': 100
-        }
-        
+        # Calculate weighted pipe for July-Dec period using Excel formula (stage × source × recency)
         july_dec_weighted_data = df[
             (df['discovery_date'] >= july_dec_start) & 
             (df['discovery_date'] <= july_dec_end)
         ].copy()
         
-        july_dec_weighted_data['probability'] = july_dec_weighted_data['stage'].map(stage_probabilities).fillna(0)
-        july_dec_weighted_data['weighted_value'] = july_dec_weighted_data['pipeline'] * july_dec_weighted_data['probability'] / 100.0
+        july_dec_weighted_data['weighted_value'] = july_dec_weighted_data.apply(calculate_excel_weighted_value, axis=1)
         weighted_pipe_july_dec = july_dec_weighted_data['weighted_value'].sum()
         
-        # Calculate aggregate weighted pipe (all active deals, not just July-Dec created)
+        # Calculate aggregate weighted pipe (all active deals, not just July-Dec created) using Excel formula
         # This includes all deals regardless of when they were created
         all_active_deals = df[
             ~df['stage'].isin(['I Lost', 'H Lost - can be revived', 'F Inbox', 'A Closed']) &
@@ -1807,8 +1800,7 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
             (df['relevance'] == 'Relevant')
         ].copy()
         
-        all_active_deals['probability'] = all_active_deals['stage'].map(stage_probabilities).fillna(0)
-        all_active_deals['weighted_value'] = all_active_deals['pipeline'] * all_active_deals['probability'] / 100.0
+        all_active_deals['weighted_value'] = all_active_deals.apply(calculate_excel_weighted_value, axis=1)
         aggregate_weighted_pipe_july_dec = all_active_deals['weighted_value'].sum()
         
         # Revenue for July-Dec period from view config
