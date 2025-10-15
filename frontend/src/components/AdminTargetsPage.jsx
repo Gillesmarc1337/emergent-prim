@@ -427,15 +427,29 @@ function AdminTargetsPage() {
           ))}
         </TabsList>
 
-        {views.map(view => (
+        {views.map(view => {
+          const isMasterView = view.name === 'Master';
+          
+          return (
           <TabsContent key={view.id} value={view.id}>
             <div className="space-y-6">
+              
+              {/* Master View Info */}
+              {isMasterView && (
+                <Alert className="bg-amber-50 border-amber-300">
+                  <Info className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-amber-900">
+                    <strong>Master View:</strong> Targets are automatically calculated as the sum of all other views (Signal, Full Funnel, Market, Organic). 
+                    You cannot edit these values directly. To change Master targets, edit the individual views.
+                  </AlertDescription>
+                </Alert>
+              )}
               
               {/* Sync Button */}
               <div className="flex justify-end">
                 <Button
                   onClick={handleSyncFromSheet}
-                  disabled={syncing}
+                  disabled={syncing || isMasterView}
                   variant="outline"
                   size="sm"
                 >
@@ -452,7 +466,9 @@ function AdminTargetsPage() {
                     Revenue Targets 2025 (Monthly)
                   </CardTitle>
                   <CardDescription>
-                    Configure monthly revenue targets. These are read from Google Sheet column Y (row 19) but can be edited manually.
+                    {isMasterView 
+                      ? 'Auto-calculated sum of all other views. Read-only.' 
+                      : 'Configure monthly revenue targets. These are read from Google Sheet column Y (row 19) but can be edited manually.'}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -467,6 +483,7 @@ function AdminTargetsPage() {
                           type="number"
                           value={targets?.revenue_2025?.[month.key] || 0}
                           onChange={(e) => updateRevenueTarget(month.key, e.target.value)}
+                          disabled={isMasterView}
                           className="mt-1"
                         />
                       </div>
