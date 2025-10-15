@@ -1713,9 +1713,11 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
         ]
         
         # Calculate meeting targets from view config for full July-Dec period (6 months)
-        monthly_inbound_target = view_targets.get("meeting_generation", {}).get("inbound", 22)
-        monthly_outbound_target = view_targets.get("meeting_generation", {}).get("outbound", 17)
-        monthly_referral_target = view_targets.get("meeting_generation", {}).get("referrals", 11)
+        # Support both 'referral' (back office) and 'referrals' (setup script) for backward compatibility
+        meeting_gen = view_targets.get("meeting_generation", {})
+        monthly_inbound_target = meeting_gen.get("inbound", 22)
+        monthly_outbound_target = meeting_gen.get("outbound", 17)
+        monthly_referral_target = meeting_gen.get("referral", meeting_gen.get("referrals", 11))  # Try singular first, then plural
         monthly_meeting_target = monthly_inbound_target + monthly_outbound_target + monthly_referral_target
         
         # For yearly analytics, always use full 6-month July-December period
