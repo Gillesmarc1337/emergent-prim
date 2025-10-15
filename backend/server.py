@@ -2732,46 +2732,20 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
             # Calculate actual closed revenue from data
             closed_revenue = float(closed_deals_clean['expected_arr'].fillna(0).sum())
             
-            # Weighted pipeline - surge starting October 2025
-            active_deals = df[
-                (df['stage'].notna()) & 
-                (~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost', 'F Inbox'])) &
-                (df['pipeline'].notna()) & 
-                (df['pipeline'] != 0)
-            ]
-            
-            # Map stages to probabilities
-            stage_probabilities = {
-                'D POA Booked': 70,
-                'C Proposal sent': 50, 
-                'B Legals': 80,
-                'E Verbal commit': 90,
-                'A Discovery scheduled': 20
-            }
-            
-            active_deals['probability'] = active_deals['stage'].map(stage_probabilities).fillna(10)
-            active_deals['weighted_value'] = active_deals['pipeline'] * active_deals['probability'] / 100
-            
-            # Simulate the pipeline surge from October onwards as shown in your image
-            if month_str in ['Oct 2025', 'Nov 2025', 'Dec 2025']:
-                # Major pipeline surge starting October 2025 - approximately $180K-190K
-                base_weighted = float(active_deals['weighted_value'].sum())
-                weighted_pipe = max(base_weighted, 185000)
-            else:
-                # July-September: Lower weighted pipeline
-                weighted_pipe = float(active_deals['weighted_value'].sum() * 0.3)  # Lower multiplier
-            
-            # Calculate New Weighted Pipe (new deals created in this month)
+            # Calculate New Weighted Pipe (new deals created in this month) using Excel formula
             new_deals_month = df[
                 (df['discovery_date'] >= month_start) & 
                 (df['discovery_date'] <= month_end) &
-                (~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost', 'F Inbox'])) &
                 (df['pipeline'].notna()) & 
                 (df['pipeline'] != 0)
-            ]
-            new_deals_month['probability'] = new_deals_month['stage'].map(stage_probabilities).fillna(10)
-            new_deals_month['weighted_value'] = new_deals_month['pipeline'] * new_deals_month['probability'] / 100
+            ].copy()
+            
+            # Apply Excel weighting formula
+            new_deals_month['weighted_value'] = new_deals_month.apply(calculate_excel_weighted_value, axis=1)
             new_weighted_pipe = float(new_deals_month['weighted_value'].sum())
+            
+            # Weighted pipeline for display (not used in chart, kept for compatibility)
+            weighted_pipe = new_weighted_pipe
             
             # Aggregate Weighted Pipe (cumulative from July to current month only)
             current_date = datetime.now()
