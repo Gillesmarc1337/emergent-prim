@@ -211,8 +211,8 @@ async def setup_multi_views():
             created_view_ids[view_name] = view_data["id"]
             print(f"  ✅ Created view: {view_name} ({config['user_email']})")
     
-    # Step 3: Calculate and create Master view (sum of all 3 views)
-    print("\n🎯 Creating Master view (aggregated targets)...")
+    # Step 3: Calculate and create Master view (sum of all 4 views)
+    print("\n🎯 Creating Master view (aggregated targets from 4 views)...")
     
     master_targets = {
         "dashboard": {
