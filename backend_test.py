@@ -5452,6 +5452,293 @@ def test_multi_view_endpoints():
     
     return passed_tests == total_tests
 
+def test_projections_preferences_api():
+    """Test the new Projections Preferences API endpoints as requested in review"""
+    print(f"\n{'='*80}")
+    print(f"🎯 TESTING PROJECTIONS PREFERENCES API ENDPOINTS")
+    print(f"{'='*80}")
+    
+    test_results = {
+        'demo_session_creation': False,
+        'save_preferences': False,
+        'load_preferences': False,
+        'reset_preferences': False,
+        'verify_reset': False,
+        'data_structure_validation': False
+    }
+    
+    # Step 1: Create demo session for authentication
+    print(f"\n🔄 Step 1: Create demo session")
+    demo_data, session_token = test_demo_login()
+    
+    if not demo_data or not session_token:
+        print(f"❌ Could not create demo session - cannot test projections preferences")
+        return False
+    
+    test_results['demo_session_creation'] = True
+    cookies = {'session_token': session_token}
+    print(f"✅ Demo session created: {demo_data.get('email')} (role: {demo_data.get('role')})")
+    
+    # Step 2: Save preferences (POST /api/user/projections-preferences)
+    print(f"\n{'='*60}")
+    print(f"💾 STEP 2: SAVE PREFERENCES")
+    print(f"{'='*60}")
+    
+    # Test data as specified in the review request
+    save_preferences_data = {
+        "view_id": "view-organic-xxx",
+        "preferences": {
+            "next14": [
+                {"id": "deal-1", "hidden": False},
+                {"id": "deal-2", "hidden": True}
+            ],
+            "next30": [
+                {"id": "deal-3", "hidden": False}
+            ],
+            "next60": [
+                {"id": "deal-4", "hidden": False}
+            ]
+        }
+    }
+    
+    print(f"📊 Testing POST /api/user/projections-preferences")
+    print(f"📋 Request data:")
+    print(f"  • view_id: {save_preferences_data['view_id']}")
+    print(f"  • next14 deals: {len(save_preferences_data['preferences']['next14'])}")
+    print(f"  • next30 deals: {len(save_preferences_data['preferences']['next30'])}")
+    print(f"  • next60 deals: {len(save_preferences_data['preferences']['next60'])}")
+    
+    result = test_api_endpoint(
+        "/user/projections-preferences", 
+        method="POST", 
+        data=save_preferences_data, 
+        cookies=cookies, 
+        expected_status=200
+    )
+    
+    if result and len(result) == 2:
+        data, response = result
+        if data and isinstance(data, dict):
+            print(f"✅ Save preferences successful")
+            print(f"  📋 Response: {data.get('message', 'No message')}")
+            print(f"  🆔 User ID: {data.get('user_id', 'Not provided')}")
+            print(f"  👁️  View ID: {data.get('view_id', 'Not provided')}")
+            
+            # Validate response structure
+            if (data.get('message') and 
+                data.get('user_id') and 
+                data.get('view_id') == save_preferences_data['view_id']):
+                test_results['save_preferences'] = True
+                print(f"✅ Save preferences response structure valid")
+            else:
+                print(f"❌ Save preferences response structure invalid")
+        else:
+            print(f"❌ Save preferences failed - invalid response data")
+    else:
+        print(f"❌ Save preferences failed - no response")
+    
+    # Step 3: Load preferences (GET /api/user/projections-preferences)
+    print(f"\n{'='*60}")
+    print(f"📥 STEP 3: LOAD PREFERENCES")
+    print(f"{'='*60}")
+    
+    view_id = save_preferences_data['view_id']
+    print(f"📊 Testing GET /api/user/projections-preferences?view_id={view_id}")
+    
+    result = test_api_endpoint(
+        f"/user/projections-preferences?view_id={view_id}",
+        cookies=cookies,
+        expected_status=200
+    )
+    
+    if result and len(result) == 2:
+        data, response = result
+        if data and isinstance(data, dict):
+            print(f"✅ Load preferences successful")
+            
+            # Validate response structure as specified in review
+            has_preferences = data.get('has_preferences')
+            preferences = data.get('preferences')
+            
+            print(f"  📋 has_preferences: {has_preferences}")
+            print(f"  📋 preferences type: {type(preferences)}")
+            
+            if has_preferences is True:
+                print(f"✅ has_preferences is True as expected")
+                
+                if preferences and isinstance(preferences, dict):
+                    print(f"✅ preferences object found")
+                    
+                    # Validate the saved data matches what we sent
+                    saved_next14 = preferences.get('next14', [])
+                    saved_next30 = preferences.get('next30', [])
+                    saved_next60 = preferences.get('next60', [])
+                    
+                    print(f"  📊 Loaded preferences structure:")
+                    print(f"    • next14: {len(saved_next14)} deals")
+                    print(f"    • next30: {len(saved_next30)} deals")
+                    print(f"    • next60: {len(saved_next60)} deals")
+                    
+                    # Detailed validation of saved data
+                    data_matches = True
+                    
+                    # Check next14 deals
+                    expected_next14 = save_preferences_data['preferences']['next14']
+                    if len(saved_next14) == len(expected_next14):
+                        for i, deal in enumerate(saved_next14):
+                            expected_deal = expected_next14[i]
+                            if (deal.get('id') == expected_deal['id'] and 
+                                deal.get('hidden') == expected_deal['hidden']):
+                                print(f"    ✅ next14[{i}]: id={deal.get('id')}, hidden={deal.get('hidden')}")
+                            else:
+                                print(f"    ❌ next14[{i}]: mismatch")
+                                data_matches = False
+                    else:
+                        print(f"    ❌ next14 length mismatch: expected {len(expected_next14)}, got {len(saved_next14)}")
+                        data_matches = False
+                    
+                    # Check next30 deals
+                    expected_next30 = save_preferences_data['preferences']['next30']
+                    if len(saved_next30) == len(expected_next30):
+                        for i, deal in enumerate(saved_next30):
+                            expected_deal = expected_next30[i]
+                            if (deal.get('id') == expected_deal['id'] and 
+                                deal.get('hidden') == expected_deal['hidden']):
+                                print(f"    ✅ next30[{i}]: id={deal.get('id')}, hidden={deal.get('hidden')}")
+                            else:
+                                print(f"    ❌ next30[{i}]: mismatch")
+                                data_matches = False
+                    else:
+                        print(f"    ❌ next30 length mismatch: expected {len(expected_next30)}, got {len(saved_next30)}")
+                        data_matches = False
+                    
+                    # Check next60 deals
+                    expected_next60 = save_preferences_data['preferences']['next60']
+                    if len(saved_next60) == len(expected_next60):
+                        for i, deal in enumerate(saved_next60):
+                            expected_deal = expected_next60[i]
+                            if (deal.get('id') == expected_deal['id'] and 
+                                deal.get('hidden') == expected_deal['hidden']):
+                                print(f"    ✅ next60[{i}]: id={deal.get('id')}, hidden={deal.get('hidden')}")
+                            else:
+                                print(f"    ❌ next60[{i}]: mismatch")
+                                data_matches = False
+                    else:
+                        print(f"    ❌ next60 length mismatch: expected {len(expected_next60)}, got {len(saved_next60)}")
+                        data_matches = False
+                    
+                    if data_matches:
+                        test_results['load_preferences'] = True
+                        test_results['data_structure_validation'] = True
+                        print(f"✅ All saved data matches expected values")
+                    else:
+                        print(f"❌ Some saved data doesn't match expected values")
+                        
+                else:
+                    print(f"❌ preferences should be an object, got {type(preferences)}")
+            else:
+                print(f"❌ has_preferences should be True, got {has_preferences}")
+        else:
+            print(f"❌ Load preferences failed - invalid response data")
+    else:
+        print(f"❌ Load preferences failed - no response")
+    
+    # Step 4: Reset preferences (DELETE /api/user/projections-preferences)
+    print(f"\n{'='*60}")
+    print(f"🗑️  STEP 4: RESET PREFERENCES")
+    print(f"{'='*60}")
+    
+    print(f"📊 Testing DELETE /api/user/projections-preferences?view_id={view_id}")
+    
+    result = test_api_endpoint(
+        f"/user/projections-preferences?view_id={view_id}",
+        method="DELETE",
+        cookies=cookies,
+        expected_status=200
+    )
+    
+    if result and len(result) == 2:
+        data, response = result
+        if data and isinstance(data, dict):
+            print(f"✅ Reset preferences successful")
+            print(f"  📋 Response: {data.get('message', 'No message')}")
+            print(f"  🔄 Reset status: {data.get('reset', 'Not provided')}")
+            
+            # Validate response structure
+            if data.get('message') and data.get('reset') is True:
+                test_results['reset_preferences'] = True
+                print(f"✅ Reset preferences response structure valid")
+            else:
+                print(f"❌ Reset preferences response structure invalid")
+        else:
+            print(f"❌ Reset preferences failed - invalid response data")
+    else:
+        print(f"❌ Reset preferences failed - no response")
+    
+    # Step 5: Verify reset by loading preferences again
+    print(f"\n{'='*60}")
+    print(f"🔍 STEP 5: VERIFY RESET")
+    print(f"{'='*60}")
+    
+    print(f"📊 Testing GET /api/user/projections-preferences?view_id={view_id} after reset")
+    
+    result = test_api_endpoint(
+        f"/user/projections-preferences?view_id={view_id}",
+        cookies=cookies,
+        expected_status=200
+    )
+    
+    if result and len(result) == 2:
+        data, response = result
+        if data and isinstance(data, dict):
+            print(f"✅ Load preferences after reset successful")
+            
+            # Should return has_preferences: false, preferences: null
+            has_preferences = data.get('has_preferences')
+            preferences = data.get('preferences')
+            
+            print(f"  📋 has_preferences: {has_preferences}")
+            print(f"  📋 preferences: {preferences}")
+            
+            if has_preferences is False and preferences is None:
+                test_results['verify_reset'] = True
+                print(f"✅ Reset verification successful - no preferences found")
+            else:
+                print(f"❌ Reset verification failed - preferences still exist")
+                print(f"    Expected: has_preferences=False, preferences=None")
+                print(f"    Got: has_preferences={has_preferences}, preferences={preferences}")
+        else:
+            print(f"❌ Load preferences after reset failed - invalid response data")
+    else:
+        print(f"❌ Load preferences after reset failed - no response")
+    
+    # Test Summary
+    print(f"\n{'='*80}")
+    print(f"📊 PROJECTIONS PREFERENCES API TEST SUMMARY")
+    print(f"{'='*80}")
+    
+    passed_tests = sum(1 for result in test_results.values() if result)
+    total_tests = len(test_results)
+    
+    for test_name, result in test_results.items():
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"  {test_name}: {status}")
+    
+    print(f"\n📈 Test Results: {passed_tests}/{total_tests} tests passed ({passed_tests/total_tests*100:.1f}%)")
+    
+    if passed_tests == total_tests:
+        print(f"\n🎉 SUCCESS: All Projections Preferences API tests passed!")
+        print(f"✅ VERIFIED FUNCTIONALITY:")
+        print(f"  • Save preferences with mixed hidden/visible deals")
+        print(f"  • Load preferences and verify data matches")
+        print(f"  • Reset preferences")
+        print(f"  • Verify preferences are deleted after reset")
+        print(f"  • Test with valid session authentication")
+    else:
+        print(f"\n❌ ISSUES: {total_tests - passed_tests} Projections Preferences API tests failed")
+    
+    return passed_tests == total_tests
+
 def main():
     """Run comprehensive backend API testing including new multi-view endpoints"""
     print(f"{'='*80}")
