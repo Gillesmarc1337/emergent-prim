@@ -2164,7 +2164,7 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
         
         # Use back office target if available, otherwise calculate from distribution
         if revenue_2025 and revenue_2025.get(month_key):
-            focus_month_target = int(revenue_2025.get(month_key, 0))
+            focus_month_target = safe_int(revenue_2025.get(month_key, 0))
         else:
             # Fallback: Calculate from distribution
             monthly_distribution = {
