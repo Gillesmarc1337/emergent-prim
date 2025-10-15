@@ -801,34 +801,15 @@ def calculate_ae_performance(df, start_date, end_date):
     }
 
 def calculate_deals_closed(df, start_date, end_date):
-    """Calculate deals closed metrics"""
-    # Improved logic to detect closed deals from your actual data structure
-    # Look for deals that have Expected ARR/MRR values and are in advanced stages
-    potential_closed_deals = df[
-        (
-            (df['expected_arr'].notna()) & 
-            (df['expected_arr'] > 0)
-        ) | (
-            (df['expected_mrr'].notna()) & 
-            (df['expected_mrr'] > 0)
-        )
-    ]
-    
-    # Filter by date range (use discovery_date if billing_start is not available)
-    date_filtered = potential_closed_deals[
-        (
-            (potential_closed_deals['billing_start'] >= start_date) & 
-            (potential_closed_deals['billing_start'] <= end_date)
-        ) | (
-            (potential_closed_deals['discovery_date'] >= start_date) & 
-            (potential_closed_deals['discovery_date'] <= end_date) &
-            (potential_closed_deals['stage'].isin(['B Legals', 'C Proposal sent', 'D POA Booked']))
-        )
-    ]
-    
-    # Consider deals with stage "A Closed" as closed deals
-    closed_deals = date_filtered[
-        date_filtered['stage'] == 'A Closed'
+    """Calculate deals closed metrics - based on stage 'A Closed' only"""
+    # Simple and clear: Only deals with stage "A Closed" in the period
+    # Use discovery_date as the reference date for when the deal was closed
+    closed_deals = df[
+        (df['stage'] == 'A Closed') &
+        (df['discovery_date'] >= start_date) &
+        (df['discovery_date'] <= end_date) &
+        (df['expected_arr'].notna()) &
+        (df['expected_arr'] > 0)
     ]
     
     # Monthly breakdown for chart
