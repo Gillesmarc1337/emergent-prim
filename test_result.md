@@ -552,6 +552,18 @@ frontend:
           agent: "main"
           comment: "✅ USER MANAGEMENT FRONTEND IMPLEMENTED: Completed UserManagementPage.jsx with full CRUD functionality. Features: 1) User list display with email, role badges (super_admin/viewer), and view access. 2) Add new user form with email, role selection, and view access assignment. 3) Interactive view access management - click to toggle view access for each user. 4) Role toggle buttons - promote viewer to super_admin or demote super_admin to viewer. 5) Delete user functionality with confirmation prompt and self-delete protection. 6) Real-time success/error messages with color-coded alerts. 7) Integration with backend API using user_id for all operations. Integrated into App.js routing at /admin/users. Updated Header.jsx with dropdown menu for Admin pages (Targets Config, User Management). Navigation accessible to super_admin users only. Frontend compiling successfully without errors."
 
+  - task: "Projections Board Save/Reset User Preferences"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ PROJECTIONS PREFERENCES SYSTEM IMPLEMENTED: Created complete save/reset functionality for Interactive Board. BACKEND: Added 3 new endpoints in server.py: POST /api/user/projections-preferences (save order & hidden deals per view), GET /api/user/projections-preferences (load saved state), DELETE /api/user/projections-preferences (reset to default). Created ProjectionDeal and ProjectionsPreferencesRequest Pydantic models. MongoDB collection: user_projections_preferences (keyed by user_id + view_id). FRONTEND: Modified App.js to use API instead of localStorage. Functions: loadProjectionsPreferences() loads on startup, saveProjectionsPreferences() called by Save button, resetProjectionsPreferences() called by Reset button. State includes deal order, hidden status, and column assignment (next14/next30/next60). Preferences are view-specific and persist until user clicks Reset. hasUnsavedChanges flag shows 'Unsaved Changes' badge. Both backend and frontend compiling successfully. Ready for testing."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
