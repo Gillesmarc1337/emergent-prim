@@ -2774,10 +2774,10 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
         active_pipeline = df[~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost'])]
         total_pipeline = float(active_pipeline['pipeline'].sum())
         
-        # Weighted pipeline
-        active_pipeline['probability'] = active_pipeline['stage'].map(stage_probabilities).fillna(0)
-        active_pipeline['weighted_value'] = active_pipeline['pipeline'] * active_pipeline['probability'] / 100
-        total_weighted_pipeline = float(active_pipeline['weighted_value'].sum())
+        # Weighted pipeline using Excel formula
+        active_pipeline_copy = active_pipeline.copy()
+        active_pipeline_copy['weighted_value'] = active_pipeline_copy.apply(calculate_excel_weighted_value, axis=1)
+        total_weighted_pipeline = float(active_pipeline_copy['weighted_value'].sum())
         
         # July to December 2025 targets chart using view-specific targets
         period_targets_2025 = []
