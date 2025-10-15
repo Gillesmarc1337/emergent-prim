@@ -46,6 +46,11 @@ class NumpyEncoder(json.JSONEncoder):
             return None
         return super().default(obj)
 
+def json_response(data: Any) -> JSONResponse:
+    """Create JSON response with numpy-safe encoding"""
+    json_str = json.dumps(data, cls=NumpyEncoder)
+    return JSONResponse(content=json.loads(json_str))
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
