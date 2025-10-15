@@ -66,7 +66,7 @@ const Header = () => {
                       <SelectValue placeholder="Select view" />
                     </SelectTrigger>
                     <SelectContent>
-                      {views.map((view) => (
+                      {getSortedViews().map((view) => (
                         <SelectItem key={view.id} value={view.id}>
                           {view.name}
                           {view.is_default && ' (Default)'}
