@@ -1265,6 +1265,80 @@ function Dashboard() {
   };
 
   // New functions for projections data
+  // Load user's saved projections preferences from backend
+  const loadProjectionsPreferences = async () => {
+    if (!currentView?.id) return null;
+    
+    try {
+      const response = await axios.get(`${API}/user/projections-preferences`, {
+        params: { view_id: currentView.id },
+        withCredentials: true
+      });
+      
+      if (response.data.has_preferences) {
+        console.log('✅ Loaded saved projections preferences:', response.data);
+        return response.data.preferences;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error loading projections preferences:', error);
+      return null;
+    }
+  };
+
+  // Save projections preferences to backend
+  const saveProjectionsPreferences = async (dealsData, hiddenDealsSet) => {
+    if (!currentView?.id) return;
+    
+    try {
+      // Organize deals by column with hidden status
+      const next30Deals = dealsData
+        .filter(d => d.column === 'next30')
+        .map(d => ({ id: d.id, hidden: hiddenDealsSet.has(d.id) }));
+      
+      const next60Deals = dealsData
+        .filter(d => d.column === 'next60')
+        .map(d => ({ id: d.id, hidden: hiddenDealsSet.has(d.id) }));
+      
+      const next90Deals = dealsData
+        .filter(d => d.column === 'next90')
+        .map(d => ({ id: d.id, hidden: hiddenDealsSet.has(d.id) }));
+      
+      await axios.post(`${API}/user/projections-preferences`, {
+        view_id: currentView.id,
+        preferences: {
+          next30: next30Deals,
+          next60: next60Deals,
+          next90: next90Deals
+        }
+      }, {
+        withCredentials: true
+      });
+      
+      console.log('✅ Projections preferences saved successfully');
+    } catch (error) {
+      console.error('Error saving projections preferences:', error);
+      throw error;
+    }
+  };
+
+  // Reset projections preferences (delete from backend)
+  const resetProjectionsPreferences = async () => {
+    if (!currentView?.id) return;
+    
+    try {
+      await axios.delete(`${API}/user/projections-preferences`, {
+        params: { view_id: currentView.id },
+        withCredentials: true
+      });
+      
+      console.log('✅ Projections preferences reset successfully');
+    } catch (error) {
+      console.error('Error resetting projections preferences:', error);
+      throw error;
+    }
+  };
+
   const loadProjectionsData = async () => {
     setLoadingProjections(true);
     try {
@@ -1307,19 +1381,45 @@ function Dashboard() {
         next60: dealsWithColumns.filter(d => d.column === 'next60').length
       });
       
-      // Try to load saved board state from localStorage
-      const savedStateKey = `closingBoard_${currentView?.id || 'default'}`;
-      const savedState = localStorage.getItem(savedStateKey);
+      // Try to load saved preferences from backend
+      const savedPreferences = await loadProjectionsPreferences();
       
-      if (savedState) {
+      if (savedPreferences) {
         try {
-          const { hotDeals: savedDeals, hiddenDeals: savedHidden } = JSON.parse(savedState);
-          setHotDeals(savedDeals);
-          setHiddenDeals(new Set(savedHidden));
+          // Rebuild deals array from saved preferences
+          const reconstructedDeals = [];
+          const hiddenSet = new Set();
+          
+          // Process each column from saved preferences
+          ['next30', 'next60', 'next90'].forEach(columnKey => {
+            const savedColumn = savedPreferences[columnKey] || [];
+            savedColumn.forEach(savedDeal => {
+              // Find the deal in our fresh data
+              const dealData = dealsWithColumns.find(d => d.id === savedDeal.id);
+              if (dealData) {
+                // Update its column from saved preferences
+                dealData.column = columnKey;
+                reconstructedDeals.push(dealData);
+                if (savedDeal.hidden) {
+                  hiddenSet.add(savedDeal.id);
+                }
+              }
+            });
+          });
+          
+          // Add any new deals that weren't in saved preferences
+          dealsWithColumns.forEach(deal => {
+            if (!reconstructedDeals.find(d => d.id === deal.id)) {
+              reconstructedDeals.push(deal);
+            }
+          });
+          
+          setHotDeals(reconstructedDeals);
+          setHiddenDeals(hiddenSet);
           setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns))); // Keep original for reset
-          console.log('Loaded saved board state');
+          console.log('✅ Applied saved projections preferences');
         } catch (e) {
-          console.error('Error loading saved state:', e);
+          console.error('Error applying saved preferences:', e);
           // Fall back to fresh data
           setHotDeals(dealsWithColumns);
           setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns)));
