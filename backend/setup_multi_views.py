@@ -13,6 +13,29 @@ db = client[os.environ.get('DB_NAME', 'sales_analytics')]
 
 # View configurations with targets per view
 VIEW_CONFIGS = {
+    "Organic": {
+        "user_email": "demo@primelis.com",
+        "sheet_url": None,  # Default view
+        "targets": {
+            "dashboard": {
+                "objectif_6_mois": 4500000,  # 4.5M (default from original system)
+                "deals": 25,
+                "new_pipe_created": 2000000,  # 2M
+                "weighted_pipe": 800000  # 800K
+            },
+            "meeting_generation": {
+                "intro": 45,
+                "inbound": 22,
+                "outbound": 17,
+                "referrals": 11,
+                "upsells_x": 0
+            },
+            "meeting_attended": {
+                "poa": 18,
+                "deals_closed": 6
+            }
+        }
+    },
     "Full Funnel": {
         "user_email": "maxime.toubia@primelis.com",
         "sheet_url": "https://docs.google.com/spreadsheets/d/12vOjTGZKoBNiodDMb-dFNH7r7aUOrPdFs5whMFjDKZo/edit?usp=drive_link",
