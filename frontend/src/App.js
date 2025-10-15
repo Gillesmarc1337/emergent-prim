@@ -1105,6 +1105,23 @@ function Dashboard() {
   const [importMethod, setImportMethod] = useState('csv'); // 'csv' or 'sheets'
   const [viewMode, setViewMode] = useState('monthly'); // 'monthly' or 'yearly'
   
+  // Listen for view config updates from other admins
+  useEffect(() => {
+    const handleConfigUpdate = () => {
+      console.log('View config updated, reloading analytics...');
+      // Reload current analytics
+      if (viewMode === 'monthly') {
+        loadAnalytics();
+      } else {
+        loadYearlyAnalytics();
+      }
+      loadDashboard();
+    };
+
+    window.addEventListener('viewConfigUpdated', handleConfigUpdate);
+    return () => window.removeEventListener('viewConfigUpdated', handleConfigUpdate);
+  }, [viewMode, monthOffset]);
+  
   // New states for projections
   const [hotDeals, setHotDeals] = useState([]);
   const [originalHotDeals, setOriginalHotDeals] = useState([]); // Store original state for reset
