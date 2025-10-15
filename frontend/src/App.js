@@ -2387,9 +2387,11 @@ function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* AE Performance Blocks - 4 blocks similar to dashboard */}
+            {/* AE Performance Blocks - All AEs sorted by Closing Value (descending) */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-              {analytics.ae_performance.ae_performance.slice(0, 4).map((ae, index) => (
+              {analytics.ae_performance.ae_performance
+                .sort((a, b) => b.valeur_closing - a.valeur_closing) // Sort by closing value descending
+                .map((ae, index) => (
                 <Card key={index}>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-lg text-center">AE #{index + 1}</CardTitle>
