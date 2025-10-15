@@ -1107,11 +1107,14 @@ function Dashboard() {
   
   // New states for projections
   const [hotDeals, setHotDeals] = useState([]);
+  const [originalHotDeals, setOriginalHotDeals] = useState([]); // Store original state for reset
   const [hotLeads, setHotLeads] = useState([]);
   const [performanceSummary, setPerformanceSummary] = useState(null);
   const [hiddenDeals, setHiddenDeals] = useState(new Set());
   const [hiddenLeads, setHiddenLeads] = useState(new Set());
   const [loadingProjections, setLoadingProjections] = useState(false);
+  const [selectedAE, setSelectedAE] = useState('all'); // Filter by AE
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
   // State for Upsell & Renew tab
   const [upsellRenewData, setUpsellRenewData] = useState(null);
