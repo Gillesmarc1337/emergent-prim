@@ -5756,6 +5756,7 @@ def main():
         'google_sheet_upload': False,  # NEW TEST - Google Sheet Upload for Market View
         'multi_view_endpoints': False,
         'projections_endpoints': False,
+        'projections_preferences_api': False,  # NEW TEST - Projections Preferences API
         'analytics_endpoints': False,
         'session_management': False
     }
