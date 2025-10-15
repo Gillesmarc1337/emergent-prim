@@ -438,11 +438,19 @@ def calculate_meeting_generation(df, start_date, end_date, view_targets=None):
     bdr_list = ['Xavier', 'Selma', 'Kenny', 'Marie']
     monthly_bdr_meeting_target = 6  # 6 meetings per month per BDR
     
-    # Base monthly targets (50 total = 22 inbound + 17 outbound + 11 referrals)
-    monthly_inbound_target = 22
-    monthly_outbound_target = 17 
-    monthly_referral_target = 11
-    monthly_total_target = 50
+    # Get targets from view_targets if provided, otherwise use defaults
+    if view_targets:
+        meeting_gen = view_targets.get("meeting_generation", {})
+        monthly_inbound_target = meeting_gen.get("inbound", 22)
+        monthly_outbound_target = meeting_gen.get("outbound", 17)
+        monthly_referral_target = meeting_gen.get("referral", meeting_gen.get("referrals", 11))
+        monthly_total_target = monthly_inbound_target + monthly_outbound_target + monthly_referral_target
+    else:
+        # Default targets
+        monthly_inbound_target = 22
+        monthly_outbound_target = 17 
+        monthly_referral_target = 11
+        monthly_total_target = 50
     
     # Dynamic targets based on period duration
     inbound_target = monthly_inbound_target * period_duration_months
