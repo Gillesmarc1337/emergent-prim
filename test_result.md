@@ -554,15 +554,18 @@ frontend:
 
   - task: "Projections Board Save/Reset User Preferences"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py, /app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "✅ PROJECTIONS PREFERENCES SYSTEM IMPLEMENTED: Created complete save/reset functionality for Interactive Board. BACKEND: Added 3 new endpoints in server.py: POST /api/user/projections-preferences (save order & hidden deals per view), GET /api/user/projections-preferences (load saved state), DELETE /api/user/projections-preferences (reset to default). Created ProjectionDeal and ProjectionsPreferencesRequest Pydantic models. MongoDB collection: user_projections_preferences (keyed by user_id + view_id). FRONTEND: Modified App.js to use API instead of localStorage. Functions: loadProjectionsPreferences() loads on startup, saveProjectionsPreferences() called by Save button, resetProjectionsPreferences() called by Reset button. State includes deal order, hidden status, and column assignment (next14/next30/next60). Preferences are view-specific and persist until user clicks Reset. hasUnsavedChanges flag shows 'Unsaved Changes' badge. Both backend and frontend compiling successfully. Ready for testing."
+        - working: true
+          agent: "testing"
+          comment: "✅ PROJECTIONS PREFERENCES API TESTING COMPLETE - ALL TESTS PASSED (6/6): Comprehensive testing of new Projections Preferences API endpoints successfully completed as requested in review. VERIFIED FUNCTIONALITY: 1) POST /api/user/projections-preferences - Successfully saves preferences with mixed hidden/visible deals for view-organic-xxx, returns proper response structure with user_id and view_id. 2) GET /api/user/projections-preferences?view_id=view-organic-xxx - Correctly loads saved preferences, returns {has_preferences: true, preferences: {...}} structure as specified. Data validation confirms all saved deals match expected values (next14: 2 deals, next30: 1 deal, next60: 1 deal) with correct id and hidden status. 3) DELETE /api/user/projections-preferences?view_id=view-organic-xxx - Successfully resets preferences, returns success message and reset: true status. 4) GET after DELETE - Correctly returns {has_preferences: false, preferences: null} confirming preferences are deleted. 5) Authentication working correctly with demo session (demo@primelis.com, viewer role). All test scenarios from review request completed successfully: save preferences with mixed hidden/visible deals, load and verify data matches, reset preferences, verify deletion after reset, valid session authentication. Backend API endpoints are fully functional and ready for production use."
 
 metadata:
   created_by: "main_agent"
