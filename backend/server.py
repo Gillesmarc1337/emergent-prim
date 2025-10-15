@@ -552,7 +552,8 @@ def calculate_meeting_generation(df, start_date, end_date, view_targets=None):
             'source': str(row.get('type_of_source', 'N/A')),
             'relevance': str(row.get('relevance', 'N/A')),
             'owner': str(row.get('owner', 'N/A')),  # AE owner
-            'stage': str(row.get('stage', 'N/A'))  # Deal stage
+            'stage': str(row.get('stage', 'N/A')),  # Deal stage
+            'expected_arr': float(row.get('expected_arr', 0))  # Column K - Expected ARR
         })
     
     return {
