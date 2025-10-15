@@ -20,6 +20,25 @@ const Header = () => {
     }
   };
 
+  // Sort views in specific order for admins: Master / Full Funnel / Organic / Signal / Market
+  const getSortedViews = () => {
+    if (!views || views.length === 0) return [];
+    
+    const viewOrder = ['Master', 'Full Funnel', 'Organic', 'Signal', 'Market'];
+    
+    return [...views].sort((a, b) => {
+      const indexA = viewOrder.indexOf(a.name);
+      const indexB = viewOrder.indexOf(b.name);
+      
+      // If view is not in the order list, put it at the end
+      if (indexA === -1 && indexB === -1) return 0;
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      
+      return indexA - indexB;
+    });
+  };
+
   // Debug: Log views state
   console.log('Header - Views:', views, 'CurrentView:', currentView);
 
