@@ -184,7 +184,16 @@ async def setup_multi_views():
         existing_view = await db.views.find_one({"name": view_name})
         
         if existing_view:
-            print(f"  ✓ View '{view_name}' already exists")
+            # Update existing view with targets
+            await db.views.update_one(
+                {"name": view_name},
+                {"$set": {
+                    "targets": config["targets"],
+                    "sheet_url": config["sheet_url"],
+                    "assigned_user": config["user_email"]
+                }}
+            )
+            print(f"  ✓ View '{view_name}' already exists - updated targets")
             created_view_ids[view_name] = existing_view["id"]
         else:
             view_data = {
@@ -193,7 +202,7 @@ async def setup_multi_views():
                 "sheet_url": config["sheet_url"],
                 "sheet_name": None,
                 "is_master": False,
-                "is_default": False,
+                "is_default": (view_name == "Organic"),  # Mark Organic as default
                 "targets": config["targets"],
                 "assigned_user": config["user_email"],
                 "created_at": datetime.now(timezone.utc)
