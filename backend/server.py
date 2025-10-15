@@ -53,8 +53,8 @@ def get_collection_for_view(view_name: str):
     return VIEW_COLLECTION_MAP.get(view_name, "sales_records")
 
 def get_collections_for_master():
-    """Get all collections to aggregate for Master view"""
-    return ["sales_records_signal", "sales_records_fullfunnel", "sales_records_market"]
+    """Get all collections to aggregate for Master view (includes Organic)"""
+    return ["sales_records", "sales_records_signal", "sales_records_fullfunnel", "sales_records_market"]
 
 async def get_sales_data_for_view(view_id: str):
     """
