@@ -1588,19 +1588,43 @@ def get_month_range(date=None, month_offset=0):
 async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
     """Generate yearly analytics report"""
     try:
-        # Calculate year range (January 1 to December 31)
-        year_start = datetime(year, 1, 1, 0, 0, 0, 0)
-        year_end = datetime(year, 12, 31, 23, 59, 59, 999999)
-        
-        # Get data from MongoDB based on view
+        # Get view config and targets if view_id provided
+        view_config = None
+        view_targets = None
         if view_id:
+            config_data = await get_view_config_with_defaults(view_id)
+            view_config = config_data["view"]
+            view_targets = config_data["targets"]
             records = await get_sales_data_for_view(view_id)
         else:
+            # Default targets for Organic view
+            view_targets = {
+                "dashboard": {
+                    "objectif_6_mois": 4500000,
+                    "deals": 25,
+                    "new_pipe_created": 2000000,
+                    "weighted_pipe": 800000
+                },
+                "meeting_generation": {
+                    "intro": 45,
+                    "inbound": 22,
+                    "outbound": 17,
+                    "referrals": 11
+                },
+                "meeting_attended": {
+                    "poa": 18,
+                    "deals_closed": 6
+                }
+            }
             # Fallback to default Organic collection
             records = await db.sales_records.find().to_list(10000)
             
         if not records:
             raise HTTPException(status_code=404, detail="No sales data found. Please upload data first.")
+        
+        # Calculate year range (January 1 to December 31)
+        year_start = datetime(year, 1, 1, 0, 0, 0, 0)
+        year_end = datetime(year, 12, 31, 23, 59, 59, 999999)
         
         # Convert to DataFrame for analysis
         df = pd.DataFrame(records)
