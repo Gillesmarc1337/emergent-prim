@@ -3662,7 +3662,7 @@ function Dashboard() {
                           <thead>
                             <tr className="border-b bg-gray-50">
                               <th className="text-left p-3 font-semibold">ACCOUNT EXECUTIVE</th>
-                              <th className="text-right p-3 font-semibold">NEXT 14 DAYS<br /><span className="text-xs font-normal text-gray-600">Pipeline</span></th>
+                              <th className="text-right p-3 font-semibold">NEXT 30 DAYS<br /><span className="text-xs font-normal text-gray-600">Pipeline</span></th>
                               <th className="text-right p-3 font-semibold">NEXT 30 DAYS<br /><span className="text-xs font-normal text-gray-600">Pipeline</span></th>
                               <th className="text-right p-3 font-semibold">NEXT 60-90 DAYS<br /><span className="text-xs font-normal text-gray-600">Pipeline</span></th>
                             </tr>
