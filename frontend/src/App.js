@@ -1539,6 +1539,16 @@ function Dashboard() {
   
   // State for AE Pipeline Breakdown sorting
   const [aePipelineSortConfig, setAePipelineSortConfig] = useState({ key: 'total', direction: 'descending' });
+  
+  // State for Meeting Details filters and sorting
+  const [meetingDetailsFilters, setMeetingDetailsFilters] = useState({
+    bdr: 'all',
+    source: 'all',
+    relevance: 'all',
+    stage: 'all'
+  });
+  const { items: sortedMeetingDetails, requestSort: requestMeetingDetailsSort, sortConfig: meetingDetailsSortConfig } = 
+    useSortableData(analytics?.meeting_generation?.meetings_details || []);
 
   if (loading) {
     return (
