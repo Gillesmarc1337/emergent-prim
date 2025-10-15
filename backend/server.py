@@ -938,8 +938,14 @@ def calculate_excel_weighted_value(row):
 def calculate_pipe_metrics(df, start_date, end_date):
     """Calculate pipeline metrics with Excel-exact weighted pipe logic"""
     
+    # Filter to only deals with valid pipeline first
+    df_with_pipeline = df[
+        (df['pipeline'].notna()) & 
+        (df['pipeline'] > 0)
+    ].copy()
+    
     # Apply centralized Excel weighting formula to each row
-    df['weighted_value'] = df.apply(calculate_excel_weighted_value, axis=1)
+    df_with_pipeline['weighted_value'] = df_with_pipeline.apply(calculate_excel_weighted_value, axis=1)
     
     # Calculate dynamic targets based on period duration
     period_duration_days = (end_date - start_date).days + 1
