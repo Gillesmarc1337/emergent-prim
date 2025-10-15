@@ -2049,10 +2049,9 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
         actual_show = len(show_meetings)
         actual_no_show = len(no_show_meetings)
         
-        # Block 2: Intro & POA (filtered for focus month)
-        # Targets: 45 intro, 18 POA per month
-        target_intro = 45
-        target_poa = 18
+        # Block 2: Intro & POA (filtered for focus month) - use view-specific targets
+        target_intro = view_targets.get("meeting_generation", {}).get("intro", 45)
+        target_poa = view_targets.get("meeting_attended", {}).get("poa", 18)
         
         # Intro = "Show" (une intro c'est un "show") for the focus month
         intro_data = df[
