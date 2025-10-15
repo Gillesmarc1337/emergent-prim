@@ -615,7 +615,22 @@ function DataManagementSection({ onDataUpdated, currentView }) {
             <div>
               <div className="text-sm text-gray-600">Last Updated</div>
               <div className="text-sm font-medium">
-                {dataStatus.last_update ? new Date(dataStatus.last_update).toLocaleDateString() : 'Never'}
+                {dataStatus.last_update ? (
+                  <>
+                    {new Date(dataStatus.last_update).toLocaleDateString('fr-FR', { 
+                      day: '2-digit', 
+                      month: '2-digit', 
+                      year: 'numeric',
+                      timeZone: 'Europe/Paris'
+                    })}
+                    {' à '}
+                    {new Date(dataStatus.last_update).toLocaleTimeString('fr-FR', { 
+                      hour: '2-digit', 
+                      minute: '2-digit',
+                      timeZone: 'Europe/Paris'
+                    })}
+                  </>
+                ) : 'Never'}
               </div>
             </div>
           </div>
