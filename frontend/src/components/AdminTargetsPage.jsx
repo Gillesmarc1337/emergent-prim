@@ -267,6 +267,16 @@ function AdminTargetsPage() {
   const handleSave = async () => {
     if (!selectedView || !targets) return;
 
+    // Prevent saving for Master view (it's auto-calculated)
+    const isMasterView = selectedView.name === 'Master';
+    if (isMasterView) {
+      setMessage({ 
+        type: 'info', 
+        text: 'Master view targets are auto-calculated from other views. Edit individual views instead.' 
+      });
+      return;
+    }
+
     setSaving(true);
     setMessage(null);
 
