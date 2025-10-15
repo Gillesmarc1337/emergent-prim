@@ -524,6 +524,18 @@ frontend:
         - working: true
           agent: "testing"
           comment: "🎉 GOOGLE SHEET UPLOAD FOR MARKET VIEW - COMPLETE SUCCESS: Comprehensive testing of Google Sheet upload functionality as requested in review. ALL 5 TESTS PASSED (100% SUCCESS RATE): 1) ✅ GET /api/views - Successfully retrieved Market view ID (view-market-1760356092). 2) ✅ POST /api/upload-google-sheets - Successfully uploaded Google Sheet (https://docs.google.com/spreadsheets/d/1BJ_thepAfcZ7YQY1aWFoPbuBIakzd65hoMfbCJCDSlk/edit?gid=1327587298#gid=1327587298) to Market view, processed 88 records, all valid. 3) ✅ GET /api/analytics/dashboard?view_id=Market - Dashboard analytics accessible, key_metrics and dashboard_blocks present, YTD revenue: $60,000, YTD target: $1,700,000. 4) ✅ GET /api/analytics/monthly?view_id=Market&month_offset=0 - Monthly analytics working perfectly, 5 dashboard blocks validated, NO numpy serialization errors, all numeric fields properly serialized. 5) ✅ GET /api/data/status?view_id=Market - Data status confirmed: 88 total records, has_data: true, source_type: 'google_sheets', last_update timestamp recorded. CRITICAL FIXES VERIFIED: ✅ Numpy serialization bug fixed - all analytics endpoints return clean JSON without numpy.int64 errors. ✅ View-specific targets working - Market view uses its own data collection (sales_records_market). ✅ All endpoints support view_id parameter correctly. CONCLUSION: Google Sheet upload for Market view is fully functional and ready for production use."
+  
+  - task: "User Management Backend API Endpoints"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ BACKEND USER MANAGEMENT ENDPOINTS IMPLEMENTED: Created comprehensive API endpoints for user management at /app/backend/server.py. Endpoints added: 1) GET /api/admin/users - List all users with roles and view access (super_admin only). 2) POST /api/admin/users - Create or update user (super_admin only). 3) PUT /api/admin/users/{user_id}/role - Update user role (super_admin only). 4) GET /api/admin/users/{user_id}/views - Get user's view access. 5) PUT /api/admin/users/{user_id}/views - Update user's view access with validation. 6) DELETE /api/admin/users/{user_id} - Delete user and all sessions (super_admin only, with self-delete protection). Added Pydantic models: UserCreateRequest, UserUpdateRequest, UserRoleUpdateRequest, UserViewAccessRequest. All endpoints protected with require_super_admin middleware. Backend service restarted successfully. Ready for comprehensive testing."
 
 metadata:
   created_by: "main_agent"
