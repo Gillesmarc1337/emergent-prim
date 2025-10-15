@@ -547,6 +547,98 @@ function AdminTargetsPage() {
                 </CardContent>
               </Card>
 
+              {/* MEETINGS GENERATION TAB - Meetings Attended Banner */}
+              <Card className="border-green-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded">MEETINGS GENERATION TAB</span>
+                    Meetings Attended Configuration
+                  </CardTitle>
+                  <CardDescription>
+                    Configure targets for Meetings Scheduled, POA Generated, and Deals Closed
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="meetings_scheduled">Meetings Scheduled (Monthly)</Label>
+                      <Input
+                        id="meetings_scheduled"
+                        type="number"
+                        value={targets?.meetings_attended?.meetings_scheduled || 0}
+                        onChange={(e) => {
+                          setTargets(prev => ({
+                            ...prev,
+                            meetings_attended: {
+                              ...prev.meetings_attended,
+                              meetings_scheduled: parseInt(e.target.value) || 0
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Total meetings scheduled target</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="poa_generated">POA Generated (Monthly)</Label>
+                      <Input
+                        id="poa_generated"
+                        type="number"
+                        value={targets?.meetings_attended?.poa_generated || 0}
+                        onChange={(e) => {
+                          setTargets(prev => ({
+                            ...prev,
+                            meetings_attended: {
+                              ...prev.meetings_attended,
+                              poa_generated: parseInt(e.target.value) || 0
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">POA generated from intros</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="deals_closed_target">Deals Closed (Monthly)</Label>
+                      <Input
+                        id="deals_closed_target"
+                        type="number"
+                        value={targets?.meetings_attended?.deals_closed || 0}
+                        onChange={(e) => {
+                          setTargets(prev => ({
+                            ...prev,
+                            meetings_attended: {
+                              ...prev.meetings_attended,
+                              deals_closed: parseInt(e.target.value) || 0
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Total deals closed target</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-green-50 rounded">
+                    <div className="text-sm font-semibold mb-2">Preview Banner:</div>
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div className="border p-3 rounded bg-white">
+                        <div className="font-semibold text-lg">_/{targets?.meetings_attended?.meetings_scheduled || 0}</div>
+                        <div className="text-gray-600">Meetings Scheduled</div>
+                      </div>
+                      <div className="border p-3 rounded bg-white">
+                        <div className="font-semibold text-lg">_/{targets?.meetings_attended?.poa_generated || 0}</div>
+                        <div className="text-gray-600">POA Generated</div>
+                      </div>
+                      <div className="border p-3 rounded bg-white">
+                        <div className="font-semibold text-lg">_/{targets?.meetings_attended?.deals_closed || 0}</div>
+                        <div className="text-gray-600">Deals Closed</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Info sur autres KPIs */}
               <Alert className="bg-gray-50 border-gray-300">
                 <Info className="h-4 w-4 text-gray-600" />
