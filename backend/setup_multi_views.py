@@ -163,17 +163,23 @@ async def setup_multi_views():
             await db.users.insert_one(user_data)
             print(f"  ✅ Created user: {user_info['email']} ({user_info['role']})")
     
-    # Update remi and asher to have access to all views including Master
+    # Update remi and asher to have super_admin role and access to all views including Master
     print("\n📝 Updating existing users (remi, asher) access...")
     await db.users.update_one(
         {"email": "remi@primelis.com"},
-        {"$set": {"view_access": ["Organic", "Full Funnel", "Signal", "Market", "Master"]}}
+        {"$set": {
+            "role": "super_admin",
+            "view_access": ["Organic", "Full Funnel", "Signal", "Market", "Master"]
+        }}
     )
     await db.users.update_one(
         {"email": "asher@primelis.com"},
-        {"$set": {"view_access": ["Organic", "Full Funnel", "Signal", "Market", "Master"]}}
+        {"$set": {
+            "role": "super_admin",
+            "view_access": ["Organic", "Full Funnel", "Signal", "Market", "Master"]
+        }}
     )
-    print("  ✅ Updated remi and asher with full view access")
+    print("  ✅ Updated remi and asher with super_admin role and full view access")
     
     # Step 2: Create views with targets
     print("\n📊 Creating views with targets...")
