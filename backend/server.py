@@ -1956,7 +1956,7 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
             'dashboard_blocks': dashboard_blocks
         }
         
-        return analytics
+        return convert_numpy_types(analytics)
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating yearly analytics: {str(e)}")
