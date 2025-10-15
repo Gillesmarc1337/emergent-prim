@@ -3608,7 +3608,7 @@ function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Projection by 14/30/60-90 days - Pipeline by AE per period */}
+            {/* Projection by 30/30/60-90 days - Pipeline by AE per period */}
             {Object.keys(analytics.closing_projections.ae_projections).length > 0 && (
               <Card className="mb-6">
                 <CardHeader>
