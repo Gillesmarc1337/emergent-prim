@@ -842,9 +842,9 @@ def calculate_deals_closed(df, start_date, end_date):
     
     # Convert numpy types to Python native types
     deals_count = int(len(closed_deals))
-    arr_sum = float(closed_deals['expected_arr'].sum())
-    mrr_sum = float(closed_deals['expected_mrr'].sum())
-    avg_deal = float(closed_deals['expected_arr'].mean() if len(closed_deals) > 0 else 0)
+    arr_sum = float(closed_deals['expected_arr'].fillna(0).sum())
+    mrr_sum = float(closed_deals['expected_mrr'].fillna(0).sum())
+    avg_deal = float(closed_deals['expected_arr'].fillna(0).mean() if len(closed_deals) > 0 else 0)
     
     # Calculate period length to adjust targets
     period_days = (end_date - start_date).days
