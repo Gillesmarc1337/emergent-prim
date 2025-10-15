@@ -806,13 +806,13 @@ def calculate_ae_performance(df, start_date, end_date):
     }
 
 def calculate_deals_closed(df, start_date, end_date):
-    """Calculate deals closed metrics - based on stage 'A Closed' only"""
-    # Simple and clear: Only deals with stage "A Closed" in the period
-    # Use discovery_date as the reference date for when the deal was closed
+    """Calculate deals closed metrics - based on stage 'A Closed' with billing_start date"""
+    # Use billing_start (colonne R) as the reference date for when the deal was closed
+    # Sum expected_arr (colonne J) for ARR Closed
     closed_deals = df[
         (df['stage'] == 'A Closed') &
-        (df['discovery_date'] >= start_date) &
-        (df['discovery_date'] <= end_date) &
+        (df['billing_start'] >= start_date) &
+        (df['billing_start'] <= end_date) &
         (df['expected_arr'].notna()) &
         (df['expected_arr'] > 0)
     ]
