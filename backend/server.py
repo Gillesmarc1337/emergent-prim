@@ -3109,10 +3109,11 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
             }
         }
 
-        # Calculate pipe created (YTD)
+        # Calculate pipe created (July-December 2025)
+        # Sum of colonne K (pipeline) for deals created from July to December
         current_year = datetime.now().year
-        year_start = datetime(current_year, 1, 1)
-        year_end = datetime(current_year, 12, 31, 23, 59, 59)
+        year_start = datetime(current_year, 7, 1)  # July 1st
+        year_end = datetime(current_year, 12, 31, 23, 59, 59)  # December 31st
         ytd_pipe_created = df[
             (df['discovery_date'] >= year_start) &
             (df['discovery_date'] <= year_end) &
