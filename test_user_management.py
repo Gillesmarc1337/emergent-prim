@@ -29,6 +29,7 @@ def test_endpoint(endpoint, method="GET", data=None, cookies=None, expected_stat
             raise ValueError(f"Unsupported method: {method}")
             
         print(f"Status Code: {response.status_code}")
+        print(f"Response object: {response}")
         
         # Always return the response object for analysis
         return response
