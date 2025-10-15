@@ -2263,6 +2263,34 @@ async def get_custom_analytics(
 ):
     """Generate analytics report for custom date range"""
     try:
+        # Get view config and targets if view_id provided
+        view_config = None
+        view_targets = None
+        if view_id:
+            config_data = await get_view_config_with_defaults(view_id)
+            view_config = config_data["view"]
+            view_targets = config_data["targets"]
+        else:
+            # Default targets for Organic view
+            view_targets = {
+                "dashboard": {
+                    "objectif_6_mois": 4500000,
+                    "deals": 25,
+                    "new_pipe_created": 2000000,
+                    "weighted_pipe": 800000
+                },
+                "meeting_generation": {
+                    "intro": 45,
+                    "inbound": 22,
+                    "outbound": 17,
+                    "referrals": 11
+                },
+                "meeting_attended": {
+                    "poa": 18,
+                    "deals_closed": 6
+                }
+            }
+        
         # Parse dates
         try:
             custom_start = datetime.strptime(start_date, "%Y-%m-%d").replace(hour=0, minute=0, second=0, microsecond=0)
