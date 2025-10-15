@@ -3549,8 +3549,9 @@ function Dashboard() {
                             return `$${value.toFixed(0)}`;
                           };
                           
-                          // Calculate sum excluding hidden deals
-                          const columnValue = hotDeals
+                          // Calculate sum excluding hidden deals (with AE filter)
+                          const filteredDeals = getFilteredDeals();
+                          const columnValue = filteredDeals
                             .filter(deal => deal.column === 'next60' && !hiddenDeals.has(deal.id))
                             .reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
                           const columnTarget = 750000; // Fixed target: $750K for next 60-90 days
