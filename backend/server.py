@@ -2177,7 +2177,7 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
                     df['type_of_deal'].apply(is_upsell) &
                     (df['stage'] == 'A Closed')
                 ]),
-                'closing_target': 6,  # 6 closing upsells per month
+                'closing_target': view_targets.get("meeting_attended", {}).get("deals_closed", 6),  # Use view-specific monthly target
                 'closing_value': float(df[
                     (df['discovery_date'] >= month_start) & 
                     (df['discovery_date'] <= month_end) &
