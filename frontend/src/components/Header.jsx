@@ -86,15 +86,31 @@ const Header = () => {
               </div>
             )}
 
-            {/* Admin Link (super_admin only) */}
+            {/* Admin Dropdown (super_admin only) */}
             {isAdmin && (
-              <a
-                href="/admin/targets"
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-              >
-                <Settings className="h-4 w-4" />
-                Admin
-              </a>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Settings className="h-4 w-4" />
+                    Admin
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <a href="/admin/targets" className="flex items-center gap-2 cursor-pointer">
+                      <Settings className="h-4 w-4" />
+                      Targets Config
+                    </a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <a href="/admin/users" className="flex items-center gap-2 cursor-pointer">
+                      <Users className="h-4 w-4" />
+                      User Management
+                    </a>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
 
             {/* User Info */}
