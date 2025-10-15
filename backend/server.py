@@ -2013,11 +2013,10 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
         focus_month_num = focus_month.month
         focus_month_str = focus_month.strftime('%b %Y')
         
-        # Block 1: Meetings Generation (for selected month)
-        # Fixed targets as per user requirements: 22 inbound, 17 outbound, 11 referral per month = 50 total
-        target_inbound = 22
-        target_outbound = 17
-        target_referral = 11
+        # Block 1: Meetings Generation (for selected month) - use view-specific targets
+        target_inbound = view_targets.get("meeting_generation", {}).get("inbound", 22)
+        target_outbound = view_targets.get("meeting_generation", {}).get("outbound", 17)
+        target_referral = view_targets.get("meeting_generation", {}).get("referrals", 11)
         target_total = target_inbound + target_outbound + target_referral
         
         # Calculate actual values for the focus month
