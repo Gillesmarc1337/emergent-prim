@@ -20,6 +20,7 @@ import { useAuth } from './contexts/AuthContext';
 import LoginPage from './components/LoginPage';
 import Header from './components/Header';
 import AdminTargetsPage from './components/AdminTargetsPage';
+import UserManagementPage from './components/UserManagementPage';
 import './App.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
