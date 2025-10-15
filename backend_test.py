@@ -5265,9 +5265,15 @@ def main():
         print(f"{'='*60}")
         test_results['views_authentication'] = test_views_endpoint_authentication()
         
-        # Test 4: NEW - Multi-view endpoints (as requested in review)
+        # Test 4: NEW - Google Sheet Upload for Market View (as requested in review)
         print(f"\n{'='*60}")
-        print(f"🔍 PHASE 4: MULTI-VIEW ENDPOINTS (NEW)")
+        print(f"📊 PHASE 4: GOOGLE SHEET UPLOAD - MARKET VIEW (NEW)")
+        print(f"{'='*60}")
+        test_results['google_sheet_upload'] = test_google_sheet_upload_for_market_view()
+        
+        # Test 5: Multi-view endpoints
+        print(f"\n{'='*60}")
+        print(f"🔍 PHASE 5: MULTI-VIEW ENDPOINTS")
         print(f"{'='*60}")
         test_results['multi_view_endpoints'] = test_multi_view_endpoints()
         
