@@ -5240,7 +5240,8 @@ def main():
         'basic_connectivity': False,
         'authentication_flow': False,
         'views_authentication': False,
-        'multi_view_endpoints': False,  # NEW TEST
+        'google_sheet_upload': False,  # NEW TEST - Google Sheet Upload for Market View
+        'multi_view_endpoints': False,
         'projections_endpoints': False,
         'analytics_endpoints': False,
         'session_management': False
