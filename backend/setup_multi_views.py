@@ -112,7 +112,7 @@ async def setup_multi_views():
     Setup multi-view system:
     1. Create new users
     2. Create views with targets
-    3. Calculate Master view targets (sum of 3 views)
+    3. Calculate Master view targets (sum of 4 views: Organic + Signal + Full Funnel + Market)
     """
     print("🚀 Setting up multi-view system...")
     
