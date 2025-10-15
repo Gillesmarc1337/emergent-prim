@@ -961,15 +961,15 @@ def calculate_pipe_metrics(df, start_date, end_date):
     created_pipe_target = monthly_new_pipe_target * period_duration_months
     created_weighted_target = monthly_weighted_pipe_target * period_duration_months
     
-    # New pipe created in period (Excel logic: ALL deals created in period, including Closed/Lost/Not Relevant)
-    new_pipe = df[
-        (df['discovery_date'] >= start_date) & 
-        (df['discovery_date'] <= end_date)
-        # Note: Excel includes ALL stages for "Created" metrics
+    # New pipe created in period (Excel logic: ALL deals created in period with valid pipeline)
+    new_pipe = df_with_pipeline[
+        (df_with_pipeline['discovery_date'] >= start_date) & 
+        (df_with_pipeline['discovery_date'] <= end_date)
+        # Note: Already filtered to have pipeline > 0
     ]
     
     # Total active pipeline (Excel logic: exclude A Closed, I Lost, H not relevant)
-    active_pipe = df[~df['stage'].isin(['A Closed', 'I Lost', 'H not relevant'])]
+    active_pipe = df_with_pipeline[~df_with_pipeline['stage'].isin(['A Closed', 'I Lost', 'H not relevant'])]
     
     # AE breakdown
     ae_breakdown = []
