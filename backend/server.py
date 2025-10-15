@@ -2106,17 +2106,23 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
         all_active_deals_monthly['weighted_value'] = all_active_deals_monthly['pipeline'] * all_active_deals_monthly['probability'] / 100
         aggregate_weighted_pipe_monthly = float(all_active_deals_monthly['weighted_value'].sum())
         
-        # Block 4: Revenue objective vs closed
-        exact_targets = {
-            'Jul 2025': 465000, 'Aug 2025': 397500, 'Sep 2025': 547500,
-            'Oct 2025': 1080000, 'Nov 2025': 997500, 'Dec 2025': 1312500
+        # Block 4: Revenue objective vs closed - calculate from view-specific 6-month target
+        objectif_6_mois = view_targets.get("dashboard", {}).get("objectif_6_mois", 4500000)
+        
+        # Monthly distribution percentages for July-December
+        monthly_distribution = {
+            'Jul 2025': 0.103, 'Aug 2025': 0.088, 'Sep 2025': 0.122,
+            'Oct 2025': 0.24, 'Nov 2025': 0.186, 'Dec 2025': 0.261
         }
-        exact_closed = {
-            'Jul 2025': 492396, 'Aug 2025': 454800, 'Sep 2025': 182400,
-            'Oct 2025': 0, 'Nov 2025': 0, 'Dec 2025': 0
-        }
-        focus_month_target = exact_targets.get(focus_month_str, 500000)
-        focus_month_closed = exact_closed.get(focus_month_str, 0)
+        focus_month_target = int(objectif_6_mois * monthly_distribution.get(focus_month_str, 0.167))
+        
+        # Calculate actual closed revenue from data
+        focus_month_closed_deals = df[
+            (df['stage'] == 'A Closed') &
+            (df['discovery_date'] >= month_start) &
+            (df['discovery_date'] <= month_end)
+        ]
+        focus_month_closed = float(focus_month_closed_deals['expected_arr'].fillna(0).sum())
         
         dashboard_blocks = {
             'block_1_meetings': {
