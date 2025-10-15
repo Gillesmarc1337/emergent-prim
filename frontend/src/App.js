@@ -3391,11 +3391,11 @@ function Dashboard() {
               <CardContent>
                 <DragDropContext onDragEnd={onDragEnd}>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Next 14 Days Column */}
+                    {/* Next 30 Days Column */}
                     <div className="bg-green-50 rounded-lg p-4">
                       <div className="mb-4">
                         <div className="font-semibold text-green-800 text-center mb-2">
-                          Next 14 Days
+                          Next 30 Days
                         </div>
                         {(() => {
                           // Format number with K (thousands) or M (millions)
