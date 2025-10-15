@@ -1736,9 +1736,9 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
         actual_show_july_dec = len(july_dec_meetings[july_dec_meetings['show_noshow'] == 'Show'])
         actual_no_show_july_dec = len(july_dec_meetings[july_dec_meetings['show_noshow'] == 'Noshow'])
         
-        # Intro & POA for July-Dec period
+        # Intro & POA for July-Dec period - use view-specific targets
         intro_july_dec = len(july_dec_meetings[july_dec_meetings['show_noshow'] == 'Show'])
-        monthly_intro_target = 45
+        monthly_intro_target = view_targets.get("meeting_generation", {}).get("intro", 45)
         july_dec_intro_target = monthly_intro_target * months_in_july_dec_period
         
         poa_stages = ['D POA Booked', 'C Proposal sent', 'B Legals', 'A Closed']
@@ -1747,7 +1747,7 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
             (df['discovery_date'] <= min(july_dec_end, current_date)) &
             (df['stage'].isin(poa_stages))
         ])
-        monthly_poa_target = 18
+        monthly_poa_target = view_targets.get("meeting_attended", {}).get("poa", 18)
         july_dec_poa_target = monthly_poa_target * months_in_july_dec_period
         
         # Upsells / Cross-sells for July-Dec period (Type of deal = "Upsell", "Up-sell", etc.)
@@ -1756,14 +1756,14 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
             (df['discovery_date'] <= min(july_dec_end, current_date)) &
             df['type_of_deal'].apply(is_upsell)
         ])
-        monthly_upsell_target = 5  # 5 upsells per month
+        monthly_upsell_target = view_targets.get("meeting_attended", {}).get("deals_closed", 6)
         july_dec_upsell_target = monthly_upsell_target * months_in_july_dec_period
         
         # New pipe created for July-Dec period
         new_pipe_july_dec = july_dec_meetings['pipeline'].sum()
         
-        # Calculate target pipe created for the period
-        monthly_pipe_target = 2000000  # $2M per month
+        # Calculate target pipe created from view config
+        monthly_pipe_target = view_targets.get("dashboard", {}).get("new_pipe_created", 2000000)
         target_pipe_july_dec = monthly_pipe_target * months_in_july_dec_period
         
         # Calculate weighted pipe properly for July-Dec period
