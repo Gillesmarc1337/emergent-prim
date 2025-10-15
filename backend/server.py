@@ -2045,9 +2045,11 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
         focus_month_str = focus_month.strftime('%b %Y')
         
         # Block 1: Meetings Generation (for selected month) - use view-specific targets
-        target_inbound = view_targets.get("meeting_generation", {}).get("inbound", 22)
-        target_outbound = view_targets.get("meeting_generation", {}).get("outbound", 17)
-        target_referral = view_targets.get("meeting_generation", {}).get("referrals", 11)
+        # Support both 'referral' (back office) and 'referrals' (setup script) for backward compatibility
+        meeting_gen = view_targets.get("meeting_generation", {})
+        target_inbound = meeting_gen.get("inbound", 22)
+        target_outbound = meeting_gen.get("outbound", 17)
+        target_referral = meeting_gen.get("referral", meeting_gen.get("referrals", 11))  # Try singular first, then plural
         target_total = target_inbound + target_outbound + target_referral
         
         # Calculate actual values for the focus month
