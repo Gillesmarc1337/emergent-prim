@@ -3117,7 +3117,7 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
         ]
         active_deals_count = len(active_deals_count_data)
 
-        return {
+        result = {
             'monthly_revenue_chart': months_data,
             'annual_targets_2025': period_targets_2025,
             'dashboard_blocks': dashboard_blocks,
@@ -3136,6 +3136,7 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
                 'ytd_closed_2025': cumulative_closed
             }
         }
+        return convert_numpy_types(result)
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating dashboard analytics: {str(e)}")
