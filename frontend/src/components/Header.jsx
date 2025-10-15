@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
-import { LogOut, User, Eye, Settings } from 'lucide-react';
+import { LogOut, User, Eye, Settings, Users, ChevronDown } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -9,6 +9,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 
 const Header = () => {
   const { user, logout, currentView, setCurrentView, views, isAdmin, isDemo } = useAuth();
