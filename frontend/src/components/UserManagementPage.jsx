@@ -238,7 +238,7 @@ function UserManagementPage() {
           <CardContent>
             <div className="space-y-4">
               {users.map((u) => (
-                <div key={u.email} className="border rounded-lg p-4 bg-white">
+                <div key={u.id} className="border rounded-lg p-4 bg-white">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
@@ -250,6 +250,7 @@ function UserManagementPage() {
                         }`}>
                           {u.role === 'super_admin' ? <><Shield className="inline h-3 w-3 mr-1" />Super Admin</> : 'Viewer'}
                         </span>
+                        {u.name && <span className="text-sm text-gray-600">({u.name})</span>}
                       </div>
                       
                       {/* View Access */}
@@ -264,7 +265,7 @@ function UserManagementPage() {
                             return (
                               <button
                                 key={view.id}
-                                onClick={() => handleUpdateUserViews(u.email, view.name, hasAccess ? 'remove' : 'add')}
+                                onClick={() => handleUpdateUserViews(u.id, view.name, hasAccess ? 'remove' : 'add')}
                                 className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                                   hasAccess
                                     ? 'bg-green-100 text-green-800 hover:bg-green-200'
@@ -285,14 +286,15 @@ function UserManagementPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleToggleRole(u.email, u.role)}
+                        onClick={() => handleToggleRole(u.id, u.email, u.role)}
+                        disabled={u.email === user?.email}
                       >
                         {u.role === 'super_admin' ? 'Remove Admin' : 'Make Admin'}
                       </Button>
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => handleDeleteUser(u.email)}
+                        onClick={() => handleDeleteUser(u.id, u.email)}
                         disabled={u.email === user?.email}
                       >
                         <Trash2 className="h-4 w-4" />
