@@ -407,7 +407,8 @@ def calculate_meeting_generation(df, start_date, end_date):
     # Split by source type
     inbound = period_data[period_data['type_of_source'] == 'Inbound']
     outbound = period_data[period_data['type_of_source'] == 'Outbound']
-    referrals = period_data[period_data['type_of_source'].isin(['Internal referral', 'Client referral'])]
+    # Referrals include: Internal referral, External referral, Client referral
+    referrals = period_data[period_data['type_of_source'].isin(['Internal referral', 'External referral', 'Client referral'])]
     
     # Relevance analysis
     relevant = period_data[period_data['relevance'] == 'Relevant']
