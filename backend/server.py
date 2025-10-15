@@ -2996,10 +2996,10 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
             },
             'block_3_pipe_creation': {
                 'title': 'New Pipe Created',
-                'monthly_target': 2000000,  # 2M target per month
+                'monthly_target': view_targets.get("dashboard", {}).get("new_pipe_created", 2000000),  # Use view-specific monthly target
                 'new_pipe_created': new_pipe_created,
                 'weighted_pipe_created': weighted_pipe_created,
-                'target_label': '2M New Pipe Target/Month',
+                'target_label': f'${int(view_targets.get("dashboard", {}).get("new_pipe_created", 2000000) / 1000000)}M New Pipe Target/Month',
                 'weighted_label': f'Weighted Pipe: ${int(weighted_pipe_created):,}',
                 'period': focus_month_str
             },
