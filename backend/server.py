@@ -64,6 +64,23 @@ def safe_int(value):
         return int(value.item())
     return int(value)
 
+def convert_numpy_types(obj):
+    """Recursively convert numpy types to native Python types"""
+    if isinstance(obj, dict):
+        return {key: convert_numpy_types(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_numpy_types(item) for item in obj]
+    elif isinstance(obj, tuple):
+        return tuple(convert_numpy_types(item) for item in obj)
+    elif hasattr(obj, 'item'):  # numpy scalar types
+        return obj.item()
+    elif isinstance(obj, (np.integer, np.floating)):
+        return obj.item()
+    elif pd.isna(obj):  # pandas NaN
+        return None
+    else:
+        return obj
+
 async def get_view_config_with_defaults(view_id: str):
     """
     Get view configuration with default targets if not set
