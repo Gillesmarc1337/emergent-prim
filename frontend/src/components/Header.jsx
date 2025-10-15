@@ -69,7 +69,6 @@ const Header = () => {
                       {getSortedViews().map((view) => (
                         <SelectItem key={view.id} value={view.id}>
                           {view.name}
-                          {view.is_default && ' (Default)'}
                           {view.is_master && ' (Master)'}
                         </SelectItem>
                       ))}
