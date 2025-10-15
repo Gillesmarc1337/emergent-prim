@@ -6,7 +6,7 @@ Simple authentication test to verify all endpoints work correctly
 import requests
 import json
 
-BASE_URL = "https://salesview-switch.preview.emergentagent.com/api"
+BASE_URL = "https://viewsync-analytics.preview.emergentagent.com/api"
 
 def test_auth_endpoints():
     print("🔐 Testing Authentication System Endpoints")
