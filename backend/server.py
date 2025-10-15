@@ -278,6 +278,25 @@ class SessionDataResponse(BaseModel):
     picture: Optional[str]
     session_token: str
 
+class UserCreateRequest(BaseModel):
+    email: str
+    name: str
+    role: str = "viewer"
+    view_access: List[str] = []
+    picture: Optional[str] = None
+
+class UserUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    role: Optional[str] = None
+    view_access: Optional[List[str]] = None
+    picture: Optional[str] = None
+
+class UserRoleUpdateRequest(BaseModel):
+    role: str
+
+class UserViewAccessRequest(BaseModel):
+    view_access: List[str]
+
 # Utility functions
 def clean_records(records):
     """Clean records to ensure all values are JSON serializable"""
