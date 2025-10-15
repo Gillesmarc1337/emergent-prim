@@ -259,19 +259,21 @@ async def setup_multi_views():
         await db.views.insert_one(master_view_data)
         print(f"  ✅ Created Master view with aggregated targets")
     
-    print("\n✨ Master view targets (Sum of 3 views):")
+    print("\n✨ Master view targets (Sum of 4 views: Organic + Signal + Full Funnel + Market):")
     print(f"  - Objectif 6 mois: ${master_targets['dashboard']['objectif_6_mois']:,}")
     print(f"  - Deals: {master_targets['dashboard']['deals']}")
     print(f"  - New Pipe Created: ${master_targets['dashboard']['new_pipe_created']:,}")
     print(f"  - Weighted Pipe: ${master_targets['dashboard']['weighted_pipe']:,}")
+    print(f"  - Meeting Intro: {master_targets['meeting_generation']['intro']}")
+    print(f"  - POA: {master_targets['meeting_attended']['poa']}")
     
     print("\n✅ Multi-view setup complete!")
     print("\nView Summary:")
+    print("  - Organic (default view - demo@primelis.com)")
     print("  - Full Funnel (maxime.toubia@primelis.com)")
     print("  - Signal (oren@primelis.com)")
     print("  - Market (coralie.truffy@primelis.com)")
-    print("  - Master (philippe@primelis.com + remi + asher)")
-    print("  - Organic (existing default view)")
+    print("  - Master (aggregates all 4 views - philippe@primelis.com + remi + asher)")
 
 if __name__ == "__main__":
     asyncio.run(setup_multi_views())
