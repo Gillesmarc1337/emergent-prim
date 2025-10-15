@@ -110,6 +110,10 @@ function AdminTargetsPage() {
           meetings_scheduled: 50,
           poa_generated: 18,
           deals_closed: 6
+        },
+        deals_closed_yearly: {
+          deals_target: 36,
+          arr_target: 4500000
         }
       };
 
