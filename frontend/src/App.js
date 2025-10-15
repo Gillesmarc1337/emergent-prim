@@ -1473,30 +1473,32 @@ function Dashboard() {
   // Alias for backward compatibility
   const handleOnDragEnd = onDragEnd;
 
-  // Save current board state to localStorage
-  const handleSaveBoard = () => {
+  // Save current board state to backend
+  const handleSaveBoard = async () => {
     try {
-      const boardState = {
-        hotDeals: hotDeals,
-        hiddenDeals: Array.from(hiddenDeals),
-        timestamp: new Date().toISOString()
-      };
-      localStorage.setItem(`closingBoard_${currentView?.id || 'default'}`, JSON.stringify(boardState));
+      await saveProjectionsPreferences(hotDeals, hiddenDeals);
       setOriginalHotDeals(JSON.parse(JSON.stringify(hotDeals))); // Update original to current
       setHasUnsavedChanges(false);
-      alert('Board state saved successfully!');
+      alert('💾 Board state saved successfully!');
     } catch (error) {
       console.error('Error saving board state:', error);
-      alert('Failed to save board state');
+      alert('❌ Failed to save board state. Please try again.');
     }
   };
 
   // Reset board to original state
-  const handleResetBoard = () => {
-    if (window.confirm('Are you sure you want to reset all changes? This will restore the original board state.')) {
-      setHotDeals(JSON.parse(JSON.stringify(originalHotDeals))); // Deep copy
-      setHiddenDeals(new Set()); // Clear hidden deals
-      setHasUnsavedChanges(false);
+  const handleResetBoard = async () => {
+    if (window.confirm('⚠️ Are you sure you want to reset all changes? This will restore the default board state.')) {
+      try {
+        await resetProjectionsPreferences();
+        setHotDeals(JSON.parse(JSON.stringify(originalHotDeals))); // Deep copy
+        setHiddenDeals(new Set()); // Clear hidden deals
+        setHasUnsavedChanges(false);
+        alert('✅ Board reset to default state!');
+      } catch (error) {
+        console.error('Error resetting board:', error);
+        alert('❌ Failed to reset board. Please try again.');
+      }
     }
   };
 
