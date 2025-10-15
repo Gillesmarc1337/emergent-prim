@@ -19,7 +19,7 @@ ROLE_SUPER_ADMIN = "super_admin"
 
 # Authorized users
 AUTHORIZED_USERS = {
-    "asher@primelis.com": ROLE_VIEWER,
+    "asher@primelis.com": ROLE_SUPER_ADMIN,  # Super admin
     "remi@primelis.com": ROLE_SUPER_ADMIN,
     "demo@primelis.com": ROLE_VIEWER,  # Demo mode user
     # New multi-view users
