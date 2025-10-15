@@ -5277,9 +5277,9 @@ def main():
         print(f"{'='*60}")
         test_results['multi_view_endpoints'] = test_multi_view_endpoints()
         
-        # Test 5: Projections endpoints
+        # Test 6: Projections endpoints
         print(f"\n{'='*60}")
-        print(f"📊 PHASE 5: PROJECTIONS ENDPOINTS")
+        print(f"📊 PHASE 6: PROJECTIONS ENDPOINTS")
         print(f"{'='*60}")
         hot_deals_success = test_projections_hot_deals()
         hot_leads_success = test_projections_hot_leads()
