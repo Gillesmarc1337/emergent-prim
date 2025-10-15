@@ -1320,6 +1320,48 @@ function Dashboard() {
   // Alias for backward compatibility
   const handleOnDragEnd = onDragEnd;
 
+  // Save current board state to localStorage
+  const handleSaveBoard = () => {
+    try {
+      const boardState = {
+        hotDeals: hotDeals,
+        hiddenDeals: Array.from(hiddenDeals),
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem(`closingBoard_${currentView?.id || 'default'}`, JSON.stringify(boardState));
+      setOriginalHotDeals(JSON.parse(JSON.stringify(hotDeals))); // Update original to current
+      setHasUnsavedChanges(false);
+      alert('Board state saved successfully!');
+    } catch (error) {
+      console.error('Error saving board state:', error);
+      alert('Failed to save board state');
+    }
+  };
+
+  // Reset board to original state
+  const handleResetBoard = () => {
+    if (window.confirm('Are you sure you want to reset all changes? This will restore the original board state.')) {
+      setHotDeals(JSON.parse(JSON.stringify(originalHotDeals))); // Deep copy
+      setHiddenDeals(new Set()); // Clear hidden deals
+      setHasUnsavedChanges(false);
+    }
+  };
+
+  // Get unique AEs from deals for filter dropdown
+  const getUniqueAEs = () => {
+    const aes = new Set();
+    hotDeals.forEach(deal => {
+      if (deal.owner) aes.add(deal.owner);
+    });
+    return Array.from(aes).sort();
+  };
+
+  // Filter deals by selected AE
+  const getFilteredDeals = () => {
+    if (selectedAE === 'all') return hotDeals;
+    return hotDeals.filter(deal => deal.owner === selectedAE);
+  };
+
   const hideItem = (type, id) => {
     if (type === 'deals') {
       setHiddenDeals(prev => new Set([...prev, id]));
