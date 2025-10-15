@@ -87,10 +87,24 @@ export const AuthProvider = ({ children }) => {
       });
       setViews(response.data);
       
-      // Set first view as default or find Organic view
       if (response.data.length > 0) {
-        const defaultView = response.data.find(v => v.is_default || v.name === 'Organic') || response.data[0];
-        await switchView(defaultView);
+        // Try to restore last selected view from localStorage
+        const savedViewId = localStorage.getItem('selectedViewId');
+        let viewToLoad = null;
+        
+        if (savedViewId) {
+          // Try to find the saved view
+          viewToLoad = response.data.find(v => v.id === savedViewId);
+          console.log(`Restoring saved view: ${savedViewId}`, viewToLoad ? '✓' : '✗');
+        }
+        
+        // Fallback to default view if saved view not found
+        if (!viewToLoad) {
+          viewToLoad = response.data.find(v => v.is_default || v.name === 'Organic') || response.data[0];
+          console.log('Using default view:', viewToLoad?.name);
+        }
+        
+        await switchView(viewToLoad);
       }
     } catch (error) {
       console.error('Error loading views:', error);
