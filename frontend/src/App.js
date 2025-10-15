@@ -1532,10 +1532,13 @@ function Dashboard() {
     useSortableData(analytics?.ae_performance?.ae_performance || []);
   const { items: sortedIntrosDetails, requestSort: requestIntrosDetailsSort, sortConfig: introsDetailsSortConfig } = 
     useSortableData(analytics?.ae_performance?.intros_details || []);
-  const { items: sortedAePoa, requestSort: requestAePoaSort, sortConfig: aePoaSortConfig } = 
+  const { items: sortedAePoa, requestSort: requestAePoaSort, sortConfig: aePoaSortConfig} = 
     useSortableData(analytics?.ae_performance?.ae_poa_performance || []);
   const { items: sortedPoaDetails, requestSort: requestPoaDetailsSort, sortConfig: poaDetailsSortConfig } = 
     useSortableData(analytics?.ae_performance?.poa_attended_details || []);
+  
+  // State for AE Pipeline Breakdown sorting
+  const [aePipelineSortConfig, setAePipelineSortConfig] = useState({ key: 'total', direction: 'descending' });
 
   if (loading) {
     return (
