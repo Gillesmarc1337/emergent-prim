@@ -2126,32 +2126,27 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
         actual_upsells = len(upsells_data)
         target_upsells = 5  # 5 upsells per month
         
-        # Block 3: Pipe creation
+        # Block 3: Pipe creation - use Excel formula from spreadsheet
         new_pipe_focus_month = df[
             (df['discovery_date'] >= month_start) & 
             (df['discovery_date'] <= month_end) &
             (df['pipeline'].notna()) & 
             (df['pipeline'] > 0)
-        ]
+        ].copy()
         new_pipe_created = float(new_pipe_focus_month['pipeline'].sum())
         
-        stage_probabilities = {
-            'D POA Booked': 70, 'C Proposal sent': 50, 'B Legals': 80,
-            'E Verbal commit': 90, 'A Discovery scheduled': 20
-        }
-        new_pipe_focus_month['probability'] = new_pipe_focus_month['stage'].map(stage_probabilities).fillna(10)
-        new_pipe_focus_month['weighted_value'] = new_pipe_focus_month['pipeline'] * new_pipe_focus_month['probability'] / 100
+        # Weighted pipe created using Excel formula (stage × source × recency)
+        new_pipe_focus_month['weighted_value'] = new_pipe_focus_month.apply(calculate_excel_weighted_value, axis=1)
         weighted_pipe_created = float(new_pipe_focus_month['weighted_value'].sum())
         
-        # Calculate aggregate weighted pipe (all active deals)
+        # Calculate aggregate weighted pipe (all active deals) using Excel formula
         all_active_deals_monthly = df[
             ~df['stage'].isin(['I Lost', 'H Lost - can be revived', 'F Inbox', 'A Closed']) &
             (df['show_noshow'] == 'Show') &
             (df['relevance'] == 'Relevant')
         ].copy()
         
-        all_active_deals_monthly['probability'] = all_active_deals_monthly['stage'].map(stage_probabilities).fillna(10)
-        all_active_deals_monthly['weighted_value'] = all_active_deals_monthly['pipeline'] * all_active_deals_monthly['probability'] / 100
+        all_active_deals_monthly['weighted_value'] = all_active_deals_monthly.apply(calculate_excel_weighted_value, axis=1)
         aggregate_weighted_pipe_monthly = float(all_active_deals_monthly['weighted_value'].sum())
         
         # Block 4: Revenue objective vs closed - use back office targets or calculate
