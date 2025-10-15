@@ -5465,6 +5465,7 @@ def main():
         'basic_connectivity': False,
         'authentication_flow': False,
         'views_authentication': False,
+        'user_management': False,  # NEW TEST - User Management Backend API Endpoints
         'google_sheet_upload': False,  # NEW TEST - Google Sheet Upload for Market View
         'multi_view_endpoints': False,
         'projections_endpoints': False,
