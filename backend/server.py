@@ -3011,22 +3011,17 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
         actual_upsells = len(upsells_data)
         target_upsells = 5  # 5 upsells per month
         
-        # Block 3: Pipe creation (for focus month)
+        # Block 3: Pipe creation (for focus month) - use Excel formula from spreadsheet
         new_pipe_focus_month = df[
             (df['discovery_date'] >= focus_month_start) & 
             (df['discovery_date'] <= focus_month_end) &
             (df['pipeline'].notna()) & 
             (df['pipeline'] > 0)
-        ]
+        ].copy()
         new_pipe_created = float(new_pipe_focus_month['pipeline'].sum())
         
-        # Weighted pipe created (probability adjusted)
-        stage_probabilities = {
-            'D POA Booked': 70, 'C Proposal sent': 50, 'B Legals': 80,
-            'E Verbal commit': 90, 'A Discovery scheduled': 20
-        }
-        new_pipe_focus_month['probability'] = new_pipe_focus_month['stage'].map(stage_probabilities).fillna(10)
-        new_pipe_focus_month['weighted_value'] = new_pipe_focus_month['pipeline'] * new_pipe_focus_month['probability'] / 100
+        # Weighted pipe created using Excel formula (stage × source × recency)
+        new_pipe_focus_month['weighted_value'] = new_pipe_focus_month.apply(calculate_excel_weighted_value, axis=1)
         weighted_pipe_created = float(new_pipe_focus_month['weighted_value'].sum())
         
         # Block 4: Revenue objective vs closed (for focus month)
