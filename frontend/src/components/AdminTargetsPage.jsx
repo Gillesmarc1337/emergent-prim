@@ -117,12 +117,120 @@ function AdminTargetsPage() {
         }
       };
 
-      setTargets(response.data.targets || defaultTargets);
+      // Check if this is the Master view
+      const currentView = views.find(v => v.id === viewId);
+      const isMasterView = currentView?.name === 'Master';
+
+      if (isMasterView) {
+        // For Master view, calculate targets as sum of all other views
+        const calculatedTargets = await calculateMasterTargets();
+        setTargets(calculatedTargets);
+      } else {
+        setTargets(response.data.targets || defaultTargets);
+      }
     } catch (error) {
       console.error('Error loading targets:', error);
       setMessage({ type: 'error', text: 'Failed to load targets' });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const calculateMasterTargets = async () => {
+    try {
+      // Get all views except Master
+      const otherViews = views.filter(v => v.name !== 'Master');
+      
+      // Fetch targets for all other views
+      const targetsPromises = otherViews.map(view => 
+        axios.get(`${API}/views/${view.id}/config`, { withCredentials: true })
+      );
+      
+      const responses = await Promise.all(targetsPromises);
+      const allTargets = responses.map(r => r.data.targets).filter(t => t);
+
+      // Initialize sum structure
+      const sumTargets = {
+        revenue_2025: {
+          jan: 0, feb: 0, mar: 0, apr: 0, may: 0, jun: 0,
+          jul: 0, aug: 0, sep: 0, oct: 0, nov: 0, dec: 0
+        },
+        dashboard_bottom_cards: {
+          new_pipe_created: 0,
+          created_weighted_pipe: 0,
+          ytd_revenue: 0
+        },
+        meeting_generation: {
+          total_target: 0,
+          inbound: 0,
+          outbound: 0,
+          referral: 0,
+          upsells_cross: 0
+        },
+        intro_poa: {
+          intro: 0,
+          poa: 0
+        },
+        meetings_attended: {
+          meetings_scheduled: 0,
+          poa_generated: 0,
+          deals_closed: 0
+        },
+        deals_closed_yearly: {
+          deals_target: 0,
+          arr_target: 0
+        }
+      };
+
+      // Sum all targets
+      allTargets.forEach(viewTargets => {
+        // Revenue 2025
+        if (viewTargets.revenue_2025) {
+          Object.keys(sumTargets.revenue_2025).forEach(month => {
+            sumTargets.revenue_2025[month] += (viewTargets.revenue_2025[month] || 0);
+          });
+        }
+
+        // Dashboard bottom cards
+        if (viewTargets.dashboard_bottom_cards) {
+          sumTargets.dashboard_bottom_cards.new_pipe_created += (viewTargets.dashboard_bottom_cards.new_pipe_created || 0);
+          sumTargets.dashboard_bottom_cards.created_weighted_pipe += (viewTargets.dashboard_bottom_cards.created_weighted_pipe || 0);
+          sumTargets.dashboard_bottom_cards.ytd_revenue += (viewTargets.dashboard_bottom_cards.ytd_revenue || 0);
+        }
+
+        // Meeting generation
+        if (viewTargets.meeting_generation) {
+          sumTargets.meeting_generation.total_target += (viewTargets.meeting_generation.total_target || 0);
+          sumTargets.meeting_generation.inbound += (viewTargets.meeting_generation.inbound || 0);
+          sumTargets.meeting_generation.outbound += (viewTargets.meeting_generation.outbound || 0);
+          sumTargets.meeting_generation.referral += (viewTargets.meeting_generation.referral || 0);
+          sumTargets.meeting_generation.upsells_cross += (viewTargets.meeting_generation.upsells_cross || 0);
+        }
+
+        // Intro POA
+        if (viewTargets.intro_poa) {
+          sumTargets.intro_poa.intro += (viewTargets.intro_poa.intro || 0);
+          sumTargets.intro_poa.poa += (viewTargets.intro_poa.poa || 0);
+        }
+
+        // Meetings attended
+        if (viewTargets.meetings_attended) {
+          sumTargets.meetings_attended.meetings_scheduled += (viewTargets.meetings_attended.meetings_scheduled || 0);
+          sumTargets.meetings_attended.poa_generated += (viewTargets.meetings_attended.poa_generated || 0);
+          sumTargets.meetings_attended.deals_closed += (viewTargets.meetings_attended.deals_closed || 0);
+        }
+
+        // Deals closed yearly
+        if (viewTargets.deals_closed_yearly) {
+          sumTargets.deals_closed_yearly.deals_target += (viewTargets.deals_closed_yearly.deals_target || 0);
+          sumTargets.deals_closed_yearly.arr_target += (viewTargets.deals_closed_yearly.arr_target || 0);
+        }
+      });
+
+      return sumTargets;
+    } catch (error) {
+      console.error('Error calculating master targets:', error);
+      return null;
     }
   };
 
