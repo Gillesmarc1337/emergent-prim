@@ -2705,32 +2705,18 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
             month_start, month_end = get_month_range(target_date, 0)
             month_str = target_date.strftime('%b %Y')
             
-            # Find closed deals - prioritize your actual data structure
-            closed_deals = df[
-                (
-                    (df['billing_start'] >= month_start) & 
-                    (df['billing_start'] <= month_end)
-                ) |
-                (
-                    # For July-Sep 2025: Look for actual closed deals in discovery period
-                    (df['stage'].isin(['Closed Won', 'Won', 'Signed', 'B Legals'])) &
-                    (df['discovery_date'] >= month_start) & 
-                    (df['discovery_date'] <= month_end)
-                )
-            ]
-            
-            # Remove rows with empty/null values for ARR
-            closed_deals_clean = closed_deals[
-                (closed_deals['expected_arr'].notna()) & 
-                (closed_deals['expected_arr'] != 0) & 
-                (closed_deals['expected_arr'] != '')
-            ]
-            
-            # Get targets from monthly_targets_2025 (calculated from view config)
+            # Get targets from monthly_targets_2025 (calculated from view config - Back Office)
             target_revenue = monthly_targets_2025.get(month_str, 0)
             
-            # Calculate actual closed revenue from data
-            closed_revenue = float(closed_deals_clean['expected_arr'].fillna(0).sum())
+            # Calculate actual closed revenue from sheet data (stage "A Closed" only)
+            closed_deals = df[
+                (df['stage'] == 'A Closed') &
+                (df['discovery_date'] >= month_start) & 
+                (df['discovery_date'] <= month_end) &
+                (df['expected_arr'].notna()) & 
+                (df['expected_arr'] != 0)
+            ]
+            closed_revenue = float(closed_deals['expected_arr'].fillna(0).sum())
             
             # Calculate New Weighted Pipe (new deals created in this month) using Excel formula
             new_deals_month = df[
