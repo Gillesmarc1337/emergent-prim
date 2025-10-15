@@ -64,6 +64,11 @@ function AdminTargetsPage() {
         intro_poa: {
           intro: 45,
           poa: 18
+        },
+        meetings_attended: {
+          meetings_scheduled: 50,
+          poa_generated: 18,
+          deals_closed: 6
         }
       };
 
