@@ -488,7 +488,7 @@ def calculate_meeting_generation(df, start_date, end_date, view_targets=None):
     period_duration_months = max(1, months_diff)
     
     # List of BDRs (Business Development Representatives)
-    bdr_list = ['Xavier', 'Selma', 'Kenny', 'Marie']
+    bdr_list = ['Xavier', 'Selma', 'Kenny', 'Marie', 'Gil', 'Louis', 'Yered', 'Killian']
     monthly_bdr_meeting_target = 6  # 6 meetings per month per BDR
     
     # Get targets from view_targets if provided, otherwise use defaults
