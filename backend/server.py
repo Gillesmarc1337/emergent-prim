@@ -3125,12 +3125,15 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
         year_end = datetime(current_year, 12, 31, 23, 59, 59)
         ytd_pipe_created = df[
             (df['discovery_date'] >= year_start) &
-            (df['discovery_date'] <= year_end)
-        ]
+            (df['discovery_date'] <= year_end) &
+            (df['pipeline'].notna()) &
+            (df['pipeline'] > 0)
+        ].copy()
         total_pipe_created = float(ytd_pipe_created['pipeline'].sum())
         
-        # Calculate weighted pipe created (YTD)
-        total_weighted_pipe_created = float(ytd_pipe_created['weighted_value'].sum()) if 'weighted_value' in ytd_pipe_created.columns else 0
+        # Calculate weighted pipe created (YTD) using Excel formula (stage × source × recency)
+        ytd_pipe_created['weighted_value'] = ytd_pipe_created.apply(calculate_excel_weighted_value, axis=1)
+        total_weighted_pipe_created = float(ytd_pipe_created['weighted_value'].sum())
         
         # Calculate active deals count (not lost, not inbox, show and relevant)
         active_deals_count_data = df[
