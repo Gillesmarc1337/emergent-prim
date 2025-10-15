@@ -117,16 +117,19 @@ def test_user_management_endpoints():
         "view_access": ["Organic"]
     }
     response = test_endpoint("/admin/users", method="POST", data=create_user_data, cookies=cookies)
-    if response and response.status_code == 403:
-        test_results['create_user_403'] = True
-        print(f"✅ Demo user correctly denied access (403)")
-        try:
-            error_data = response.json()
-            print(f"  📝 Error message: {error_data.get('detail', 'No detail')}")
-        except:
-            print(f"  📝 Error text: {response.text}")
+    if response:
+        if response.status_code == 403:
+            test_results['create_user_403'] = True
+            print(f"✅ Demo user correctly denied access (403)")
+            try:
+                error_data = response.json()
+                print(f"  📝 Error message: {error_data.get('detail', 'No detail')}")
+            except:
+                print(f"  📝 Error text: {response.text}")
+        else:
+            print(f"❌ Expected 403, got {response.status_code}")
     else:
-        print(f"❌ Expected 403, got {response.status_code if response else 'No response'}")
+        print(f"❌ No response received")
     
     # Test 3: PUT /api/admin/users/{user_id}/role (should return 403)
     print(f"\n📊 Test 3: PUT /api/admin/users/test-id/role")
