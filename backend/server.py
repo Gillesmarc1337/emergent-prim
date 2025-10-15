@@ -1659,7 +1659,7 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
         july_dec_end = datetime(year, 12, 31, 23, 59, 59, 999999)
         
         # Generate analytics sections - use July-December period for meeting_generation to match dashboard blocks
-        meeting_generation = calculate_meeting_generation(df, july_dec_start, july_dec_end)
+        meeting_generation = calculate_meeting_generation(df, july_dec_start, july_dec_end, view_targets)
         meetings_attended = calculate_meetings_attended(df, july_dec_start, july_dec_end)
         ae_performance = calculate_ae_performance(df, july_dec_start, july_dec_end)
         deals_closed = calculate_deals_closed(df, july_dec_start, july_dec_end)
