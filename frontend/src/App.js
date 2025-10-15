@@ -3762,6 +3762,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/admin/targets" element={<AdminTargetsPage />} />
+          <Route path="/admin/users" element={<UserManagementPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
