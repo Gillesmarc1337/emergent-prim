@@ -1385,6 +1385,7 @@ function Dashboard() {
   const hideItem = (type, id) => {
     if (type === 'deals') {
       setHiddenDeals(prev => new Set([...prev, id]));
+      setHasUnsavedChanges(true); // Mark as changed
     } else if (type === 'leads') {
       setHiddenLeads(prev => new Set([...prev, id]));
     }
