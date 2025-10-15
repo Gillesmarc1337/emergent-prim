@@ -812,7 +812,7 @@ def calculate_deals_closed(df, start_date, end_date):
         (df['expected_arr'] > 0)
     ]
     
-    # Monthly breakdown for chart
+    # Monthly breakdown for chart (using discovery_date as reference)
     monthly_closed = []
     current_date = start_date
     while current_date <= end_date:
@@ -823,15 +823,15 @@ def calculate_deals_closed(df, start_date, end_date):
             month_end = current_date.replace(month=current_date.month + 1, day=1) - timedelta(seconds=1)
         
         month_deals = closed_deals[
-            (closed_deals['billing_start'] >= month_start) &
-            (closed_deals['billing_start'] <= month_end)
+            (closed_deals['discovery_date'] >= month_start) &
+            (closed_deals['discovery_date'] <= month_end)
         ]
         
         monthly_closed.append({
             'month': current_date.strftime('%b %Y'),
             'deals_count': int(len(month_deals)),
-            'arr_closed': float(month_deals['expected_arr'].sum()),
-            'mrr_closed': float(month_deals['expected_mrr'].sum())
+            'arr_closed': float(month_deals['expected_arr'].fillna(0).sum()),
+            'mrr_closed': float(month_deals['expected_mrr'].fillna(0).sum())
         })
         
         # Move to next month
