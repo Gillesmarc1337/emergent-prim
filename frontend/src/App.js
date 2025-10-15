@@ -1275,8 +1275,10 @@ function Dashboard() {
       });
       
       setHotDeals(dealsWithColumns);
+      setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns))); // Deep copy for reset
       setHotLeads(hotLeadsResponse.data);
       setPerformanceSummary(performanceResponse.data);
+      setHasUnsavedChanges(false); // Reset unsaved changes flag
     } catch (error) {
       console.error('Error loading projections data:', error);
     } finally {
