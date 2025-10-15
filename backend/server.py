@@ -2154,15 +2154,29 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
         all_active_deals_monthly['weighted_value'] = all_active_deals_monthly['pipeline'] * all_active_deals_monthly['probability'] / 100
         aggregate_weighted_pipe_monthly = float(all_active_deals_monthly['weighted_value'].sum())
         
-        # Block 4: Revenue objective vs closed - calculate from view-specific 6-month target
+        # Block 4: Revenue objective vs closed - use back office targets or calculate
+        revenue_2025 = view_targets.get("revenue_2025", {})
         objectif_6_mois = view_targets.get("dashboard", {}).get("objectif_6_mois", 4500000)
         
-        # Monthly distribution percentages for July-December
-        monthly_distribution = {
-            'Jul 2025': 0.103, 'Aug 2025': 0.088, 'Sep 2025': 0.122,
-            'Oct 2025': 0.24, 'Nov 2025': 0.186, 'Dec 2025': 0.261
+        # Map focus month to back office key (e.g., "Jul 2025" -> "jul")
+        month_key_map = {
+            'Jan 2025': 'jan', 'Feb 2025': 'feb', 'Mar 2025': 'mar',
+            'Apr 2025': 'apr', 'May 2025': 'may', 'Jun 2025': 'jun',
+            'Jul 2025': 'jul', 'Aug 2025': 'aug', 'Sep 2025': 'sep',
+            'Oct 2025': 'oct', 'Nov 2025': 'nov', 'Dec 2025': 'dec'
         }
-        focus_month_target = int(objectif_6_mois * monthly_distribution.get(focus_month_str, 0.167))
+        month_key = month_key_map.get(focus_month_str, 'jul')
+        
+        # Use back office target if available, otherwise calculate from distribution
+        if revenue_2025 and revenue_2025.get(month_key):
+            focus_month_target = int(revenue_2025.get(month_key, 0))
+        else:
+            # Fallback: Calculate from distribution
+            monthly_distribution = {
+                'Jul 2025': 0.103, 'Aug 2025': 0.088, 'Sep 2025': 0.122,
+                'Oct 2025': 0.24, 'Nov 2025': 0.186, 'Dec 2025': 0.261
+            }
+            focus_month_target = int(objectif_6_mois * monthly_distribution.get(focus_month_str, 0.167))
         
         # Calculate actual closed revenue from data
         focus_month_closed_deals = df[
