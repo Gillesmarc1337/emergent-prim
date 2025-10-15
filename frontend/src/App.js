@@ -1368,13 +1368,17 @@ function Dashboard() {
       
       if (savedPreferences) {
         try {
-          // Rebuild deals array from saved preferences
+          // Rebuild deals array from saved preferences WITH ORDER
           const reconstructedDeals = [];
           const hiddenSet = new Set();
           
           // Process each column from saved preferences
           ['next14', 'next30', 'next60'].forEach(columnKey => {
             const savedColumn = savedPreferences[columnKey] || [];
+            
+            // Sort by order to maintain saved sequence
+            savedColumn.sort((a, b) => (a.order || 0) - (b.order || 0));
+            
             savedColumn.forEach(savedDeal => {
               // Find the deal in our fresh data
               const dealData = dealsWithColumns.find(d => d.id === savedDeal.id);
@@ -1399,16 +1403,18 @@ function Dashboard() {
           setHotDeals(reconstructedDeals);
           setHiddenDeals(hiddenSet);
           setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns))); // Keep original for reset
-          console.log('✅ Applied saved projections preferences');
+          console.log('✅ Applied saved projections preferences with order');
         } catch (e) {
           console.error('Error applying saved preferences:', e);
           // Fall back to fresh data
           setHotDeals(dealsWithColumns);
           setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns)));
+          setHiddenDeals(new Set());
         }
       } else {
         setHotDeals(dealsWithColumns);
         setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns))); // Deep copy for reset
+        setHiddenDeals(new Set());
       }
       
       setHotLeads(hotLeadsResponse.data);
