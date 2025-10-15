@@ -36,6 +36,47 @@ function AdminTargetsPage() {
     }
   }, [selectedView]);
 
+  // Auto-refresh targets every 30 seconds to detect changes from other admins
+  useEffect(() => {
+    if (!selectedView) return;
+
+    const intervalId = setInterval(() => {
+      // Silent reload without showing loading state
+      axios.get(`${API}/views/${selectedView.id}/config`, {
+        withCredentials: true
+      })
+      .then(response => {
+        const newTargets = response.data.targets;
+        // Only update if targets actually changed
+        if (JSON.stringify(newTargets) !== JSON.stringify(targets)) {
+          setTargets(newTargets);
+          setMessage({
+            type: 'info',
+            text: '🔄 Targets updated by another admin. Refreshed automatically.'
+          });
+          setTimeout(() => setMessage(null), 3000);
+        }
+      })
+      .catch(err => {
+        console.error('Auto-refresh failed:', err);
+      });
+    }, 30000); // Check every 30 seconds
+
+    return () => clearInterval(intervalId);
+  }, [selectedView, targets]);
+
+  // Also reload when tab becomes visible again
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && selectedView) {
+        loadViewTargets(selectedView.id);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [selectedView]);
+
   const loadViewTargets = async (viewId) => {
     setLoading(true);
     try {
