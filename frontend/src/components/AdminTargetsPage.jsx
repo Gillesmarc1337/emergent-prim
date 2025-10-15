@@ -694,6 +694,78 @@ function AdminTargetsPage() {
                 </AlertDescription>
               </Alert>
 
+              {/* JULY TO DEC TAB - Deals Closed Yearly */}
+              <Card className="border-purple-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded">JULY TO DEC TAB</span>
+                    Deals Closed (Jul-Dec 2025)
+                  </CardTitle>
+                  <CardDescription>
+                    Configure targets for Deals Closed and ARR Closed shown in July to Dec view
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="deals_closed_yearly">Deals Closed Target (Jul-Dec)</Label>
+                      <Input
+                        id="deals_closed_yearly"
+                        type="number"
+                        value={targets?.deals_closed_yearly?.deals_target || 0}
+                        onChange={(e) => {
+                          setTargets(prev => ({
+                            ...prev,
+                            deals_closed_yearly: {
+                              ...prev.deals_closed_yearly,
+                              deals_target: parseInt(e.target.value) || 0
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Number of deals to close from July to December</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="arr_closed_yearly">ARR Closed Target (Jul-Dec)</Label>
+                      <Input
+                        id="arr_closed_yearly"
+                        type="number"
+                        value={targets?.deals_closed_yearly?.arr_target || 0}
+                        onChange={(e) => {
+                          setTargets(prev => ({
+                            ...prev,
+                            deals_closed_yearly: {
+                              ...prev.deals_closed_yearly,
+                              arr_target: parseInt(e.target.value) || 0
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                        step="100000"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Total ARR target in $ (e.g., 4500000 for $4.5M)</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-purple-50 rounded">
+                    <div className="text-sm font-semibold mb-2">Preview Banner:</div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="border p-3 rounded bg-white">
+                        <div className="font-semibold text-lg">_/{targets?.deals_closed_yearly?.deals_target || 0}</div>
+                        <div className="text-gray-600">Deals Closed</div>
+                        <div className="text-xs text-gray-500">Target: {targets?.deals_closed_yearly?.deals_target || 0}</div>
+                      </div>
+                      <div className="border p-3 rounded bg-white">
+                        <div className="font-semibold text-lg">$_M</div>
+                        <div className="text-gray-600">ARR Closed</div>
+                        <div className="text-xs text-gray-500">Target: ${((targets?.deals_closed_yearly?.arr_target || 0) / 1000000).toFixed(1)}M</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Save Button */}
               <div className="flex justify-end gap-3">
                 <Button 
