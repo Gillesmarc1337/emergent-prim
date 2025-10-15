@@ -917,18 +917,20 @@ function AdminTargetsPage() {
                 </CardContent>
               </Card>
 
-              {/* Save Button */}
-              <div className="flex justify-end gap-3">
-                <Button 
-                  onClick={handleSave} 
-                  disabled={saving}
-                  size="lg"
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  {saving ? 'Saving...' : 'Save All Targets'}
-                </Button>
-              </div>
+              {/* Save Button - Hide for Master view */}
+              {!isMasterView && (
+                <div className="flex justify-end gap-3">
+                  <Button 
+                    onClick={handleSave} 
+                    disabled={saving}
+                    size="lg"
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    {saving ? 'Saving...' : 'Save All Targets'}
+                  </Button>
+                </div>
+              )}
 
             </div>
           </TabsContent>
