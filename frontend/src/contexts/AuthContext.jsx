@@ -17,6 +17,53 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
+  // Auto-refresh view configs every 30 seconds to detect changes
+  useEffect(() => {
+    if (!currentView) return;
+
+    const intervalId = setInterval(async () => {
+      try {
+        const response = await axios.get(`${API}/api/views/${currentView.id}/config`, {
+          withCredentials: true
+        });
+        
+        // Only update if config actually changed
+        if (JSON.stringify(response.data) !== JSON.stringify(viewConfig)) {
+          console.log('View config updated by another admin, refreshing...');
+          setViewConfig(response.data);
+          // Optionally reload the page or trigger a data refresh
+          window.dispatchEvent(new CustomEvent('viewConfigUpdated', { detail: response.data }));
+        }
+      } catch (error) {
+        console.error('Failed to refresh view config:', error);
+      }
+    }, 30000); // Check every 30 seconds
+
+    return () => clearInterval(intervalId);
+  }, [currentView, viewConfig]);
+
+  // Reload when tab becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && currentView) {
+        // Reload view config when user returns to tab
+        axios.get(`${API}/api/views/${currentView.id}/config`, {
+          withCredentials: true
+        })
+        .then(response => {
+          if (JSON.stringify(response.data) !== JSON.stringify(viewConfig)) {
+            setViewConfig(response.data);
+            window.dispatchEvent(new CustomEvent('viewConfigUpdated', { detail: response.data }));
+          }
+        })
+        .catch(err => console.error('Failed to reload config:', err));
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [currentView, viewConfig]);
+
   const checkAuth = async () => {
     try {
       const response = await axios.get(`${API}/api/auth/me`, {
