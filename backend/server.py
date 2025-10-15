@@ -2751,7 +2751,7 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
                 'new_weighted_pipe': new_weighted_pipe,
                 'aggregate_weighted_pipe': aggregate_weighted_pipe,
                 'is_future': target_date > datetime.now(),
-                'deals_count': len(closed_deals_clean)
+                'deals_count': len(closed_deals)
             })
         
         # Calculate YTD metrics for 2025 (July-December period)
