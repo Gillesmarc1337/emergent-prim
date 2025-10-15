@@ -1292,6 +1292,10 @@ function Dashboard() {
     
     try {
       // Organize deals by column with hidden status
+      const next14Deals = dealsData
+        .filter(d => d.column === 'next14')
+        .map(d => ({ id: d.id, hidden: hiddenDealsSet.has(d.id) }));
+      
       const next30Deals = dealsData
         .filter(d => d.column === 'next30')
         .map(d => ({ id: d.id, hidden: hiddenDealsSet.has(d.id) }));
@@ -1300,16 +1304,12 @@ function Dashboard() {
         .filter(d => d.column === 'next60')
         .map(d => ({ id: d.id, hidden: hiddenDealsSet.has(d.id) }));
       
-      const next90Deals = dealsData
-        .filter(d => d.column === 'next90')
-        .map(d => ({ id: d.id, hidden: hiddenDealsSet.has(d.id) }));
-      
       await axios.post(`${API}/user/projections-preferences`, {
         view_id: currentView.id,
         preferences: {
+          next14: next14Deals,
           next30: next30Deals,
-          next60: next60Deals,
-          next90: next90Deals
+          next60: next60Deals
         }
       }, {
         withCredentials: true
