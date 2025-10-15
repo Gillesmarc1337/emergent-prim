@@ -56,6 +56,45 @@ def get_collections_for_master():
     """Get all collections to aggregate for Master view (includes Organic)"""
     return ["sales_records", "sales_records_signal", "sales_records_fullfunnel", "sales_records_market"]
 
+async def get_view_config_with_defaults(view_id: str):
+    """
+    Get view configuration with default targets if not set
+    """
+    view = await db.views.find_one({"id": view_id})
+    if not view:
+        raise HTTPException(status_code=404, detail="View not found")
+    
+    # Default targets (Organic view defaults)
+    default_targets = {
+        "dashboard": {
+            "objectif_6_mois": 4500000,
+            "deals": 25,
+            "new_pipe_created": 2000000,
+            "weighted_pipe": 800000
+        },
+        "meeting_generation": {
+            "intro": 45,
+            "inbound": 22,
+            "outbound": 17,
+            "referrals": 11,
+            "upsells_x": 0
+        },
+        "meeting_attended": {
+            "poa": 18,
+            "deals_closed": 6
+        }
+    }
+    
+    # Merge view targets with defaults
+    view_targets = view.get("targets", {})
+    if not view_targets:
+        view_targets = default_targets
+    
+    return {
+        "view": view,
+        "targets": view_targets
+    }
+
 async def get_sales_data_for_view(view_id: str):
     """
     Get sales data for a specific view
