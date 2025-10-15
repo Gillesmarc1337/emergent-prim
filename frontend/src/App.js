@@ -3331,13 +3331,61 @@ function Dashboard() {
             {/* Interactive Closing Projections Drag & Drop Board */}
             <Card className="mb-6">
               <CardHeader>
-                <CardTitle className="text-xl flex items-center gap-2">
-                  <Target className="h-6 w-6 text-green-600" />
-                  Closing Projections — Interactive Board
-                </CardTitle>
-                <CardDescription>
-                  Drag & drop deals to simulate closing timelines. Changes are visual only and don't affect source data.
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      <Target className="h-6 w-6 text-green-600" />
+                      Closing Projections — Interactive Board
+                      {hasUnsavedChanges && (
+                        <Badge className="ml-2 bg-orange-100 text-orange-800">
+                          Unsaved Changes
+                        </Badge>
+                      )}
+                    </CardTitle>
+                    <CardDescription>
+                      Drag & drop deals to simulate closing timelines. Changes are visual only and don't affect source data.
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {/* AE Filter Dropdown */}
+                    <select
+                      value={selectedAE}
+                      onChange={(e) => setSelectedAE(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="all">All AEs</option>
+                      {getUniqueAEs().map(ae => (
+                        <option key={ae} value={ae}>{ae}</option>
+                      ))}
+                    </select>
+                    
+                    {/* Reset Button */}
+                    <button
+                      onClick={handleResetBoard}
+                      disabled={!hasUnsavedChanges}
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        hasUnsavedChanges
+                          ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          : 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                      }`}
+                    >
+                      Reset
+                    </button>
+                    
+                    {/* Save Button */}
+                    <button
+                      onClick={handleSaveBoard}
+                      disabled={!hasUnsavedChanges}
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        hasUnsavedChanges
+                          ? 'bg-blue-600 text-white hover:bg-blue-700'
+                          : 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                      }`}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 <DragDropContext onDragEnd={onDragEnd}>
