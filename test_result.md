@@ -513,6 +513,18 @@ frontend:
           agent: "testing"
           comment: "🔍 MULTI-VIEW ENDPOINTS TESTING COMPLETE: Comprehensive testing of new multi-view endpoints as requested in review. FINDINGS: 1) GET /api/views/user/accessible - ✅ WORKING: Returns list of accessible views for demo user (5 views found), properly respects user permissions, demo user has viewer role access. 2) Expected views found: ✅ Full Funnel, ✅ Signal, ✅ Market, ✅ Master views all present in system. 3) GET /api/views/{view_id}/config - ❌ CRITICAL BUG: All requests return 404 'View not found'. ROOT CAUSE IDENTIFIED: Backend bug in view ID handling - GET /api/views endpoint overwrites custom 'id' field with MongoDB '_id' (converted to string), but GET /api/views/{view_id}/config searches for custom 'id' field in database. TECHNICAL DETAILS: Views created with custom id like 'view-1234567890' but retrieved with MongoDB ObjectId like '68ece6fc4c667ca086ce5d48'. Config endpoint searches for {id: view_id} but should search for {_id: ObjectId(view_id)} or maintain consistent ID handling. VERIFICATION: Tested with curl - all config endpoints return 404, backend logs confirm 404 responses. IMPACT: View configuration and targets cannot be retrieved, blocking Excel target validation (4.5M objectif, 25 deals, 2M new pipe, 800K weighted pipe). RECOMMENDATION: Fix backend ID consistency - either use custom IDs throughout or use MongoDB ObjectIds consistently."
 
+  - task: "Google Sheet upload for Market view"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "🎉 GOOGLE SHEET UPLOAD FOR MARKET VIEW - COMPLETE SUCCESS: Comprehensive testing of Google Sheet upload functionality as requested in review. ALL 5 TESTS PASSED (100% SUCCESS RATE): 1) ✅ GET /api/views - Successfully retrieved Market view ID (view-market-1760356092). 2) ✅ POST /api/upload-google-sheets - Successfully uploaded Google Sheet (https://docs.google.com/spreadsheets/d/1BJ_thepAfcZ7YQY1aWFoPbuBIakzd65hoMfbCJCDSlk/edit?gid=1327587298#gid=1327587298) to Market view, processed 88 records, all valid. 3) ✅ GET /api/analytics/dashboard?view_id=Market - Dashboard analytics accessible, key_metrics and dashboard_blocks present, YTD revenue: $60,000, YTD target: $1,700,000. 4) ✅ GET /api/analytics/monthly?view_id=Market&month_offset=0 - Monthly analytics working perfectly, 5 dashboard blocks validated, NO numpy serialization errors, all numeric fields properly serialized. 5) ✅ GET /api/data/status?view_id=Market - Data status confirmed: 88 total records, has_data: true, source_type: 'google_sheets', last_update timestamp recorded. CRITICAL FIXES VERIFIED: ✅ Numpy serialization bug fixed - all analytics endpoints return clean JSON without numpy.int64 errors. ✅ View-specific targets working - Market view uses its own data collection (sales_records_market). ✅ All endpoints support view_id parameter correctly. CONCLUSION: Google Sheet upload for Market view is fully functional and ready for production use."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
