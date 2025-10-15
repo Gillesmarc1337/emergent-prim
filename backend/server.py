@@ -1712,13 +1712,19 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
             (df['discovery_date'] <= min(july_dec_end, current_date))
         ]
         
-        # Calculate meeting targets for full July-Dec period (6 months)
-        monthly_meeting_target = 50  # Base monthly target
+        # Calculate meeting targets from view config for full July-Dec period (6 months)
+        monthly_inbound_target = view_targets.get("meeting_generation", {}).get("inbound", 22)
+        monthly_outbound_target = view_targets.get("meeting_generation", {}).get("outbound", 17)
+        monthly_referral_target = view_targets.get("meeting_generation", {}).get("referrals", 11)
+        monthly_meeting_target = monthly_inbound_target + monthly_outbound_target + monthly_referral_target
         
         # For yearly analytics, always use full 6-month July-December period
         months_in_july_dec_period = 6  # July, August, September, October, November, December
         
         july_dec_meeting_target = monthly_meeting_target * months_in_july_dec_period
+        july_dec_inbound_target = monthly_inbound_target * months_in_july_dec_period
+        july_dec_outbound_target = monthly_outbound_target * months_in_july_dec_period
+        july_dec_referral_target = monthly_referral_target * months_in_july_dec_period
         
         # Meeting breakdown
         actual_total_july_dec = len(july_dec_meetings)
