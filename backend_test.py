@@ -5807,18 +5807,24 @@ def main():
         performance_summary_success = test_projections_performance_summary()
         test_results['projections_endpoints'] = hot_deals_success and hot_leads_success and performance_summary_success
         
-        # Test 8: Analytics endpoints
+        # Test 8: NEW - Projections Preferences API (as requested in review)
         print(f"\n{'='*60}")
-        print(f"📈 PHASE 8: ANALYTICS ENDPOINTS")
+        print(f"🎯 PHASE 8: PROJECTIONS PREFERENCES API (NEW)")
+        print(f"{'='*60}")
+        test_results['projections_preferences_api'] = test_projections_preferences_api()
+        
+        # Test 9: Analytics endpoints
+        print(f"\n{'='*60}")
+        print(f"📈 PHASE 9: ANALYTICS ENDPOINTS")
         print(f"{'='*60}")
         monthly_success = test_monthly_analytics_with_offset(0, "Oct 2025")
         yearly_success = test_yearly_analytics_july_dec_blocks()
         custom_success = test_custom_analytics_dynamic_targets()
         test_results['analytics_endpoints'] = monthly_success and yearly_success and custom_success
         
-        # Test 9: Session management
+        # Test 10: Session management
         print(f"\n{'='*60}")
-        print(f"🔑 PHASE 9: SESSION MANAGEMENT")
+        print(f"🔑 PHASE 10: SESSION MANAGEMENT")
         print(f"{'='*60}")
         test_results['session_management'] = test_session_expiration_validation()
         
