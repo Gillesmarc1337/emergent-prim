@@ -1274,8 +1274,28 @@ function Dashboard() {
         next60: dealsWithColumns.filter(d => d.column === 'next60').length
       });
       
-      setHotDeals(dealsWithColumns);
-      setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns))); // Deep copy for reset
+      // Try to load saved board state from localStorage
+      const savedStateKey = `closingBoard_${currentView?.id || 'default'}`;
+      const savedState = localStorage.getItem(savedStateKey);
+      
+      if (savedState) {
+        try {
+          const { hotDeals: savedDeals, hiddenDeals: savedHidden } = JSON.parse(savedState);
+          setHotDeals(savedDeals);
+          setHiddenDeals(new Set(savedHidden));
+          setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns))); // Keep original for reset
+          console.log('Loaded saved board state');
+        } catch (e) {
+          console.error('Error loading saved state:', e);
+          // Fall back to fresh data
+          setHotDeals(dealsWithColumns);
+          setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns)));
+        }
+      } else {
+        setHotDeals(dealsWithColumns);
+        setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns))); // Deep copy for reset
+      }
+      
       setHotLeads(hotLeadsResponse.data);
       setPerformanceSummary(performanceResponse.data);
       setHasUnsavedChanges(false); // Reset unsaved changes flag
