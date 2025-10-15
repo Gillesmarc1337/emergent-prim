@@ -135,59 +135,71 @@ def test_user_management_endpoints():
     print(f"\n📊 Test 3: PUT /api/admin/users/test-id/role")
     role_update_data = {"role": "super_admin"}
     response = test_endpoint("/admin/users/test-id/role", method="PUT", data=role_update_data, cookies=cookies)
-    if response and response.status_code == 403:
-        test_results['update_role_403'] = True
-        print(f"✅ Demo user correctly denied access (403)")
-        try:
-            error_data = response.json()
-            print(f"  📝 Error message: {error_data.get('detail', 'No detail')}")
-        except:
-            print(f"  📝 Error text: {response.text}")
+    if response:
+        if response.status_code == 403:
+            test_results['update_role_403'] = True
+            print(f"✅ Demo user correctly denied access (403)")
+            try:
+                error_data = response.json()
+                print(f"  📝 Error message: {error_data.get('detail', 'No detail')}")
+            except:
+                print(f"  📝 Error text: {response.text}")
+        else:
+            print(f"❌ Expected 403, got {response.status_code}")
     else:
-        print(f"❌ Expected 403, got {response.status_code if response else 'No response'}")
+        print(f"❌ No response received")
     
     # Test 4: GET /api/admin/users/{user_id}/views (should return 403)
     print(f"\n📊 Test 4: GET /api/admin/users/test-id/views")
     response = test_endpoint("/admin/users/test-id/views", cookies=cookies)
-    if response and response.status_code == 403:
-        test_results['get_user_views_403'] = True
-        print(f"✅ Demo user correctly denied access (403)")
-        try:
-            error_data = response.json()
-            print(f"  📝 Error message: {error_data.get('detail', 'No detail')}")
-        except:
-            print(f"  📝 Error text: {response.text}")
+    if response:
+        if response.status_code == 403:
+            test_results['get_user_views_403'] = True
+            print(f"✅ Demo user correctly denied access (403)")
+            try:
+                error_data = response.json()
+                print(f"  📝 Error message: {error_data.get('detail', 'No detail')}")
+            except:
+                print(f"  📝 Error text: {response.text}")
+        else:
+            print(f"❌ Expected 403, got {response.status_code}")
     else:
-        print(f"❌ Expected 403, got {response.status_code if response else 'No response'}")
+        print(f"❌ No response received")
     
     # Test 5: PUT /api/admin/users/{user_id}/views (should return 403)
     print(f"\n📊 Test 5: PUT /api/admin/users/test-id/views")
     view_access_data = {"view_access": ["Signal", "Market"]}
     response = test_endpoint("/admin/users/test-id/views", method="PUT", data=view_access_data, cookies=cookies)
-    if response and response.status_code == 403:
-        test_results['update_user_views_403'] = True
-        print(f"✅ Demo user correctly denied access (403)")
-        try:
-            error_data = response.json()
-            print(f"  📝 Error message: {error_data.get('detail', 'No detail')}")
-        except:
-            print(f"  📝 Error text: {response.text}")
+    if response:
+        if response.status_code == 403:
+            test_results['update_user_views_403'] = True
+            print(f"✅ Demo user correctly denied access (403)")
+            try:
+                error_data = response.json()
+                print(f"  📝 Error message: {error_data.get('detail', 'No detail')}")
+            except:
+                print(f"  📝 Error text: {response.text}")
+        else:
+            print(f"❌ Expected 403, got {response.status_code}")
     else:
-        print(f"❌ Expected 403, got {response.status_code if response else 'No response'}")
+        print(f"❌ No response received")
     
     # Test 6: DELETE /api/admin/users/{user_id} (should return 403)
     print(f"\n📊 Test 6: DELETE /api/admin/users/test-id")
     response = test_endpoint("/admin/users/test-id", method="DELETE", cookies=cookies)
-    if response and response.status_code == 403:
-        test_results['delete_user_403'] = True
-        print(f"✅ Demo user correctly denied access (403)")
-        try:
-            error_data = response.json()
-            print(f"  📝 Error message: {error_data.get('detail', 'No detail')}")
-        except:
-            print(f"  📝 Error text: {response.text}")
+    if response:
+        if response.status_code == 403:
+            test_results['delete_user_403'] = True
+            print(f"✅ Demo user correctly denied access (403)")
+            try:
+                error_data = response.json()
+                print(f"  📝 Error message: {error_data.get('detail', 'No detail')}")
+            except:
+                print(f"  📝 Error text: {response.text}")
+        else:
+            print(f"❌ Expected 403, got {response.status_code}")
     else:
-        print(f"❌ Expected 403, got {response.status_code if response else 'No response'}")
+        print(f"❌ No response received")
     
     # Summary
     print(f"\n{'='*80}")
