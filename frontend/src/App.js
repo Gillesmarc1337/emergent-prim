@@ -3782,21 +3782,85 @@ function Dashboard() {
                       return `$${value.toFixed(0)}`;
                     };
                     
+                    // Handle sorting for AE Pipeline table
+                    const requestAePipelineSort = (key) => {
+                      let direction = 'ascending';
+                      if (aePipelineSortConfig.key === key && aePipelineSortConfig.direction === 'ascending') {
+                        direction = 'descending';
+                      }
+                      setAePipelineSortConfig({ key, direction });
+                    };
+                    
+                    // Sort AE breakdown
+                    const sortedAeBreakdown = Object.entries(aeBreakdown).sort(([aeA, valuesA], [aeB, valuesB]) => {
+                      if (aePipelineSortConfig.key === 'ae') {
+                        // Alphabetical sort
+                        return aePipelineSortConfig.direction === 'ascending' 
+                          ? aeA.localeCompare(aeB)
+                          : aeB.localeCompare(aeA);
+                      } else if (aePipelineSortConfig.key === 'next14') {
+                        return aePipelineSortConfig.direction === 'ascending'
+                          ? valuesA.next14 - valuesB.next14
+                          : valuesB.next14 - valuesA.next14;
+                      } else if (aePipelineSortConfig.key === 'next30') {
+                        return aePipelineSortConfig.direction === 'ascending'
+                          ? valuesA.next30 - valuesB.next30
+                          : valuesB.next30 - valuesA.next30;
+                      } else if (aePipelineSortConfig.key === 'next60') {
+                        return aePipelineSortConfig.direction === 'ascending'
+                          ? valuesA.next60 - valuesB.next60
+                          : valuesB.next60 - valuesA.next60;
+                      } else {
+                        // Default: sort by total
+                        const totalA = valuesA.next14 + valuesA.next30 + valuesA.next60;
+                        const totalB = valuesB.next14 + valuesB.next30 + valuesB.next60;
+                        return aePipelineSortConfig.direction === 'ascending'
+                          ? totalA - totalB
+                          : totalB - totalA;
+                      }
+                    });
+                    
                     return (
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                           <thead>
                             <tr className="border-b bg-gray-50">
-                              <th className="text-left p-3 font-semibold">ACCOUNT EXECUTIVE</th>
-                              <th className="text-right p-3 font-semibold">NEXT 30 DAYS<br /><span className="text-xs font-normal text-gray-600">Pipeline</span></th>
-                              <th className="text-right p-3 font-semibold">NEXT 60 DAYS<br /><span className="text-xs font-normal text-gray-600">Pipeline</span></th>
-                              <th className="text-right p-3 font-semibold">NEXT 90 DAYS<br /><span className="text-xs font-normal text-gray-600">Pipeline</span></th>
+                              <SortableTableHeader 
+                                sortKey="ae" 
+                                requestSort={requestAePipelineSort} 
+                                sortConfig={aePipelineSortConfig} 
+                                className="text-left p-3 font-semibold"
+                              >
+                                ACCOUNT EXECUTIVE
+                              </SortableTableHeader>
+                              <SortableTableHeader 
+                                sortKey="next14" 
+                                requestSort={requestAePipelineSort} 
+                                sortConfig={aePipelineSortConfig} 
+                                className="text-right p-3 font-semibold"
+                              >
+                                NEXT 30 DAYS<br /><span className="text-xs font-normal text-gray-600">Pipeline</span>
+                              </SortableTableHeader>
+                              <SortableTableHeader 
+                                sortKey="next30" 
+                                requestSort={requestAePipelineSort} 
+                                sortConfig={aePipelineSortConfig} 
+                                className="text-right p-3 font-semibold"
+                              >
+                                NEXT 60 DAYS<br /><span className="text-xs font-normal text-gray-600">Pipeline</span>
+                              </SortableTableHeader>
+                              <SortableTableHeader 
+                                sortKey="next60" 
+                                requestSort={requestAePipelineSort} 
+                                sortConfig={aePipelineSortConfig} 
+                                className="text-right p-3 font-semibold"
+                              >
+                                NEXT 90 DAYS<br /><span className="text-xs font-normal text-gray-600">Pipeline</span>
+                              </SortableTableHeader>
                             </tr>
                           </thead>
                           <tbody>
-                            {Object.entries(aeBreakdown)
-                              .sort(([, a], [, b]) => (b.next14 + b.next30 + b.next60) - (a.next14 + a.next30 + a.next60)) // Sort by total pipeline
-                              .map(([ae, values]) => (
+                            {sortedAeBreakdown.map(([ae, values]) => (
                                 <tr key={ae} className="border-b hover:bg-gray-50">
                                   <td className="p-3 font-medium">{ae}</td>
                                   <td className="text-right p-3">{formatValue(values.next14)}</td>
