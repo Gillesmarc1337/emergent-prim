@@ -2604,12 +2604,25 @@ async def get_upsell_renewals_analytics(
 async def get_dashboard_analytics(view_id: str = Query(None)):
     """Generate main dashboard with revenue charts"""
     try:
-        # Get data from MongoDB based on view
+        # Get view config and targets if view_id provided
+        view_config = None
+        view_targets = None
         if view_id:
+            config_data = await get_view_config_with_defaults(view_id)
+            view_config = config_data["view"]
+            view_targets = config_data["targets"]
             records = await get_sales_data_for_view(view_id)
         else:
-            # Fallback to default Organic collection
+            # Fallback to default Organic collection with default targets
             records = await db.sales_records.find().to_list(10000)
+            view_targets = {
+                "dashboard": {
+                    "objectif_6_mois": 4500000,
+                    "deals": 25,
+                    "new_pipe_created": 2000000,
+                    "weighted_pipe": 800000
+                }
+            }
             
         if not records:
             raise HTTPException(status_code=404, detail="No sales data found. Please upload data first.")
@@ -2623,11 +2636,26 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors='coerce')
         
-        # Monthly targets for 2025 (configurable)
+        # Get monthly targets from view config or use defaults
+        # For H2 2025 (July-Dec), calculate from 6-month target
+        objectif_6_mois = view_targets.get("dashboard", {}).get("objectif_6_mois", 4500000)
+        
+        # Default distribution for July-December (percentages of 6-month target)
+        monthly_distribution = {
+            'Jul': 0.103, 'Aug': 0.088, 'Sep': 0.122,
+            'Oct': 0.24, 'Nov': 0.186, 'Dec': 0.261
+        }
+        
+        # Calculate monthly targets based on view-specific 6-month target
         monthly_targets_2025 = {
-            'Jan 2025': 500000, 'Feb 2025': 520000, 'Mar 2025': 540000, 'Apr 2025': 560000,
-            'May 2025': 580000, 'Jun 2025': 600000, 'Jul 2025': 620000, 'Aug 2025': 640000,
-            'Sep 2025': 660000, 'Oct 2025': 680000, 'Nov 2025': 700000, 'Dec 2025': 720000
+            'Jan 2025': 0, 'Feb 2025': 0, 'Mar 2025': 0, 
+            'Apr 2025': 0, 'May 2025': 0, 'Jun 2025': 0,
+            'Jul 2025': int(objectif_6_mois * monthly_distribution['Jul']),
+            'Aug 2025': int(objectif_6_mois * monthly_distribution['Aug']),
+            'Sep 2025': int(objectif_6_mois * monthly_distribution['Sep']),
+            'Oct 2025': int(objectif_6_mois * monthly_distribution['Oct']),
+            'Nov 2025': int(objectif_6_mois * monthly_distribution['Nov']),
+            'Dec 2025': int(objectif_6_mois * monthly_distribution['Dec'])
         }
         
         # Get current date and analyze data
