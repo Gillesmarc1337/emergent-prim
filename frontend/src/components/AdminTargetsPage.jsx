@@ -484,6 +484,7 @@ function AdminTargetsPage() {
                           value={targets?.revenue_2025?.[month.key] || 0}
                           onChange={(e) => updateRevenueTarget(month.key, e.target.value)}
                           disabled={isMasterView}
+                          disabled={isMasterView}
                           className="mt-1"
                         />
                       </div>
@@ -515,7 +516,8 @@ function AdminTargetsPage() {
                         type="number"
                         value={targets?.dashboard_bottom_cards?.new_pipe_created || 0}
                         onChange={(e) => updateDashboardBottomCard('new_pipe_created', e.target.value)}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                       <p className="text-xs text-gray-500 mt-1">Total pipeline to create in selected period</p>
                     </div>
@@ -526,7 +528,8 @@ function AdminTargetsPage() {
                         type="number"
                         value={targets?.dashboard_bottom_cards?.created_weighted_pipe || 0}
                         onChange={(e) => updateDashboardBottomCard('created_weighted_pipe', e.target.value)}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                       <p className="text-xs text-gray-500 mt-1">Weighted pipeline target for period</p>
                     </div>
@@ -537,7 +540,8 @@ function AdminTargetsPage() {
                         type="number"
                         value={targets?.dashboard_bottom_cards?.ytd_revenue || 0}
                         onChange={(e) => updateDashboardBottomCard('ytd_revenue', e.target.value)}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                       <p className="text-xs text-gray-500 mt-1">Year-to-date revenue target (usually H2 total)</p>
                     </div>
@@ -600,7 +604,8 @@ function AdminTargetsPage() {
                         type="number"
                         value={targets?.meeting_generation?.total_target || 0}
                         onChange={(e) => updateMeetingTarget('total_target', e.target.value)}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                       <p className="text-xs text-gray-500 mt-1">Total meetings expected per month</p>
                     </div>
@@ -611,7 +616,8 @@ function AdminTargetsPage() {
                         type="number"
                         value={targets?.meeting_generation?.inbound || 0}
                         onChange={(e) => updateMeetingTarget('inbound', e.target.value)}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                     </div>
                     <div>
@@ -621,7 +627,8 @@ function AdminTargetsPage() {
                         type="number"
                         value={targets?.meeting_generation?.outbound || 0}
                         onChange={(e) => updateMeetingTarget('outbound', e.target.value)}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                     </div>
                     <div>
@@ -631,7 +638,8 @@ function AdminTargetsPage() {
                         type="number"
                         value={targets?.meeting_generation?.referral || 0}
                         onChange={(e) => updateMeetingTarget('referral', e.target.value)}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                     </div>
                     <div>
@@ -641,7 +649,8 @@ function AdminTargetsPage() {
                         type="number"
                         value={targets?.meeting_generation?.upsells_cross || 0}
                         onChange={(e) => updateMeetingTarget('upsells_cross', e.target.value)}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                     </div>
                   </div>
@@ -694,7 +703,8 @@ function AdminTargetsPage() {
                         type="number"
                         value={targets?.intro_poa?.intro || 0}
                         onChange={(e) => updateIntroPOATarget('intro', e.target.value)}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                       <p className="text-xs text-gray-500 mt-1">Total introductions expected</p>
                     </div>
@@ -705,7 +715,8 @@ function AdminTargetsPage() {
                         type="number"
                         value={targets?.intro_poa?.poa || 0}
                         onChange={(e) => updateIntroPOATarget('poa', e.target.value)}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                       <p className="text-xs text-gray-500 mt-1">Total POAs expected</p>
                     </div>
@@ -755,7 +766,8 @@ function AdminTargetsPage() {
                             }
                           }));
                         }}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                       <p className="text-xs text-gray-500 mt-1">Total meetings scheduled target</p>
                     </div>
@@ -774,7 +786,8 @@ function AdminTargetsPage() {
                             }
                           }));
                         }}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                       <p className="text-xs text-gray-500 mt-1">POA generated from intros</p>
                     </div>
@@ -793,7 +806,8 @@ function AdminTargetsPage() {
                             }
                           }));
                         }}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                       <p className="text-xs text-gray-500 mt-1">Total deals closed target</p>
                     </div>
@@ -857,7 +871,8 @@ function AdminTargetsPage() {
                             }
                           }));
                         }}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                       />
                       <p className="text-xs text-gray-500 mt-1">Number of deals to close from July to December</p>
                     </div>
@@ -876,7 +891,8 @@ function AdminTargetsPage() {
                             }
                           }));
                         }}
-                        className="mt-1"
+                        disabled={isMasterView}
+                          className="mt-1"
                         step="100000"
                       />
                       <p className="text-xs text-gray-500 mt-1">Total ARR target in $ (e.g., 4500000 for $4.5M)</p>
