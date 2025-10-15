@@ -1273,18 +1273,18 @@ function Dashboard() {
     if (!currentView?.id) return;
     
     try {
-      // Organize deals by column with hidden status
+      // Organize deals by column with hidden status AND ORDER (index)
       const next14Deals = dealsData
         .filter(d => d.column === 'next14')
-        .map(d => ({ id: d.id, hidden: hiddenDealsSet.has(d.id) }));
+        .map((d, index) => ({ id: d.id, hidden: hiddenDealsSet.has(d.id), order: index }));
       
       const next30Deals = dealsData
         .filter(d => d.column === 'next30')
-        .map(d => ({ id: d.id, hidden: hiddenDealsSet.has(d.id) }));
+        .map((d, index) => ({ id: d.id, hidden: hiddenDealsSet.has(d.id), order: index }));
       
       const next60Deals = dealsData
         .filter(d => d.column === 'next60')
-        .map(d => ({ id: d.id, hidden: hiddenDealsSet.has(d.id) }));
+        .map((d, index) => ({ id: d.id, hidden: hiddenDealsSet.has(d.id), order: index }));
       
       await axios.post(`${API}/user/projections-preferences`, {
         view_id: currentView.id,
