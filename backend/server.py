@@ -1730,6 +1730,112 @@ async def delete_user(
     
     return {"message": f"User {target_user.get('email')} and all associated sessions deleted successfully"}
 
+# ============= USER PROJECTIONS PREFERENCES ENDPOINTS =============
+@api_router.post("/user/projections-preferences")
+async def save_projections_preferences(
+    preferences_request: ProjectionsPreferencesRequest,
+    user: dict = Depends(get_current_user)
+):
+    """
+    Save user's projections board preferences (order, hidden deals) per view
+    """
+    try:
+        user_id = user.get("id")
+        view_id = preferences_request.view_id
+        
+        # Convert Pydantic models to dict for MongoDB
+        preferences_data = {
+            "user_id": user_id,
+            "view_id": view_id,
+            "preferences": {
+                key: [deal.dict() for deal in deals]
+                for key, deals in preferences_request.preferences.items()
+            },
+            "updated_at": datetime.now(timezone.utc)
+        }
+        
+        # Upsert (update if exists, insert if not)
+        await db.user_projections_preferences.update_one(
+            {"user_id": user_id, "view_id": view_id},
+            {"$set": preferences_data},
+            upsert=True
+        )
+        
+        return {
+            "message": "Projections preferences saved successfully",
+            "user_id": user_id,
+            "view_id": view_id
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error saving preferences: {str(e)}")
+
+@api_router.get("/user/projections-preferences")
+async def get_projections_preferences(
+    view_id: str = Query(..., description="View ID to get preferences for"),
+    user: dict = Depends(get_current_user)
+):
+    """
+    Get user's saved projections board preferences for a specific view
+    """
+    try:
+        user_id = user.get("id")
+        
+        # Find preferences for this user and view
+        preferences_doc = await db.user_projections_preferences.find_one({
+            "user_id": user_id,
+            "view_id": view_id
+        })
+        
+        if not preferences_doc:
+            return {
+                "has_preferences": False,
+                "preferences": None
+            }
+        
+        # Clean MongoDB _id
+        if '_id' in preferences_doc:
+            del preferences_doc['_id']
+        
+        return {
+            "has_preferences": True,
+            "preferences": preferences_doc.get("preferences"),
+            "updated_at": preferences_doc.get("updated_at").isoformat() if preferences_doc.get("updated_at") else None
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error loading preferences: {str(e)}")
+
+@api_router.delete("/user/projections-preferences")
+async def reset_projections_preferences(
+    view_id: str = Query(..., description="View ID to reset preferences for"),
+    user: dict = Depends(get_current_user)
+):
+    """
+    Reset user's projections board preferences for a specific view (delete saved state)
+    """
+    try:
+        user_id = user.get("id")
+        
+        result = await db.user_projections_preferences.delete_one({
+            "user_id": user_id,
+            "view_id": view_id
+        })
+        
+        if result.deleted_count == 0:
+            return {
+                "message": "No preferences found to reset (already at default)",
+                "reset": True
+            }
+        
+        return {
+            "message": "Projections preferences reset successfully",
+            "reset": True
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error resetting preferences: {str(e)}")
+
 @api_router.post("/upload-data", response_model=UploadResponse)
 async def upload_sales_data(
     file: UploadFile = File(...),
