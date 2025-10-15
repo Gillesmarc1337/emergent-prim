@@ -916,7 +916,8 @@ function AdminTargetsPage() {
 
             </div>
           </TabsContent>
-        ))}
+          );
+        })}
       </Tabs>
     </div>
   );
