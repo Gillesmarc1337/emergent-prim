@@ -2694,28 +2694,11 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
                 (closed_deals['expected_arr'] != '')
             ]
             
-            # Use exact values from your dashboard image
-            exact_targets = {
-                'Jul 2025': 465000,
-                'Aug 2025': 397500,
-                'Sep 2025': 547500,
-                'Oct 2025': 1080000,
-                'Nov 2025': 997500,
-                'Dec 2025': 1312500
-            }
+            # Get targets from monthly_targets_2025 (calculated from view config)
+            target_revenue = monthly_targets_2025.get(month_str, 0)
             
-            exact_closed = {
-                'Jul 2025': 492396,
-                'Aug 2025': 454800,
-                'Sep 2025': 182400,
-                'Oct 2025': 0,
-                'Nov 2025': 0,
-                'Dec 2025': 0
-            }
-            
-            # Get exact values from your image
-            target_revenue = exact_targets.get(month_str, 500000)
-            closed_revenue = exact_closed.get(month_str, 0)
+            # Calculate actual closed revenue from data
+            closed_revenue = float(closed_deals_clean['expected_arr'].fillna(0).sum())
             
             # Weighted pipeline - surge starting October 2025
             active_deals = df[
