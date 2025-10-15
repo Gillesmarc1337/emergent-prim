@@ -1865,23 +1865,115 @@ function Dashboard() {
               <Card className="mt-6">
                 <CardHeader>
                   <CardTitle>Meeting Details</CardTitle>
+                  <CardDescription>Detailed list of all meetings with filters and sorting</CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {/* Filters */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div>
+                      <Label htmlFor="filter-bdr" className="text-xs font-semibold">Filter by BDR</Label>
+                      <select
+                        id="filter-bdr"
+                        className="w-full mt-1 p-2 border rounded text-sm"
+                        value={meetingDetailsFilters.bdr}
+                        onChange={(e) => setMeetingDetailsFilters({...meetingDetailsFilters, bdr: e.target.value})}
+                      >
+                        <option value="all">All BDRs</option>
+                        {Array.from(new Set(analytics.meeting_generation.meetings_details.map(m => m.bdr).filter(Boolean))).map(bdr => (
+                          <option key={bdr} value={bdr}>{bdr}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <Label htmlFor="filter-source" className="text-xs font-semibold">Filter by Source</Label>
+                      <select
+                        id="filter-source"
+                        className="w-full mt-1 p-2 border rounded text-sm"
+                        value={meetingDetailsFilters.source}
+                        onChange={(e) => setMeetingDetailsFilters({...meetingDetailsFilters, source: e.target.value})}
+                      >
+                        <option value="all">All Sources</option>
+                        <option value="Inbound">Inbound</option>
+                        <option value="Outbound">Outbound</option>
+                        <option value="referral">Referral</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label htmlFor="filter-relevance" className="text-xs font-semibold">Filter by Relevance</Label>
+                      <select
+                        id="filter-relevance"
+                        className="w-full mt-1 p-2 border rounded text-sm"
+                        value={meetingDetailsFilters.relevance}
+                        onChange={(e) => setMeetingDetailsFilters({...meetingDetailsFilters, relevance: e.target.value})}
+                      >
+                        <option value="all">All Relevance</option>
+                        <option value="Relevant">Relevant</option>
+                        <option value="Question mark">Question mark</option>
+                        <option value="Maybe">Maybe</option>
+                        <option value="Not relevant">Not relevant</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label htmlFor="filter-stage" className="text-xs font-semibold">Filter by Stage</Label>
+                      <select
+                        id="filter-stage"
+                        className="w-full mt-1 p-2 border rounded text-sm"
+                        value={meetingDetailsFilters.stage}
+                        onChange={(e) => setMeetingDetailsFilters({...meetingDetailsFilters, stage: e.target.value})}
+                      >
+                        <option value="all">All Stages</option>
+                        {Array.from(new Set(analytics.meeting_generation.meetings_details.map(m => m.stage).filter(Boolean))).map(stage => (
+                          <option key={stage} value={stage}>{stage}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Table */}
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b">
-                          <th className="text-left p-2 font-semibold">Date</th>
-                          <th className="text-left p-2 font-semibold">Client / Prospect</th>
-                          <th className="text-left p-2 font-semibold">Owner (BDR)</th>
-                          <th className="text-left p-2 font-semibold">Source</th>
-                          <th className="text-center p-2 font-semibold">Relevance</th>
-                          <th className="text-left p-2 font-semibold">Owner</th>
-                          <th className="text-left p-2 font-semibold">Stage</th>
+                        <tr className="border-b bg-gray-50">
+                          <SortableTableHeader sortKey="date" requestSort={requestMeetingDetailsSort} sortConfig={meetingDetailsSortConfig} className="text-left p-2 font-semibold">
+                            Date
+                          </SortableTableHeader>
+                          <SortableTableHeader sortKey="client" requestSort={requestMeetingDetailsSort} sortConfig={meetingDetailsSortConfig} className="text-left p-2 font-semibold">
+                            Client / Prospect
+                          </SortableTableHeader>
+                          <SortableTableHeader sortKey="bdr" requestSort={requestMeetingDetailsSort} sortConfig={meetingDetailsSortConfig} className="text-left p-2 font-semibold">
+                            Owner (BDR)
+                          </SortableTableHeader>
+                          <SortableTableHeader sortKey="source" requestSort={requestMeetingDetailsSort} sortConfig={meetingDetailsSortConfig} className="text-left p-2 font-semibold">
+                            Source
+                          </SortableTableHeader>
+                          <SortableTableHeader sortKey="relevance" requestSort={requestMeetingDetailsSort} sortConfig={meetingDetailsSortConfig} className="text-center p-2 font-semibold">
+                            Relevance
+                          </SortableTableHeader>
+                          <SortableTableHeader sortKey="owner" requestSort={requestMeetingDetailsSort} sortConfig={meetingDetailsSortConfig} className="text-left p-2 font-semibold">
+                            Owner (AE)
+                          </SortableTableHeader>
+                          <SortableTableHeader sortKey="stage" requestSort={requestMeetingDetailsSort} sortConfig={meetingDetailsSortConfig} className="text-left p-2 font-semibold">
+                            Stage
+                          </SortableTableHeader>
+                          <SortableTableHeader sortKey="expected_arr" requestSort={requestMeetingDetailsSort} sortConfig={meetingDetailsSortConfig} className="text-right p-2 font-semibold">
+                            Expected ARR
+                          </SortableTableHeader>
                         </tr>
                       </thead>
                       <tbody>
-                        {analytics.meeting_generation.meetings_details.map((meeting, index) => (
+                        {sortedMeetingDetails
+                          .filter(meeting => {
+                            // Apply filters
+                            if (meetingDetailsFilters.bdr !== 'all' && meeting.bdr !== meetingDetailsFilters.bdr) return false;
+                            if (meetingDetailsFilters.source !== 'all') {
+                              if (meetingDetailsFilters.source === 'referral' && !meeting.source?.toLowerCase().includes('referral')) return false;
+                              if (meetingDetailsFilters.source !== 'referral' && meeting.source !== meetingDetailsFilters.source) return false;
+                            }
+                            if (meetingDetailsFilters.relevance !== 'all' && meeting.relevance !== meetingDetailsFilters.relevance) return false;
+                            if (meetingDetailsFilters.stage !== 'all' && meeting.stage !== meetingDetailsFilters.stage) return false;
+                            return true;
+                          })
+                          .map((meeting, index) => (
                           <tr key={index} className="border-b hover:bg-gray-50">
                             <td className="p-2">{meeting.date}</td>
                             <td className="p-2 font-medium">{meeting.client}</td>
@@ -1890,7 +1982,7 @@ function Dashboard() {
                               <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                                 meeting.source === 'Inbound' ? 'bg-blue-100 text-blue-800' :
                                 meeting.source === 'Outbound' ? 'bg-green-100 text-green-800' :
-                                meeting.source.includes('referral') ? 'bg-purple-100 text-purple-800' :
+                                meeting.source?.toLowerCase().includes('referral') ? 'bg-purple-100 text-purple-800' :
                                 'bg-gray-100 text-gray-800'
                               }`}>
                                 {meeting.source}
@@ -1915,10 +2007,27 @@ function Dashboard() {
                                 {meeting.stage}
                               </span>
                             </td>
+                            <td className="p-2 text-right font-medium text-green-600">
+                              ${(meeting.expected_arr || 0).toLocaleString()}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
+                  </div>
+                  
+                  {/* Results count */}
+                  <div className="mt-4 text-sm text-gray-600">
+                    Showing {sortedMeetingDetails.filter(meeting => {
+                      if (meetingDetailsFilters.bdr !== 'all' && meeting.bdr !== meetingDetailsFilters.bdr) return false;
+                      if (meetingDetailsFilters.source !== 'all') {
+                        if (meetingDetailsFilters.source === 'referral' && !meeting.source?.toLowerCase().includes('referral')) return false;
+                        if (meetingDetailsFilters.source !== 'referral' && meeting.source !== meetingDetailsFilters.source) return false;
+                      }
+                      if (meetingDetailsFilters.relevance !== 'all' && meeting.relevance !== meetingDetailsFilters.relevance) return false;
+                      if (meetingDetailsFilters.stage !== 'all' && meeting.stage !== meetingDetailsFilters.stage) return false;
+                      return true;
+                    }).length} of {sortedMeetingDetails.length} meetings
                   </div>
                 </CardContent>
               </Card>
