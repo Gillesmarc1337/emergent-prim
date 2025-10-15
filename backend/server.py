@@ -2744,27 +2744,43 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors='coerce')
         
-        # Get monthly targets from view config or use defaults
-        # For H2 2025 (July-Dec), calculate from 6-month target
+        # Get monthly targets from back office (revenue_2025) or calculate from 6-month target
+        revenue_2025 = view_targets.get("revenue_2025", {})
         objectif_6_mois = view_targets.get("dashboard", {}).get("objectif_6_mois", 4500000)
         
-        # Default distribution for July-December (percentages of 6-month target)
-        monthly_distribution = {
-            'Jul': 0.103, 'Aug': 0.088, 'Sep': 0.122,
-            'Oct': 0.24, 'Nov': 0.186, 'Dec': 0.261
-        }
-        
-        # Calculate monthly targets based on view-specific 6-month target
-        monthly_targets_2025 = {
-            'Jan 2025': 0, 'Feb 2025': 0, 'Mar 2025': 0, 
-            'Apr 2025': 0, 'May 2025': 0, 'Jun 2025': 0,
-            'Jul 2025': int(objectif_6_mois * monthly_distribution['Jul']),
-            'Aug 2025': int(objectif_6_mois * monthly_distribution['Aug']),
-            'Sep 2025': int(objectif_6_mois * monthly_distribution['Sep']),
-            'Oct 2025': int(objectif_6_mois * monthly_distribution['Oct']),
-            'Nov 2025': int(objectif_6_mois * monthly_distribution['Nov']),
-            'Dec 2025': int(objectif_6_mois * monthly_distribution['Dec'])
-        }
+        # Use back office targets if available, otherwise calculate from distribution
+        if revenue_2025 and any(revenue_2025.values()):
+            # Back office has specific monthly targets - use them!
+            monthly_targets_2025 = {
+                'Jan 2025': int(revenue_2025.get('jan', 0)),
+                'Feb 2025': int(revenue_2025.get('feb', 0)),
+                'Mar 2025': int(revenue_2025.get('mar', 0)),
+                'Apr 2025': int(revenue_2025.get('apr', 0)),
+                'May 2025': int(revenue_2025.get('may', 0)),
+                'Jun 2025': int(revenue_2025.get('jun', 0)),
+                'Jul 2025': int(revenue_2025.get('jul', 0)),
+                'Aug 2025': int(revenue_2025.get('aug', 0)),
+                'Sep 2025': int(revenue_2025.get('sep', 0)),
+                'Oct 2025': int(revenue_2025.get('oct', 0)),
+                'Nov 2025': int(revenue_2025.get('nov', 0)),
+                'Dec 2025': int(revenue_2025.get('dec', 0))
+            }
+        else:
+            # Fallback: Calculate from distribution if back office targets not set
+            monthly_distribution = {
+                'Jul': 0.103, 'Aug': 0.088, 'Sep': 0.122,
+                'Oct': 0.24, 'Nov': 0.186, 'Dec': 0.261
+            }
+            monthly_targets_2025 = {
+                'Jan 2025': 0, 'Feb 2025': 0, 'Mar 2025': 0, 
+                'Apr 2025': 0, 'May 2025': 0, 'Jun 2025': 0,
+                'Jul 2025': int(objectif_6_mois * monthly_distribution['Jul']),
+                'Aug 2025': int(objectif_6_mois * monthly_distribution['Aug']),
+                'Sep 2025': int(objectif_6_mois * monthly_distribution['Sep']),
+                'Oct 2025': int(objectif_6_mois * monthly_distribution['Oct']),
+                'Nov 2025': int(objectif_6_mois * monthly_distribution['Nov']),
+                'Dec 2025': int(objectif_6_mois * monthly_distribution['Dec'])
+            }
         
         # Get current date and analyze data
         today = datetime.now()
