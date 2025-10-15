@@ -2775,8 +2775,8 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
         ]
         ytd_revenue = float(ytd_closed_deals['expected_arr'].fillna(0).sum())
         
-        # Annual target 2025 (corrected target)
-        annual_target_2025 = 4500000.0  # Correct annual target for 2025
+        # Annual target 2025 from view config (July-December H2 target)
+        annual_target_2025 = float(objectif_6_mois)  # Use view-specific 6-month target
         
         # Total pipeline
         active_pipeline = df[~df['stage'].isin(['Closed Won', 'Closed Lost', 'I Lost'])]
