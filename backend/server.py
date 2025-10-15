@@ -1689,14 +1689,17 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
         ]
         active_deals_count = len(active_deals)
         
+        # Get YTD target from view config (July-December H2 target)
+        ytd_target = float(view_targets.get("dashboard", {}).get("objectif_6_mois", 4500000))
+        
         big_numbers_recap = {
             'ytd_revenue': ytd_revenue,
-            'ytd_target': 4500000.0,  # Annual target
-            'remaining_target': 4500000.0 - ytd_revenue,
+            'ytd_target': ytd_target,
+            'remaining_target': ytd_target - ytd_revenue,
             'pipe_created': total_pipe_created,
             'active_deals_count': active_deals_count,
             'monthly_breakdown': {str(k): float(v) for k, v in df.groupby(df['discovery_date'].dt.to_period('M'))['pipeline'].sum().to_dict().items()} if len(df) > 0 else {},
-            'forecast_gap': ytd_revenue < 4500000.0 * 0.75
+            'forecast_gap': ytd_revenue < ytd_target * 0.75
         }
         
         # For realistic testing, let's use a period that has actual data
