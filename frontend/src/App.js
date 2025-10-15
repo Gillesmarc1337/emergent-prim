@@ -1024,20 +1024,20 @@ function MainDashboard({ analytics, currentView }) {
                 
                 return (
                   <>
-                    {/* Total Pipe Generation by X mois */}
+                    {/* Total Pipe Generation */}
                     <div className="text-center p-3 bg-white rounded-lg">
                       <div className="text-2xl font-bold text-purple-600">
                         ${(analytics.dashboard_blocks.block_3_pipe_creation.new_pipe_created / 1000000).toFixed(1)}M
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">Total Pipe Generation by {monthsText}</div>
+                      <div className="text-xs text-gray-600 mt-1">Total Pipe Generation</div>
                     </div>
                     
-                    {/* Aggregate Weighted Pipe Generated X mois */}
+                    {/* Aggregate Weighted Pipe */}
                     <div className="text-center p-3 bg-white rounded-lg">
                       <div className="text-2xl font-bold text-purple-600">
                         ${(analytics.dashboard_blocks.block_3_pipe_creation.aggregate_weighted_pipe / 1000000).toFixed(1)}M
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">Aggregate Weighted Pipe Generated {monthsText}</div>
+                      <div className="text-xs text-gray-600 mt-1">Aggregate Weighted Pipe</div>
                     </div>
                   </>
                 );
