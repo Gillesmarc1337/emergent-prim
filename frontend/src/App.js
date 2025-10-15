@@ -3413,7 +3413,7 @@ function Dashboard() {
                           const columnValue = filteredDeals
                             .filter(deal => deal.column === 'next14' && !hiddenDeals.has(deal.id))
                             .reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
-                          const columnTarget = 375000; // Fixed target: $375K for next 14 days
+                          const columnTarget = 375000; // Fixed target: $375K for next 30 days
                           const percentage = Math.round((columnValue / columnTarget) * 100);
                           const isOnTrack = columnValue >= columnTarget;
                           
