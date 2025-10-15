@@ -5504,33 +5504,33 @@ def main():
         print(f"{'='*60}")
         test_results['google_sheet_upload'] = test_google_sheet_upload_for_market_view()
         
-        # Test 5: Multi-view endpoints
+        # Test 6: Multi-view endpoints
         print(f"\n{'='*60}")
-        print(f"🔍 PHASE 5: MULTI-VIEW ENDPOINTS")
+        print(f"🔍 PHASE 6: MULTI-VIEW ENDPOINTS")
         print(f"{'='*60}")
         test_results['multi_view_endpoints'] = test_multi_view_endpoints()
         
-        # Test 6: Projections endpoints
+        # Test 7: Projections endpoints
         print(f"\n{'='*60}")
-        print(f"📊 PHASE 6: PROJECTIONS ENDPOINTS")
+        print(f"📊 PHASE 7: PROJECTIONS ENDPOINTS")
         print(f"{'='*60}")
         hot_deals_success = test_projections_hot_deals()
         hot_leads_success = test_projections_hot_leads()
         performance_summary_success = test_projections_performance_summary()
         test_results['projections_endpoints'] = hot_deals_success and hot_leads_success and performance_summary_success
         
-        # Test 6: Analytics endpoints
+        # Test 8: Analytics endpoints
         print(f"\n{'='*60}")
-        print(f"📈 PHASE 6: ANALYTICS ENDPOINTS")
+        print(f"📈 PHASE 8: ANALYTICS ENDPOINTS")
         print(f"{'='*60}")
         monthly_success = test_monthly_analytics_with_offset(0, "Oct 2025")
         yearly_success = test_yearly_analytics_july_dec_blocks()
         custom_success = test_custom_analytics_dynamic_targets()
         test_results['analytics_endpoints'] = monthly_success and yearly_success and custom_success
         
-        # Test 7: Session management
+        # Test 9: Session management
         print(f"\n{'='*60}")
-        print(f"🔑 PHASE 7: SESSION MANAGEMENT")
+        print(f"🔑 PHASE 9: SESSION MANAGEMENT")
         print(f"{'='*60}")
         test_results['session_management'] = test_session_expiration_validation()
         
