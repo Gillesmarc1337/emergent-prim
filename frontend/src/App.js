@@ -1302,6 +1302,7 @@ function Dashboard() {
         // Update the deal's column assignment
         draggedDeal.column = destination.droppableId;
         setHotDeals(newDeals);
+        setHasUnsavedChanges(true); // Mark as changed
       }
     } else if (source.droppableId === 'hot-deals') {
       const newDeals = Array.from(hotDeals);
