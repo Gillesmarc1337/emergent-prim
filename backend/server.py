@@ -2872,9 +2872,9 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
         if revenue_2025 and any(revenue_2025.values()):
             # Sum July to December targets from back office
             annual_target_2025 = float(
-                revenue_2025.get('jul', 0) + revenue_2025.get('aug', 0) + 
-                revenue_2025.get('sep', 0) + revenue_2025.get('oct', 0) + 
-                revenue_2025.get('nov', 0) + revenue_2025.get('dec', 0)
+                safe_int(revenue_2025.get('jul', 0)) + safe_int(revenue_2025.get('aug', 0)) + 
+                safe_int(revenue_2025.get('sep', 0)) + safe_int(revenue_2025.get('oct', 0)) + 
+                safe_int(revenue_2025.get('nov', 0)) + safe_int(revenue_2025.get('dec', 0))
             )
         else:
             # Fallback to objectif_6_mois
