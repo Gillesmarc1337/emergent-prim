@@ -2787,24 +2787,25 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
         active_pipeline['weighted_value'] = active_pipeline['pipeline'] * active_pipeline['probability'] / 100
         total_weighted_pipeline = float(active_pipeline['weighted_value'].sum())
         
-        # July to December 2025 targets chart with exact values (total 4.5M)
-        exact_targets = {
-            'Jul': 465000, 'Aug': 397500, 'Sep': 547500,
-            'Oct': 1080000, 'Nov': 835000, 'Dec': 1175000  # Redistributed to total exactly 4.5M
-        }
-        
-        exact_closed = {
-            'Jul': 492396, 'Aug': 454800, 'Sep': 182400,
-            'Oct': 0, 'Nov': 0, 'Dec': 0
-        }
-        
+        # July to December 2025 targets chart using view-specific targets
         period_targets_2025 = []
         cumulative_target = 0  # Start from zero for H2 period
         cumulative_closed = 0
         
         for month in ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']:
-            month_target = exact_targets[month]
-            month_closed = exact_closed[month]
+            month_str = f'{month} 2025'
+            month_target = monthly_targets_2025.get(month_str, 0)
+            
+            # Calculate actual closed revenue for this month
+            month_date = datetime(2025, {'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}[month], 1)
+            month_start, month_end = get_month_range(month_date, 0)
+            
+            month_closed_deals = df[
+                (df['stage'] == 'A Closed') &
+                (df['discovery_date'] >= month_start) &
+                (df['discovery_date'] <= month_end)
+            ]
+            month_closed = float(month_closed_deals['expected_arr'].fillna(0).sum())
             
             cumulative_target += month_target
             cumulative_closed += month_closed
