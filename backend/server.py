@@ -56,6 +56,14 @@ def get_collections_for_master():
     """Get all collections to aggregate for Master view (includes Organic)"""
     return ["sales_records", "sales_records_signal", "sales_records_fullfunnel", "sales_records_market"]
 
+def safe_int(value):
+    """Convert any numeric type (including numpy types) to Python int"""
+    if value is None:
+        return 0
+    if hasattr(value, 'item'):  # numpy type
+        return int(value.item())
+    return int(value)
+
 async def get_view_config_with_defaults(view_id: str):
     """
     Get view configuration with default targets if not set
