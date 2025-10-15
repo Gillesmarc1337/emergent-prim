@@ -760,8 +760,14 @@ def calculate_ae_performance(df, start_date, end_date):
         # Relevant intros (assuming relevant means they progressed)
         relevant_intros = ae_intros[ae_intros['relevance'] == 'Relevant']
         
-        # Closing value calculation (sum of expected_arr for closed won deals)
-        closed_won = ae_poas[ae_poas['stage'] == 'A Closed']
+        # Closing value calculation - FIXED: Filter by billing_start (column R) instead of discovery_date
+        # This ensures we count closed deals in the period they actually closed, not when they were discovered
+        closed_won = df[
+            (df['owner'] == ae) & 
+            (df['stage'] == 'A Closed') &
+            (df['billing_start'] >= start_date) &
+            (df['billing_start'] <= end_date)
+        ]
         closing_value = float(closed_won['expected_arr'].fillna(0).sum())
         
         ae_performance.append({
