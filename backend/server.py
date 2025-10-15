@@ -297,6 +297,14 @@ class UserRoleUpdateRequest(BaseModel):
 class UserViewAccessRequest(BaseModel):
     view_access: List[str]
 
+class ProjectionDeal(BaseModel):
+    id: str
+    hidden: bool = False
+
+class ProjectionsPreferencesRequest(BaseModel):
+    view_id: str
+    preferences: Dict[str, List[ProjectionDeal]]  # e.g., {"next30": [...], "next60": [...], "next90": [...]}
+
 # Utility functions
 def clean_records(records):
     """Clean records to ensure all values are JSON serializable"""
