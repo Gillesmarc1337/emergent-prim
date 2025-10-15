@@ -115,6 +115,10 @@ export const AuthProvider = ({ children }) => {
     try {
       setCurrentView(view);
       
+      // Save selected view to localStorage for persistence
+      localStorage.setItem('selectedViewId', view.id);
+      console.log('Saved view to localStorage:', view.id, view.name);
+      
       // Load view configuration/targets
       const configResponse = await axios.get(`${API}/api/views/${view.id}/config`, {
         withCredentials: true
