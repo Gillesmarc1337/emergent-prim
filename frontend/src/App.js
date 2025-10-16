@@ -1171,6 +1171,9 @@ function Dashboard() {
   // State for Upsell & Renew tab
   const [upsellRenewData, setUpsellRenewData] = useState(null);
   
+  // State for AE Pipeline Breakdown sorting
+  const [aeSortConfig, setAESortConfig] = useState({ key: null, direction: 'asc' });
+  
   // NEW: Tab targets (direct from BO, no multiplication)
   const [tabTargets, setTabTargets] = useState({
     meetings_attended_tab: {
