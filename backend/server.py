@@ -107,6 +107,7 @@ def convert_numpy_types(obj):
 async def get_view_config_with_defaults(view_id: str):
     """
     Get view configuration with default targets if not set
+    For Master view: auto-calculates from other views if no manual targets saved
     """
     view = await db.views.find_one({"id": view_id})
     if not view:
@@ -133,9 +134,59 @@ async def get_view_config_with_defaults(view_id: str):
         }
     }
     
-    # Merge view targets with defaults
+    # Check if this is Master view
+    is_master = view.get("is_master", False) or view.get("name") == "Master"
     view_targets = view.get("targets", {})
-    if not view_targets:
+    
+    if is_master and not view_targets:
+        # Master view with no manual targets: auto-aggregate from other views
+        print(f"🔢 Master view: Auto-aggregating targets from other views")
+        
+        # Get all non-master views
+        all_views = await db.views.find({"name": {"$ne": "Master"}}).to_list(100)
+        
+        # Initialize aggregated targets
+        aggregated = {
+            "dashboard": {
+                "objectif_6_mois": 0,
+                "deals": 0,
+                "new_pipe_created": 0,
+                "weighted_pipe": 0
+            },
+            "meeting_generation": {
+                "intro": 0,
+                "inbound": 0,
+                "outbound": 0,
+                "referrals": 0,
+                "upsells_x": 0
+            },
+            "meeting_attended": {
+                "poa": 0,
+                "deals_closed": 0
+            }
+        }
+        
+        # Sum targets from all other views
+        for v in all_views:
+            v_targets = v.get("targets", {})
+            if v_targets:
+                # Dashboard targets
+                if "dashboard" in v_targets:
+                    for key in aggregated["dashboard"].keys():
+                        aggregated["dashboard"][key] += v_targets["dashboard"].get(key, 0)
+                
+                # Meeting generation targets
+                if "meeting_generation" in v_targets:
+                    for key in aggregated["meeting_generation"].keys():
+                        aggregated["meeting_generation"][key] += v_targets["meeting_generation"].get(key, 0)
+                
+                # Meeting attended targets
+                if "meeting_attended" in v_targets:
+                    for key in aggregated["meeting_attended"].keys():
+                        aggregated["meeting_attended"][key] += v_targets["meeting_attended"].get(key, 0)
+        
+        view_targets = aggregated
+    elif not view_targets:
         view_targets = default_targets
     
     return {
