@@ -1433,9 +1433,9 @@ function Dashboard() {
 
     const { source, destination } = result;
     
-    // Handle column-based drag and drop for the new interactive board
-    if (['next14', 'next30', 'next60'].includes(source.droppableId) || 
-        ['next14', 'next30', 'next60'].includes(destination.droppableId)) {
+    // Handle column-based drag and drop for the new interactive board (including delayed column)
+    if (['next14', 'next30', 'next60', 'delayed'].includes(source.droppableId) || 
+        ['next14', 'next30', 'next60', 'delayed'].includes(destination.droppableId)) {
       
       const newDeals = Array.from(hotDeals);
       const draggedDeal = newDeals.find(deal => deal.id === result.draggableId);
