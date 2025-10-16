@@ -6027,7 +6027,8 @@ def main():
         'projections_endpoints': False,
         'projections_preferences_api': False,  # NEW TEST - Projections Preferences API
         'analytics_endpoints': False,
-        'session_management': False
+        'session_management': False,
+        'master_view_targets': False  # NEW TEST - Master View Targets Configuration
     }
     
     try:
