@@ -2326,6 +2326,7 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
             'ae_performance': ae_performance,
             'attribution': attribution,
             'deals_closed': deals_closed,
+            'deals_closed_current_period': deals_closed,  # Same data, for banner display
             'pipe_metrics': pipe_metrics,
             'old_pipe': old_pipe,
             'closing_projections': closing_projections,
