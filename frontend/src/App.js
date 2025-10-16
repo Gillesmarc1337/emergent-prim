@@ -2353,12 +2353,20 @@ function Dashboard() {
                       deals_closed: analytics.meetings_attended.monthly_breakdown.deals_closed[index]
                     }));
                     
+                    // Function to toggle visibility of chart series
+                    const handleLegendClick = (dataKey) => {
+                      setAttendedChartVisibility(prev => ({
+                        ...prev,
+                        [dataKey]: !prev[dataKey]
+                      }));
+                    };
+                    
                     return (
                       <Card className="mb-6">
                         <CardHeader>
                           <CardTitle>Monthly Meetings Attended Evolution</CardTitle>
                           <CardDescription>
-                            Track attended meetings, POA generated, and deals closed on a monthly basis
+                            Track attended meetings, POA generated, and deals closed on a monthly basis (click legend to toggle)
                           </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -2368,10 +2376,19 @@ function Dashboard() {
                               <XAxis dataKey="month" />
                               <YAxis />
                               <Tooltip />
-                              <Legend />
-                              <Bar dataKey="attended" fill="#3b82f6" name="Meetings Attended" />
-                              <Bar dataKey="poa_generated" fill="#10b981" name="POA Generated" />
-                              <Line type="monotone" dataKey="deals_closed" stroke="#ef4444" strokeWidth={3} name="Deals Closed" />
+                              <Legend 
+                                onClick={(e) => handleLegendClick(e.dataKey)}
+                                wrapperStyle={{ cursor: 'pointer' }}
+                              />
+                              {attendedChartVisibility.attended && (
+                                <Bar dataKey="attended" fill="#3b82f6" name="Meetings Attended" />
+                              )}
+                              {attendedChartVisibility.poa_generated && (
+                                <Bar dataKey="poa_generated" fill="#10b981" name="POA Generated" />
+                              )}
+                              {attendedChartVisibility.deals_closed && (
+                                <Line type="monotone" dataKey="deals_closed" stroke="#ef4444" strokeWidth={3} name="Deals Closed" />
+                              )}
                             </ComposedChart>
                           </ResponsiveContainer>
                         </CardContent>
