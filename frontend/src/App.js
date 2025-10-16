@@ -720,6 +720,7 @@ function MainDashboard({ analytics, currentView }) {
     // Only load if currentView is defined
     if (currentView) {
       loadDashboard();
+      loadTabTargets(); // Load tab targets when view changes
     }
   }, [currentView]); // Reload when view changes
 
