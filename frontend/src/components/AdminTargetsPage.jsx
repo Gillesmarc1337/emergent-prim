@@ -93,7 +93,9 @@ function AdminTargetsPage() {
         dashboard_bottom_cards: {
           new_pipe_created: 2000000,
           created_weighted_pipe: 800000,
-          ytd_revenue: 4500000
+          ytd_revenue: 4500000,
+          ytd_aggregate_pipeline: 7500000,
+          ytd_cumulative_weighted: 2500000
         },
         meeting_generation: {
           total_target: 50,
