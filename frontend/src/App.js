@@ -3851,6 +3851,79 @@ function Dashboard() {
                         )}
                       </Droppable>
                     </div>
+                    
+                    {/* Potentially Delayed Deals Column */}
+                    <div className="bg-red-50 rounded-lg p-4">
+                      <div className="mb-4">
+                        <div className="font-semibold text-red-800 text-center mb-2">
+                          Potentially Delayed Deals
+                        </div>
+                        {(() => {
+                          // Format number with K (thousands) or M (millions)
+                          const formatValue = (value) => {
+                            if (value >= 1000000) {
+                              return `$${(value / 1000000).toFixed(1)}M`;
+                            } else if (value >= 1000) {
+                              return `$${(value / 1000).toFixed(0)}K`;
+                            }
+                            return `$${value.toFixed(0)}`;
+                          };
+                          
+                          // Calculate sum excluding hidden deals (with AE filter)
+                          const filteredDeals = getFilteredDeals();
+                          const columnValue = filteredDeals
+                            .filter(deal => deal.column === 'delayed' && !hiddenDeals.has(deal.id))
+                            .reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                          
+                          return (
+                            <Card className="bg-white">
+                              <CardContent className="p-3">
+                                <div className="text-2xl font-bold text-red-800 text-center">
+                                  {formatValue(columnValue)}
+                                </div>
+                                <div className="text-xs text-gray-600 text-center mb-2">
+                                  Deals at risk of delay
+                                </div>
+                                <div className="text-xs text-center mt-1">
+                                  <span className="text-red-600 font-medium">
+                                    {filteredDeals.filter(deal => deal.column === 'delayed' && !hiddenDeals.has(deal.id)).length} deal(s)
+                                  </span>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })()}
+                      </div>
+                      <Droppable droppableId="delayed">
+                        {(provided) => (
+                          <div 
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className="space-y-2 min-h-[600px] max-h-[600px] overflow-y-auto border-2 border-dashed border-red-300 rounded-lg bg-red-50/30 p-2"
+                          >
+                            {getFilteredDeals()
+                              .filter(deal => deal.column === 'delayed')
+                              .sort((a, b) => (b.pipeline || 0) - (a.pipeline || 0)) // Sort by pipeline descending
+                              .map((deal, index) => (
+                              <DraggableDealItem 
+                                key={deal.id}
+                                deal={deal} 
+                                index={index}
+                                showActions={true}
+                                onHide={() => hideItem('deals', deal.id)}
+                              />
+                            ))}
+                            {getFilteredDeals().filter(deal => deal.column === 'delayed').length === 0 && (
+                              <div className="text-center text-gray-400 text-sm mt-8">
+                                <p className="font-medium">No delayed deals</p>
+                                <p className="text-xs mt-1">Drag deals here if potentially delayed</p>
+                              </div>
+                            )}
+                            {provided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
+                    </div>
                   </div>
                 </DragDropContext>
               </CardContent>
