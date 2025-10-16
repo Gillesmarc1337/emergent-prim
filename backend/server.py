@@ -891,8 +891,9 @@ def calculate_ae_performance(df, start_date, end_date):
         'poa_attended_details': poa_attended_list
     }
 
-def calculate_deals_closed(df, start_date, end_date):
-    """Calculate deals closed metrics - based on stage 'A Closed' with billing_start date"""
+def calculate_deals_closed(df, start_date, end_date, view_targets=None):
+    """Calculate deals closed metrics - based on stage 'A Closed' with billing_start date
+    Uses targets from Back Office (deals_closed_current_period)"""
     # Use billing_start (colonne R) as the reference date for when the deal was closed
     # Sum expected_arr (colonne J) for ARR Closed
     closed_deals = df[
@@ -937,12 +938,16 @@ def calculate_deals_closed(df, start_date, end_date):
     mrr_sum = float(closed_deals['expected_mrr'].fillna(0).sum())
     avg_deal = float(closed_deals['expected_arr'].fillna(0).mean() if len(closed_deals) > 0 else 0)
     
+    # Get targets from Back Office (deals_closed_current_period)
+    monthly_target_deals = 10  # Default fallback
+    monthly_target_arr = 500000  # Default fallback
+    
+    if view_targets and 'deals_closed_current_period' in view_targets:
+        monthly_target_deals = view_targets['deals_closed_current_period'].get('deals_target', 10)
+        monthly_target_arr = view_targets['deals_closed_current_period'].get('arr_target', 500000)
+    
     # Calculate period length to adjust targets
     period_days = (end_date - start_date).days
-    monthly_target_deals = 6  # 6 deals per month target
-    
-    # Monthly ARR target: 750K per month
-    monthly_target_arr = 750000  # 750K per month base target
     
     # Adjust targets based on period length
     if period_days <= 31:  # Monthly or shorter
@@ -964,7 +969,8 @@ def calculate_deals_closed(df, start_date, end_date):
         'avg_deal_size': avg_deal,
         'on_track': bool(deals_count >= target_deals or arr_sum >= target_arr),
         'deals_detail': clean_records(closed_deals[['client', 'expected_arr', 'owner', 'type_of_deal']].to_dict('records')),
-        'monthly_closed': monthly_closed
+        'monthly_closed': monthly_closed,
+        'period': f"{start_date.strftime('%b %Y')}"  # Add period display
     }
 
 # Centralized Excel weighting function
