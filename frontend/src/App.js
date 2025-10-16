@@ -3285,6 +3285,49 @@ function Dashboard() {
                     : "Need to increase upsell and renewal prospecting efforts."
                 }
               >
+                {/* Monthly Upsell/Renew Evolution Chart - MOVED TO TOP */}
+                {upsellRenewData && upsellRenewData.monthly_breakdown && upsellRenewData.monthly_breakdown.months && upsellRenewData.monthly_breakdown.months.length > 0 && (() => {
+                  const chartData = upsellRenewData.monthly_breakdown.months.map((month, index) => ({
+                    month,
+                    meetings_attended: upsellRenewData.monthly_breakdown.meetings_attended[index],
+                    poa_generated: upsellRenewData.monthly_breakdown.poa_generated[index],
+                    revenue_generated: upsellRenewData.monthly_breakdown.revenue_generated[index]
+                  }));
+                  
+                  return (
+                    <Card className="mb-6">
+                      <CardHeader>
+                        <CardTitle>Monthly Upsell & Renew Evolution</CardTitle>
+                        <CardDescription>
+                          Track upsell/renew meetings, POA generated, and revenue on a monthly basis
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={350}>
+                          <ComposedChart data={chartData}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="month" />
+                            <YAxis yAxisId="left" />
+                            <YAxis yAxisId="right" orientation="right" />
+                            <Tooltip 
+                              formatter={(value, name) => {
+                                if (name === 'Revenue Generated') {
+                                  return [`$${value.toLocaleString()}`, name];
+                                }
+                                return [value, name];
+                              }}
+                            />
+                            <Legend />
+                            <Bar yAxisId="left" dataKey="meetings_attended" fill="#6366f1" name="Meetings Attended" />
+                            <Bar yAxisId="left" dataKey="poa_generated" fill="#10b981" name="POA Generated" />
+                            <Line yAxisId="right" type="monotone" dataKey="revenue_generated" stroke="#ef4444" strokeWidth={3} name="Revenue Generated" />
+                          </ComposedChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+                  );
+                })()}
+
                 {/* 3 Large Metric Cards with Fixed Targets */}
                 {(() => {
                   // Fixed monthly targets for Upsell & Cross-sell
