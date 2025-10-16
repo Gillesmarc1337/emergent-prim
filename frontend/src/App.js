@@ -779,8 +779,6 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
               unit="$"
               icon={TrendingUp}
               color="purple"
-              selectedPeriodValue={newPipeCreated}
-              periodMonths={periodMonths}
             />
             <MetricCard
               title="Created Weighted Pipe"
@@ -789,8 +787,6 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
               unit="$"
               icon={Target}
               color="blue"
-              selectedPeriodValue={weightedPipe}
-              periodMonths={periodMonths}
             />
             <MetricCard
               title="Active Deals"
