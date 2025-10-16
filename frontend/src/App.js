@@ -779,8 +779,8 @@ function MainDashboard({ analytics, currentView, tabTargets }) {
               unit="$"
               icon={TrendingUp}
               color="purple"
-              monthlyAverage={Math.round(newPipeCreated / newPipePeriodMonths)}
-              periodMonths={newPipePeriodMonths}
+              monthlyAverage={Math.round(newPipeCreated / periodMonths)}
+              periodMonths={periodMonths}
             />
             <MetricCard
               title="Created Weighted Pipe"
@@ -789,8 +789,8 @@ function MainDashboard({ analytics, currentView, tabTargets }) {
               unit="$"
               icon={Target}
               color="blue"
-              monthlyAverage={Math.round(weightedPipe / weightedPipePeriodMonths)}
-              periodMonths={weightedPipePeriodMonths}
+              monthlyAverage={Math.round(weightedPipe / periodMonths)}
+              periodMonths={periodMonths}
             />
             <MetricCard
               title="Active Deals"
