@@ -111,6 +111,10 @@ function AdminTargetsPage() {
           poa_generated: 18,
           deals_closed: 6
         },
+        deals_closed_current_period: {
+          deals_target: 10,
+          arr_target: 500000
+        },
         deals_closed_yearly: {
           deals_target: 36,
           arr_target: 4500000
