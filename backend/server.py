@@ -1661,6 +1661,34 @@ async def update_view_targets(
     
     return {"message": "Targets updated successfully", "targets": targets}
 
+@api_router.get("/views/{view_id}/tab-targets")
+async def get_tab_targets(
+    view_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """
+    Get DIRECT tab display targets (no multiplication, no mapping)
+    Returns: meetings_attended_tab and deals_closed_tab targets
+    """
+    view = await db.views.find_one({"id": view_id})
+    
+    if not view:
+        raise HTTPException(status_code=404, detail="View not found")
+    
+    targets = view.get("targets", {})
+    
+    return {
+        "meetings_attended_tab": targets.get("meetings_attended_tab", {
+            "meetings_scheduled_target": 50,
+            "poa_generated_target": 18,
+            "deals_closed_target": 6
+        }),
+        "deals_closed_tab": targets.get("deals_closed_tab", {
+            "deals_closed_target": 10,
+            "arr_closed_target": 500000
+        })
+    }
+
 @api_router.post("/admin/views/{view_id}/sync-targets-from-sheet")
 async def sync_targets_from_sheet(
     view_id: str,
