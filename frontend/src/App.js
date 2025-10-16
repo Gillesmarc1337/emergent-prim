@@ -219,7 +219,7 @@ function FileUpload({ onUploadSuccess }) {
   );
 }
 
-function MetricCard({ title, value, target, unit = '', trend, icon: Icon, color = 'blue', statusBadge, monthlyAverage, periodMonths }) {
+function MetricCard({ title, value, target, unit = '', trend, icon: Icon, color = 'blue', statusBadge, selectedPeriodValue, periodMonths }) {
   const percentage = target ? (value / target * 100) : 0;
   const isOnTrack = percentage >= 90;
   
@@ -251,9 +251,9 @@ function MetricCard({ title, value, target, unit = '', trend, icon: Icon, color 
               <div className="text-sm text-gray-500">
                 Target: {target.toLocaleString()} {unit}
               </div>
-              {monthlyAverage && periodMonths && (
+              {selectedPeriodValue && periodMonths && (
                 <div className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded">
-                  📊 Monthly Avg: {monthlyAverage.toLocaleString()} {unit} ({periodMonths} {periodMonths === 1 ? 'month' : 'months'})
+                  📊 Selected Period: {selectedPeriodValue.toLocaleString()} {unit} ({periodMonths} {periodMonths === 1 ? 'month' : 'months'})
                 </div>
               )}
               <Progress value={percentage} className="h-2" />
