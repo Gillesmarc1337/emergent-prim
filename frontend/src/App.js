@@ -2211,10 +2211,10 @@ function Dashboard() {
                 periodMonths = 1;
               }
 
-              // Use direct tab targets from Back Office (NO multiplication)
-              const dynamicMeetingsScheduledTarget = tabTargets.meetings_attended_tab.meetings_scheduled_target;
-              const dynamicPOAGeneratedTarget = tabTargets.meetings_attended_tab.poa_generated_target;
-              const dynamicDealsClosedTarget = tabTargets.meetings_attended_tab.deals_closed_target;
+              // Use tab targets from Back Office (MONTHLY) and multiply by period duration
+              const dynamicMeetingsScheduledTarget = tabTargets.meetings_attended_tab.meetings_scheduled_target * periodMonths;
+              const dynamicPOAGeneratedTarget = tabTargets.meetings_attended_tab.poa_generated_target * periodMonths;
+              const dynamicDealsClosedTarget = tabTargets.meetings_attended_tab.deals_closed_target * periodMonths;
 
               // Calculate achievement percentages
               const meetingsScheduledAchievement = analytics.meetings_attended.intro_metrics.scheduled / dynamicMeetingsScheduledTarget * 100;
