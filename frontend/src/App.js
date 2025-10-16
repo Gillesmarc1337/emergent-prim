@@ -3545,12 +3545,12 @@ function Dashboard() {
                 )}
                 
                 {/* Monthly Upsell/Renew Evolution Chart */}
-                {upsellData.monthly_breakdown && upsellData.monthly_breakdown.months && upsellData.monthly_breakdown.months.length > 0 && (() => {
-                  const chartData = upsellData.monthly_breakdown.months.map((month, index) => ({
+                {upsellRenewData && upsellRenewData.monthly_breakdown && upsellRenewData.monthly_breakdown.months && upsellRenewData.monthly_breakdown.months.length > 0 && (() => {
+                  const chartData = upsellRenewData.monthly_breakdown.months.map((month, index) => ({
                     month,
-                    meetings_attended: upsellData.monthly_breakdown.meetings_attended[index],
-                    poa_generated: upsellData.monthly_breakdown.poa_generated[index],
-                    revenue_generated: upsellData.monthly_breakdown.revenue_generated[index]
+                    meetings_attended: upsellRenewData.monthly_breakdown.meetings_attended[index],
+                    poa_generated: upsellRenewData.monthly_breakdown.poa_generated[index],
+                    revenue_generated: upsellRenewData.monthly_breakdown.revenue_generated[index]
                   }));
                   
                   return (
