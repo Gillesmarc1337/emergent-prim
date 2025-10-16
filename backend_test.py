@@ -6097,6 +6097,12 @@ def main():
         print(f"{'='*60}")
         test_results['session_management'] = test_session_expiration_validation()
         
+        # Test 11: NEW - Master View Targets Configuration (as requested in review)
+        print(f"\n{'='*60}")
+        print(f"🎯 PHASE 11: MASTER VIEW TARGETS CONFIGURATION (NEW)")
+        print(f"{'='*60}")
+        test_results['master_view_targets'] = test_master_view_targets_configuration()
+        
     except Exception as e:
         print(f"\n❌ CRITICAL ERROR during testing: {str(e)}")
         import traceback
