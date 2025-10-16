@@ -973,21 +973,44 @@ function AdminTargetsPage() {
                     </div>
                   </div>
                   
-                  <div className="mt-4 p-3 bg-green-50 rounded">
-                    <div className="text-sm font-semibold mb-2">Preview Banner:</div>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div className="border p-3 rounded bg-white">
-                        <div className="font-semibold text-lg">_/{targets?.meetings_attended_tab?.meetings_scheduled_target || 0}</div>
-                        <div className="text-gray-600">Meetings Scheduled</div>
+                  <div className="mt-6 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+                    <div className="text-sm font-semibold mb-3 text-gray-700">📊 Dashboard Preview (Grey Replica):</div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Meetings Scheduled */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">📅 Meetings Scheduled</div>
+                        <div className="text-2xl font-bold text-gray-800">X</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: {targets?.meetings_attended_tab?.meetings_scheduled_target || 0}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center mt-2">X% of target</div>
                       </div>
-                      <div className="border p-3 rounded bg-white">
-                        <div className="font-semibold text-lg">_/{targets?.meetings_attended_tab?.poa_generated_target || 0}</div>
-                        <div className="text-gray-600">POA Generated</div>
+
+                      {/* POA Generated */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">📋 POA Generated</div>
+                        <div className="text-2xl font-bold text-gray-800">X</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: {targets?.meetings_attended_tab?.poa_generated_target || 0}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center mt-2">X% of target</div>
                       </div>
-                      <div className="border p-3 rounded bg-white">
-                        <div className="font-semibold text-lg">_/{targets?.meetings_attended_tab?.deals_closed_target || 0}</div>
-                        <div className="text-gray-600">Deals Closed</div>
+
+                      {/* Deals Closed */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">✅ Deals Closed</div>
+                        <div className="text-2xl font-bold text-gray-800">X</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: {targets?.meetings_attended_tab?.deals_closed_target || 0}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center mt-2">X% of target</div>
                       </div>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-3 text-center italic">
+                      ℹ️ Preview shows layout only. Actual values × period (Monthly = ×1, Yearly = ×6).
                     </div>
                   </div>
                 </CardContent>
