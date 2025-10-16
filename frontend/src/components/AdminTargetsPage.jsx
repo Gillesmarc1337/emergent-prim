@@ -288,6 +288,19 @@ function AdminTargetsPage() {
           sumTargets.deals_closed_yearly.deals_target += (viewTargets.deals_closed_yearly.deals_target || 0);
           sumTargets.deals_closed_yearly.arr_target += (viewTargets.deals_closed_yearly.arr_target || 0);
         }
+
+        // NEW: Meetings Attended TAB direct targets
+        if (viewTargets.meetings_attended_tab) {
+          sumTargets.meetings_attended_tab.meetings_scheduled_target += (viewTargets.meetings_attended_tab.meetings_scheduled_target || 0);
+          sumTargets.meetings_attended_tab.poa_generated_target += (viewTargets.meetings_attended_tab.poa_generated_target || 0);
+          sumTargets.meetings_attended_tab.deals_closed_target += (viewTargets.meetings_attended_tab.deals_closed_target || 0);
+        }
+
+        // NEW: Deals Closed TAB direct targets
+        if (viewTargets.deals_closed_tab) {
+          sumTargets.deals_closed_tab.deals_closed_target += (viewTargets.deals_closed_tab.deals_closed_target || 0);
+          sumTargets.deals_closed_tab.arr_closed_target += (viewTargets.deals_closed_tab.arr_closed_target || 0);
+        }
       });
 
       return sumTargets;
