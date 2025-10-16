@@ -940,6 +940,99 @@ function AdminTargetsPage() {
                 </CardContent>
               </Card>
 
+              {/* UPSELL & RENEW TAB - Upsells & Renewals Targets */}
+              <Card className="border-teal-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs font-semibold rounded">UPSELL & RENEW TAB</span>
+                    Upsells & Renewals Target Configuration
+                  </CardTitle>
+                  <CardDescription>
+                    Configure targets for Upsells and Renewals shown in the Upsells & Renewals tab
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="upsells_target">Upsells Target</Label>
+                      <Input
+                        id="upsells_target"
+                        type="number"
+                        value={targets?.upsell_renew?.upsells_target || 0}
+                        onChange={(e) => {
+                          setTargets(prev => ({
+                            ...prev,
+                            upsell_renew: {
+                              ...prev.upsell_renew,
+                              upsells_target: parseInt(e.target.value) || 0
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Number of upsells expected</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="renewals_target">Renewals Target</Label>
+                      <Input
+                        id="renewals_target"
+                        type="number"
+                        value={targets?.upsell_renew?.renewals_target || 0}
+                        onChange={(e) => {
+                          setTargets(prev => ({
+                            ...prev,
+                            upsell_renew: {
+                              ...prev.upsell_renew,
+                              renewals_target: parseInt(e.target.value) || 0
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Number of renewals expected</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="mrr_target">MRR Target</Label>
+                      <Input
+                        id="mrr_target"
+                        type="number"
+                        value={targets?.upsell_renew?.mrr_target || 0}
+                        onChange={(e) => {
+                          setTargets(prev => ({
+                            ...prev,
+                            upsell_renew: {
+                              ...prev.upsell_renew,
+                              mrr_target: parseInt(e.target.value) || 0
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                        step="1000"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Monthly Recurring Revenue target in $ (e.g., 50000 for $50K)</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-teal-50 rounded">
+                    <div className="text-sm font-semibold mb-2">Preview Banner:</div>
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div className="border p-3 rounded bg-white">
+                        <div className="font-semibold text-lg">_/{targets?.upsell_renew?.upsells_target || 0}</div>
+                        <div className="text-gray-600">Upsells</div>
+                      </div>
+                      <div className="border p-3 rounded bg-white">
+                        <div className="font-semibold text-lg">_/{targets?.upsell_renew?.renewals_target || 0}</div>
+                        <div className="text-gray-600">Renewals</div>
+                      </div>
+                      <div className="border p-3 rounded bg-white">
+                        <div className="font-semibold text-lg">${(targets?.upsell_renew?.mrr_target || 0).toLocaleString()}</div>
+                        <div className="text-gray-600">MRR Target</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* DEALS & PIPELINE TAB - Deals Closed Yearly (Jul-Dec 2025) */}
               <Card className="border-indigo-200">
                 <CardHeader>
