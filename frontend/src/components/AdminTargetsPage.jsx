@@ -869,17 +869,33 @@ function AdminTargetsPage() {
                     </div>
                   </div>
                   
-                  <div className="mt-4 p-3 bg-blue-50 rounded">
-                    <div className="text-sm font-semibold mb-2">Preview Banner:</div>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="border p-3 rounded bg-white">
-                        <div className="font-semibold text-lg">_/{targets?.intro_poa?.intro || 0}</div>
-                        <div className="text-gray-600">Intro</div>
+                  <div className="mt-6 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+                    <div className="text-sm font-semibold mb-3 text-gray-700">📊 Dashboard Preview (Grey Replica):</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Intro Card */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">👥 Intro</div>
+                        <div className="text-2xl font-bold text-gray-800">X</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: {targets?.intro_poa?.intro || 0}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center mt-2">X% of target</div>
                       </div>
-                      <div className="border p-3 rounded bg-white">
-                        <div className="font-semibold text-lg">_/{targets?.intro_poa?.poa || 0}</div>
-                        <div className="text-gray-600">POA</div>
+
+                      {/* POA Card */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">📋 POA</div>
+                        <div className="text-2xl font-bold text-gray-800">X</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: {targets?.intro_poa?.poa || 0}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center mt-2">X% of target</div>
                       </div>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-3 text-center italic">
+                      ℹ️ Preview shows layout only. Actual values calculated from sheet data.
                     </div>
                   </div>
                 </CardContent>
