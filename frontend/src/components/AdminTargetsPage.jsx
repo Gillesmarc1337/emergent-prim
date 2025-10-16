@@ -1227,12 +1227,6 @@ function AdminTargetsPage() {
                   </div>
                 </CardContent>
               </Card>
-                        <div className="text-gray-600">MRR Target</div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
 
               {/* DEALS & PIPELINE TAB - Deals Closed Yearly (Jul-Dec 2025) */}
               <Card className="border-indigo-200">
