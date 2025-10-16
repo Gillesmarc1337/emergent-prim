@@ -1056,16 +1056,9 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
 
           {/* Block 5: Deals Closed (Current Period) - Uses NEW tab targets from BO (MONTHLY) */}
           {analytics.deals_closed_current_period && (() => {
-            // Calculate period months based on the period string
+            // Use actualPeriodMonths passed from parent Dashboard component
+            const periodMonths = actualPeriodMonths || 1;
             const periodStr = analytics.deals_closed_current_period?.period || 'Monthly';
-            let periodMonths = 1;
-            
-            if (periodStr.toLowerCase().includes('july') || periodStr.toLowerCase().includes('dec')) {
-              // July to December = 6 months
-              periodMonths = 6;
-            } else if (periodStr.toLowerCase().includes('year')) {
-              periodMonths = 12;
-            }
             
             // Calculate dynamic targets (monthly target × period)
             const dealsTarget = tabTargets.deals_closed_tab.deals_closed_target * periodMonths;
