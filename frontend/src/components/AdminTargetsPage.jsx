@@ -814,21 +814,21 @@ function AdminTargetsPage() {
                 </CardContent>
               </Card>
 
-              {/* MEETINGS ATTENDED TAB - NEW Direct Tab Targets (No Multiplication) */}
+              {/* MEETINGS ATTENDED TAB - NEW Monthly Tab Targets */}
               <Card className="border-blue-200">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded">MEETINGS ATTENDED TAB</span>
-                    Meetings Attended Display Targets
+                    Meetings Attended Monthly Targets
                   </CardTitle>
                   <CardDescription>
-                    Configure DIRECT display targets for Meetings Attended tab (shown as-is, no multiplication)
+                    Configure MONTHLY targets for Meetings Attended tab (will be multiplied by period duration in dashboard)
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="meetings_scheduled_tab">Meetings Scheduled Target</Label>
+                      <Label htmlFor="meetings_scheduled_tab">Meetings Scheduled Target (Monthly)</Label>
                       <Input
                         id="meetings_scheduled_tab"
                         type="number"
