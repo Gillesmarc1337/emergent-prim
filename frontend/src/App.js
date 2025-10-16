@@ -2733,14 +2733,14 @@ function Dashboard() {
                 <MetricCard
                   title="Deals Closed"
                   value={analytics.deals_closed.deals_closed}
-                  target={analytics.deals_closed.target_deals}
+                  target={tabTargets.deals_closed_tab.deals_closed_target}
                   icon={CheckCircle2}
                   color="green"
                 />
                 <MetricCard
                   title="ARR Closed"
                   value={analytics.deals_closed.arr_closed}
-                  target={analytics.deals_closed.target_arr}
+                  target={tabTargets.deals_closed_tab.arr_closed_target}
                   unit="$"
                   icon={DollarSign}
                   color="green"
