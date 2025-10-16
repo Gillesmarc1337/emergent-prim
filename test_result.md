@@ -629,7 +629,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Target key mapping between Admin BO and analytics functions"
+    - "Fix Monthly Average calculation and Tab Reset issue"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
