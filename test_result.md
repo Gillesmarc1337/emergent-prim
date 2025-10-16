@@ -567,6 +567,18 @@ frontend:
           agent: "testing"
           comment: "✅ PROJECTIONS PREFERENCES API TESTING COMPLETE - ALL TESTS PASSED (6/6): Comprehensive testing of new Projections Preferences API endpoints successfully completed as requested in review. VERIFIED FUNCTIONALITY: 1) POST /api/user/projections-preferences - Successfully saves preferences with mixed hidden/visible deals for view-organic-xxx, returns proper response structure with user_id and view_id. 2) GET /api/user/projections-preferences?view_id=view-organic-xxx - Correctly loads saved preferences, returns {has_preferences: true, preferences: {...}} structure as specified. Data validation confirms all saved deals match expected values (next14: 2 deals, next30: 1 deal, next60: 1 deal) with correct id and hidden status. 3) DELETE /api/user/projections-preferences?view_id=view-organic-xxx - Successfully resets preferences, returns success message and reset: true status. 4) GET after DELETE - Correctly returns {has_preferences: false, preferences: null} confirming preferences are deleted. 5) Authentication working correctly with demo session (demo@primelis.com, viewer role). All test scenarios from review request completed successfully: save preferences with mixed hidden/visible deals, load and verify data matches, reset preferences, verify deletion after reset, valid session authentication. Backend API endpoints are fully functional and ready for production use."
 
+  - task: "Master view targets configuration testing"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ MASTER VIEW TARGETS CONFIGURATION TESTING COMPLETE - ALL REQUIREMENTS VERIFIED: Comprehensive testing of Master view targets configuration as requested in review. VERIFIED FUNCTIONALITY: 1) Demo login successful (demo@primelis.com, viewer role). 2) Master view found (ID: view-master-1760356092, is_master: true). 3) GET /api/views/{master_view_id}/config successfully retrieved Master view configuration with targets. 4) ALL TARGETS SET TO 150 AS EXPECTED: revenue_2025.jan=150, dashboard_bottom_cards.new_pipe_created=150, meeting_generation.total_target=150, meetings_attended.meetings_scheduled=150, deals_closed_yearly.deals_target=150. 5) Analytics endpoint GET /api/analytics/monthly?view_id={master_view_id} working correctly and using manual targets (150) where configured: block_1_meetings.inbound_target=150, block_1_meetings.outbound_target=150, block_1_meetings.referral_target=150, block_2_intro_poa.poa_target=150, block_3_pipe_creation.target_pipe_created=150, block_4_revenue.revenue_target=150, block_5_upsells.closing_target=150. 6) Master view data aggregation confirmed working (data from Signal + Full Funnel + Market + Organic views). CONCLUSION: Master view targets configuration is working correctly - manual targets override auto-aggregated values as expected, while data remains auto-aggregated from other views."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
