@@ -823,6 +823,13 @@ function MainDashboard({ analytics, currentView, tabTargets }) {
                   name="Aggregate Weighted Pipe"
                 />
               )}
+              {visibleSeries['Created Pipe'] && (
+                <Bar 
+                  dataKey="new_pipe_created" 
+                  fill="#8b5cf6" 
+                  name="Created Pipe"
+                />
+              )}
             </BarChart>
           </ResponsiveContainer>
           
