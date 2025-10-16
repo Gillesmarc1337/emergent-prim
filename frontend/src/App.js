@@ -656,7 +656,7 @@ function DataManagementSection({ onDataUpdated, currentView }) {
   );
 }
 
-function MainDashboard({ analytics, currentView, tabTargets }) {
+function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths }) {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
