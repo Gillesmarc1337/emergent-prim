@@ -916,21 +916,21 @@ function AdminTargetsPage() {
                 </AlertDescription>
               </Alert>
 
-              {/* DEALS & PIPELINE TAB - NEW Direct Tab Targets for Deals Closed */}
+              {/* DEALS & PIPELINE TAB - NEW Monthly Tab Targets for Deals Closed */}
               <Card className="border-orange-200">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-semibold rounded">DEALS & PIPELINE TAB</span>
-                    Deals Closed Display Targets
+                    Deals Closed Monthly Targets
                   </CardTitle>
                   <CardDescription>
-                    Configure DIRECT display targets for Deals Closed banner (shown as-is, no multiplication)
+                    Configure MONTHLY targets for Deals Closed banner (will be multiplied by period duration in dashboard)
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="deals_closed_tab_target">Deals Closed Target</Label>
+                      <Label htmlFor="deals_closed_tab_target">Deals Closed Target (Monthly)</Label>
                       <Input
                         id="deals_closed_tab_target"
                         type="number"
@@ -946,10 +946,10 @@ function AdminTargetsPage() {
                         }}
                         className="mt-1"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Displayed directly in dashboard banner (no period multiplication)</p>
+                      <p className="text-xs text-gray-500 mt-1">Monthly target × period duration</p>
                     </div>
                     <div>
-                      <Label htmlFor="arr_closed_tab_target">ARR Closed Target</Label>
+                      <Label htmlFor="arr_closed_tab_target">ARR Closed Target (Monthly)</Label>
                       <Input
                         id="arr_closed_tab_target"
                         type="number"
@@ -966,7 +966,7 @@ function AdminTargetsPage() {
                         className="mt-1"
                         step="10000"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Displayed directly in dashboard banner (no period multiplication)</p>
+                      <p className="text-xs text-gray-500 mt-1">Monthly target × period duration</p>
                     </div>
                   </div>
                   
