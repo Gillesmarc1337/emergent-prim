@@ -213,6 +213,9 @@ def map_admin_targets_to_analytics_format(admin_targets: dict) -> dict:
     print(f"   objectif_6_mois: {mapped_targets['dashboard']['objectif_6_mois']}")
     print(f"   new_pipe_created: {mapped_targets['dashboard']['new_pipe_created']}")
     print(f"   meeting intro: {mapped_targets['meeting_generation']['intro']}")
+    print(f"   meeting_attended.meetings_scheduled: {mapped_targets['meeting_attended'].get('meetings_scheduled', 'NOT SET')}")
+    print(f"   meeting_attended.poa: {mapped_targets['meeting_attended'].get('poa', 'NOT SET')}")
+    print(f"   meeting_attended.deals_closed: {mapped_targets['meeting_attended'].get('deals_closed', 'NOT SET')}")
     
     return mapped_targets
 
