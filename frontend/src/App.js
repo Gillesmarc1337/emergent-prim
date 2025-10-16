@@ -2858,6 +2858,9 @@ function Dashboard() {
                   </CardContent>
                 </Card>
               )}
+                  </>
+                );
+              })()}
             </AnalyticsSection>
 
             {/* Pipeline Metrics */}
