@@ -250,6 +250,8 @@ function AdminTargetsPage() {
           sumTargets.dashboard_bottom_cards.new_pipe_created += (viewTargets.dashboard_bottom_cards.new_pipe_created || 0);
           sumTargets.dashboard_bottom_cards.created_weighted_pipe += (viewTargets.dashboard_bottom_cards.created_weighted_pipe || 0);
           sumTargets.dashboard_bottom_cards.ytd_revenue += (viewTargets.dashboard_bottom_cards.ytd_revenue || 0);
+          sumTargets.dashboard_bottom_cards.ytd_aggregate_pipeline += (viewTargets.dashboard_bottom_cards.ytd_aggregate_pipeline || 0);
+          sumTargets.dashboard_bottom_cards.ytd_cumulative_weighted += (viewTargets.dashboard_bottom_cards.ytd_cumulative_weighted || 0);
         }
 
         // Meeting generation
