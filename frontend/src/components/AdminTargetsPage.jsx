@@ -572,19 +572,19 @@ function AdminTargetsPage() {
                 </CardContent>
               </Card>
 
-              {/* DASHBOARD TAB - Bottom Cards Targets */}
+              {/* DASHBOARD TAB - Pipeline Metrics Cards Preview with Editable Targets */}
               <Card className="border-pink-200">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <span className="px-2 py-1 bg-pink-100 text-pink-700 text-xs font-semibold rounded">DASHBOARD TAB</span>
-                    Dashboard Bottom Cards - Targets
+                    Pipeline Metrics - Bottom Cards Targets
                   </CardTitle>
                   <CardDescription>
-                    Configure targets for the 4 bottom cards displayed on the dashboard (period-based calculations)
+                    Configure targets for the 4 pipeline metrics cards (Excel-based weighted calculation shown in dashboard)
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="new_pipe_created">New Pipe Created Target ($)</Label>
                       <Input
@@ -592,10 +592,10 @@ function AdminTargetsPage() {
                         type="number"
                         value={targets?.dashboard_bottom_cards?.new_pipe_created || 0}
                         onChange={(e) => updateDashboardBottomCard('new_pipe_created', e.target.value)}
-                        
-                          className="mt-1"
+                        className="mt-1"
+                        step="100000"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Total pipeline to create in selected period</p>
+                      <p className="text-xs text-gray-500 mt-1">Total new pipeline to create (Column K sum by discovery date)</p>
                     </div>
                     <div>
                       <Label htmlFor="created_weighted_pipe">Created Weighted Pipe Target ($)</Label>
@@ -604,45 +604,92 @@ function AdminTargetsPage() {
                         type="number"
                         value={targets?.dashboard_bottom_cards?.created_weighted_pipe || 0}
                         onChange={(e) => updateDashboardBottomCard('created_weighted_pipe', e.target.value)}
-                        
-                          className="mt-1"
+                        className="mt-1"
+                        step="100000"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Weighted pipeline target for period</p>
+                      <p className="text-xs text-gray-500 mt-1">Weighted pipeline using stage × source × recency formula</p>
                     </div>
                     <div>
-                      <Label htmlFor="ytd_revenue">YTD Revenue 2025 Target ($)</Label>
+                      <Label htmlFor="ytd_aggregate">YTD Aggregate Pipeline Target ($)</Label>
                       <Input
-                        id="ytd_revenue"
+                        id="ytd_aggregate"
                         type="number"
-                        value={targets?.dashboard_bottom_cards?.ytd_revenue || 0}
-                        onChange={(e) => updateDashboardBottomCard('ytd_revenue', e.target.value)}
-                        
-                          className="mt-1"
+                        value={targets?.dashboard_bottom_cards?.ytd_aggregate_pipeline || 0}
+                        onChange={(e) => updateDashboardBottomCard('ytd_aggregate_pipeline', e.target.value)}
+                        className="mt-1"
+                        step="100000"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Year-to-date revenue target (usually H2 total)</p>
+                      <p className="text-xs text-gray-500 mt-1">Total active pipeline target (all non-closed deals)</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="ytd_cumulative">YTD Cumulative Weighted Target ($)</Label>
+                      <Input
+                        id="ytd_cumulative"
+                        type="number"
+                        value={targets?.dashboard_bottom_cards?.ytd_cumulative_weighted || 0}
+                        onChange={(e) => updateDashboardBottomCard('ytd_cumulative_weighted', e.target.value)}
+                        className="mt-1"
+                        step="100000"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Cumulative weighted pipeline target for YTD</p>
                     </div>
                   </div>
                   
-                  <div className="mt-4 p-3 bg-pink-50 rounded">
-                    <div className="text-sm font-semibold mb-2">Preview Cards:</div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                      <div className="border p-3 rounded bg-white">
-                        <div className="text-gray-600 mb-1">New Pipe Created</div>
-                        <div className="font-bold text-lg">$_._M</div>
-                        <div className="text-gray-500">Target: ${(targets?.dashboard_bottom_cards?.new_pipe_created || 0).toLocaleString()}</div>
+                  <div className="mt-6 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+                    <div className="text-sm font-semibold mb-3 text-gray-700">📊 Dashboard Preview (Grey Replica):</div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                      {/* Card 1: New Pipe Created */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-2">📈 New Pipe Created</div>
+                        <div className="text-2xl font-bold text-gray-800 mb-1">$X.XX M</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: ${((targets?.dashboard_bottom_cards?.new_pipe_created || 0) / 1000000).toFixed(1)}M</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                          <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center">X% of target</div>
+                        <div className="mt-2 text-xs text-center px-2 py-1 bg-gray-200 text-gray-600 rounded">Status</div>
                       </div>
-                      <div className="border p-3 rounded bg-white">
-                        <div className="text-gray-600 mb-1">Created Weighted Pipe</div>
-                        <div className="font-bold text-lg">$_._M</div>
-                        <div className="text-gray-500">Target: ${(targets?.dashboard_bottom_cards?.created_weighted_pipe || 0).toLocaleString()}</div>
+
+                      {/* Card 2: Created Weighted Pipe */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-2">🎯 Created Weighted Pipe</div>
+                        <div className="text-2xl font-bold text-gray-800 mb-1">$X.XX M</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: ${((targets?.dashboard_bottom_cards?.created_weighted_pipe || 0) / 1000000).toFixed(1)}M</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                          <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center">X% of target</div>
+                        <div className="mt-2 text-xs text-center px-2 py-1 bg-gray-200 text-gray-600 rounded">Status</div>
                       </div>
-                      <div className="border p-3 rounded bg-white">
-                        <div className="text-gray-600 mb-1">YTD Revenue 2025</div>
-                        <div className="font-bold text-lg">$_._M</div>
-                        <div className="text-gray-500">Target: ${(targets?.dashboard_bottom_cards?.ytd_revenue || 0).toLocaleString()}</div>
+
+                      {/* Card 3: YTD Aggregate Pipeline */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-2">📊 YTD Aggregate Pipeline</div>
+                        <div className="text-2xl font-bold text-gray-800 mb-1">$X.XX M</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: ${((targets?.dashboard_bottom_cards?.ytd_aggregate_pipeline || 0) / 1000000).toFixed(1)}M</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                          <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center">X% of target</div>
+                        <div className="mt-2 text-xs text-center px-2 py-1 bg-gray-200 text-gray-600 rounded">Status</div>
                       </div>
-                      <div className="border p-3 rounded bg-white">
-                        <div className="text-gray-600 mb-1">YTD Remaining 2025</div>
+
+                      {/* Card 4: YTD Cumulative Weighted */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-2">💰 YTD Cumulative Weighted</div>
+                        <div className="text-2xl font-bold text-gray-800 mb-1">$X.XX M</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: ${((targets?.dashboard_bottom_cards?.ytd_cumulative_weighted || 0) / 1000000).toFixed(1)}M</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                          <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center">X% of target</div>
+                        <div className="mt-2 text-xs text-center px-2 py-1 bg-gray-200 text-gray-600 rounded">Status</div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-3 text-center italic">
+                      ℹ️ Preview shows layout only. Actual values calculated from sheet data using Excel formula: Stage × Source × Recency
+                    </div>
+                  </div>
                         <div className="font-bold text-lg">$_._M</div>
                         <div className="text-gray-500 text-xs">Auto-calculated</div>
                       </div>
