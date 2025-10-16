@@ -744,8 +744,15 @@ def calculate_meeting_generation(df, start_date, end_date, view_targets=None):
         'on_track': bool(total_intros >= total_target)
     }
 
-def calculate_meetings_attended(df, start_date, end_date):
-    """Calculate meetings attended metrics"""
+def calculate_meetings_attended(df, start_date, end_date, view_targets=None):
+    """Calculate meetings attended metrics
+    
+    Args:
+        df: DataFrame with sales data
+        start_date: Start date for period
+        end_date: End date for period
+        view_targets: Optional dict with view-specific targets (from back office)
+    """
     period_data = df[
         (df['discovery_date'] >= start_date) & 
         (df['discovery_date'] <= end_date)
