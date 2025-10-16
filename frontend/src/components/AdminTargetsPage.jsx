@@ -696,20 +696,6 @@ function AdminTargetsPage() {
                       ℹ️ Preview shows layout only. Actual values calculated from sheet data using Excel formula: Stage × Source × Recency
                     </div>
                   </div>
-                        <div className="font-bold text-lg">$_._M</div>
-                        <div className="text-gray-500 text-xs">Auto-calculated</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Alert className="mt-4 bg-amber-50 border-amber-300">
-                    <Info className="h-4 w-4 text-amber-600" />
-                    <AlertDescription className="text-amber-900 text-xs">
-                      <strong>Note:</strong> These targets are typically period-based (monthly or 6-month H2). 
-                      The actual values displayed are calculated from your Google Sheet data. 
-                      "YTD Remaining" is auto-calculated as: YTD Target - YTD Revenue Achieved.
-                    </AlertDescription>
-                  </Alert>
                 </CardContent>
               </Card>
 
