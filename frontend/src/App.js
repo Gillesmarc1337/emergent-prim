@@ -1378,8 +1378,8 @@ function Dashboard() {
           const reconstructedDeals = [];
           const hiddenSet = new Set();
           
-          // Process each column from saved preferences
-          ['next14', 'next30', 'next60'].forEach(columnKey => {
+          // Process each column from saved preferences (including delayed)
+          ['next14', 'next30', 'next60', 'delayed'].forEach(columnKey => {
             const savedColumn = savedPreferences[columnKey] || [];
             
             // Sort by order to maintain saved sequence
