@@ -1080,17 +1080,33 @@ function AdminTargetsPage() {
                     </div>
                   </div>
                   
-                  <div className="mt-4 p-3 bg-orange-50 rounded">
-                    <div className="text-sm font-semibold mb-2">Preview Banner:</div>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="border p-3 rounded bg-white">
-                        <div className="font-semibold text-lg">_/{targets?.deals_closed_tab?.deals_closed_target || 0}</div>
-                        <div className="text-gray-600">Deals Closed</div>
+                  <div className="mt-6 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+                    <div className="text-sm font-semibold mb-3 text-gray-700">📊 Dashboard Preview (Grey Replica):</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Deals Closed */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">✅ Deals Closed</div>
+                        <div className="text-2xl font-bold text-gray-800">X</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: {targets?.deals_closed_tab?.deals_closed_target || 0}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center mt-2">X% of target</div>
                       </div>
-                      <div className="border p-3 rounded bg-white">
-                        <div className="font-semibold text-lg">$_/${(targets?.deals_closed_tab?.arr_closed_target || 0).toLocaleString()}</div>
-                        <div className="text-gray-600">ARR Closed</div>
+
+                      {/* ARR Closed */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">💰 ARR Closed</div>
+                        <div className="text-2xl font-bold text-gray-800">$X.XM</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: ${((targets?.deals_closed_tab?.arr_closed_target || 0) / 1000000).toFixed(1)}M</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center mt-2">X% of target</div>
                       </div>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-3 text-center italic">
+                      ℹ️ Preview shows layout only. Actual values × period (Monthly = ×1, Yearly = ×6).
                     </div>
                   </div>
                 </CardContent>
