@@ -191,6 +191,10 @@ function AdminTargetsPage() {
           poa_generated: 0,
           deals_closed: 0
         },
+        deals_closed_current_period: {
+          deals_target: 0,
+          arr_target: 0
+        },
         deals_closed_yearly: {
           deals_target: 0,
           arr_target: 0
