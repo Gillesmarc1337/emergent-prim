@@ -255,6 +255,13 @@ function AdminTargetsPage() {
           sumTargets.deals_closed_current_period.arr_target += (viewTargets.deals_closed_current_period.arr_target || 0);
         }
 
+        // Upsell & Renew
+        if (viewTargets.upsell_renew) {
+          sumTargets.upsell_renew.upsells_target += (viewTargets.upsell_renew.upsells_target || 0);
+          sumTargets.upsell_renew.renewals_target += (viewTargets.upsell_renew.renewals_target || 0);
+          sumTargets.upsell_renew.mrr_target += (viewTargets.upsell_renew.mrr_target || 0);
+        }
+
         // Deals closed yearly
         if (viewTargets.deals_closed_yearly) {
           sumTargets.deals_closed_yearly.deals_target += (viewTargets.deals_closed_yearly.deals_target || 0);
