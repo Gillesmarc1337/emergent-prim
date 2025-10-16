@@ -478,7 +478,7 @@ function AdminTargetsPage() {
                   </CardTitle>
                   <CardDescription>
                     {isMasterView 
-                      ? 'Auto-calculated sum of all other views. Read-only.' 
+                      ? 'Monthly revenue targets. Auto-aggregated by default, but you can manually override any value.' 
                       : 'Configure monthly revenue targets. These are read from Google Sheet column Y (row 19) but can be edited manually.'}
                   </CardDescription>
                 </CardHeader>
