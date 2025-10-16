@@ -207,9 +207,19 @@ function AdminTargetsPage() {
           poa_generated: 0,
           deals_closed: 0
         },
+        // NEW: Direct tab targets
+        meetings_attended_tab: {
+          meetings_scheduled_target: 0,
+          poa_generated_target: 0,
+          deals_closed_target: 0
+        },
         deals_closed_current_period: {
           deals_target: 0,
           arr_target: 0
+        },
+        deals_closed_tab: {
+          deals_closed_target: 0,
+          arr_closed_target: 0
         },
         upsell_renew: {
           upsells_target: 0,
