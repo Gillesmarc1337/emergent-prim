@@ -940,12 +940,12 @@ function AdminTargetsPage() {
                 </CardContent>
               </Card>
 
-              {/* JULY TO DEC TAB - Deals Closed Yearly */}
-              <Card className="border-purple-200">
+              {/* DEALS & PIPELINE TAB - Deals Closed Yearly (Jul-Dec 2025) */}
+              <Card className="border-indigo-200">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded">JULY TO DEC TAB</span>
-                    Deals Closed (Jul-Dec 2025)
+                    <span className="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded">DEALS & PIPELINE TAB</span>
+                    Deals Closed Yearly Configuration (Jul-Dec 2025)
                   </CardTitle>
                   <CardDescription>
                     Configure targets for Deals Closed and ARR Closed shown in July to Dec view
