@@ -937,112 +937,112 @@ function AdminTargetsPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <span className="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded">PROJECTIONS TAB</span>
-                    Closing Projections Board - Monthly Targets
+                    Closing Projections Board - Period Targets
                   </CardTitle>
                   <CardDescription>
-                    Configure revenue targets for each month column in the interactive closing projections board
+                    Configure revenue targets for each time period column in the interactive closing projections board
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="october_target">October 2025 Target ($)</Label>
+                      <Label htmlFor="next_30_days_target">Next 30 Days Target ($)</Label>
                       <Input
-                        id="october_target"
+                        id="next_30_days_target"
                         type="number"
-                        value={targets?.closing_projections?.october_target || 0}
+                        value={targets?.closing_projections?.next_30_days_target || 0}
                         onChange={(e) => {
                           const value = parseInt(e.target.value) || 0;
                           setTargets(prev => ({
                             ...prev,
                             closing_projections: {
                               ...(prev.closing_projections || {}),
-                              october_target: value
+                              next_30_days_target: value
                             }
                           }));
                         }}
                         className="mt-1"
                         step="50000"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Expected ARR to close in October</p>
+                      <p className="text-xs text-gray-500 mt-1">Expected ARR to close in next 30 days</p>
                     </div>
                     <div>
-                      <Label htmlFor="november_target">November 2025 Target ($)</Label>
+                      <Label htmlFor="next_60_days_target">Next 60 Days Target ($)</Label>
                       <Input
-                        id="november_target"
+                        id="next_60_days_target"
                         type="number"
-                        value={targets?.closing_projections?.november_target || 0}
+                        value={targets?.closing_projections?.next_60_days_target || 0}
                         onChange={(e) => {
                           const value = parseInt(e.target.value) || 0;
                           setTargets(prev => ({
                             ...prev,
                             closing_projections: {
                               ...(prev.closing_projections || {}),
-                              november_target: value
+                              next_60_days_target: value
                             }
                           }));
                         }}
                         className="mt-1"
                         step="50000"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Expected ARR to close in November</p>
+                      <p className="text-xs text-gray-500 mt-1">Expected ARR to close in next 60 days</p>
                     </div>
                     <div>
-                      <Label htmlFor="december_target">December 2025 Target ($)</Label>
+                      <Label htmlFor="next_90_days_target">Next 90 Days Target ($)</Label>
                       <Input
-                        id="december_target"
+                        id="next_90_days_target"
                         type="number"
-                        value={targets?.closing_projections?.december_target || 0}
+                        value={targets?.closing_projections?.next_90_days_target || 0}
                         onChange={(e) => {
                           const value = parseInt(e.target.value) || 0;
                           setTargets(prev => ({
                             ...prev,
                             closing_projections: {
                               ...(prev.closing_projections || {}),
-                              december_target: value
+                              next_90_days_target: value
                             }
                           }));
                         }}
                         className="mt-1"
                         step="50000"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Expected ARR to close in December</p>
+                      <p className="text-xs text-gray-500 mt-1">Expected ARR to close in next 90 days</p>
                     </div>
                     <div>
-                      <Label htmlFor="q1_2026_target">Q1 2026 Target ($)</Label>
+                      <Label htmlFor="potentially_delayed_target">Potentially Delayed Target ($)</Label>
                       <Input
-                        id="q1_2026_target"
+                        id="potentially_delayed_target"
                         type="number"
-                        value={targets?.closing_projections?.q1_2026_target || 0}
+                        value={targets?.closing_projections?.potentially_delayed_target || 0}
                         onChange={(e) => {
                           const value = parseInt(e.target.value) || 0;
                           setTargets(prev => ({
                             ...prev,
                             closing_projections: {
                               ...(prev.closing_projections || {}),
-                              q1_2026_target: value
+                              potentially_delayed_target: value
                             }
                           }));
                         }}
                         className="mt-1"
                         step="50000"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Expected ARR to close in Q1 2026</p>
+                      <p className="text-xs text-gray-500 mt-1">Expected ARR for deals at risk of delay</p>
                     </div>
                   </div>
                   
                   <div className="mt-6 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
                     <div className="text-sm font-semibold mb-3 text-gray-700">📊 Closing Projections Preview (Grey Replica):</div>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                      {/* Column 1: October 2025 */}
-                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 shadow-sm">
+                      {/* Column 1: Next 30 Days */}
+                      <div className="bg-gray-50 border-2 border-green-300 rounded-lg p-3 shadow-sm">
                         <div className="text-center mb-2">
-                          <div className="text-xs font-semibold text-gray-600 mb-1">October 2025</div>
-                          <div className="text-lg font-bold text-gray-800">${((targets?.closing_projections?.october_target || 0) / 1000).toFixed(0)}K</div>
-                          <div className="text-xs text-gray-500">Target: ${((targets?.closing_projections?.october_target || 0) / 1000).toFixed(0)}K</div>
+                          <div className="text-xs font-semibold text-green-600 mb-1">Next 30 Days</div>
+                          <div className="text-lg font-bold text-gray-800">${((targets?.closing_projections?.next_30_days_target || 0) / 1000).toFixed(0)}K</div>
+                          <div className="text-xs text-gray-500">Target: ${((targets?.closing_projections?.next_30_days_target || 0) / 1000).toFixed(0)}K</div>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
-                          <div className="bg-gray-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
+                          <div className="bg-green-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
                         </div>
                         <div className="text-xs text-center text-gray-500 mb-2">X deals • $XK</div>
                         <div className="space-y-1">
@@ -1050,15 +1050,15 @@ function AdminTargetsPage() {
                         </div>
                       </div>
 
-                      {/* Column 2: November 2025 */}
-                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 shadow-sm">
+                      {/* Column 2: Next 60 Days */}
+                      <div className="bg-gray-50 border-2 border-blue-300 rounded-lg p-3 shadow-sm">
                         <div className="text-center mb-2">
-                          <div className="text-xs font-semibold text-gray-600 mb-1">November 2025</div>
-                          <div className="text-lg font-bold text-gray-800">${((targets?.closing_projections?.november_target || 0) / 1000).toFixed(0)}K</div>
-                          <div className="text-xs text-gray-500">Target: ${((targets?.closing_projections?.november_target || 0) / 1000).toFixed(0)}K</div>
+                          <div className="text-xs font-semibold text-blue-600 mb-1">Next 60 Days</div>
+                          <div className="text-lg font-bold text-gray-800">${((targets?.closing_projections?.next_60_days_target || 0) / 1000).toFixed(0)}K</div>
+                          <div className="text-xs text-gray-500">Target: ${((targets?.closing_projections?.next_60_days_target || 0) / 1000).toFixed(0)}K</div>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
-                          <div className="bg-gray-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
+                          <div className="bg-blue-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
                         </div>
                         <div className="text-xs text-center text-gray-500 mb-2">X deals • $XK</div>
                         <div className="space-y-1">
@@ -1066,15 +1066,15 @@ function AdminTargetsPage() {
                         </div>
                       </div>
 
-                      {/* Column 3: December 2025 */}
-                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 shadow-sm">
+                      {/* Column 3: Next 90 Days */}
+                      <div className="bg-gray-50 border-2 border-purple-300 rounded-lg p-3 shadow-sm">
                         <div className="text-center mb-2">
-                          <div className="text-xs font-semibold text-gray-600 mb-1">December 2025</div>
-                          <div className="text-lg font-bold text-gray-800">${((targets?.closing_projections?.december_target || 0) / 1000).toFixed(0)}K</div>
-                          <div className="text-xs text-gray-500">Target: ${((targets?.closing_projections?.december_target || 0) / 1000).toLocaleString()}K</div>
+                          <div className="text-xs font-semibold text-purple-600 mb-1">Next 90 Days</div>
+                          <div className="text-lg font-bold text-gray-800">${((targets?.closing_projections?.next_90_days_target || 0) / 1000).toFixed(0)}K</div>
+                          <div className="text-xs text-gray-500">Target: ${((targets?.closing_projections?.next_90_days_target || 0) / 1000).toFixed(0)}K</div>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
-                          <div className="bg-gray-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
+                          <div className="bg-purple-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
                         </div>
                         <div className="text-xs text-center text-gray-500 mb-2">X deals • $XK</div>
                         <div className="space-y-1">
@@ -1082,15 +1082,15 @@ function AdminTargetsPage() {
                         </div>
                       </div>
 
-                      {/* Column 4: Q1 2026 */}
-                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 shadow-sm">
+                      {/* Column 4: Potentially Delayed */}
+                      <div className="bg-gray-50 border-2 border-orange-300 rounded-lg p-3 shadow-sm">
                         <div className="text-center mb-2">
-                          <div className="text-xs font-semibold text-gray-600 mb-1">Q1 2026</div>
-                          <div className="text-lg font-bold text-gray-800">${((targets?.closing_projections?.q1_2026_target || 0) / 1000).toFixed(0)}K</div>
-                          <div className="text-xs text-gray-500">Target: ${((targets?.closing_projections?.q1_2026_target || 0) / 1000).toFixed(0)}K</div>
+                          <div className="text-xs font-semibold text-orange-600 mb-1">Potentially Delayed</div>
+                          <div className="text-lg font-bold text-gray-800">${((targets?.closing_projections?.potentially_delayed_target || 0) / 1000).toFixed(0)}K</div>
+                          <div className="text-xs text-gray-500">Target: ${((targets?.closing_projections?.potentially_delayed_target || 0) / 1000).toFixed(0)}K</div>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
-                          <div className="bg-gray-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
+                          <div className="bg-orange-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
                         </div>
                         <div className="text-xs text-center text-gray-500 mb-2">X deals • $XK</div>
                         <div className="space-y-1">
