@@ -3200,6 +3200,43 @@ function Dashboard() {
                   </CardContent>
                 </Card>
               )}
+              
+              {/* Monthly Pipeline Evolution Chart */}
+              {analytics.pipe_metrics.monthly_breakdown && analytics.pipe_metrics.monthly_breakdown.months && analytics.pipe_metrics.monthly_breakdown.months.length > 0 && (() => {
+                const chartData = analytics.pipe_metrics.monthly_breakdown.months.map((month, index) => ({
+                  month,
+                  new_pipe_created: analytics.pipe_metrics.monthly_breakdown.new_pipe_created[index],
+                  new_weighted_pipe: analytics.pipe_metrics.monthly_breakdown.new_weighted_pipe[index],
+                  total_pipe: analytics.pipe_metrics.monthly_breakdown.total_pipe[index],
+                  total_weighted: analytics.pipe_metrics.monthly_breakdown.total_weighted[index]
+                }));
+                
+                return (
+                  <Card className="mt-6">
+                    <CardHeader>
+                      <CardTitle>Monthly Pipeline Evolution</CardTitle>
+                      <CardDescription>
+                        Track new pipeline created and total pipeline value on a monthly basis
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={350}>
+                        <ComposedChart data={chartData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" />
+                          <YAxis />
+                          <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
+                          <Legend />
+                          <Bar dataKey="new_pipe_created" fill="#8b5cf6" name="New Pipe Created" />
+                          <Bar dataKey="new_weighted_pipe" fill="#3b82f6" name="New Weighted Pipe" />
+                          <Line type="monotone" dataKey="total_pipe" stroke="#10b981" strokeWidth={3} name="Total Pipeline" />
+                          <Line type="monotone" dataKey="total_weighted" stroke="#f97316" strokeWidth={2} strokeDasharray="5 5" name="Total Weighted" />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+                );
+              })()}
             </AnalyticsSection>
 
             {/* Old Pipeline */}
