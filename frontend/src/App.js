@@ -1854,7 +1854,7 @@ function Dashboard() {
 
         {/* Main Dashboard */}
         <TabsContent value="dashboard">
-          <MainDashboard analytics={analytics} currentView={currentView} tabTargets={tabTargets} />
+          <MainDashboard analytics={analytics} currentView={currentView} tabTargets={tabTargets} actualPeriodMonths={actualPeriodMonths} />
         </TabsContent>
 
         {/* Meetings Generation */}
