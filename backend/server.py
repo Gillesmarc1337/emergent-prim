@@ -143,8 +143,11 @@ def map_admin_targets_to_analytics_format(admin_targets: dict) -> dict:
         }
     }
     
-    # If admin_targets is already in the old format, return as-is
-    if "dashboard" in admin_targets and "objectif_6_mois" in admin_targets.get("dashboard", {}):
+    # If admin_targets is already COMPLETELY in the old format (no new format keys), return as-is
+    new_format_keys = ["revenue_2025", "dashboard_bottom_cards", "meeting_generation", "intro_poa", "meetings_attended", "deals_closed_yearly"]
+    has_new_format = any(key in admin_targets for key in new_format_keys)
+    
+    if not has_new_format and "dashboard" in admin_targets and "objectif_6_mois" in admin_targets.get("dashboard", {}):
         return admin_targets
     
     # Map revenue_2025 -> dashboard.objectif_6_mois (sum of all months or use yearly target)
