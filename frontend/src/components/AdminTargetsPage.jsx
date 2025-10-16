@@ -446,11 +446,12 @@ function AdminTargetsPage() {
               
               {/* Master View Info */}
               {isMasterView && (
-                <Alert className="bg-amber-50 border-amber-300">
-                  <Info className="h-4 w-4 text-amber-600" />
-                  <AlertDescription className="text-amber-900">
-                    <strong>Master View:</strong> Targets are automatically calculated as the sum of all other views (Signal, Full Funnel, Market, Organic). 
-                    You cannot edit these values directly. To change Master targets, edit the individual views.
+                <Alert className="bg-blue-50 border-blue-300">
+                  <Info className="h-4 w-4 text-blue-600" />
+                  <AlertDescription className="text-blue-900">
+                    <strong>Master View:</strong> By default, targets are auto-calculated as the sum of all other views. 
+                    However, you can <strong>manually override</strong> any target value. Manual values will be used instead of auto-calculated ones.
+                    Monthly targets will be multiplied by the number of months in the selected period in the dashboard.
                   </AlertDescription>
                 </Alert>
               )}
