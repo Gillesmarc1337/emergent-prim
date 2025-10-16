@@ -525,30 +525,6 @@ function DataManagementSection({ onDataUpdated, currentView }) {
   const [dataStatus, setDataStatus] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
-  
-  // NEW: Tab targets (direct from BO, no multiplication)
-  const [tabTargets, setTabTargets] = useState({
-    meetings_attended_tab: {
-      meetings_scheduled_target: 50,
-      poa_generated_target: 18,
-      deals_closed_target: 6
-    },
-    deals_closed_tab: {
-      deals_closed_target: 10,
-      arr_closed_target: 500000
-    }
-  });
-
-  const loadTabTargets = async () => {
-    try {
-      if (currentView?.id) {
-        const response = await axios.get(`${API}/views/${currentView.id}/tab-targets`);
-        setTabTargets(response.data);
-      }
-    } catch (error) {
-      console.error('Error loading tab targets:', error);
-    }
-  };
 
   const loadDataStatus = async () => {
     try {
