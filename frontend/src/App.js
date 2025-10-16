@@ -3145,7 +3145,52 @@ function Dashboard() {
               </div>
 
               {/* AE Breakdown Table */}
-              {analytics.pipe_metrics.ae_breakdown && analytics.pipe_metrics.ae_breakdown.length > 0 && (
+              {analytics.pipe_metrics.ae_breakdown && analytics.pipe_metrics.ae_breakdown.length > 0 && (() => {
+                // Function to sort AE breakdown
+                const sortAEBreakdown = (key) => {
+                  let direction = 'asc';
+                  if (aeSortConfig.key === key && aeSortConfig.direction === 'asc') {
+                    direction = 'desc';
+                  }
+                  setAESortConfig({ key, direction });
+                };
+
+                // Sort the data based on current sort config
+                const sortedAEBreakdown = [...analytics.pipe_metrics.ae_breakdown].sort((a, b) => {
+                  if (!aeSortConfig.key) return 0;
+
+                  let aValue, bValue;
+                  switch (aeSortConfig.key) {
+                    case 'ae':
+                      aValue = a.ae || '';
+                      bValue = b.ae || '';
+                      break;
+                    case 'new_pipe_created':
+                      aValue = a.new_pipe_created || 0;
+                      bValue = b.new_pipe_created || 0;
+                      break;
+                    case 'new_weighted_pipe':
+                      aValue = a.new_weighted_pipe || 0;
+                      bValue = b.new_weighted_pipe || 0;
+                      break;
+                    case 'total_pipe':
+                      aValue = a.total_pipe || 0;
+                      bValue = b.total_pipe || 0;
+                      break;
+                    case 'weighted_pipe':
+                      aValue = a.weighted_pipe || 0;
+                      bValue = b.weighted_pipe || 0;
+                      break;
+                    default:
+                      return 0;
+                  }
+
+                  if (aValue < bValue) return aeSortConfig.direction === 'asc' ? -1 : 1;
+                  if (aValue > bValue) return aeSortConfig.direction === 'asc' ? 1 : -1;
+                  return 0;
+                });
+
+                return (
                 <Card className="mb-6">
                   <CardHeader>
                     <CardTitle>AE Pipeline Performance</CardTitle>
@@ -3156,15 +3201,65 @@ function Dashboard() {
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b">
-                            <th className="text-left p-3 font-semibold">AE</th>
-                            <th className="text-right p-3 font-semibold">New Pipe Created</th>
-                            <th className="text-right p-3 font-semibold">Created Weighted Pipe</th>
-                            <th className="text-right p-3 font-semibold">Total Pipe</th>
-                            <th className="text-right p-3 font-semibold">Total Weighted Pipe</th>
+                            <th 
+                              className="text-left p-3 font-semibold cursor-pointer hover:bg-gray-100"
+                              onClick={() => sortAEBreakdown('ae')}
+                            >
+                              <div className="flex items-center gap-1">
+                                AE
+                                {aeSortConfig.key === 'ae' && (
+                                  <span>{aeSortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                                )}
+                              </div>
+                            </th>
+                            <th 
+                              className="text-right p-3 font-semibold cursor-pointer hover:bg-gray-100"
+                              onClick={() => sortAEBreakdown('new_pipe_created')}
+                            >
+                              <div className="flex items-center justify-end gap-1">
+                                New Pipe Created
+                                {aeSortConfig.key === 'new_pipe_created' && (
+                                  <span>{aeSortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                                )}
+                              </div>
+                            </th>
+                            <th 
+                              className="text-right p-3 font-semibold cursor-pointer hover:bg-gray-100"
+                              onClick={() => sortAEBreakdown('new_weighted_pipe')}
+                            >
+                              <div className="flex items-center justify-end gap-1">
+                                Created Weighted Pipe
+                                {aeSortConfig.key === 'new_weighted_pipe' && (
+                                  <span>{aeSortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                                )}
+                              </div>
+                            </th>
+                            <th 
+                              className="text-right p-3 font-semibold cursor-pointer hover:bg-gray-100"
+                              onClick={() => sortAEBreakdown('total_pipe')}
+                            >
+                              <div className="flex items-center justify-end gap-1">
+                                Total Pipe
+                                {aeSortConfig.key === 'total_pipe' && (
+                                  <span>{aeSortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                                )}
+                              </div>
+                            </th>
+                            <th 
+                              className="text-right p-3 font-semibold cursor-pointer hover:bg-gray-100"
+                              onClick={() => sortAEBreakdown('weighted_pipe')}
+                            >
+                              <div className="flex items-center justify-end gap-1">
+                                Total Weighted Pipe
+                                {aeSortConfig.key === 'weighted_pipe' && (
+                                  <span>{aeSortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                                )}
+                              </div>
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
-                          {analytics.pipe_metrics.ae_breakdown.map((ae, index) => (
+                          {sortedAEBreakdown.map((ae, index) => (
                             <tr key={index} className="border-b hover:bg-gray-50">
                               <td className="p-3 font-medium">{ae.ae}</td>
                               {/* Block 1: New Pipe Created */}
@@ -3210,7 +3305,8 @@ function Dashboard() {
                     </div>
                   </CardContent>
                 </Card>
-              )}
+                );
+              })()}
 
               {/* Pipeline Details */}
               {analytics.pipe_metrics.pipe_details && analytics.pipe_metrics.pipe_details.length > 0 && (
