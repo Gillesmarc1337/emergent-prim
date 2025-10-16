@@ -3478,6 +3478,7 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
                 'closed_revenue': closed_revenue,
                 'weighted_pipe': weighted_pipe,
                 'new_weighted_pipe': new_weighted_pipe,
+                'new_pipe_created': new_pipe_created,  # Add Created Pipe (column K sum)
                 'aggregate_weighted_pipe': aggregate_weighted_pipe,
                 'is_future': target_date > datetime.now(),
                 'deals_count': len(closed_deals)
