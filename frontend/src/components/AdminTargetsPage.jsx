@@ -200,6 +200,11 @@ function AdminTargetsPage() {
           deals_target: 0,
           arr_target: 0
         },
+        upsell_renew: {
+          upsells_target: 0,
+          renewals_target: 0,
+          mrr_target: 0
+        },
         deals_closed_yearly: {
           deals_target: 0,
           arr_target: 0
