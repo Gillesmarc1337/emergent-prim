@@ -2324,6 +2324,41 @@ function Dashboard() {
 
               return (
                 <>
+                  {/* Monthly Meetings Attended Evolution Chart - MOVED TO TOP */}
+                  {analytics.meetings_attended.monthly_breakdown && analytics.meetings_attended.monthly_breakdown.months && analytics.meetings_attended.monthly_breakdown.months.length > 0 && (() => {
+                    const chartData = analytics.meetings_attended.monthly_breakdown.months.map((month, index) => ({
+                      month,
+                      attended: analytics.meetings_attended.monthly_breakdown.attended[index],
+                      poa_generated: analytics.meetings_attended.monthly_breakdown.poa_generated[index],
+                      deals_closed: analytics.meetings_attended.monthly_breakdown.deals_closed[index]
+                    }));
+                    
+                    return (
+                      <Card className="mb-6">
+                        <CardHeader>
+                          <CardTitle>Monthly Meetings Attended Evolution</CardTitle>
+                          <CardDescription>
+                            Track attended meetings, POA generated, and deals closed on a monthly basis
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <ResponsiveContainer width="100%" height={350}>
+                            <ComposedChart data={chartData}>
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis dataKey="month" />
+                              <YAxis />
+                              <Tooltip />
+                              <Legend />
+                              <Bar dataKey="attended" fill="#3b82f6" name="Meetings Attended" />
+                              <Bar dataKey="poa_generated" fill="#10b981" name="POA Generated" />
+                              <Line type="monotone" dataKey="deals_closed" stroke="#ef4444" strokeWidth={3} name="Deals Closed" />
+                            </ComposedChart>
+                          </ResponsiveContainer>
+                        </CardContent>
+                      </Card>
+                    );
+                  })()}
+
                   {/* Period and Target Info */}
                   <div className="mb-4 p-3 bg-gray-50 rounded-lg border">
                     <div className="text-sm text-gray-600">
