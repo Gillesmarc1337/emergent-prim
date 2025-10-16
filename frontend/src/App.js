@@ -1219,6 +1219,17 @@ function Dashboard() {
     };
   };
 
+  const loadTabTargets = async () => {
+    try {
+      if (currentView?.id) {
+        const response = await axios.get(`${API}/views/${currentView.id}/tab-targets`);
+        setTabTargets(response.data);
+      }
+    } catch (error) {
+      console.error('Error loading tab targets:', error);
+    }
+  };
+
   const loadAnalytics = async () => {
     setLoading(true);
     setError(null);
