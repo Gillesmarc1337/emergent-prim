@@ -844,7 +844,7 @@ function AdminTargetsPage() {
                         }}
                         className="mt-1"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Displayed directly in dashboard (no period multiplication)</p>
+                      <p className="text-xs text-gray-500 mt-1">Monthly target × period duration</p>
                     </div>
                     <div>
                       <Label htmlFor="poa_generated_tab">POA Generated Target (Monthly)</Label>
