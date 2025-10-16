@@ -928,8 +928,24 @@ function AdminTargetsPage() {
                 </CardContent>
               </Card>
 
-              {/* Save Button */}
+              {/* Save Button & Reset to Auto-Aggregate for Master */}
               <div className="flex justify-end gap-3">
+                {isMasterView && (
+                  <Button 
+                    onClick={async () => {
+                      if (window.confirm('Reset Master targets to auto-calculated values from other views?')) {
+                        const calculatedTargets = await calculateMasterTargets();
+                        setTargets(calculatedTargets);
+                        setMessage({ type: 'info', text: 'Master targets reset to auto-aggregated values. Click Save to confirm.' });
+                      }
+                    }}
+                    variant="outline"
+                    size="lg"
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Reset to Auto-Aggregate
+                  </Button>
+                )}
                 <Button 
                   onClick={handleSave} 
                   disabled={saving}
