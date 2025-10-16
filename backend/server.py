@@ -226,7 +226,9 @@ def map_admin_targets_to_analytics_format(admin_targets: dict) -> dict:
             if mapped_targets["meeting_generation"]["intro"] == 45:  # Still default
                 mapped_targets["meeting_generation"]["intro"] = meetings_att["meetings_scheduled"]
         if "poa_generated" in meetings_att and meetings_att["poa_generated"] > 0:
-            mapped_targets["meeting_attended"]["poa"] = meetings_att["poa_generated"]
+            # Only use if dashboard_banners didn't set it (dashboard_banners has priority)
+            if "dashboard_banners" not in admin_targets or "poa_target" not in admin_targets.get("dashboard_banners", {}):
+                mapped_targets["meeting_attended"]["poa"] = meetings_att["poa_generated"]
         if "deals_closed" in meetings_att and meetings_att["deals_closed"] > 0:
             mapped_targets["meeting_attended"]["deals_closed"] = meetings_att["deals_closed"]
     
