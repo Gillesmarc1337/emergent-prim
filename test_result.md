@@ -613,7 +613,8 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Target key mapping between Admin BO and analytics functions"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
