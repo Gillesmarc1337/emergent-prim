@@ -3456,6 +3456,9 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
             new_deals_month['weighted_value'] = new_deals_month.apply(calculate_excel_weighted_value, axis=1)
             new_weighted_pipe = float(new_deals_month['weighted_value'].sum())
             
+            # Calculate New Pipe Created (sum of column K - pipeline for new deals in this month)
+            new_pipe_created = float(new_deals_month['pipeline'].fillna(0).sum())
+            
             # Weighted pipeline for display (not used in chart, kept for compatibility)
             weighted_pipe = new_weighted_pipe
             
