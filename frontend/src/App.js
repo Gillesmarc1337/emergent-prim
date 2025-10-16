@@ -1174,6 +1174,13 @@ function Dashboard() {
   // State for AE Pipeline Breakdown sorting
   const [aeSortConfig, setAESortConfig] = useState({ key: null, direction: 'asc' });
   
+  // State for chart legend visibility (meetings attended evolution)
+  const [attendedChartVisibility, setAttendedChartVisibility] = useState({
+    attended: true,
+    poa_generated: true,
+    deals_closed: true
+  });
+  
   // NEW: Tab targets (direct from BO, no multiplication)
   const [tabTargets, setTabTargets] = useState({
     meetings_attended_tab: {
