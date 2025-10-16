@@ -2232,7 +2232,7 @@ function Dashboard() {
                        ' (Current Month)'}
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
-                      Base monthly targets: Meetings Scheduled (50) • POA Generated (18) • Deals Closed (6)
+                      Targets from Back Office (shown as-is, no period multiplication)
                     </div>
                   </div>
 
