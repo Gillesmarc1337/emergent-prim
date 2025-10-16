@@ -1745,6 +1745,22 @@ function Dashboard() {
     { name: 'Not Relevant', value: analytics.meeting_generation.relevance_analysis.not_relevant, color: '#FF8042' }
   ];
 
+  // Calculate actual period months based on view mode and date range
+  let actualPeriodMonths = 1; // Default to 1 month
+  
+  if (useCustomDate && dateRange?.from && dateRange?.to) {
+    // Calculate months from custom date range
+    const diffTime = Math.abs(dateRange.to - dateRange.from);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    actualPeriodMonths = Math.max(1, Math.round(diffDays / 30.44)); // Convert days to months
+  } else if (viewMode === 'yearly') {
+    // July to December = 6 months
+    actualPeriodMonths = 6;
+  } else {
+    // Monthly view = 1 month
+    actualPeriodMonths = 1;
+  }
+
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
