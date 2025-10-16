@@ -3543,6 +3543,49 @@ function Dashboard() {
                     </CardContent>
                   </Card>
                 )}
+                
+                {/* Monthly Upsell/Renew Evolution Chart */}
+                {upsellData.monthly_breakdown && upsellData.monthly_breakdown.months && upsellData.monthly_breakdown.months.length > 0 && (() => {
+                  const chartData = upsellData.monthly_breakdown.months.map((month, index) => ({
+                    month,
+                    meetings_attended: upsellData.monthly_breakdown.meetings_attended[index],
+                    poa_generated: upsellData.monthly_breakdown.poa_generated[index],
+                    revenue_generated: upsellData.monthly_breakdown.revenue_generated[index]
+                  }));
+                  
+                  return (
+                    <Card className="mt-6">
+                      <CardHeader>
+                        <CardTitle>Monthly Upsell & Renew Evolution</CardTitle>
+                        <CardDescription>
+                          Track upsell/renew meetings, POA generated, and revenue on a monthly basis
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={350}>
+                          <ComposedChart data={chartData}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="month" />
+                            <YAxis yAxisId="left" />
+                            <YAxis yAxisId="right" orientation="right" />
+                            <Tooltip 
+                              formatter={(value, name) => {
+                                if (name === 'Revenue Generated') {
+                                  return [`$${value.toLocaleString()}`, name];
+                                }
+                                return [value, name];
+                              }}
+                            />
+                            <Legend />
+                            <Bar yAxisId="left" dataKey="meetings_attended" fill="#6366f1" name="Meetings Attended" />
+                            <Bar yAxisId="left" dataKey="poa_generated" fill="#10b981" name="POA Generated" />
+                            <Line yAxisId="right" type="monotone" dataKey="revenue_generated" stroke="#ef4444" strokeWidth={3} name="Revenue Generated" />
+                          </ComposedChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+                  );
+                })()}
               </AnalyticsSection>
             </div>
           ) : (
