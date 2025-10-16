@@ -1272,6 +1272,7 @@ function Dashboard() {
     loadAnalytics();
     loadProjectionsData();
     loadUpsellRenewData();
+    loadTabTargets(); // Load tab targets when view changes
   }, [monthOffset, dateRange, useCustomDate, viewMode, currentView]); // Added currentView to reload when view changes
 
   const handleUploadSuccess = () => {
