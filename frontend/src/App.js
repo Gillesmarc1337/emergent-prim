@@ -1135,6 +1135,7 @@ function Dashboard() {
   const [useCustomDate, setUseCustomDate] = useState(false);
   const [importMethod, setImportMethod] = useState('csv'); // 'csv' or 'sheets'
   const [viewMode, setViewMode] = useState('monthly'); // 'monthly' or 'yearly'
+  const [activeTab, setActiveTab] = useState('dashboard'); // Track active tab
   
   // Listen for view config updates from other admins
   useEffect(() => {
