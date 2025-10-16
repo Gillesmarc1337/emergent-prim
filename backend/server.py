@@ -4072,6 +4072,106 @@ async def get_projections_performance_summary(view_id: str = Query(None)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting performance summary: {str(e)}")
 
+@api_router.get("/analytics/comprehensive")
+async def get_comprehensive_analytics(view_id: str = Query(None)):
+    """Get comprehensive analytics data with all components"""
+    try:
+        # Get view config and targets if view_id provided
+        view_config = None
+        view_targets = None
+        if view_id:
+            config_data = await get_view_config_with_defaults(view_id)
+            view_config = config_data["view"]
+            view_targets = config_data["targets"]
+        else:
+            # Default targets for Organic view
+            view_targets = {
+                "dashboard": {
+                    "objectif_6_mois": 4500000,
+                    "deals": 25,
+                    "new_pipe_created": 2000000,
+                    "weighted_pipe": 800000
+                },
+                "meeting_generation": {
+                    "intro": 45,
+                    "inbound": 22,
+                    "outbound": 17,
+                    "referrals": 11
+                },
+                "meeting_attended": {
+                    "poa": 18,
+                    "deals_closed": 6
+                }
+            }
+
+        # Get data from MongoDB based on view
+        if view_id:
+            records = await get_sales_data_for_view(view_id)
+        else:
+            # Fallback to default Organic collection
+            records = await db.sales_records.find().to_list(10000)
+            
+        if not records:
+            raise HTTPException(status_code=404, detail="No sales data found. Please upload data first.")
+
+        # Convert to DataFrame for analysis
+        df = pd.DataFrame(records)
+        
+        # Convert date strings back to datetime
+        date_columns = ['discovery_date', 'poa_date', 'billing_start', 'created_at']
+        for col in date_columns:
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors='coerce')
+
+        # Use current month for analytics
+        today = datetime.now()
+        month_start, month_end = get_month_range(today, 0)
+
+        # Generate all analytics components
+        meeting_generation = calculate_meeting_generation(df, month_start, month_end, view_targets)
+        meetings_attended = calculate_meetings_attended(df, month_start, month_end)
+        ae_performance = calculate_ae_performance(df, month_start, month_end)
+        deals_closed = calculate_deals_closed(df, month_start, month_end, view_targets)
+        pipe_metrics = calculate_pipe_metrics(df, month_start, month_end)
+        closing_projections = calculate_closing_projections(df)
+
+        # Attribution analysis
+        attribution = {
+            'intro_attribution': {k: int(v) for k, v in df.groupby('type_of_source')['id'].count().to_dict().items()},
+            'disco_attribution': {k: int(v) for k, v in df[~df['discovery_date'].isna()].groupby('type_of_source')['id'].count().to_dict().items()},
+            'bdr_attribution': {k: int(v) for k, v in df.groupby('bdr')['id'].count().to_dict().items()}
+        }
+
+        # Dashboard blocks
+        dashboard_blocks = {
+            'current_month': today.strftime('%b %Y'),
+            'total_meetings': len(df[(df['discovery_date'] >= month_start) & (df['discovery_date'] <= month_end)]),
+            'total_deals': len(df[df['stage'] == 'A Closed'])
+        }
+
+        # Key metrics
+        key_metrics = {
+            'total_revenue': float(df[df['stage'] == 'A Closed']['expected_arr'].fillna(0).sum()),
+            'total_pipeline': float(df['pipeline'].fillna(0).sum()),
+            'active_deals': len(df[~df['stage'].isin(['I Lost', 'Closed Lost'])])
+        }
+
+        return convert_numpy_types({
+            "dashboard_blocks": dashboard_blocks,
+            "key_metrics": key_metrics,
+            "meeting_generation": meeting_generation,
+            "meetings_attended": meetings_attended,
+            "ae_performance": ae_performance,
+            "deals_closed": deals_closed,
+            "deals_closed_current_period": deals_closed,  # Same data, different key for frontend
+            "pipe_metrics": pipe_metrics,
+            "attribution": attribution,
+            "closing_projections": closing_projections
+        })
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating comprehensive analytics: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
