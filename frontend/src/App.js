@@ -1044,63 +1044,80 @@ function MainDashboard({ analytics, currentView, tabTargets }) {
             </CardContent>
           </Card>
 
-          {/* Block 5: Deals Closed (Current Period) - Uses NEW tab targets from BO */}
-          {analytics.deals_closed_current_period && (
-            <Card className="border-2 border-blue-200 bg-blue-50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-center font-semibold">Deals Closed (Current Period)</CardTitle>
-                <CardDescription className="text-center font-medium text-blue-600">
-                  {analytics.deals_closed_current_period?.period || 'Current Period'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center bg-white p-3 rounded-lg">
-                    <div className="text-3xl font-bold text-gray-800">
-                      {analytics.deals_closed_current_period?.deals_closed || 0}
+          {/* Block 5: Deals Closed (Current Period) - Uses NEW tab targets from BO (MONTHLY) */}
+          {analytics.deals_closed_current_period && (() => {
+            // Calculate period months based on the period string
+            const periodStr = analytics.deals_closed_current_period?.period || 'Monthly';
+            let periodMonths = 1;
+            
+            if (periodStr.toLowerCase().includes('july') || periodStr.toLowerCase().includes('dec')) {
+              // July to December = 6 months
+              periodMonths = 6;
+            } else if (periodStr.toLowerCase().includes('year')) {
+              periodMonths = 12;
+            }
+            
+            // Calculate dynamic targets (monthly target × period)
+            const dealsTarget = tabTargets.deals_closed_tab.deals_closed_target * periodMonths;
+            const arrTarget = tabTargets.deals_closed_tab.arr_closed_target * periodMonths;
+            
+            return (
+              <Card className="border-2 border-blue-200 bg-blue-50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg text-center font-semibold">Deals Closed (Current Period)</CardTitle>
+                  <CardDescription className="text-center font-medium text-blue-600">
+                    {periodStr} {periodMonths > 1 ? `(${periodMonths} months)` : ''}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center bg-white p-3 rounded-lg">
+                      <div className="text-3xl font-bold text-gray-800">
+                        {analytics.deals_closed_current_period?.deals_closed || 0}
+                      </div>
+                      <div className="text-sm text-gray-600 mt-1">Deals Closed</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        Target: {dealsTarget || 0}
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">Deals Closed</div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      Target: {tabTargets.deals_closed_tab.deals_closed_target || 0}
+                    <div className="text-center bg-white p-3 rounded-lg">
+                      <div className="text-3xl font-bold text-green-600">
+                        ${analytics.deals_closed_current_period?.arr_closed ? (analytics.deals_closed_current_period.arr_closed / 1000000).toFixed(1) + 'M' : '0'}
+                      </div>
+                      <div className="text-sm text-gray-600 mt-1">ARR Closed</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        Target: ${arrTarget ? (arrTarget / 1000000).toFixed(1) + 'M' : '0'}
+                      </div>
                     </div>
                   </div>
-                  <div className="text-center bg-white p-3 rounded-lg">
-                    <div className="text-3xl font-bold text-green-600">
-                      ${analytics.deals_closed_current_period?.arr_closed ? (analytics.deals_closed_current_period.arr_closed / 1000000).toFixed(1) + 'M' : '0'}
+                  <div className="mt-4">
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className={`h-2.5 rounded-full transition-all ${
+                          analytics.deals_closed_current_period?.deals_closed >= dealsTarget 
+                            ? 'bg-green-500' 
+                            : 'bg-orange-500'
+                        }`}
+                        style={{ 
+                          width: `${Math.min(
+                            dealsTarget 
+                              ? (analytics.deals_closed_current_period.deals_closed / dealsTarget * 100) 
+                              : 0, 
+                            100
+                          )}%` 
+                        }}
+                      ></div>
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">ARR Closed</div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      Target: ${tabTargets.deals_closed_tab.arr_closed_target ? (tabTargets.deals_closed_tab.arr_closed_target / 1000000).toFixed(1) + 'M' : '0'}
+                    <div className="text-center text-sm font-semibold text-gray-700 mt-2">
+                      {dealsTarget 
+                        ? ((analytics.deals_closed_current_period.deals_closed / dealsTarget * 100).toFixed(1)) 
+                        : 0}% of target
                     </div>
                   </div>
-                </div>
-                <div className="mt-4">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div 
-                      className={`h-2.5 rounded-full transition-all ${
-                        analytics.deals_closed_current_period?.deals_closed >= tabTargets.deals_closed_tab.deals_closed_target 
-                          ? 'bg-green-500' 
-                          : 'bg-orange-500'
-                      }`}
-                      style={{ 
-                        width: `${Math.min(
-                          tabTargets.deals_closed_tab.deals_closed_target 
-                            ? (analytics.deals_closed_current_period.deals_closed / tabTargets.deals_closed_tab.deals_closed_target * 100) 
-                            : 0, 
-                          100
-                        )}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <div className="text-center text-sm font-semibold text-gray-700 mt-2">
-                    {tabTargets.deals_closed_tab.deals_closed_target 
-                      ? ((analytics.deals_closed_current_period.deals_closed / tabTargets.deals_closed_tab.deals_closed_target * 100).toFixed(1)) 
-                      : 0}% of target
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                </CardContent>
+              </Card>
+            );
+          })()}
         </div>
       )}
     </div>
