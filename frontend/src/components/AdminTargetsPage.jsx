@@ -763,12 +763,12 @@ function AdminTargetsPage() {
                 </CardContent>
               </Card>
 
-              {/* MEETINGS GENERATION TAB - Meetings Attended Banner */}
-              <Card className="border-green-200">
+              {/* MEETINGS ATTENDED TAB - Meetings Attended Configuration */}
+              <Card className="border-blue-200">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded">MEETINGS GENERATION TAB</span>
-                    Meetings Attended Configuration
+                    <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded">MEETINGS ATTENDED TAB</span>
+                    Meetings Attended Target Configuration
                   </CardTitle>
                   <CardDescription>
                     Configure targets for Meetings Scheduled, POA Generated, and Deals Closed
