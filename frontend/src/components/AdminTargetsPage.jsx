@@ -90,6 +90,19 @@ function AdminTargetsPage() {
           jan: 0, feb: 0, mar: 0, apr: 0, may: 0, jun: 0,
           jul: 120000, aug: 744000, sep: 1344000, oct: 528000, nov: 1068000, dec: 744000
         },
+        dashboard_top_cards: {
+          ytd_target: 12600000,
+          new_pipe_created: 2000000,
+          created_weighted_pipe: 800000
+        },
+        dashboard_banners: {
+          meetings_generation_target: 50,
+          intro_target: 45,
+          poa_target: 45,
+          new_pipe_target: 2000000,
+          deals_closed_count: 10,
+          deals_closed_arr: 500000
+        },
         dashboard_bottom_cards: {
           new_pipe_created: 2000000,
           created_weighted_pipe: 800000,
