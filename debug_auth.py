@@ -6,7 +6,7 @@ Debug authentication issue
 import requests
 import json
 
-BASE_URL = "https://sales-analytics-dash-3.preview.emergentagent.com/api"
+BASE_URL = "https://revdash-2.preview.emergentagent.com/api"
 
 def debug_auth_flow():
     print("🔍 Debugging authentication flow...")

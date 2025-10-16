@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://sales-analytics-dash-3.preview.emergentagent.com/api"
+BASE_URL = "https://revdash-2.preview.emergentagent.com/api"
 
 def test_endpoint(endpoint, method="GET", data=None, cookies=None, expected_status=200):
     """Test an API endpoint and return response"""
