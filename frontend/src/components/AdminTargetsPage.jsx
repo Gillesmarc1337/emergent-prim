@@ -712,6 +712,207 @@ function AdminTargetsPage() {
                 </CardContent>
               </Card>
 
+              {/* DASHBOARD TAB - Dashboard Banner Cards (Row 2) */}
+              <Card className="border-pink-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-pink-100 text-pink-700 text-xs font-semibold rounded">DASHBOARD TAB</span>
+                    Dashboard Banner Cards Targets (Row 2)
+                  </CardTitle>
+                  <CardDescription>
+                    Configure monthly targets for the 4 dashboard banner cards below the main cards
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="dashboard_meetings_gen">Meetings Generation Monthly Target</Label>
+                      <Input
+                        id="dashboard_meetings_gen"
+                        type="number"
+                        value={targets?.dashboard_banners?.meetings_generation_target || 0}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          setTargets(prev => ({
+                            ...prev,
+                            dashboard_banners: {
+                              ...(prev.dashboard_banners || {}),
+                              meetings_generation_target: value
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Total meetings to generate per month</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="dashboard_intro_poa">Intro & POA Monthly Targets</Label>
+                      <div className="grid grid-cols-2 gap-2 mt-1">
+                        <Input
+                          placeholder="Intro"
+                          type="number"
+                          value={targets?.dashboard_banners?.intro_target || 0}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value) || 0;
+                            setTargets(prev => ({
+                              ...prev,
+                              dashboard_banners: {
+                                ...(prev.dashboard_banners || {}),
+                                intro_target: value
+                              }
+                            }));
+                          }}
+                        />
+                        <Input
+                          placeholder="POA"
+                          type="number"
+                          value={targets?.dashboard_banners?.poa_target || 0}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value) || 0;
+                            setTargets(prev => ({
+                              ...prev,
+                              dashboard_banners: {
+                                ...(prev.dashboard_banners || {}),
+                                poa_target: value
+                              }
+                            }));
+                          }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">Intro meetings and POA generated per month</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="dashboard_new_pipe">New Pipe Created Monthly ($)</Label>
+                      <Input
+                        id="dashboard_new_pipe"
+                        type="number"
+                        value={targets?.dashboard_banners?.new_pipe_target || 0}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          setTargets(prev => ({
+                            ...prev,
+                            dashboard_banners: {
+                              ...(prev.dashboard_banners || {}),
+                              new_pipe_target: value
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                        step="100000"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Pipeline creation target per month</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="dashboard_deals_closed">Deals Closed Monthly Targets</Label>
+                      <div className="grid grid-cols-2 gap-2 mt-1">
+                        <Input
+                          placeholder="Deals #"
+                          type="number"
+                          value={targets?.dashboard_banners?.deals_closed_count || 0}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value) || 0;
+                            setTargets(prev => ({
+                              ...prev,
+                              dashboard_banners: {
+                                ...(prev.dashboard_banners || {}),
+                                deals_closed_count: value
+                              }
+                            }));
+                          }}
+                        />
+                        <Input
+                          placeholder="ARR $"
+                          type="number"
+                          value={targets?.dashboard_banners?.deals_closed_arr || 0}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value) || 0;
+                            setTargets(prev => ({
+                              ...prev,
+                              dashboard_banners: {
+                                ...(prev.dashboard_banners || {}),
+                                deals_closed_arr: value
+                              }
+                            }));
+                          }}
+                          step="50000"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">Number of deals and ARR closed per month</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+                    <div className="text-sm font-semibold mb-3 text-gray-700">📊 Dashboard Preview (Grey Replica):</div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                      {/* Card 1: Meetings Generation */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs font-semibold text-gray-600 mb-3">Meetings Generation</div>
+                        <div className="text-center mb-2">
+                          <div className="text-3xl font-bold text-gray-800">X/X</div>
+                          <div className="text-xs text-gray-500 mt-1">Total Target: {targets?.dashboard_banners?.meetings_generation_target || 0}</div>
+                        </div>
+                        <div className="text-xs text-gray-600 space-y-1">
+                          <div>Inbound: X/X</div>
+                          <div>Outbound: X/X</div>
+                          <div>Referral: X/X</div>
+                        </div>
+                      </div>
+
+                      {/* Card 2: Intro & POA */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs font-semibold text-gray-600 mb-3">Intro & POA</div>
+                        <div className="text-center space-y-3">
+                          <div>
+                            <div className="text-3xl font-bold text-gray-800">X/{targets?.dashboard_banners?.intro_target || 0}</div>
+                            <div className="text-xs text-gray-500">Intro</div>
+                          </div>
+                          <div>
+                            <div className="text-3xl font-bold text-gray-800">X/{targets?.dashboard_banners?.poa_target || 0}</div>
+                            <div className="text-xs text-gray-500">POA</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Card 3: New Pipe Created */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs font-semibold text-gray-600 mb-3">New Pipe Created</div>
+                        <div className="text-center mb-2">
+                          <div className="text-3xl font-bold text-purple-600">$X.XM</div>
+                          <div className="text-xs text-gray-500 mt-1">Total Pipe Generation</div>
+                        </div>
+                        <div className="text-center mb-2">
+                          <div className="text-2xl font-bold text-gray-800">$X.XM</div>
+                          <div className="text-xs text-gray-500 mt-1">Aggregate Weighted Pipe</div>
+                        </div>
+                        <div className="text-xs text-gray-500 text-center">Target: ${((targets?.dashboard_banners?.new_pipe_target || 0) / 1000000).toFixed(1)}M × period</div>
+                      </div>
+
+                      {/* Card 4: Deals Closed (Current Period) */}
+                      <div className="bg-gray-50 border-2 border-blue-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs font-semibold text-blue-600 mb-3">Deals Closed (Current Period)</div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="text-center bg-white p-2 rounded">
+                            <div className="text-2xl font-bold text-gray-800">X</div>
+                            <div className="text-xs text-gray-600">Deals Closed</div>
+                            <div className="text-xs text-gray-500">Target: {targets?.dashboard_banners?.deals_closed_count || 0}</div>
+                          </div>
+                          <div className="text-center bg-white p-2 rounded">
+                            <div className="text-2xl font-bold text-green-600">$X.XM</div>
+                            <div className="text-xs text-gray-600">ARR Closed</div>
+                            <div className="text-xs text-gray-500">Target: ${((targets?.dashboard_banners?.deals_closed_arr || 0) / 1000000).toFixed(1)}M</div>
+                          </div>
+                        </div>
+                        <div className="mt-2 text-xs text-gray-600 text-center">X% of target</div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-3 text-center italic">
+                      ℹ️ Preview shows layout only. Actual values calculated from sheet data. Targets multiply by selected period (Monthly/July-Dec/Custom).
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+
               {/* MEETINGS GENERATION TAB - Banner Targets */}
               <Card className="border-green-200">
                 <CardHeader>
