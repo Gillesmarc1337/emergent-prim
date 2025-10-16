@@ -841,7 +841,8 @@ function MainDashboard({ analytics, currentView, tabTargets }) {
                 'Closed Revenue': REVENUE_COLORS.closed,
                 'Target Revenue': REVENUE_COLORS.target,
                 'New Weighted Pipe': '#D97706',
-                'Aggregate Weighted Pipe': '#4ECDC4'
+                'Aggregate Weighted Pipe': '#4ECDC4',
+                'Created Pipe': '#8b5cf6'
               };
               
               return (
