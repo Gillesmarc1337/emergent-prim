@@ -1263,7 +1263,20 @@ def calculate_pipe_metrics(df, start_date, end_date):
             'on_track': bool(total_pipe_value >= monthly_total_pipe_target)
         },
         'ae_breakdown': ae_breakdown,
-        'pipe_details': clean_records(active_pipe[['client', 'pipeline', 'weighted_value', 'stage', 'owner']].to_dict('records'))
+        'pipe_details': clean_records(active_pipe[['client', 'pipeline', 'weighted_value', 'stage', 'owner']].to_dict('records')),
+        'monthly_breakdown': {
+            'months': [],
+            'new_pipe_created': [],
+            'new_weighted_pipe': [],
+            'total_pipe': [],
+            'total_weighted': []
+        } if len(df_with_pipeline) == 0 else {
+            'months': [m.strftime('%b %Y') for m in sorted(df_with_pipeline.groupby(df_with_pipeline['discovery_date'].dt.to_period('M')).groups.keys())],
+            'new_pipe_created': [float(df_with_pipeline[(df_with_pipeline['discovery_date'].dt.to_period('M') == m) & (df_with_pipeline['discovery_date'] >= start_date) & (df_with_pipeline['discovery_date'] <= end_date)]['pipeline'].sum()) for m in sorted(df_with_pipeline.groupby(df_with_pipeline['discovery_date'].dt.to_period('M')).groups.keys())],
+            'new_weighted_pipe': [float(df_with_pipeline[(df_with_pipeline['discovery_date'].dt.to_period('M') == m) & (df_with_pipeline['discovery_date'] >= start_date) & (df_with_pipeline['discovery_date'] <= end_date)]['weighted_value'].sum()) for m in sorted(df_with_pipeline.groupby(df_with_pipeline['discovery_date'].dt.to_period('M')).groups.keys())],
+            'total_pipe': [float(df_with_pipeline[(df_with_pipeline['discovery_date'].dt.to_period('M') == m) & (~df_with_pipeline['stage'].isin(['A Closed', 'I Lost', 'H not relevant']))]['pipeline'].sum()) for m in sorted(df_with_pipeline.groupby(df_with_pipeline['discovery_date'].dt.to_period('M')).groups.keys())],
+            'total_weighted': [float(df_with_pipeline[(df_with_pipeline['discovery_date'].dt.to_period('M') == m) & (~df_with_pipeline['stage'].isin(['A Closed', 'I Lost', 'H not relevant']))]['weighted_value'].sum()) for m in sorted(df_with_pipeline.groupby(df_with_pipeline['discovery_date'].dt.to_period('M')).groups.keys())]
+        }
     }
 
 def calculate_closing_projections(df):
