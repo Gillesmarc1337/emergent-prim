@@ -814,78 +814,75 @@ function AdminTargetsPage() {
                 </CardContent>
               </Card>
 
-              {/* MEETINGS ATTENDED TAB - Meetings Attended Configuration */}
+              {/* MEETINGS ATTENDED TAB - NEW Direct Tab Targets (No Multiplication) */}
               <Card className="border-blue-200">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded">MEETINGS ATTENDED TAB</span>
-                    Meetings Attended Target Configuration
+                    Meetings Attended Display Targets
                   </CardTitle>
                   <CardDescription>
-                    Configure targets for Meetings Scheduled, POA Generated, and Deals Closed
+                    Configure DIRECT display targets for Meetings Attended tab (shown as-is, no multiplication)
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="meetings_scheduled">Meetings Scheduled (Monthly)</Label>
+                      <Label htmlFor="meetings_scheduled_tab">Meetings Scheduled Target</Label>
                       <Input
-                        id="meetings_scheduled"
+                        id="meetings_scheduled_tab"
                         type="number"
-                        value={targets?.meetings_attended?.meetings_scheduled || 0}
+                        value={targets?.meetings_attended_tab?.meetings_scheduled_target || 0}
                         onChange={(e) => {
                           setTargets(prev => ({
                             ...prev,
-                            meetings_attended: {
-                              ...prev.meetings_attended,
-                              meetings_scheduled: parseInt(e.target.value) || 0
+                            meetings_attended_tab: {
+                              ...prev.meetings_attended_tab,
+                              meetings_scheduled_target: parseInt(e.target.value) || 0
                             }
                           }));
                         }}
-                        
-                          className="mt-1"
+                        className="mt-1"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Total meetings scheduled target</p>
+                      <p className="text-xs text-gray-500 mt-1">Displayed directly in dashboard (no period multiplication)</p>
                     </div>
                     <div>
-                      <Label htmlFor="poa_generated">POA Generated (Monthly)</Label>
+                      <Label htmlFor="poa_generated_tab">POA Generated Target</Label>
                       <Input
-                        id="poa_generated"
+                        id="poa_generated_tab"
                         type="number"
-                        value={targets?.meetings_attended?.poa_generated || 0}
+                        value={targets?.meetings_attended_tab?.poa_generated_target || 0}
                         onChange={(e) => {
                           setTargets(prev => ({
                             ...prev,
-                            meetings_attended: {
-                              ...prev.meetings_attended,
-                              poa_generated: parseInt(e.target.value) || 0
+                            meetings_attended_tab: {
+                              ...prev.meetings_attended_tab,
+                              poa_generated_target: parseInt(e.target.value) || 0
                             }
                           }));
                         }}
-                        
-                          className="mt-1"
+                        className="mt-1"
                       />
-                      <p className="text-xs text-gray-500 mt-1">POA generated from intros</p>
+                      <p className="text-xs text-gray-500 mt-1">Displayed directly in dashboard (no period multiplication)</p>
                     </div>
                     <div>
-                      <Label htmlFor="deals_closed_target">Deals Closed (Monthly)</Label>
+                      <Label htmlFor="deals_closed_tab">Deals Closed Target</Label>
                       <Input
-                        id="deals_closed_target"
+                        id="deals_closed_tab"
                         type="number"
-                        value={targets?.meetings_attended?.deals_closed || 0}
+                        value={targets?.meetings_attended_tab?.deals_closed_target || 0}
                         onChange={(e) => {
                           setTargets(prev => ({
                             ...prev,
-                            meetings_attended: {
-                              ...prev.meetings_attended,
-                              deals_closed: parseInt(e.target.value) || 0
+                            meetings_attended_tab: {
+                              ...prev.meetings_attended_tab,
+                              deals_closed_target: parseInt(e.target.value) || 0
                             }
                           }));
                         }}
-                        
-                          className="mt-1"
+                        className="mt-1"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Total deals closed target</p>
+                      <p className="text-xs text-gray-500 mt-1">Displayed directly in dashboard (no period multiplication)</p>
                     </div>
                   </div>
                   
@@ -893,15 +890,15 @@ function AdminTargetsPage() {
                     <div className="text-sm font-semibold mb-2">Preview Banner:</div>
                     <div className="grid grid-cols-3 gap-4 text-sm">
                       <div className="border p-3 rounded bg-white">
-                        <div className="font-semibold text-lg">_/{targets?.meetings_attended?.meetings_scheduled || 0}</div>
+                        <div className="font-semibold text-lg">_/{targets?.meetings_attended_tab?.meetings_scheduled_target || 0}</div>
                         <div className="text-gray-600">Meetings Scheduled</div>
                       </div>
                       <div className="border p-3 rounded bg-white">
-                        <div className="font-semibold text-lg">_/{targets?.meetings_attended?.poa_generated || 0}</div>
+                        <div className="font-semibold text-lg">_/{targets?.meetings_attended_tab?.poa_generated_target || 0}</div>
                         <div className="text-gray-600">POA Generated</div>
                       </div>
                       <div className="border p-3 rounded bg-white">
-                        <div className="font-semibold text-lg">_/{targets?.meetings_attended?.deals_closed || 0}</div>
+                        <div className="font-semibold text-lg">_/{targets?.meetings_attended_tab?.deals_closed_target || 0}</div>
                         <div className="text-gray-600">Deals Closed</div>
                       </div>
                     </div>
