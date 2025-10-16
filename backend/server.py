@@ -2546,7 +2546,7 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
         
         # Generate all analytics sections
         meeting_generation = calculate_meeting_generation(df, month_start, month_end, view_targets)
-        meetings_attended = calculate_meetings_attended(df, month_start, month_end)
+        meetings_attended = calculate_meetings_attended(df, month_start, month_end, view_targets)
         ae_performance = calculate_ae_performance(df, month_start, month_end)
         deals_closed = calculate_deals_closed(df, month_start, month_end, view_targets)
         pipe_metrics = calculate_pipe_metrics(df, month_start, month_end)
