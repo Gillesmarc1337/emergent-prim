@@ -779,7 +779,7 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
               unit="$"
               icon={TrendingUp}
               color="purple"
-              monthlyAverage={Math.round(dynamicNewPipeTarget / periodMonths)}
+              monthlyAverage={Math.round(newPipeCreated / periodMonths)}
               periodMonths={periodMonths}
             />
             <MetricCard
@@ -789,7 +789,7 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
               unit="$"
               icon={Target}
               color="blue"
-              monthlyAverage={Math.round(dynamicWeightedPipeTarget / periodMonths)}
+              monthlyAverage={Math.round(weightedPipe / periodMonths)}
               periodMonths={periodMonths}
             />
             <MetricCard
