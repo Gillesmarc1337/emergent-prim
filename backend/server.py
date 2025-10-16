@@ -1459,8 +1459,9 @@ async def update_view_targets(
         {"$set": {"targets": targets}}
     )
     
-    if result.modified_count == 0:
-        raise HTTPException(status_code=400, detail="Failed to update targets")
+    # Check if view was found (matched_count)
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="View not found")
     
     return {"message": "Targets updated successfully", "targets": targets}
 
