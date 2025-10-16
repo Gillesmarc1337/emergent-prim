@@ -868,7 +868,7 @@ function AdminTargetsPage() {
                 </AlertDescription>
               </Alert>
 
-              {/* MEETINGS ATTENDED TAB - Deals Closed Current Period */}
+              {/* MEETINGS ATTENDED TAB - Deals Closed (Current Period) */}
               <Card className="border-orange-200">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
