@@ -191,7 +191,9 @@ function AdminTargetsPage() {
         dashboard_bottom_cards: {
           new_pipe_created: 0,
           created_weighted_pipe: 0,
-          ytd_revenue: 0
+          ytd_revenue: 0,
+          ytd_aggregate_pipeline: 0,
+          ytd_cumulative_weighted: 0
         },
         meeting_generation: {
           total_target: 0,
