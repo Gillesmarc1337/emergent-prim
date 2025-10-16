@@ -278,16 +278,8 @@ function AdminTargetsPage() {
   const handleSave = async () => {
     if (!selectedView || !targets) return;
 
-    // Prevent saving for Master view (it's auto-calculated)
     const isMasterView = selectedView.name === 'Master';
-    if (isMasterView) {
-      setMessage({ 
-        type: 'info', 
-        text: 'Master view targets are auto-calculated from other views. Edit individual views instead.' 
-      });
-      return;
-    }
-
+    
     setSaving(true);
     setMessage(null);
 
@@ -298,7 +290,14 @@ function AdminTargetsPage() {
         { withCredentials: true }
       );
       
-      setMessage({ type: 'success', text: 'Targets updated successfully!' });
+      if (isMasterView) {
+        setMessage({ 
+          type: 'success', 
+          text: 'Master targets saved! These manual values will override auto-calculated aggregates.' 
+        });
+      } else {
+        setMessage({ type: 'success', text: 'Targets updated successfully!' });
+      }
       
       // Clear message after 3 seconds
       setTimeout(() => setMessage(null), 3000);
