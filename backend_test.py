@@ -6584,9 +6584,9 @@ def test_back_office_targets_final_verification():
     return passed_tests == total_tests
 
 def main():
-    """Main test execution"""
+    """Main test execution - FINAL VERIFICATION: Back Office Targets Display"""
     print(f"{'='*100}")
-    print(f"🚀 MEETINGS ATTENDED TARGETS TESTING")
+    print(f"🎯 FINAL VERIFICATION: BACK OFFICE TARGETS DISPLAY IN DASHBOARD")
     print(f"{'='*100}")
     print(f"🌐 Testing against: {BASE_URL}")
     print(f"⏰ Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -6596,7 +6596,18 @@ def main():
         print(f"\n❌ CRITICAL: Cannot connect to API - stopping tests")
         return False
     
-    # Run the specific Meetings Attended targets fix test
+    # PRIORITY TEST: Back Office Targets Final Verification
+    print(f"\n{'='*80}")
+    print(f"🎯 PRIORITY: BACK OFFICE TARGETS FINAL VERIFICATION")
+    print(f"{'='*80}")
+    
+    back_office_verification_passed = test_back_office_targets_final_verification()
+    
+    # Also run the specific Meetings Attended targets fix test for completeness
+    print(f"\n{'='*80}")
+    print(f"🔄 ADDITIONAL: MEETINGS ATTENDED TARGETS FIX VERIFICATION")
+    print(f"{'='*80}")
+    
     meetings_attended_success = test_meetings_attended_targets_fix()
     
     # Final summary
