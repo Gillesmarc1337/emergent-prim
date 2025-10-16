@@ -740,15 +740,15 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
         const baseNewPipeMonthlyTarget = 2000000; // $2M per month
         const baseWeightedPipeMonthlyTarget = 800000; // $800K per month
         
+        // Use the actual period months passed from Dashboard component (calculated from date range/view mode)
+        const periodMonths = actualPeriodMonths || 1;
+        
         // Get backend target which is already multiplied by period months
-        const backendPipeTarget = analytics.dashboard_blocks?.block_3_pipe_creation?.target_pipe_created || baseNewPipeMonthlyTarget;
+        const backendPipeTarget = analytics.dashboard_blocks?.block_3_pipe_creation?.target_pipe_created || (baseNewPipeMonthlyTarget * periodMonths);
         
-        // Calculate number of months from backend target (target / 2M base)
-        const periodMonths = backendPipeTarget / baseNewPipeMonthlyTarget;
-        
-        // Calculate dynamic targets based on period
-        const dynamicNewPipeTarget = backendPipeTarget; // Use backend's dynamic target
-        const dynamicWeightedPipeTarget = baseWeightedPipeMonthlyTarget * periodMonths; // 800K × months
+        // Calculate dynamic targets based on actual period
+        const dynamicNewPipeTarget = baseNewPipeMonthlyTarget * periodMonths; // 2M × actual months
+        const dynamicWeightedPipeTarget = baseWeightedPipeMonthlyTarget * periodMonths; // 800K × actual months
         
         // Use data from dashboardData which is loaded with view_id
         // New Pipe Created and Weighted Pipe should come from dashboardData, not analytics prop
