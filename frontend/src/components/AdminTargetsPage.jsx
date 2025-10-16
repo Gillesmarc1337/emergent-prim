@@ -916,57 +916,57 @@ function AdminTargetsPage() {
                 </AlertDescription>
               </Alert>
 
-              {/* MEETINGS ATTENDED TAB - Deals Closed (Current Period) */}
+              {/* DEALS & PIPELINE TAB - NEW Direct Tab Targets for Deals Closed */}
               <Card className="border-orange-200">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-semibold rounded">MEETINGS ATTENDED TAB</span>
-                    Deals Closed (Current Period)
+                    <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-semibold rounded">DEALS & PIPELINE TAB</span>
+                    Deals Closed Display Targets
                   </CardTitle>
                   <CardDescription>
-                    Configure targets for Deals Closed and ARR Closed for the current period (monthly selection)
+                    Configure DIRECT display targets for Deals Closed banner (shown as-is, no multiplication)
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="deals_closed_current">Deals Closed Target</Label>
+                      <Label htmlFor="deals_closed_tab_target">Deals Closed Target</Label>
                       <Input
-                        id="deals_closed_current"
+                        id="deals_closed_tab_target"
                         type="number"
-                        value={targets?.deals_closed_current_period?.deals_target || 0}
+                        value={targets?.deals_closed_tab?.deals_closed_target || 0}
                         onChange={(e) => {
                           setTargets(prev => ({
                             ...prev,
-                            deals_closed_current_period: {
-                              ...prev.deals_closed_current_period,
-                              deals_target: parseInt(e.target.value) || 0
+                            deals_closed_tab: {
+                              ...prev.deals_closed_tab,
+                              deals_closed_target: parseInt(e.target.value) || 0
                             }
                           }));
                         }}
                         className="mt-1"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Number of deals to close in the current period</p>
+                      <p className="text-xs text-gray-500 mt-1">Displayed directly in dashboard banner (no period multiplication)</p>
                     </div>
                     <div>
-                      <Label htmlFor="arr_closed_current">ARR Closed Target</Label>
+                      <Label htmlFor="arr_closed_tab_target">ARR Closed Target</Label>
                       <Input
-                        id="arr_closed_current"
+                        id="arr_closed_tab_target"
                         type="number"
-                        value={targets?.deals_closed_current_period?.arr_target || 0}
+                        value={targets?.deals_closed_tab?.arr_closed_target || 0}
                         onChange={(e) => {
                           setTargets(prev => ({
                             ...prev,
-                            deals_closed_current_period: {
-                              ...prev.deals_closed_current_period,
-                              arr_target: parseInt(e.target.value) || 0
+                            deals_closed_tab: {
+                              ...prev.deals_closed_tab,
+                              arr_closed_target: parseInt(e.target.value) || 0
                             }
                           }));
                         }}
                         className="mt-1"
                         step="10000"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Total ARR target in $ for current period (e.g., 500000 for $500K)</p>
+                      <p className="text-xs text-gray-500 mt-1">Displayed directly in dashboard banner (no period multiplication)</p>
                     </div>
                   </div>
                   
@@ -974,14 +974,12 @@ function AdminTargetsPage() {
                     <div className="text-sm font-semibold mb-2">Preview Banner:</div>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div className="border p-3 rounded bg-white">
-                        <div className="font-semibold text-lg">_/{targets?.deals_closed_current_period?.deals_target || 0}</div>
+                        <div className="font-semibold text-lg">_/{targets?.deals_closed_tab?.deals_closed_target || 0}</div>
                         <div className="text-gray-600">Deals Closed</div>
-                        <div className="text-xs text-gray-500">Target: {targets?.deals_closed_current_period?.deals_target || 0}</div>
                       </div>
                       <div className="border p-3 rounded bg-white">
-                        <div className="font-semibold text-lg">$_/${(targets?.deals_closed_current_period?.arr_target || 0).toLocaleString()}</div>
+                        <div className="font-semibold text-lg">$_/${(targets?.deals_closed_tab?.arr_closed_target || 0).toLocaleString()}</div>
                         <div className="text-gray-600">ARR Closed</div>
-                        <div className="text-xs text-gray-500">Target: ${(targets?.deals_closed_current_period?.arr_target || 0).toLocaleString()}</div>
                       </div>
                     </div>
                   </div>
