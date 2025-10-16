@@ -1174,6 +1174,19 @@ function Dashboard() {
   
   // State for Upsell & Renew tab
   const [upsellRenewData, setUpsellRenewData] = useState(null);
+  
+  // NEW: Tab targets (direct from BO, no multiplication)
+  const [tabTargets, setTabTargets] = useState({
+    meetings_attended_tab: {
+      meetings_scheduled_target: 50,
+      poa_generated_target: 18,
+      deals_closed_target: 6
+    },
+    deals_closed_tab: {
+      deals_closed_target: 10,
+      arr_closed_target: 500000
+    }
+  });
 
   // Helper function to get view-specific targets or fall back to defaults
   const getViewTargets = () => {
