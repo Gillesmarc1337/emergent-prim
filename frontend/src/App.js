@@ -897,7 +897,7 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
             />
             <MetricCard
               title="Jul-Dec Closed 2025"
-              value={dashboardData.key_metrics.ytd_closed_2025}
+              value={dashboardData.key_metrics.ytd_revenue}
               target={dashboardData.key_metrics.annual_target_2025}
               unit="$"
               icon={CheckCircle2}
@@ -905,7 +905,7 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
             />
             <MetricCard
               title="Remaining H2 Target"
-              value={dashboardData.key_metrics.annual_target_2025 - dashboardData.key_metrics.ytd_closed_2025}
+              value={dashboardData.key_metrics.annual_target_2025 - dashboardData.key_metrics.ytd_revenue}
               unit="$"
               icon={AlertCircle}
               color="orange"
