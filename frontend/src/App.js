@@ -2232,7 +2232,7 @@ function Dashboard() {
                        ' (Current Month)'}
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
-                      Targets from Back Office (shown as-is, no period multiplication)
+                      Monthly targets from Back Office × Period duration
                     </div>
                   </div>
 
