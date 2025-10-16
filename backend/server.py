@@ -2087,7 +2087,7 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
         meeting_generation = calculate_meeting_generation(df, july_dec_start, july_dec_end, view_targets)
         meetings_attended = calculate_meetings_attended(df, july_dec_start, july_dec_end)
         ae_performance = calculate_ae_performance(df, july_dec_start, july_dec_end)
-        deals_closed = calculate_deals_closed(df, july_dec_start, july_dec_end)
+        deals_closed = calculate_deals_closed(df, july_dec_start, july_dec_end, view_targets)
         pipe_metrics = calculate_pipe_metrics(df, july_dec_start, july_dec_end)
         closing_projections = calculate_closing_projections(df)
         
