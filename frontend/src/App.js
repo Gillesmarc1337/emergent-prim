@@ -1069,7 +1069,7 @@ function MainDashboard({ analytics, currentView }) {
             </CardContent>
           </Card>
 
-          {/* Block 5: Deals Closed (Current Period) - Uses BO targets */}
+          {/* Block 5: Deals Closed (Current Period) - Uses NEW tab targets from BO */}
           {analytics.deals_closed_current_period && (
             <Card className="border-2 border-blue-200 bg-blue-50">
               <CardHeader className="pb-3">
@@ -1086,7 +1086,7 @@ function MainDashboard({ analytics, currentView }) {
                     </div>
                     <div className="text-sm text-gray-600 mt-1">Deals Closed</div>
                     <div className="text-xs text-gray-500 mt-1">
-                      Target: {analytics.deals_closed_current_period?.target_deals || 0}
+                      Target: {tabTargets.deals_closed_tab.deals_closed_target || 0}
                     </div>
                   </div>
                   <div className="text-center bg-white p-3 rounded-lg">
@@ -1095,7 +1095,7 @@ function MainDashboard({ analytics, currentView }) {
                     </div>
                     <div className="text-sm text-gray-600 mt-1">ARR Closed</div>
                     <div className="text-xs text-gray-500 mt-1">
-                      Target: ${analytics.deals_closed_current_period?.target_arr ? (analytics.deals_closed_current_period.target_arr / 1000000).toFixed(1) + 'M' : '0'}
+                      Target: ${tabTargets.deals_closed_tab.arr_closed_target ? (tabTargets.deals_closed_tab.arr_closed_target / 1000000).toFixed(1) + 'M' : '0'}
                     </div>
                   </div>
                 </div>
@@ -1103,14 +1103,14 @@ function MainDashboard({ analytics, currentView }) {
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
                     <div 
                       className={`h-2.5 rounded-full transition-all ${
-                        analytics.deals_closed_current_period?.deals_closed >= analytics.deals_closed_current_period?.target_deals 
+                        analytics.deals_closed_current_period?.deals_closed >= tabTargets.deals_closed_tab.deals_closed_target 
                           ? 'bg-green-500' 
                           : 'bg-orange-500'
                       }`}
                       style={{ 
                         width: `${Math.min(
-                          analytics.deals_closed_current_period?.target_deals 
-                            ? (analytics.deals_closed_current_period.deals_closed / analytics.deals_closed_current_period.target_deals * 100) 
+                          tabTargets.deals_closed_tab.deals_closed_target 
+                            ? (analytics.deals_closed_current_period.deals_closed / tabTargets.deals_closed_tab.deals_closed_target * 100) 
                             : 0, 
                           100
                         )}%` 
@@ -1118,8 +1118,8 @@ function MainDashboard({ analytics, currentView }) {
                     ></div>
                   </div>
                   <div className="text-center text-sm font-semibold text-gray-700 mt-2">
-                    {analytics.deals_closed_current_period?.target_deals 
-                      ? ((analytics.deals_closed_current_period.deals_closed / analytics.deals_closed_current_period.target_deals * 100).toFixed(1)) 
+                    {tabTargets.deals_closed_tab.deals_closed_target 
+                      ? ((analytics.deals_closed_current_period.deals_closed / tabTargets.deals_closed_tab.deals_closed_target * 100).toFixed(1)) 
                       : 0}% of target
                   </div>
                 </div>
