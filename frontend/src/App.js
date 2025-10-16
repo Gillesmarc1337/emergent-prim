@@ -661,7 +661,8 @@ function MainDashboard({ analytics, currentView, tabTargets }) {
     'Closed Revenue': true,
     'Target Revenue': false,  // Hidden by default
     'New Weighted Pipe': false,  // Hidden by default  
-    'Aggregate Weighted Pipe': true
+    'Aggregate Weighted Pipe': true,
+    'Created Pipe': false  // Hidden by default
   });
 
   const loadDashboard = async () => {
