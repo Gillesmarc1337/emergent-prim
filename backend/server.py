@@ -198,6 +198,12 @@ def map_admin_targets_to_analytics_format(admin_targets: dict) -> dict:
     # Map meetings_attended
     if "meetings_attended" in admin_targets:
         meetings_att = admin_targets["meetings_attended"]
+        if "meetings_scheduled" in meetings_att and meetings_att["meetings_scheduled"] > 0:
+            # Store meetings_scheduled in meeting_attended for the calculate function to use
+            mapped_targets["meeting_attended"]["meetings_scheduled"] = meetings_att["meetings_scheduled"]
+            # Also use it as intro target if intro hasn't been set
+            if mapped_targets["meeting_generation"]["intro"] == 45:  # Still default
+                mapped_targets["meeting_generation"]["intro"] = meetings_att["meetings_scheduled"]
         if "poa_generated" in meetings_att and meetings_att["poa_generated"] > 0:
             mapped_targets["meeting_attended"]["poa"] = meetings_att["poa_generated"]
         if "deals_closed" in meetings_att and meetings_att["deals_closed"] > 0:
