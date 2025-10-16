@@ -1119,7 +1119,7 @@ function Dashboard() {
 
     window.addEventListener('viewConfigUpdated', handleConfigUpdate);
     return () => window.removeEventListener('viewConfigUpdated', handleConfigUpdate);
-  }, [viewMode, monthOffset]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [viewMode, monthOffset]);
   
   // New states for projections
   const [hotDeals, setHotDeals] = useState([]);
