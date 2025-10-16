@@ -578,6 +578,24 @@ frontend:
         - working: true
           agent: "testing"
           comment: "✅ MASTER VIEW TARGETS CONFIGURATION TESTING COMPLETE - ALL REQUIREMENTS VERIFIED: Comprehensive testing of Master view targets configuration as requested in review. VERIFIED FUNCTIONALITY: 1) Demo login successful (demo@primelis.com, viewer role). 2) Master view found (ID: view-master-1760356092, is_master: true). 3) GET /api/views/{master_view_id}/config successfully retrieved Master view configuration with targets. 4) ALL TARGETS SET TO 150 AS EXPECTED: revenue_2025.jan=150, dashboard_bottom_cards.new_pipe_created=150, meeting_generation.total_target=150, meetings_attended.meetings_scheduled=150, deals_closed_yearly.deals_target=150. 5) Analytics endpoint GET /api/analytics/monthly?view_id={master_view_id} working correctly and using manual targets (150) where configured: block_1_meetings.inbound_target=150, block_1_meetings.outbound_target=150, block_1_meetings.referral_target=150, block_2_intro_poa.poa_target=150, block_3_pipe_creation.target_pipe_created=150, block_4_revenue.revenue_target=150, block_5_upsells.closing_target=150. 6) Master view data aggregation confirmed working (data from Signal + Full Funnel + Market + Organic views). CONCLUSION: Master view targets configuration is working correctly - manual targets override auto-aggregated values as expected, while data remains auto-aggregated from other views."
+        - working: false
+          agent: "user"
+          comment: "User reported that Master view targets set to 150 are not reflecting in the dashboard. Screenshot provided shows targets are still showing old values instead of 150."
+        - working: "NA"
+          agent: "main"
+          comment: "CRITICAL BUG IDENTIFIED: Admin Back Office uses new target key structure (revenue_2025.{month}, meeting_generation.total_target, dashboard_bottom_cards.*) but backend analytics functions expect old key structure (dashboard.objectif_6_mois, meeting_generation.intro, etc). Created comprehensive mapping function map_admin_targets_to_analytics_format() to translate between formats. Updated get_view_config_with_defaults() to apply mapping before returning targets. Master view auto-aggregation also applies mapping to each view. Ready for backend testing to verify mapping works correctly."
+
+  - task: "Target key mapping between Admin BO and analytics functions"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ BACKEND TARGET KEY MAPPING IMPLEMENTED: Created comprehensive mapping function 'map_admin_targets_to_analytics_format()' in server.py (lines 107-235) to translate Admin Back Office's new target structure to the analytics format. MAPPING LOGIC: 1) revenue_2025.{months} → dashboard.objectif_6_mois (sums all 12 months). 2) deals_closed_yearly.deals_target → dashboard.deals (divides by 12 for monthly). 3) dashboard_bottom_cards.new_pipe_created → dashboard.new_pipe_created. 4) dashboard_bottom_cards.created_weighted_pipe → dashboard.weighted_pipe. 5) intro_poa.intro → meeting_generation.intro. 6) intro_poa.poa → meeting_attended.poa. 7) meeting_generation keys (inbound, outbound, referral, upsells_cross) map with name changes (referral→referrals, upsells_cross→upsells_x). 8) meetings_attended.poa_generated → meeting_attended.poa. 9) meetings_attended.deals_closed preserved. Function includes logic to detect if targets are already in old format (checks for dashboard.objectif_6_mois) and returns as-is if true. Updated get_view_config_with_defaults() to apply mapping to all view targets before returning. Master view auto-aggregation now also applies mapping to each view before summing. Test script successfully set Master view targets to 150 for all fields. Backend restarted successfully. Needs comprehensive testing to verify mapping works for Master view and dashboard displays correct target values (150)."
 
 metadata:
   created_by: "main_agent"
