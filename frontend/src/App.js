@@ -1802,7 +1802,7 @@ function Dashboard() {
 
         {/* Main Dashboard */}
         <TabsContent value="dashboard">
-          <MainDashboard analytics={analytics} currentView={currentView} />
+          <MainDashboard analytics={analytics} currentView={currentView} tabTargets={tabTargets} />
         </TabsContent>
 
         {/* Meetings Generation */}
