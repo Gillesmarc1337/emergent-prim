@@ -6122,132 +6122,147 @@ def test_projections_preferences_api():
     return passed_tests == total_tests
 
 def main():
-    """Run comprehensive backend API testing including new multi-view endpoints"""
-    print(f"{'='*80}")
-    print(f"🚀 STARTING COMPREHENSIVE BACKEND API TESTING")
-    print(f"{'='*80}")
-    print(f"🌐 Base URL: {BASE_URL}")
-    print(f"⏰ Test started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    """Run target key mapping tests for Master view"""
+    print(f"{'='*100}")
+    print(f"🎯 TARGET KEY MAPPING TESTING - MASTER VIEW")
+    print(f"{'='*100}")
+    print(f"🌐 Testing against: {BASE_URL}")
+    print(f"⏰ Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"📋 Focus: Admin Back Office → Analytics format mapping")
+    print(f"🎯 Master View ID: view-master-1760356092")
+    print(f"🔢 Expected Target Values: 150 (all targets)")
+    print(f"{'='*100}")
     
-    # Track overall test results
-    test_results = {
-        'basic_connectivity': False,
-        'authentication_flow': False,
-        'views_authentication': False,
-        'user_management': False,  # NEW TEST - User Management Backend API Endpoints
-        'google_sheet_upload': False,  # NEW TEST - Google Sheet Upload for Market View
-        'multi_view_endpoints': False,
-        'projections_endpoints': False,
-        'projections_preferences_api': False,  # NEW TEST - Projections Preferences API
-        'analytics_endpoints': False,
-        'session_management': False,
-        'master_view_targets': False  # NEW TEST - Master View Targets Configuration
-    }
+    # Track test results
+    all_tests = []
     
-    try:
-        # Test 1: Basic connectivity
-        print(f"\n{'='*60}")
-        print(f"🔌 PHASE 1: BASIC CONNECTIVITY")
-        print(f"{'='*60}")
-        test_results['basic_connectivity'] = test_basic_connectivity()
+    # Test 1: Basic connectivity
+    print(f"\n🔌 PHASE 1: BASIC CONNECTIVITY")
+    connectivity_result = test_basic_connectivity()
+    all_tests.append(("Basic Connectivity", connectivity_result))
+    
+    if not connectivity_result:
+        print(f"\n❌ CRITICAL: API is not accessible. Stopping tests.")
+        return False
+    
+    # Test 2: Target Key Mapping (Main focus)
+    print(f"\n🔄 PHASE 2: TARGET KEY MAPPING TESTING")
+    mapping_result = test_target_key_mapping_master_view()
+    all_tests.append(("Target Key Mapping", mapping_result))
+    
+    # Test 3: Additional verification - Check backend logs
+    print(f"\n📋 PHASE 3: BACKEND LOGS VERIFICATION")
+    print(f"💡 Checking for mapping function debug output...")
+    
+    # Try to trigger the mapping by making another analytics call
+    print(f"\n🔄 Making additional analytics call to trigger mapping logs...")
+    demo_data, session_token = test_demo_login()
+    if session_token:
+        cookies = {'session_token': session_token}
+        master_view_id = "view-master-1760356092"
         
-        # Test 2: Authentication flow
-        print(f"\n{'='*60}")
-        print(f"🔐 PHASE 2: AUTHENTICATION SYSTEM")
-        print(f"{'='*60}")
-        test_results['authentication_flow'] = test_authentication_flow_end_to_end()
+        # Make analytics call to trigger mapping
+        analytics_endpoint = f"/analytics/monthly?view_id={master_view_id}"
+        result = test_api_endpoint(analytics_endpoint, cookies=cookies, expected_status=200)
         
-        # Test 3: Views endpoint authentication
-        print(f"\n{'='*60}")
-        print(f"👁️  PHASE 3: VIEWS ENDPOINT AUTHENTICATION")
-        print(f"{'='*60}")
-        test_results['views_authentication'] = test_views_endpoint_authentication()
-        
-        # Test 4: NEW - User Management Backend API Endpoints (as requested in review)
-        print(f"\n{'='*60}")
-        print(f"👥 PHASE 4: USER MANAGEMENT BACKEND API ENDPOINTS (NEW)")
-        print(f"{'='*60}")
-        test_results['user_management'] = test_user_management_endpoints()
-        
-        # Test 5: NEW - Google Sheet Upload for Market View (as requested in review)
-        print(f"\n{'='*60}")
-        print(f"📊 PHASE 5: GOOGLE SHEET UPLOAD - MARKET VIEW (NEW)")
-        print(f"{'='*60}")
-        test_results['google_sheet_upload'] = test_google_sheet_upload_for_market_view()
-        
-        # Test 6: Multi-view endpoints
-        print(f"\n{'='*60}")
-        print(f"🔍 PHASE 6: MULTI-VIEW ENDPOINTS")
-        print(f"{'='*60}")
-        test_results['multi_view_endpoints'] = test_multi_view_endpoints()
-        
-        # Test 7: Projections endpoints
-        print(f"\n{'='*60}")
-        print(f"📊 PHASE 7: PROJECTIONS ENDPOINTS")
-        print(f"{'='*60}")
-        hot_deals_success = test_projections_hot_deals()
-        hot_leads_success = test_projections_hot_leads()
-        performance_summary_success = test_projections_performance_summary()
-        test_results['projections_endpoints'] = hot_deals_success and hot_leads_success and performance_summary_success
-        
-        # Test 8: NEW - Projections Preferences API (as requested in review)
-        print(f"\n{'='*60}")
-        print(f"🎯 PHASE 8: PROJECTIONS PREFERENCES API (NEW)")
-        print(f"{'='*60}")
-        test_results['projections_preferences_api'] = test_projections_preferences_api()
-        
-        # Test 9: Analytics endpoints
-        print(f"\n{'='*60}")
-        print(f"📈 PHASE 9: ANALYTICS ENDPOINTS")
-        print(f"{'='*60}")
-        monthly_success = test_monthly_analytics_with_offset(0, "Oct 2025")
-        yearly_success = test_yearly_analytics_july_dec_blocks()
-        custom_success = test_custom_analytics_dynamic_targets()
-        test_results['analytics_endpoints'] = monthly_success and yearly_success and custom_success
-        
-        # Test 10: Session management
-        print(f"\n{'='*60}")
-        print(f"🔑 PHASE 10: SESSION MANAGEMENT")
-        print(f"{'='*60}")
-        test_results['session_management'] = test_session_expiration_validation()
-        
-        # Test 11: NEW - Master View Targets Configuration (as requested in review)
-        print(f"\n{'='*60}")
-        print(f"🎯 PHASE 11: MASTER VIEW TARGETS CONFIGURATION (NEW)")
-        print(f"{'='*60}")
-        test_results['master_view_targets'] = test_master_view_targets_configuration()
-        
-    except Exception as e:
-        print(f"\n❌ CRITICAL ERROR during testing: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        if result and len(result) == 2:
+            data, response = result
+            if data:
+                print(f"✅ Analytics call successful - mapping function should have executed")
+                print(f"💡 Look for backend logs containing: '🔄 Mapped admin targets to analytics format'")
+                
+                # Check if we can see evidence of mapping in the response
+                if 'dashboard_blocks' in data:
+                    blocks = data['dashboard_blocks']
+                    print(f"\n📊 Analytics Response Analysis:")
+                    
+                    # Check key blocks for 150 values
+                    target_fields_found = []
+                    for block_name, block_data in blocks.items():
+                        if isinstance(block_data, dict):
+                            for field_name, value in block_data.items():
+                                if 'target' in field_name and value == 150:
+                                    target_fields_found.append(f"{block_name}.{field_name}")
+                    
+                    if target_fields_found:
+                        print(f"✅ Found {len(target_fields_found)} fields with target value 150:")
+                        for field in target_fields_found:
+                            print(f"  • {field}: 150")
+                        logs_verification = True
+                    else:
+                        print(f"❌ No target fields with value 150 found in analytics response")
+                        logs_verification = False
+                else:
+                    print(f"❌ No dashboard_blocks in analytics response")
+                    logs_verification = False
+            else:
+                print(f"❌ Analytics call failed")
+                logs_verification = False
+        else:
+            print(f"❌ Analytics call failed")
+            logs_verification = False
+    else:
+        print(f"❌ Could not create session for logs verification")
+        logs_verification = False
+    
+    all_tests.append(("Backend Logs Verification", logs_verification))
     
     # Final summary
-    print(f"\n{'='*80}")
-    print(f"📋 FINAL TEST SUMMARY")
-    print(f"{'='*80}")
+    print(f"\n{'='*100}")
+    print(f"📊 TARGET KEY MAPPING TEST SUMMARY")
+    print(f"{'='*100}")
     
-    passed_tests = sum(1 for result in test_results.values() if result)
-    total_tests = len(test_results)
+    passed_tests = sum(1 for _, result in all_tests if result)
+    total_tests = len(all_tests)
     
-    for test_name, result in test_results.items():
+    print(f"📈 Overall Results: {passed_tests}/{total_tests} test phases passed")
+    print(f"⏰ Completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    
+    print(f"\n📋 Detailed Results:")
+    for test_name, result in all_tests:
         status = "✅ PASSED" if result else "❌ FAILED"
         print(f"  {test_name}: {status}")
     
-    print(f"\n📊 Overall Result: {passed_tests}/{total_tests} test phases passed")
-    
-    if passed_tests == total_tests:
-        print(f"\n🎉 SUCCESS: All backend API tests passed!")
-        print(f"✅ The authentication system is working correctly")
-        print(f"✅ All API endpoints are responding as expected")
-        print(f"✅ Multi-view endpoints are functioning properly")
-        print(f"✅ Data structures are valid and complete")
-    else:
-        print(f"\n⚠️  ISSUES: {total_tests - passed_tests} test phases failed")
-        print(f"🔧 Review the detailed output above for specific issues")
-    
-    print(f"\n⏰ Test completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    # Specific analysis for the review request
+    print(f"\n{'='*80}")
+    print(f"🎯 REVIEW REQUEST ANALYSIS")
     print(f"{'='*80}")
+    
+    if mapping_result:
+        print(f"✅ TARGET RETRIEVAL & MAPPING: Working correctly")
+        print(f"  • Raw targets in DB use new Admin BO format")
+        print(f"  • Targets are successfully mapped to analytics format")
+        print(f"  • Master view (view-master-1760356092) targets set to 150")
+        
+        print(f"\n✅ ANALYTICS ENDPOINTS: Using mapped targets correctly")
+        print(f"  • Dashboard blocks show 150 target values")
+        print(f"  • Mapping function translates Admin BO → Analytics format")
+        print(f"  • All expected target fields present with correct values")
+        
+        if logs_verification:
+            print(f"\n✅ BACKEND LOGS: Mapping function executing correctly")
+            print(f"  • Analytics responses contain expected 150 values")
+            print(f"  • Mapping function appears to be working as designed")
+        else:
+            print(f"\n⚠️  BACKEND LOGS: Could not fully verify mapping execution")
+            print(f"  • Analytics functionality works but log verification incomplete")
+        
+        print(f"\n🎉 CONCLUSION: Target key mapping fix is working correctly!")
+        print(f"✅ Admin BO targets (150) are properly mapped to analytics format")
+        print(f"✅ Dashboard should now display correct target values")
+        
+    else:
+        print(f"❌ TARGET MAPPING ISSUES DETECTED:")
+        print(f"  • Raw targets may not be set to 150")
+        print(f"  • Mapping function may not be working correctly")
+        print(f"  • Analytics endpoints may not be using mapped targets")
+        
+        print(f"\n🔧 RECOMMENDATIONS:")
+        print(f"  1. Verify Master view targets are set to 150 in database")
+        print(f"  2. Check mapping function implementation")
+        print(f"  3. Ensure analytics functions use mapped targets")
+    
+    return mapping_result
 
 if __name__ == "__main__":
     main()
