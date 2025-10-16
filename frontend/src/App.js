@@ -1287,12 +1287,17 @@ function Dashboard() {
         .filter(d => d.column === 'next60')
         .map((d, index) => ({ id: d.id, hidden: hiddenDealsSet.has(d.id), order: index }));
       
+      const delayedDeals = dealsData
+        .filter(d => d.column === 'delayed')
+        .map((d, index) => ({ id: d.id, hidden: hiddenDealsSet.has(d.id), order: index }));
+      
       await axios.post(`${API}/user/projections-preferences`, {
         view_id: currentView.id,
         preferences: {
           next14: next14Deals,
           next30: next30Deals,
-          next60: next60Deals
+          next60: next60Deals,
+          delayed: delayedDeals
         }
       }, {
         withCredentials: true
