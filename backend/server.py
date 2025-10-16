@@ -181,6 +181,24 @@ def map_admin_targets_to_analytics_format(admin_targets: dict) -> dict:
         if "poa" in intro_poa and intro_poa["poa"] > 0:
             mapped_targets["meeting_attended"]["poa"] = intro_poa["poa"]
     
+    # Map dashboard_banners (NEW from Admin BO Row 2 cards)
+    if "dashboard_banners" in admin_targets:
+        banners = admin_targets["dashboard_banners"]
+        if "intro_target" in banners and banners["intro_target"] > 0:
+            mapped_targets["meeting_generation"]["intro"] = banners["intro_target"]
+        if "poa_target" in banners and banners["poa_target"] > 0:
+            mapped_targets["meeting_attended"]["poa"] = banners["poa_target"]
+        if "meetings_generation_target" in banners and banners["meetings_generation_target"] > 0:
+            # Total meetings target can be used for validation
+            pass
+        if "new_pipe_target" in banners and banners["new_pipe_target"] > 0:
+            mapped_targets["dashboard"]["new_pipe_created"] = banners["new_pipe_target"]
+        if "deals_closed_count" in banners and banners["deals_closed_count"] > 0:
+            mapped_targets["dashboard"]["deals"] = banners["deals_closed_count"]
+        if "deals_closed_arr" in banners and banners["deals_closed_arr"] > 0:
+            # Store ARR target if needed
+            pass
+    
     # Map meeting_generation (new format keeps most of the same keys)
     if "meeting_generation" in admin_targets:
         meeting_gen = admin_targets["meeting_generation"]
