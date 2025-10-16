@@ -104,6 +104,112 @@ def convert_numpy_types(obj):
     else:
         return obj
 
+def map_admin_targets_to_analytics_format(admin_targets: dict) -> dict:
+    """
+    Map Admin Back Office target structure to analytics format expected by calculation functions
+    
+    Admin BO uses:
+        - revenue_2025.{month}
+        - dashboard_bottom_cards.new_pipe_created, created_weighted_pipe, ytd_revenue
+        - meeting_generation.total_target, inbound, outbound, referral, upsells_cross
+        - intro_poa.intro, poa
+        - meetings_attended.meetings_scheduled, poa_generated, deals_closed
+        - deals_closed_current_period.deals_target, arr_target
+        - deals_closed_yearly.deals_target, arr_target
+        
+    Analytics expects:
+        - dashboard.objectif_6_mois, deals, new_pipe_created, weighted_pipe
+        - meeting_generation.intro, inbound, outbound, referral/referrals, upsells_x
+        - meeting_attended.poa, deals_closed
+    """
+    # Initialize with defaults
+    mapped_targets = {
+        "dashboard": {
+            "objectif_6_mois": 4500000,
+            "deals": 25,
+            "new_pipe_created": 2000000,
+            "weighted_pipe": 800000
+        },
+        "meeting_generation": {
+            "intro": 45,
+            "inbound": 22,
+            "outbound": 17,
+            "referrals": 11,
+            "upsells_x": 0
+        },
+        "meeting_attended": {
+            "poa": 18,
+            "deals_closed": 6
+        }
+    }
+    
+    # If admin_targets is already in the old format, return as-is
+    if "dashboard" in admin_targets and "objectif_6_mois" in admin_targets.get("dashboard", {}):
+        return admin_targets
+    
+    # Map revenue_2025 -> dashboard.objectif_6_mois (sum of all months or use yearly target)
+    if "revenue_2025" in admin_targets:
+        revenue_sum = sum(admin_targets["revenue_2025"].values())
+        if revenue_sum > 0:
+            mapped_targets["dashboard"]["objectif_6_mois"] = revenue_sum
+    
+    # Map deals_closed_yearly -> dashboard.deals (monthly target)
+    if "deals_closed_yearly" in admin_targets:
+        yearly_deals = admin_targets["deals_closed_yearly"].get("deals_target", 0)
+        if yearly_deals > 0:
+            mapped_targets["dashboard"]["deals"] = yearly_deals / 12  # Monthly target
+    
+    # Map dashboard_bottom_cards -> dashboard
+    if "dashboard_bottom_cards" in admin_targets:
+        bottom_cards = admin_targets["dashboard_bottom_cards"]
+        if "new_pipe_created" in bottom_cards and bottom_cards["new_pipe_created"] > 0:
+            mapped_targets["dashboard"]["new_pipe_created"] = bottom_cards["new_pipe_created"]
+        if "created_weighted_pipe" in bottom_cards and bottom_cards["created_weighted_pipe"] > 0:
+            mapped_targets["dashboard"]["weighted_pipe"] = bottom_cards["created_weighted_pipe"]
+        if "ytd_revenue" in bottom_cards and bottom_cards["ytd_revenue"] > 0:
+            # This could also map to objectif_6_mois if preferred
+            pass
+    
+    # Map intro_poa -> meeting_generation.intro
+    if "intro_poa" in admin_targets:
+        intro_poa = admin_targets["intro_poa"]
+        if "intro" in intro_poa and intro_poa["intro"] > 0:
+            mapped_targets["meeting_generation"]["intro"] = intro_poa["intro"]
+        if "poa" in intro_poa and intro_poa["poa"] > 0:
+            mapped_targets["meeting_attended"]["poa"] = intro_poa["poa"]
+    
+    # Map meeting_generation (new format keeps most of the same keys)
+    if "meeting_generation" in admin_targets:
+        meeting_gen = admin_targets["meeting_generation"]
+        # Use total_target as intro if intro not set separately
+        if "total_target" in meeting_gen and meeting_gen["total_target"] > 0:
+            # Only use total_target if intro_poa.intro wasn't set
+            if mapped_targets["meeting_generation"]["intro"] == 45:  # Still default
+                mapped_targets["meeting_generation"]["intro"] = meeting_gen["total_target"]
+        if "inbound" in meeting_gen and meeting_gen["inbound"] > 0:
+            mapped_targets["meeting_generation"]["inbound"] = meeting_gen["inbound"]
+        if "outbound" in meeting_gen and meeting_gen["outbound"] > 0:
+            mapped_targets["meeting_generation"]["outbound"] = meeting_gen["outbound"]
+        if "referral" in meeting_gen and meeting_gen["referral"] > 0:
+            mapped_targets["meeting_generation"]["referrals"] = meeting_gen["referral"]
+        if "upsells_cross" in meeting_gen and meeting_gen["upsells_cross"] > 0:
+            mapped_targets["meeting_generation"]["upsells_x"] = meeting_gen["upsells_cross"]
+    
+    # Map meetings_attended
+    if "meetings_attended" in admin_targets:
+        meetings_att = admin_targets["meetings_attended"]
+        if "poa_generated" in meetings_att and meetings_att["poa_generated"] > 0:
+            mapped_targets["meeting_attended"]["poa"] = meetings_att["poa_generated"]
+        if "deals_closed" in meetings_att and meetings_att["deals_closed"] > 0:
+            mapped_targets["meeting_attended"]["deals_closed"] = meetings_att["deals_closed"]
+    
+    print(f"🔄 Mapped admin targets to analytics format:")
+    print(f"   objectif_6_mois: {mapped_targets['dashboard']['objectif_6_mois']}")
+    print(f"   new_pipe_created: {mapped_targets['dashboard']['new_pipe_created']}")
+    print(f"   meeting intro: {mapped_targets['meeting_generation']['intro']}")
+    
+    return mapped_targets
+
 async def get_view_config_with_defaults(view_id: str):
     """
     Get view configuration with default targets if not set
@@ -170,24 +276,30 @@ async def get_view_config_with_defaults(view_id: str):
         for v in all_views:
             v_targets = v.get("targets", {})
             if v_targets:
+                # Map admin format to analytics format for each view
+                mapped_v_targets = map_admin_targets_to_analytics_format(v_targets)
+                
                 # Dashboard targets
-                if "dashboard" in v_targets:
+                if "dashboard" in mapped_v_targets:
                     for key in aggregated["dashboard"].keys():
-                        aggregated["dashboard"][key] += v_targets["dashboard"].get(key, 0)
+                        aggregated["dashboard"][key] += mapped_v_targets["dashboard"].get(key, 0)
                 
                 # Meeting generation targets
-                if "meeting_generation" in v_targets:
+                if "meeting_generation" in mapped_v_targets:
                     for key in aggregated["meeting_generation"].keys():
-                        aggregated["meeting_generation"][key] += v_targets["meeting_generation"].get(key, 0)
+                        aggregated["meeting_generation"][key] += mapped_v_targets["meeting_generation"].get(key, 0)
                 
                 # Meeting attended targets
-                if "meeting_attended" in v_targets:
+                if "meeting_attended" in mapped_v_targets:
                     for key in aggregated["meeting_attended"].keys():
-                        aggregated["meeting_attended"][key] += v_targets["meeting_attended"].get(key, 0)
+                        aggregated["meeting_attended"][key] += mapped_v_targets["meeting_attended"].get(key, 0)
         
         view_targets = aggregated
     elif not view_targets:
         view_targets = default_targets
+    else:
+        # Map admin format to analytics format
+        view_targets = map_admin_targets_to_analytics_format(view_targets)
     
     return {
         "view": view,
