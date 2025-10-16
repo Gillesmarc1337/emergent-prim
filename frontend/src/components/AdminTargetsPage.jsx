@@ -122,9 +122,20 @@ function AdminTargetsPage() {
       const isMasterView = currentView?.name === 'Master';
 
       if (isMasterView) {
-        // For Master view, calculate targets as sum of all other views
-        const calculatedTargets = await calculateMasterTargets();
-        setTargets(calculatedTargets);
+        // Check if Master has manual overrides saved
+        const savedTargets = response.data.targets;
+        const hasManualOverrides = savedTargets && Object.keys(savedTargets).length > 0;
+        
+        if (hasManualOverrides) {
+          // Use saved manual targets
+          console.log('📝 Master view: Using manual overrides');
+          setTargets(savedTargets);
+        } else {
+          // Calculate targets as sum of all other views (auto-aggregate)
+          console.log('🔢 Master view: Auto-calculating from other views');
+          const calculatedTargets = await calculateMasterTargets();
+          setTargets(calculatedTargets);
+        }
       } else {
         setTargets(response.data.targets || defaultTargets);
       }
