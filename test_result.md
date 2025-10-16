@@ -587,11 +587,11 @@ frontend:
 
   - task: "Target key mapping between Admin BO and analytics functions"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
@@ -599,6 +599,12 @@ frontend:
         - working: true
           agent: "testing"
           comment: "✅ TARGET KEY MAPPING TESTING COMPLETE - FULLY FUNCTIONAL: Comprehensive testing of target key mapping between Admin Back Office and analytics functions successfully completed. VERIFIED FUNCTIONALITY: 1) GET /api/views/view-master-1760356092/config returns raw targets in new Admin BO format with ALL 33 targets set to 150 (revenue_2025.jan=150, dashboard_bottom_cards.new_pipe_created=150, meeting_generation.total_target=150, etc). 2) GET /api/analytics/monthly?view_id=view-master-1760356092 successfully uses mapped targets showing 6/7 expected target fields with value 150 (block_1_meetings.inbound_target=150, block_1_meetings.outbound_target=150, block_1_meetings.referral_target=150, block_2_intro_poa.poa_target=150, block_3_pipe_creation.target_pipe_created=150, block_4_revenue.revenue_target=150). 3) Mapping function map_admin_targets_to_analytics_format() is working correctly - translates Admin BO format (revenue_2025.{months}, dashboard_bottom_cards.*, meeting_generation.total_target) to analytics format (dashboard.objectif_6_mois, meeting_generation.intro, etc). 4) Master view data aggregation confirmed working with mapped targets. CONCLUSION: The target key mapping fix is working correctly - Admin BO targets (150) are properly mapped to analytics format and dashboard blocks show the correct target values. The issue reported by user should now be resolved."
+        - working: false
+          agent: "user"
+          comment: "User reported Meetings Attended tab still showing old targets (Meetings Scheduled: 50, POA Generated: 18, Deals Closed: 6) instead of 150. Need to fix meetings_attended targets mapping."
+        - working: "NA"
+          agent: "main"
+          comment: "✅ MEETINGS ATTENDED TARGETS FIX IMPLEMENTED: Updated calculate_meetings_attended() function to accept view_targets parameter. Modified mapping function to handle meetings_attended.meetings_scheduled target and map it to meeting_attended.meetings_scheduled. Updated all 5 calls to calculate_meetings_attended() across analytics endpoints (monthly, yearly, custom, dashboard) to pass view_targets. Backend restarted successfully. Ready for testing to verify Meetings Attended tab now displays 150 for all three targets."
 
 metadata:
   created_by: "main_agent"
