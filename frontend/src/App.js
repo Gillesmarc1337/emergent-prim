@@ -3368,8 +3368,17 @@ function Dashboard() {
                       <div className="text-2xl font-bold mb-2 text-gray-800">
                         {hotDeals.filter(deal => deal.stage === 'B Legals').length}
                       </div>
-                      <div className="text-xs text-gray-600">
+                      <div className="text-xs text-gray-600 mb-2">
                         Deals in Legals
+                      </div>
+                      <div className="text-lg font-semibold text-purple-700">
+                        ${hotDeals
+                          .filter(deal => deal.stage === 'B Legals')
+                          .reduce((sum, deal) => sum + (deal.expected_arr || deal.pipeline || 0), 0)
+                          .toLocaleString()}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Pipeline Value
                       </div>
                     </CardContent>
                   </Card>
@@ -3386,8 +3395,17 @@ function Dashboard() {
                       <div className="text-2xl font-bold mb-2 text-gray-800">
                         {hotLeads.filter(deal => deal.stage === 'C Proposal sent').length}
                       </div>
-                      <div className="text-xs text-gray-600">
+                      <div className="text-xs text-gray-600 mb-2">
                         Deals in Proposal
+                      </div>
+                      <div className="text-lg font-semibold text-indigo-700">
+                        ${hotLeads
+                          .filter(deal => deal.stage === 'C Proposal sent')
+                          .reduce((sum, deal) => sum + (deal.expected_arr || deal.value || deal.pipeline || 0), 0)
+                          .toLocaleString()}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Pipeline Value
                       </div>
                     </CardContent>
                   </Card>
