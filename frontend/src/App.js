@@ -1997,8 +1997,6 @@ function Dashboard() {
               </Card>
             </div>
 
-            {/* Monthly Meetings Evolution Chart - MOVED TO TOP */}
-
             {/* Meetings Details Table */}
             {analytics.meeting_generation.meetings_details && analytics.meeting_generation.meetings_details.length > 0 && (
               <Card className="mt-6">
