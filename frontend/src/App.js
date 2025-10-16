@@ -1114,12 +1114,12 @@ function Dashboard() {
       } else {
         loadYearlyAnalytics();
       }
-      loadDashboard();
+      // Note: loadDashboard is no longer needed here as loadAnalytics handles it
     };
 
     window.addEventListener('viewConfigUpdated', handleConfigUpdate);
     return () => window.removeEventListener('viewConfigUpdated', handleConfigUpdate);
-  }, [viewMode, monthOffset]);
+  }, [viewMode, monthOffset]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // New states for projections
   const [hotDeals, setHotDeals] = useState([]);
