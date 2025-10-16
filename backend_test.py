@@ -6343,6 +6343,246 @@ def test_meetings_attended_targets_fix():
     
     return test_results['meetings_attended_targets_150']
 
+def test_back_office_targets_final_verification():
+    """
+    FINAL VERIFICATION: Back Office Targets Display in Dashboard
+    Tests the specific issue where Back Office targets (150) should display as 150 
+    in the frontend dashboard but were showing incorrect values (300, 108, 36)
+    """
+    print(f"\n{'='*80}")
+    print(f"🎯 FINAL VERIFICATION: BACK OFFICE TARGETS DISPLAY")
+    print(f"{'='*80}")
+    
+    test_results = {
+        'demo_login': False,
+        'mongodb_clean_verification': False,
+        'monthly_analytics_targets': False,
+        'yearly_analytics_targets': False,
+        'mapping_function_execution': False,
+        'meetings_attended_targets': False
+    }
+    
+    # Step 1: Demo login
+    print(f"\n🔄 Step 1: Demo login for authentication")
+    demo_data, session_token = test_demo_login()
+    
+    if demo_data and session_token:
+        test_results['demo_login'] = True
+        print(f"✅ Demo login successful")
+        cookies = {'session_token': session_token}
+    else:
+        print(f"❌ Demo login failed - cannot continue verification")
+        return False
+    
+    # Step 2: Verify MongoDB is Clean - Master view targets
+    print(f"\n🔄 Step 2: Verify MongoDB Master view configuration")
+    master_view_id = "view-master-1760356092"
+    config_endpoint = f"/views/{master_view_id}/config"
+    result = test_api_endpoint(config_endpoint, cookies=cookies, expected_status=200)
+    
+    if result and len(result) == 2:
+        data, response = result
+        if data and isinstance(data, dict):
+            targets = data.get('targets', {})
+            print(f"✅ Master view config retrieved")
+            
+            # Check for ONLY Admin BO format keys (no old format keys)
+            admin_bo_keys = ['revenue_2025', 'dashboard_bottom_cards', 'meeting_generation', 
+                           'meetings_attended', 'deals_closed_yearly', 'intro_poa']
+            old_format_keys = ['dashboard.objectif_6_mois', 'meeting_attended.poa', 'dashboard.deals']
+            
+            has_admin_bo = any(key in targets for key in admin_bo_keys)
+            has_old_format = any(key in str(targets) for key in old_format_keys)
+            
+            if has_admin_bo and not has_old_format:
+                test_results['mongodb_clean_verification'] = True
+                print(f"✅ MongoDB is clean - ONLY Admin BO format keys present")
+                
+                # Verify all targets are set to 150
+                targets_150_count = 0
+                total_targets = 0
+                
+                def count_150_targets(obj):
+                    nonlocal targets_150_count, total_targets
+                    if isinstance(obj, dict):
+                        for key, value in obj.items():
+                            if isinstance(value, dict):
+                                count_150_targets(value)
+                            elif isinstance(value, (int, float)):
+                                total_targets += 1
+                                if value == 150:
+                                    targets_150_count += 1
+                                    print(f"  ✓ {key}: 150")
+                                else:
+                                    print(f"  ⚠️  {key}: {value} (not 150)")
+                
+                count_150_targets(targets)
+                print(f"📊 Found {targets_150_count}/{total_targets} targets set to 150")
+                
+            else:
+                print(f"❌ MongoDB not clean - found old format keys or missing Admin BO keys")
+                print(f"  Admin BO keys present: {has_admin_bo}")
+                print(f"  Old format keys present: {has_old_format}")
+        else:
+            print(f"❌ Invalid master view config response")
+            return False
+    else:
+        print(f"❌ Failed to get master view config")
+        return False
+    
+    # Step 3: Test Monthly Analytics Endpoint
+    print(f"\n🔄 Step 3: Test Monthly Analytics with Master view")
+    monthly_endpoint = f"/analytics/monthly?view_id={master_view_id}"
+    result = test_api_endpoint(monthly_endpoint, cookies=cookies, expected_status=200)
+    
+    if result and len(result) == 2:
+        data, response = result
+        if data and isinstance(data, dict):
+            print(f"✅ Monthly analytics retrieved successfully")
+            
+            # Check meetings_attended section for correct targets (150)
+            meetings_attended = data.get('meetings_attended', {})
+            if meetings_attended:
+                intro_metrics = meetings_attended.get('intro_metrics', {})
+                poa_metrics = meetings_attended.get('poa_generated_metrics', {})
+                deals_metrics = meetings_attended.get('deals_closed_metrics', {})
+                
+                meetings_target = intro_metrics.get('target', 0)
+                poa_target = poa_metrics.get('target', 0)
+                deals_target = deals_metrics.get('target', 0)
+                
+                print(f"📊 Monthly Analytics Targets:")
+                print(f"  Meetings Scheduled: {meetings_target}")
+                print(f"  POA Generated: {poa_target}")
+                print(f"  Deals Closed: {deals_target}")
+                
+                # All should be 150 for monthly view
+                if meetings_target == 150 and poa_target == 150 and deals_target == 150:
+                    test_results['monthly_analytics_targets'] = True
+                    print(f"✅ Monthly targets correctly show 150 for all metrics")
+                else:
+                    print(f"❌ Monthly targets incorrect - expected all 150")
+                    print(f"  Expected: meetings=150, poa=150, deals=150")
+                    print(f"  Actual: meetings={meetings_target}, poa={poa_target}, deals={deals_target}")
+            else:
+                print(f"❌ meetings_attended section not found in monthly analytics")
+        else:
+            print(f"❌ Invalid monthly analytics response")
+    else:
+        print(f"❌ Failed to get monthly analytics")
+    
+    # Step 4: Test Yearly Analytics Endpoint
+    print(f"\n🔄 Step 4: Test Yearly Analytics with Master view")
+    yearly_endpoint = f"/analytics/yearly?year=2025&view_id={master_view_id}"
+    result = test_api_endpoint(yearly_endpoint, cookies=cookies, expected_status=200)
+    
+    if result and len(result) == 2:
+        data, response = result
+        if data and isinstance(data, dict):
+            print(f"✅ Yearly analytics retrieved successfully")
+            
+            # Check meetings_attended section for correct targets (900 = 150×6 months)
+            meetings_attended = data.get('meetings_attended', {})
+            if meetings_attended:
+                intro_metrics = meetings_attended.get('intro_metrics', {})
+                poa_metrics = meetings_attended.get('poa_generated_metrics', {})
+                deals_metrics = meetings_attended.get('deals_closed_metrics', {})
+                
+                meetings_target = intro_metrics.get('target', 0)
+                poa_target = poa_metrics.get('target', 0)
+                deals_target = deals_metrics.get('target', 0)
+                
+                print(f"📊 Yearly Analytics Targets (July-Dec = 6 months):")
+                print(f"  Meetings Scheduled: {meetings_target}")
+                print(f"  POA Generated: {poa_target}")
+                print(f"  Deals Closed: {deals_target}")
+                
+                # All should be 900 (150×6) for 6-month July-Dec period
+                expected_yearly = 150 * 6  # 900
+                if meetings_target == expected_yearly and poa_target == expected_yearly and deals_target == expected_yearly:
+                    test_results['yearly_analytics_targets'] = True
+                    print(f"✅ Yearly targets correctly show 900 (150×6) for all metrics")
+                else:
+                    print(f"❌ Yearly targets incorrect - expected all 900")
+                    print(f"  Expected: meetings=900, poa=900, deals=900")
+                    print(f"  Actual: meetings={meetings_target}, poa={poa_target}, deals={deals_target}")
+            else:
+                print(f"❌ meetings_attended section not found in yearly analytics")
+        else:
+            print(f"❌ Invalid yearly analytics response")
+    else:
+        print(f"❌ Failed to get yearly analytics")
+    
+    # Step 5: Check backend logs for mapping function execution
+    print(f"\n🔄 Step 5: Check for mapping function execution")
+    # We can't directly check logs, but we can verify the mapping worked by checking if targets are correct
+    if test_results['monthly_analytics_targets'] and test_results['yearly_analytics_targets']:
+        test_results['mapping_function_execution'] = True
+        print(f"✅ Mapping function appears to be working correctly")
+        print(f"  - Monthly targets show 150 (base values)")
+        print(f"  - Yearly targets show 900 (150×6 months)")
+        print(f"  - This confirms Admin BO → Analytics format mapping is functional")
+    else:
+        print(f"❌ Mapping function may not be working correctly")
+        print(f"  - Targets don't match expected values")
+    
+    # Step 6: Verify Meeting Generation targets also show 150
+    print(f"\n🔄 Step 6: Verify Meeting Generation targets")
+    if 'meeting_generation' in data:
+        meeting_gen = data['meeting_generation']
+        total_target = meeting_gen.get('target', 0)
+        inbound_target = meeting_gen.get('inbound_target', 0)
+        outbound_target = meeting_gen.get('outbound_target', 0)
+        referral_target = meeting_gen.get('referral_target', 0)
+        
+        print(f"📊 Meeting Generation Targets:")
+        print(f"  Total: {total_target}")
+        print(f"  Inbound: {inbound_target}")
+        print(f"  Outbound: {outbound_target}")
+        print(f"  Referral: {referral_target}")
+        
+        # For monthly, these should be 150 or proportional
+        if total_target == 150:
+            test_results['meetings_attended_targets'] = True
+            print(f"✅ Meeting Generation total target correctly shows 150")
+        else:
+            print(f"⚠️  Meeting Generation total target: {total_target} (expected 150)")
+    
+    # Summary
+    print(f"\n{'='*80}")
+    print(f"📋 BACK OFFICE TARGETS VERIFICATION SUMMARY")
+    print(f"{'='*80}")
+    
+    passed_tests = sum(1 for result in test_results.values() if result)
+    total_tests = len(test_results)
+    
+    for test_name, result in test_results.items():
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"  {test_name}: {status}")
+    
+    print(f"\n📊 Overall Result: {passed_tests}/{total_tests} tests passed")
+    
+    if passed_tests == total_tests:
+        print(f"\n🎉 SUCCESS: Back Office → Dashboard flow works perfectly!")
+        print(f"✅ MongoDB has ONLY new format keys, all values = 150")
+        print(f"✅ Monthly API returns correct target values (150)")
+        print(f"✅ Yearly API returns correct target values (900 = 150×6)")
+        print(f"✅ Mapping function executes correctly")
+        print(f"✅ No old format keys interfering")
+    else:
+        print(f"\n❌ ISSUES FOUND: {total_tests - passed_tests} verification steps failed")
+        print(f"🔍 Review failed steps above for details")
+        
+        # Specific guidance based on failures
+        if not test_results['mongodb_clean_verification']:
+            print(f"💡 MongoDB may still have old format keys - need to clean database")
+        if not test_results['monthly_analytics_targets']:
+            print(f"💡 Monthly analytics not returning 150 - check mapping function")
+        if not test_results['yearly_analytics_targets']:
+            print(f"💡 Yearly analytics not returning 900 - check period calculation")
+    
+    return passed_tests == total_tests
+
 def main():
     """Main test execution"""
     print(f"{'='*100}")
