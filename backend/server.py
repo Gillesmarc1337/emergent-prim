@@ -828,10 +828,18 @@ def calculate_meetings_attended(df, start_date, end_date, view_targets=None):
     period_duration_days = (end_date - start_date).days + 1
     period_duration_months = max(1, round(period_duration_days / 30))  # At least 1 month
     
-    # Base monthly targets
-    base_meetings_target = 50
-    base_poa_target = 30
-    base_deals_target = 15
+    # Get targets from view_targets if provided, otherwise use defaults
+    if view_targets:
+        meeting_att = view_targets.get("meeting_attended", {})
+        # meetings_scheduled target is now stored under intro or as a separate value
+        base_meetings_target = meeting_att.get("meetings_scheduled", meeting_att.get("intro", 50))
+        base_poa_target = meeting_att.get("poa", 30)
+        base_deals_target = meeting_att.get("deals_closed", 15)
+    else:
+        # Base monthly targets (defaults)
+        base_meetings_target = 50
+        base_poa_target = 30
+        base_deals_target = 15
     
     # Dynamic targets based on period duration
     dynamic_meetings_target = base_meetings_target * period_duration_months
