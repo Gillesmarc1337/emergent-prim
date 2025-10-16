@@ -722,9 +722,11 @@ def calculate_meeting_generation(df, start_date, end_date, view_targets=None):
     for _, row in period_data.iterrows():
         meetings_list.append({
             'date': row['discovery_date'].strftime('%b %d') if pd.notna(row['discovery_date']) else 'N/A',
+            'discovery_date': row['discovery_date'].strftime('%Y-%m-%d') if pd.notna(row['discovery_date']) else None,  # Full date for charts
             'client': str(row.get('client', 'N/A')),
             'bdr': str(row.get('bdr', 'N/A')),
             'source': str(row.get('type_of_source', 'N/A')),
+            'type_of_source': str(row.get('type_of_source', 'N/A')),  # Add for consistency
             'relevance': str(row.get('relevance', 'N/A')),
             'owner': str(row.get('owner', 'N/A')),  # AE owner
             'stage': str(row.get('stage', 'N/A')),  # Deal stage
