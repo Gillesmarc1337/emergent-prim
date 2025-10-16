@@ -552,6 +552,18 @@ frontend:
           agent: "main"
           comment: "✅ USER MANAGEMENT FRONTEND IMPLEMENTED: Completed UserManagementPage.jsx with full CRUD functionality. Features: 1) User list display with email, role badges (super_admin/viewer), and view access. 2) Add new user form with email, role selection, and view access assignment. 3) Interactive view access management - click to toggle view access for each user. 4) Role toggle buttons - promote viewer to super_admin or demote super_admin to viewer. 5) Delete user functionality with confirmation prompt and self-delete protection. 6) Real-time success/error messages with color-coded alerts. 7) Integration with backend API using user_id for all operations. Integrated into App.js routing at /admin/users. Updated Header.jsx with dropdown menu for Admin pages (Targets Config, User Management). Navigation accessible to super_admin users only. Frontend compiling successfully without errors."
 
+  - task: "Fix Monthly Average calculation and Tab Reset issue"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ TWO CRITICAL FIXES IMPLEMENTED: 1) MONTHLY AVERAGE CALCULATION FIX: Modified MainDashboard component (line 659) to accept actualPeriodMonths prop. Added calculation logic in Dashboard component (lines 1747-1763) to compute actual period months based on view mode (Monthly=1, July-Dec=6, Custom=days/30.44). Updated MetricCard calculations (lines 740-793) to use actualPeriodMonths instead of deriving from backend target. Formula: monthlyAverage = value / actualPeriodMonths. 2) TAB RESET FIX: Changed Tabs component (line 1829) from defaultValue='dashboard' (uncontrolled) to value={activeTab} onValueChange={setActiveTab} (controlled component). This ensures active tab state persists when switching between Monthly/Yearly/Custom view modes. Frontend restarted successfully. Ready for comprehensive frontend testing to verify both fixes work correctly."
+
   - task: "Projections Board Save/Reset User Preferences"
     implemented: true
     working: true
