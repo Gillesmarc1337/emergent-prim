@@ -2746,33 +2746,58 @@ function Dashboard() {
                 ? "Excellent performance on deal closing this period." 
                 : "Need to accelerate deal closing efforts."}
             >
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <MetricCard
-                  title="Deals Closed"
-                  value={analytics.deals_closed.deals_closed}
-                  target={tabTargets.deals_closed_tab.deals_closed_target}
-                  icon={CheckCircle2}
-                  color="green"
-                />
-                <MetricCard
-                  title="ARR Closed"
-                  value={analytics.deals_closed.arr_closed}
-                  target={tabTargets.deals_closed_tab.arr_closed_target}
-                  unit="$"
-                  icon={DollarSign}
-                  color="green"
-                />
-                <MetricCard
-                  title="MRR Closed"
-                  value={analytics.deals_closed.mrr_closed}
-                  unit="$"
-                  icon={TrendingUp}
-                  color="blue"
-                />
-                <MetricCard
-                  title="Average Deal Size"
-                  value={analytics.deals_closed.avg_deal_size}
-                  unit="$"
+              {(() => {
+                // Calculate period duration in months for dynamic targets
+                let periodMonths = 1; // Default to 1 month
+                
+                if (useCustomDate && dateRange?.from && dateRange?.to) {
+                  // Custom date range
+                  const startDate = new Date(dateRange.from);
+                  const endDate = new Date(dateRange.to);
+                  const diffTime = Math.abs(endDate - startDate);
+                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                  periodMonths = Math.max(1, Math.round(diffDays / 30.44)); // Convert days to months
+                } else if (viewMode === 'yearly') {
+                  // July to December = 6 months
+                  periodMonths = 6;
+                } else {
+                  // Monthly view = 1 month
+                  periodMonths = 1;
+                }
+
+                // Calculate dynamic targets (monthly target × period)
+                const dealsTarget = tabTargets.deals_closed_tab.deals_closed_target * periodMonths;
+                const arrTarget = tabTargets.deals_closed_tab.arr_closed_target * periodMonths;
+
+                return (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                      <MetricCard
+                        title="Deals Closed"
+                        value={analytics.deals_closed.deals_closed}
+                        target={dealsTarget}
+                        icon={CheckCircle2}
+                        color="green"
+                      />
+                      <MetricCard
+                        title="ARR Closed"
+                        value={analytics.deals_closed.arr_closed}
+                        target={arrTarget}
+                        unit="$"
+                        icon={DollarSign}
+                        color="green"
+                      />
+                      <MetricCard
+                        title="MRR Closed"
+                        value={analytics.deals_closed.mrr_closed}
+                        unit="$"
+                        icon={TrendingUp}
+                        color="blue"
+                      />
+                      <MetricCard
+                        title="Average Deal Size"
+                        value={analytics.deals_closed.avg_deal_size}
+                        unit="$"
                   icon={BarChart3}
                   color="purple"
                 />
