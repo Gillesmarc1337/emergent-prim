@@ -770,29 +770,61 @@ function AdminTargetsPage() {
                     </div>
                   </div>
                   
-                  <div className="mt-4 p-3 bg-green-50 rounded">
-                    <div className="text-sm font-semibold mb-2">Preview Banner:</div>
-                    <div className="grid grid-cols-5 gap-2 text-xs">
-                      <div className="border p-2 rounded bg-white">
-                        <div className="font-semibold">Total</div>
-                        <div className="text-gray-600">_/{targets?.meeting_generation?.total_target || 0}</div>
+                  <div className="mt-6 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+                    <div className="text-sm font-semibold mb-3 text-gray-700">📊 Dashboard Preview (Grey Replica):</div>
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                      {/* Total Meetings */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">📊 Total Meetings</div>
+                        <div className="text-xl font-bold text-gray-800">X</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: {targets?.meeting_generation?.total_target || 0}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div className="bg-gray-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
+                        </div>
                       </div>
-                      <div className="border p-2 rounded bg-white">
-                        <div className="font-semibold">Inbound</div>
-                        <div className="text-gray-600">_/{targets?.meeting_generation?.inbound || 0}</div>
+
+                      {/* Inbound */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">🟢 Inbound</div>
+                        <div className="text-xl font-bold text-gray-800">X</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: {targets?.meeting_generation?.inbound || 0}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div className="bg-gray-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
+                        </div>
                       </div>
-                      <div className="border p-2 rounded bg-white">
-                        <div className="font-semibold">Outbound</div>
-                        <div className="text-gray-600">_/{targets?.meeting_generation?.outbound || 0}</div>
+
+                      {/* Outbound */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">🟠 Outbound</div>
+                        <div className="text-xl font-bold text-gray-800">X</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: {targets?.meeting_generation?.outbound || 0}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div className="bg-gray-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
+                        </div>
                       </div>
-                      <div className="border p-2 rounded bg-white">
-                        <div className="font-semibold">Referral</div>
-                        <div className="text-gray-600">_/{targets?.meeting_generation?.referral || 0}</div>
+
+                      {/* Referral */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">🟣 Referral</div>
+                        <div className="text-xl font-bold text-gray-800">X</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: {targets?.meeting_generation?.referral || 0}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div className="bg-gray-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
+                        </div>
                       </div>
-                      <div className="border p-2 rounded bg-white">
-                        <div className="font-semibold">Upsells</div>
-                        <div className="text-gray-600">_/{targets?.meeting_generation?.upsells_cross || 0}</div>
+
+                      {/* Upsells */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">🔵 Upsells</div>
+                        <div className="text-xl font-bold text-gray-800">X</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: {targets?.meeting_generation?.upsells_cross || 0}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div className="bg-gray-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
+                        </div>
                       </div>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-3 text-center italic">
+                      ℹ️ Preview shows layout only. Actual values calculated from sheet data.
                     </div>
                   </div>
                 </CardContent>
