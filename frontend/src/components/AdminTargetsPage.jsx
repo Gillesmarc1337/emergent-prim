@@ -111,9 +111,20 @@ function AdminTargetsPage() {
           poa_generated: 18,
           deals_closed: 6
         },
+        // NEW: Direct targets for Meetings Attended TAB (no multiplication, direct display)
+        meetings_attended_tab: {
+          meetings_scheduled_target: 50,
+          poa_generated_target: 18,
+          deals_closed_target: 6
+        },
         deals_closed_current_period: {
           deals_target: 10,
           arr_target: 500000
+        },
+        // NEW: Direct targets for Deals Closed TAB (no multiplication, direct display)
+        deals_closed_tab: {
+          deals_closed_target: 10,
+          arr_closed_target: 500000
         },
         upsell_renew: {
           upsells_target: 5,
