@@ -3638,7 +3638,7 @@ function Dashboard() {
               </CardHeader>
               <CardContent>
                 <DragDropContext onDragEnd={onDragEnd}>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     {/* Next 30 Days Column */}
                     <div className="bg-green-50 rounded-lg p-4">
                       <div className="mb-4">
