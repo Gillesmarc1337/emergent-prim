@@ -22,7 +22,7 @@ async def set_master_dummy_targets():
     
     print(f"✅ Found Master view: {master_view['id']}")
     
-    # Dummy targets with 150 everywhere
+    # Dummy targets with 150 everywhere (Admin BO format ONLY - no old format keys)
     dummy_targets = {
         "revenue_2025": {
             "jan": 150, "feb": 150, "mar": 150, "apr": 150, "may": 150, "jun": 150,
@@ -49,20 +49,18 @@ async def set_master_dummy_targets():
             "poa_generated": 150,
             "deals_closed": 150
         },
-        "deals_closed_yearly": {
+        "deals_closed_current_period": {
             "deals_target": 150,
             "arr_target": 150
         },
-        # Old format for compatibility
-        "dashboard": {
-            "objectif_6_mois": 150,
-            "deals": 150,
-            "new_pipe_created": 150,
-            "weighted_pipe": 150
+        "upsell_renew": {
+            "upsells_target": 150,
+            "renewals_target": 150,
+            "mrr_target": 150
         },
-        "meeting_attended": {
-            "poa": 150,
-            "deals_closed": 150
+        "deals_closed_yearly": {
+            "deals_target": 150,
+            "arr_target": 150
         }
     }
     
