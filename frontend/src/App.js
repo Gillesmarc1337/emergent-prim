@@ -3436,7 +3436,7 @@ function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                  {/* Card 1: Legals Count - Use master data from hot-deals */}
+                  {/* Card 1: Legals Count - Filtered by selected AE */}
                   <Card className="border-2 border-purple-200 bg-purple-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
@@ -3445,25 +3445,32 @@ function Dashboard() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold mb-2 text-gray-800">
-                        {hotDeals.filter(deal => deal.stage === 'B Legals').length}
-                      </div>
-                      <div className="text-xs text-gray-600 mb-2">
-                        Deals in Legals
-                      </div>
-                      <div className="text-lg font-semibold text-purple-700">
-                        ${hotDeals
-                          .filter(deal => deal.stage === 'B Legals')
-                          .reduce((sum, deal) => sum + (deal.expected_arr || deal.pipeline || 0), 0)
-                          .toLocaleString()}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        Pipeline Value
-                      </div>
+                      {(() => {
+                        const filteredDeals = getFilteredDeals();
+                        const legalsDeals = filteredDeals.filter(deal => deal.stage === 'B Legals');
+                        return (
+                          <>
+                            <div className="text-2xl font-bold mb-2 text-gray-800">
+                              {legalsDeals.length}
+                            </div>
+                            <div className="text-xs text-gray-600 mb-2">
+                              Deals in Legals
+                            </div>
+                            <div className="text-lg font-semibold text-purple-700">
+                              ${legalsDeals
+                                .reduce((sum, deal) => sum + (deal.expected_arr || deal.pipeline || 0), 0)
+                                .toLocaleString()}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Pipeline Value
+                            </div>
+                          </>
+                        );
+                      })()}
                     </CardContent>
                   </Card>
 
-                  {/* Card 2: Proposal Sent Count - Use master data from hot-leads */}
+                  {/* Card 2: Proposal Sent Count - Filtered by selected AE */}
                   <Card className="border-2 border-indigo-200 bg-indigo-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
@@ -3472,25 +3479,32 @@ function Dashboard() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold mb-2 text-gray-800">
-                        {hotLeads.filter(deal => deal.stage === 'C Proposal sent').length}
-                      </div>
-                      <div className="text-xs text-gray-600 mb-2">
-                        Deals in Proposal
-                      </div>
-                      <div className="text-lg font-semibold text-indigo-700">
-                        ${hotLeads
-                          .filter(deal => deal.stage === 'C Proposal sent')
-                          .reduce((sum, deal) => sum + (deal.expected_arr || deal.value || deal.pipeline || 0), 0)
-                          .toLocaleString()}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        Pipeline Value
-                      </div>
+                      {(() => {
+                        const filteredDeals = getFilteredDeals();
+                        const proposalDeals = filteredDeals.filter(deal => deal.stage === 'C Proposal sent');
+                        return (
+                          <>
+                            <div className="text-2xl font-bold mb-2 text-gray-800">
+                              {proposalDeals.length}
+                            </div>
+                            <div className="text-xs text-gray-600 mb-2">
+                              Deals in Proposal
+                            </div>
+                            <div className="text-lg font-semibold text-indigo-700">
+                              ${proposalDeals
+                                .reduce((sum, deal) => sum + (deal.expected_arr || deal.value || deal.pipeline || 0), 0)
+                                .toLocaleString()}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Pipeline Value
+                            </div>
+                          </>
+                        );
+                      })()}
                     </CardContent>
                   </Card>
 
-                  {/* Card 3: Combined Value - Use master data pipeline values */}
+                  {/* Card 3: Combined Value - Filtered by selected AE */}
                   <Card className="border-2 border-green-200 bg-green-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
@@ -3499,27 +3513,32 @@ function Dashboard() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-xl font-bold mb-2 text-gray-800">
-                        ${(() => {
-                          // Sum RAW deal values (expected_arr field - no weighting/probability)
-                          const legalsValue = hotDeals
-                            .filter(deal => deal.stage === 'B Legals')
-                            .reduce((sum, deal) => sum + (deal.expected_arr || deal.pipeline || 0), 0);
-                          
-                          const proposalValue = hotLeads
-                            .filter(deal => deal.stage === 'C Proposal sent')
-                            .reduce((sum, deal) => sum + (deal.expected_arr || deal.pipeline || 0), 0);
-                          
-                          return (legalsValue + proposalValue);
-                        })().toLocaleString()}
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        Combined Pipeline Value
-                      </div>
+                      {(() => {
+                        const filteredDeals = getFilteredDeals();
+                        // Sum RAW deal values (expected_arr field - no weighting/probability)
+                        const legalsValue = filteredDeals
+                          .filter(deal => deal.stage === 'B Legals')
+                          .reduce((sum, deal) => sum + (deal.expected_arr || deal.pipeline || 0), 0);
+                        
+                        const proposalValue = filteredDeals
+                          .filter(deal => deal.stage === 'C Proposal sent')
+                          .reduce((sum, deal) => sum + (deal.expected_arr || deal.pipeline || 0), 0);
+                        
+                        return (
+                          <>
+                            <div className="text-xl font-bold mb-2 text-gray-800">
+                              ${(legalsValue + proposalValue).toLocaleString()}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              Combined Pipeline Value
+                            </div>
+                          </>
+                        );
+                      })()}
                     </CardContent>
                   </Card>
 
-                  {/* Card 4: Upcoming POAs - Show count and total value */}
+                  {/* Card 4: Upcoming POAs - Filtered by selected AE */}
                   <Card className="border-2 border-blue-200 bg-blue-50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
@@ -3529,9 +3548,10 @@ function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       {(() => {
-                        // Get upcoming POA from hot-leads with future poa_date
+                        // Get filtered deals with future poa_date
+                        const filteredDeals = getFilteredDeals();
                         const today = new Date();
-                        const upcomingPOAs = hotLeads.filter(deal => {
+                        const upcomingPOAs = filteredDeals.filter(deal => {
                           const poaDate = deal.poa_date ? new Date(deal.poa_date) : null;
                           return poaDate && poaDate > today;
                         });
