@@ -104,10 +104,10 @@ function AdminTargetsPage() {
           deals_closed_arr: 500000
         },
         closing_projections: {
-          october_target: 250000,
-          november_target: 250000,
-          december_target: 250000,
-          q1_2026_target: 500000
+          next_30_days_target: 250000,
+          next_60_days_target: 500000,
+          next_90_days_target: 750000,
+          potentially_delayed_target: 200000
         },
         dashboard_bottom_cards: {
           new_pipe_created: 2000000,
