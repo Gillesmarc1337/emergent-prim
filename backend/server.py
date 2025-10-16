@@ -3323,7 +3323,20 @@ async def get_upsell_renewals_analytics(
             # Performance data
             'partner_performance': partner_performance,
             'intros_details': intros_list,
-            'poa_details': poa_attended_list
+            'poa_details': poa_attended_list,
+            
+            # Monthly breakdown
+            'monthly_breakdown': {
+                'months': [],
+                'meetings_attended': [],
+                'poa_generated': [],
+                'revenue_generated': []
+            } if len(upsell_renewal_data) == 0 else {
+                'months': [m.strftime('%b %Y') for m in sorted(upsell_renewal_data.groupby(upsell_renewal_data['discovery_date'].dt.to_period('M')).groups.keys())],
+                'meetings_attended': [int(len(upsell_renewal_data[(upsell_renewal_data['discovery_date'].dt.to_period('M') == m) & (upsell_renewal_data['show_noshow'].notna()) & (upsell_renewal_data['show_noshow'].str.strip().str.lower().str.contains('show', na=False)) & (~upsell_renewal_data['show_noshow'].str.strip().str.lower().str.contains('noshow|no show', na=False))])) for m in sorted(upsell_renewal_data.groupby(upsell_renewal_data['discovery_date'].dt.to_period('M')).groups.keys())],
+                'poa_generated': [int(len(upsell_renewal_data[(upsell_renewal_data['discovery_date'].dt.to_period('M') == m) & (upsell_renewal_data['stage'].isin(['B Legals', 'Legal', 'C Proposal sent', 'Proposal sent', 'D POA Booked', 'POA Booked', 'Closed Won', 'Won', 'Signed', 'A Closed', 'Lost']))])) for m in sorted(upsell_renewal_data.groupby(upsell_renewal_data['discovery_date'].dt.to_period('M')).groups.keys())],
+                'revenue_generated': [float(upsell_renewal_data[(upsell_renewal_data['discovery_date'].dt.to_period('M') == m) & (upsell_renewal_data['stage'] == 'A Closed')]['expected_arr'].fillna(0).sum()) for m in sorted(upsell_renewal_data.groupby(upsell_renewal_data['discovery_date'].dt.to_period('M')).groups.keys())]
+            }
         }
         
     except Exception as e:
