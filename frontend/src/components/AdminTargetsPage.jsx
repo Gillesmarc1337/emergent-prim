@@ -926,6 +926,180 @@ function AdminTargetsPage() {
               </Card>
 
 
+              {/* PROJECTIONS TAB - Closing Projections Board Targets */}
+              <Card className="border-indigo-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded">PROJECTIONS TAB</span>
+                    Closing Projections Board - Monthly Targets
+                  </CardTitle>
+                  <CardDescription>
+                    Configure revenue targets for each month column in the interactive closing projections board
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="october_target">October 2025 Target ($)</Label>
+                      <Input
+                        id="october_target"
+                        type="number"
+                        value={targets?.closing_projections?.october_target || 0}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          setTargets(prev => ({
+                            ...prev,
+                            closing_projections: {
+                              ...(prev.closing_projections || {}),
+                              october_target: value
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                        step="50000"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Expected ARR to close in October</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="november_target">November 2025 Target ($)</Label>
+                      <Input
+                        id="november_target"
+                        type="number"
+                        value={targets?.closing_projections?.november_target || 0}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          setTargets(prev => ({
+                            ...prev,
+                            closing_projections: {
+                              ...(prev.closing_projections || {}),
+                              november_target: value
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                        step="50000"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Expected ARR to close in November</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="december_target">December 2025 Target ($)</Label>
+                      <Input
+                        id="december_target"
+                        type="number"
+                        value={targets?.closing_projections?.december_target || 0}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          setTargets(prev => ({
+                            ...prev,
+                            closing_projections: {
+                              ...(prev.closing_projections || {}),
+                              december_target: value
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                        step="50000"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Expected ARR to close in December</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="q1_2026_target">Q1 2026 Target ($)</Label>
+                      <Input
+                        id="q1_2026_target"
+                        type="number"
+                        value={targets?.closing_projections?.q1_2026_target || 0}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          setTargets(prev => ({
+                            ...prev,
+                            closing_projections: {
+                              ...(prev.closing_projections || {}),
+                              q1_2026_target: value
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                        step="50000"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Expected ARR to close in Q1 2026</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+                    <div className="text-sm font-semibold mb-3 text-gray-700">📊 Closing Projections Preview (Grey Replica):</div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                      {/* Column 1: October 2025 */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 shadow-sm">
+                        <div className="text-center mb-2">
+                          <div className="text-xs font-semibold text-gray-600 mb-1">October 2025</div>
+                          <div className="text-lg font-bold text-gray-800">${((targets?.closing_projections?.october_target || 0) / 1000).toFixed(0)}K</div>
+                          <div className="text-xs text-gray-500">Target: ${((targets?.closing_projections?.october_target || 0) / 1000).toFixed(0)}K</div>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                          <div className="bg-gray-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-center text-gray-500 mb-2">X deals • $XK</div>
+                        <div className="space-y-1">
+                          <div className="bg-white border border-gray-300 rounded p-1 text-xs text-gray-600">Deal cards appear here</div>
+                        </div>
+                      </div>
+
+                      {/* Column 2: November 2025 */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 shadow-sm">
+                        <div className="text-center mb-2">
+                          <div className="text-xs font-semibold text-gray-600 mb-1">November 2025</div>
+                          <div className="text-lg font-bold text-gray-800">${((targets?.closing_projections?.november_target || 0) / 1000).toFixed(0)}K</div>
+                          <div className="text-xs text-gray-500">Target: ${((targets?.closing_projections?.november_target || 0) / 1000).toFixed(0)}K</div>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                          <div className="bg-gray-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-center text-gray-500 mb-2">X deals • $XK</div>
+                        <div className="space-y-1">
+                          <div className="bg-white border border-gray-300 rounded p-1 text-xs text-gray-600">Deal cards appear here</div>
+                        </div>
+                      </div>
+
+                      {/* Column 3: December 2025 */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 shadow-sm">
+                        <div className="text-center mb-2">
+                          <div className="text-xs font-semibold text-gray-600 mb-1">December 2025</div>
+                          <div className="text-lg font-bold text-gray-800">${((targets?.closing_projections?.december_target || 0) / 1000).toFixed(0)}K</div>
+                          <div className="text-xs text-gray-500">Target: ${((targets?.closing_projections?.december_target || 0) / 1000).toLocaleString()}K</div>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                          <div className="bg-gray-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-center text-gray-500 mb-2">X deals • $XK</div>
+                        <div className="space-y-1">
+                          <div className="bg-white border border-gray-300 rounded p-1 text-xs text-gray-600">Deal cards appear here</div>
+                        </div>
+                      </div>
+
+                      {/* Column 4: Q1 2026 */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 shadow-sm">
+                        <div className="text-center mb-2">
+                          <div className="text-xs font-semibold text-gray-600 mb-1">Q1 2026</div>
+                          <div className="text-lg font-bold text-gray-800">${((targets?.closing_projections?.q1_2026_target || 0) / 1000).toFixed(0)}K</div>
+                          <div className="text-xs text-gray-500">Target: ${((targets?.closing_projections?.q1_2026_target || 0) / 1000).toFixed(0)}K</div>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                          <div className="bg-gray-400 h-1.5 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-center text-gray-500 mb-2">X deals • $XK</div>
+                        <div className="space-y-1">
+                          <div className="bg-white border border-gray-300 rounded p-1 text-xs text-gray-600">Deal cards appear here</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-3 text-center italic">
+                      ℹ️ Preview shows board layout. Actual deals are draggable in the Projections tab. Progress bars update based on deals assigned to each column.
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+
               {/* MEETINGS GENERATION TAB - Banner Targets */}
               <Card className="border-green-200">
                 <CardHeader>
