@@ -868,6 +868,78 @@ function AdminTargetsPage() {
                 </AlertDescription>
               </Alert>
 
+              {/* MEETINGS ATTENDED TAB - Deals Closed Current Period */}
+              <Card className="border-orange-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-semibold rounded">MEETINGS ATTENDED TAB</span>
+                    Deals Closed (Current Period)
+                  </CardTitle>
+                  <CardDescription>
+                    Configure targets for Deals Closed and ARR Closed for the current period (monthly selection)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="deals_closed_current">Deals Closed Target</Label>
+                      <Input
+                        id="deals_closed_current"
+                        type="number"
+                        value={targets?.deals_closed_current_period?.deals_target || 0}
+                        onChange={(e) => {
+                          setTargets(prev => ({
+                            ...prev,
+                            deals_closed_current_period: {
+                              ...prev.deals_closed_current_period,
+                              deals_target: parseInt(e.target.value) || 0
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Number of deals to close in the current period</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="arr_closed_current">ARR Closed Target</Label>
+                      <Input
+                        id="arr_closed_current"
+                        type="number"
+                        value={targets?.deals_closed_current_period?.arr_target || 0}
+                        onChange={(e) => {
+                          setTargets(prev => ({
+                            ...prev,
+                            deals_closed_current_period: {
+                              ...prev.deals_closed_current_period,
+                              arr_target: parseInt(e.target.value) || 0
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                        step="10000"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Total ARR target in $ for current period (e.g., 500000 for $500K)</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-orange-50 rounded">
+                    <div className="text-sm font-semibold mb-2">Preview Banner:</div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="border p-3 rounded bg-white">
+                        <div className="font-semibold text-lg">_/{targets?.deals_closed_current_period?.deals_target || 0}</div>
+                        <div className="text-gray-600">Deals Closed</div>
+                        <div className="text-xs text-gray-500">Target: {targets?.deals_closed_current_period?.deals_target || 0}</div>
+                      </div>
+                      <div className="border p-3 rounded bg-white">
+                        <div className="font-semibold text-lg">$_/${(targets?.deals_closed_current_period?.arr_target || 0).toLocaleString()}</div>
+                        <div className="text-gray-600">ARR Closed</div>
+                        <div className="text-xs text-gray-500">Target: ${(targets?.deals_closed_current_period?.arr_target || 0).toLocaleString()}</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* JULY TO DEC TAB - Deals Closed Yearly */}
               <Card className="border-purple-200">
                 <CardHeader>
