@@ -3909,9 +3909,9 @@ function Dashboard() {
                           
                           // Calculate sum excluding hidden deals (with AE filter)
                           const filteredDeals = getFilteredDeals();
-                          const columnValue = filteredDeals
-                            .filter(deal => deal.column === 'next60' && !hiddenDeals.has(deal.id))
-                            .reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                          const columnDeals = filteredDeals.filter(deal => deal.column === 'next60' && !hiddenDeals.has(deal.id));
+                          const columnValue = columnDeals.reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                          const dealCount = columnDeals.length;
                           const columnTarget = 750000; // Fixed target: $750K for next 90 days
                           const percentage = Math.round((columnValue / columnTarget) * 100);
                           const isOnTrack = columnValue >= columnTarget;
@@ -3921,6 +3921,9 @@ function Dashboard() {
                               <CardContent className="p-3">
                                 <div className="text-2xl font-bold text-orange-800 text-center">
                                   {formatValue(columnValue)}
+                                </div>
+                                <div className="text-xs text-gray-500 text-center mb-1">
+                                  {dealCount} deal{dealCount !== 1 ? 's' : ''}
                                 </div>
                                 <div className="text-xs text-gray-600 text-center mb-2">
                                   Target: {formatValue(columnTarget)}
