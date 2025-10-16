@@ -115,6 +115,11 @@ function AdminTargetsPage() {
           deals_target: 10,
           arr_target: 500000
         },
+        upsell_renew: {
+          upsells_target: 5,
+          renewals_target: 10,
+          mrr_target: 50000
+        },
         deals_closed_yearly: {
           deals_target: 36,
           arr_target: 4500000
