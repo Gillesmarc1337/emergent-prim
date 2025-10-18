@@ -2131,13 +2131,6 @@ function Dashboard() {
               );
             })()}
 
-                value={analytics.dashboard_blocks?.block_1_meetings?.upsells_actual || 0}
-                target={analytics.dashboard_blocks?.block_1_meetings?.upsells_target || 0}
-                icon={TrendingUp}
-                color="indigo"
-              />
-            </div>
-
             {/* Monthly Meetings Evolution Chart - MOVED TO TOP */}
             {analytics.meeting_generation.meetings_details && analytics.meeting_generation.meetings_details.length > 0 && (() => {
               // Group meetings by month and source
