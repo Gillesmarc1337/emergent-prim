@@ -2115,6 +2115,100 @@ async def reset_projections_preferences(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error resetting preferences: {str(e)}")
 
+
+@api_router.post("/user/pipeline-board-preferences")
+async def save_pipeline_board_preferences(
+    request: Request,
+    view_id: str = Query(..., description="View ID"),
+    user: dict = Depends(get_current_user)
+):
+    """
+    Save user's pipeline board preferences (stage assignments, order) per view for Meetings Generation tab
+    """
+    try:
+        data = await request.json()
+        user_email = user.get("email")
+        
+        # Store in user_preferences collection with user_email + view_id as key
+        pref_key = f"{user_email}_{view_id}_pipeline_board"
+        
+        await db.user_preferences.update_one(
+            {"key": pref_key},
+            {
+                "$set": {
+                    "key": pref_key,
+                    "user_email": user_email,
+                    "view_id": view_id,
+                    "type": "pipeline_board",
+                    "deal_stages": data.get("deal_stages", {}),  # {deal_id: stage}
+                    "deal_order": data.get("deal_order", {}),  # {stage: [deal_ids]}
+                    "hidden_deals": data.get("hidden_deals", []),
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            },
+            upsert=True
+        )
+        
+        return {"message": "Pipeline board preferences saved successfully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error saving pipeline board preferences: {str(e)}")
+
+@api_router.get("/user/pipeline-board-preferences")
+async def get_pipeline_board_preferences(
+    view_id: str = Query(..., description="View ID"),
+    user: dict = Depends(get_current_user)
+):
+    """
+    Get user's saved pipeline board preferences for a specific view
+    """
+    try:
+        user_email = user.get("email")
+        pref_key = f"{user_email}_{view_id}_pipeline_board"
+        
+        preferences = await db.user_preferences.find_one({"key": pref_key})
+        
+        if not preferences:
+            return {
+                "deal_stages": {},
+                "deal_order": {},
+                "hidden_deals": [],
+                "has_preferences": False
+            }
+        
+        return {
+            "deal_stages": preferences.get("deal_stages", {}),
+            "deal_order": preferences.get("deal_order", {}),
+            "hidden_deals": preferences.get("hidden_deals", []),
+            "has_preferences": True
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error loading pipeline board preferences: {str(e)}")
+
+@api_router.delete("/user/pipeline-board-preferences")
+async def reset_pipeline_board_preferences(
+    view_id: str = Query(..., description="View ID"),
+    user: dict = Depends(get_current_user)
+):
+    """
+    Reset pipeline board preferences for a specific view
+    """
+    try:
+        user_email = user.get("email")
+        pref_key = f"{user_email}_{view_id}_pipeline_board"
+        
+        result = await db.user_preferences.delete_one({"key": pref_key})
+        
+        return {
+            "message": "Pipeline board preferences reset successfully",
+            "reset": True,
+            "deleted_count": result.deleted_count
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error resetting pipeline board preferences: {str(e)}")
+
 @api_router.post("/upload-data", response_model=UploadResponse)
 async def upload_sales_data(
     file: UploadFile = File(...),
