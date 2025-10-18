@@ -1936,8 +1936,8 @@ function Dashboard() {
                 const initialDeals = analytics.meeting_generation.meetings_details
                   .filter(meeting => meeting.stage && ['E Intro', 'D POA Booked', 'C Proposal sent', 'B Legals'].includes(meeting.stage))
                   .map(meeting => ({
-                    id: meeting.client_name || Math.random().toString(),
-                    client: meeting.client_name,
+                    id: meeting.client || Math.random().toString(),
+                    client: meeting.client,
                     pipeline: meeting.expected_arr || 0,
                     stage: meeting.stage,
                     ae: meeting.owner || 'Unassigned',
