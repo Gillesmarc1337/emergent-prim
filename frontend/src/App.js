@@ -1898,6 +1898,234 @@ function Dashboard() {
               />
               <MetricCard
                 title="Upsells / Cross-sell"
+
+
+            {/* Deal Pipeline Board - Interactive */}
+            {analytics.meeting_generation.meetings_details && analytics.meeting_generation.meetings_details.length > 0 && (() => {
+              // Calculate days since creation for each deal
+              const calculateDaysOld = (discoveryDate) => {
+                if (!discoveryDate) return 0;
+                const created = new Date(discoveryDate);
+                const now = new Date();
+                const diffTime = Math.abs(now - created);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays;
+              };
+
+              // Get aging color based on days
+              const getAgingColor = (days) => {
+                if (days < 30) return 'bg-green-100 border-green-300 text-green-800';
+                if (days < 60) return 'bg-orange-100 border-orange-300 text-orange-800';
+                return 'bg-red-100 border-red-300 text-red-800';
+              };
+
+              // Get aging badge
+              const getAgingBadge = (days) => {
+                if (days < 30) return 'Fresh';
+                if (days < 60) return 'Aging';
+                return 'Stale';
+              };
+
+              // Initialize pipeline deals from meetings_details if not loaded
+              if (pipelineDeals.length === 0 && analytics.meeting_generation.meetings_details.length > 0) {
+                const initialDeals = analytics.meeting_generation.meetings_details
+                  .filter(meeting => meeting.stage && ['E Intro', 'D POA Booked', 'C Proposal sent', 'B Legals'].includes(meeting.stage))
+                  .map(meeting => ({
+                    id: meeting.client_name || Math.random().toString(),
+                    client: meeting.client_name,
+                    pipeline: meeting.pipeline || 0,
+                    stage: meeting.stage,
+                    ae: meeting.ae_responsible || 'Unassigned',
+                    discovery_date: meeting.discovery_date,
+                    days_old: calculateDaysOld(meeting.discovery_date)
+                  }))
+                  .sort((a, b) => b.pipeline - a.pipeline); // Sort by deal size descending
+
+                setPipelineDeals(initialDeals);
+                setOriginalPipelineDeals(initialDeals);
+              }
+
+              // Group deals by stage
+              const stageColumns = {
+                'E Intro': { title: 'Intro', color: 'blue', deals: [] },
+                'D POA Booked': { title: 'POA Booked', color: 'purple', deals: [] },
+                'C Proposal sent': { title: 'Proposal Sent', color: 'orange', deals: [] },
+                'B Legals': { title: 'Legal', color: 'green', deals: [] }
+              };
+
+              // Filter and group deals
+              const filteredDeals = pipelineDeals.filter(deal => 
+                selectedPipelineAE === 'all' || deal.ae === selectedPipelineAE
+              );
+
+              filteredDeals.forEach(deal => {
+                if (stageColumns[deal.stage]) {
+                  stageColumns[deal.stage].deals.push(deal);
+                }
+              });
+
+              // Get unique AEs for filter
+              const uniqueAEs = [...new Set(pipelineDeals.map(d => d.ae))].sort();
+
+              // Handle drag and drop
+              const handleDragStart = (e, deal) => {
+                e.dataTransfer.setData('dealId', deal.id);
+                e.dataTransfer.effectAllowed = 'move';
+              };
+
+              const handleDragOver = (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+              };
+
+              const handleDrop = (e, targetStage) => {
+                e.preventDefault();
+                const dealId = e.dataTransfer.getData('dealId');
+                
+                setPipelineDeals(prev => {
+                  const updated = prev.map(deal => 
+                    deal.id === dealId ? { ...deal, stage: targetStage } : deal
+                  );
+                  return updated;
+                });
+                setHasUnsavedPipelineChanges(true);
+              };
+
+              // Save preferences
+              const savePipelinePreferences = async () => {
+                try {
+                  const dealStages = {};
+                  const dealOrder = {};
+                  
+                  pipelineDeals.forEach(deal => {
+                    dealStages[deal.id] = deal.stage;
+                  });
+
+                  Object.keys(stageColumns).forEach(stage => {
+                    dealOrder[stage] = stageColumns[stage].deals.map(d => d.id);
+                  });
+
+                  await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/pipeline-board-preferences?view_id=${currentView.id}`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ deal_stages: dealStages, deal_order: dealOrder, hidden_deals: [] })
+                  });
+
+                  setHasUnsavedPipelineChanges(false);
+                  alert('Pipeline board preferences saved!');
+                } catch (error) {
+                  console.error('Error saving pipeline preferences:', error);
+                  alert('Error saving preferences');
+                }
+              };
+
+              // Reset preferences
+              const resetPipelinePreferences = async () => {
+                if (window.confirm('Reset pipeline board to original state?')) {
+                  try {
+                    await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/pipeline-board-preferences?view_id=${currentView.id}`, {
+                      method: 'DELETE',
+                      credentials: 'include'
+                    });
+
+                    setPipelineDeals([...originalPipelineDeals]);
+                    setHasUnsavedPipelineChanges(false);
+                    alert('Pipeline board reset successfully!');
+                  } catch (error) {
+                    console.error('Error resetting pipeline preferences:', error);
+                    alert('Error resetting preferences');
+                  }
+                }
+              };
+
+              return (
+                <Card className="mb-6 border-2 border-indigo-200">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>Deal Pipeline Board — Interactive</CardTitle>
+                        <CardDescription>
+                          Drag & drop deals between stages. Color indicates aging (🟢 Fresh &lt;30d, 🟠 Aging 30-60d, 🔴 Stale &gt;60d). Sorted by deal size.
+                        </CardDescription>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={selectedPipelineAE}
+                          onChange={(e) => setSelectedPipelineAE(e.target.value)}
+                          className="px-3 py-1 border rounded text-sm"
+                        >
+                          <option value="all">All AEs</option>
+                          {uniqueAEs.map(ae => (
+                            <option key={ae} value={ae}>{ae}</option>
+                          ))}
+                        </select>
+                        <Button
+                          onClick={savePipelinePreferences}
+                          disabled={!hasUnsavedPipelineChanges}
+                          size="sm"
+                          variant={hasUnsavedPipelineChanges ? "default" : "outline"}
+                        >
+                          {hasUnsavedPipelineChanges ? '💾 Save Changes' : '✓ Saved'}
+                        </Button>
+                        <Button onClick={resetPipelinePreferences} size="sm" variant="outline">
+                          🔄 Reset
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      {Object.entries(stageColumns).map(([stageKey, column]) => (
+                        <div
+                          key={stageKey}
+                          className={`bg-${column.color}-50 border-2 border-${column.color}-200 rounded-lg p-3 min-h-[400px]`}
+                          onDragOver={handleDragOver}
+                          onDrop={(e) => handleDrop(e, stageKey)}
+                        >
+                          <div className="text-center mb-3">
+                            <h3 className={`font-semibold text-${column.color}-700 text-lg`}>{column.title}</h3>
+                            <p className="text-xs text-gray-600">
+                              {column.deals.length} deals • ${(column.deals.reduce((sum, d) => sum + d.pipeline, 0) / 1000).toFixed(0)}K
+                            </p>
+                          </div>
+                          <div className="space-y-2">
+                            {column.deals.map((deal) => (
+                              <div
+                                key={deal.id}
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, deal)}
+                                className={`${getAgingColor(deal.days_old)} border-2 rounded-lg p-3 cursor-move hover:shadow-lg transition-shadow`}
+                              >
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="font-semibold text-sm flex-1">{deal.client}</div>
+                                  <Badge variant="outline" className="text-xs ml-2">
+                                    {getAgingBadge(deal.days_old)}
+                                  </Badge>
+                                </div>
+                                <div className="text-lg font-bold text-gray-800 mb-1">
+                                  ${(deal.pipeline / 1000).toFixed(0)}K
+                                </div>
+                                <div className="flex items-center justify-between text-xs text-gray-600">
+                                  <span>📅 {deal.days_old} days old</span>
+                                  <span className="font-medium">{deal.ae}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {hasUnsavedPipelineChanges && (
+                      <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                        ⚠️ You have unsaved changes. Click "Save Changes" to persist your board configuration.
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })()}
+
                 value={analytics.dashboard_blocks?.block_1_meetings?.upsells_actual || 0}
                 target={analytics.dashboard_blocks?.block_1_meetings?.upsells_target || 0}
                 icon={TrendingUp}
