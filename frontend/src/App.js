@@ -1938,9 +1938,9 @@ function Dashboard() {
                   .map(meeting => ({
                     id: meeting.client_name || Math.random().toString(),
                     client: meeting.client_name,
-                    pipeline: meeting.pipeline || 0,
+                    pipeline: meeting.expected_arr || 0,
                     stage: meeting.stage,
-                    ae: meeting.ae_responsible || 'Unassigned',
+                    ae: meeting.owner || 'Unassigned',
                     discovery_date: meeting.discovery_date,
                     days_old: calculateDaysOld(meeting.discovery_date)
                   }))
