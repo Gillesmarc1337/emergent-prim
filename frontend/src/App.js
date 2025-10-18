@@ -1181,6 +1181,12 @@ function Dashboard() {
     deals_closed: true
   });
   
+  // State for Deal Pipeline Board (Meetings Generation tab)
+  const [pipelineDeals, setPipelineDeals] = useState([]);
+  const [originalPipelineDeals, setOriginalPipelineDeals] = useState([]);
+  const [selectedPipelineAE, setSelectedPipelineAE] = useState('all');
+  const [hasUnsavedPipelineChanges, setHasUnsavedPipelineChanges] = useState(false);
+  
   // NEW: Tab targets (direct from BO, no multiplication)
   const [tabTargets, setTabTargets] = useState({
     meetings_attended_tab: {
