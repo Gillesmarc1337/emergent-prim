@@ -2277,12 +2277,21 @@ function Dashboard() {
                 }));
               };
               
+              // Custom legend with checkboxes
+              const legendData = [
+                { key: 'Inbound', color: '#10b981', label: 'Inbound' },
+                { key: 'Outbound', color: '#f97316', label: 'Outbound' },
+                { key: 'Referral', color: '#a855f7', label: 'Referral' },
+                { key: 'Upsells/Cross-sell', color: '#6366f1', label: 'Upsells/Cross-sell' },
+                { key: 'Total', color: '#1e40af', label: 'Total Meetings' }
+              ];
+              
               return (
                 <Card className="mb-6">
                   <CardHeader>
                     <CardTitle>Monthly Meetings Evolution</CardTitle>
                     <CardDescription>
-                      Total meetings generated per month with breakdown by source (click legend to toggle)
+                      Total meetings generated per month with breakdown by source
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -2292,10 +2301,6 @@ function Dashboard() {
                         <XAxis dataKey="month" />
                         <YAxis />
                         <Tooltip />
-                        <Legend 
-                          onClick={(e) => handleLegendClick(e.dataKey)}
-                          wrapperStyle={{ cursor: 'pointer' }}
-                        />
                         {meetingsEvolutionVisibility.Inbound && <Bar dataKey="Inbound" stackId="a" fill="#10b981" />}
                         {meetingsEvolutionVisibility.Outbound && <Bar dataKey="Outbound" stackId="a" fill="#f97316" />}
                         {meetingsEvolutionVisibility.Referral && <Bar dataKey="Referral" stackId="a" fill="#a855f7" />}
@@ -2303,6 +2308,29 @@ function Dashboard() {
                         {meetingsEvolutionVisibility.Total && <Line type="monotone" dataKey="Total" stroke="#1e40af" strokeWidth={3} name="Total Meetings" />}
                       </ComposedChart>
                     </ResponsiveContainer>
+                    {/* Custom Legend with Checkboxes */}
+                    <div className="flex flex-wrap justify-center gap-4 mt-4 pt-4 border-t">
+                      {legendData.map(({ key, color, label }) => (
+                        <label 
+                          key={key}
+                          className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-3 py-2 rounded transition-colors"
+                          onClick={() => handleLegendClick(key)}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={meetingsEvolutionVisibility[key]}
+                            onChange={() => {}}
+                            className="w-4 h-4 cursor-pointer"
+                            style={{ accentColor: color }}
+                          />
+                          <span 
+                            className="w-3 h-3 rounded-sm"
+                            style={{ backgroundColor: color }}
+                          />
+                          <span className="text-sm font-medium text-gray-700">{label}</span>
+                        </label>
+                      ))}
+                    </div>
                   </CardContent>
                 </Card>
               );
