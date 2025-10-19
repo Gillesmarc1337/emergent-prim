@@ -195,9 +195,11 @@ def map_admin_targets_to_analytics_format(admin_targets: dict) -> dict:
             mapped_targets["dashboard"]["new_pipe_created"] = banners["new_pipe_target"]
         if "deals_closed_count" in banners and banners["deals_closed_count"] > 0:
             mapped_targets["dashboard"]["deals"] = banners["deals_closed_count"]
+            # Also map to meeting_attended for calculations
+            mapped_targets["meeting_attended"]["deals_closed"] = banners["deals_closed_count"]
         if "deals_closed_arr" in banners and banners["deals_closed_arr"] > 0:
-            # Store ARR target if needed
-            pass
+            # Store ARR target for deals closed
+            mapped_targets["meeting_attended"]["deals_closed_arr"] = banners["deals_closed_arr"]
     
     # Map meeting_generation (new format keeps most of the same keys)
     if "meeting_generation" in admin_targets:
