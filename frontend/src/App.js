@@ -1227,7 +1227,9 @@ function Dashboard() {
   // State for Monthly Pipeline Evolution chart
   const [pipelineEvolutionVisibility, setPipelineEvolutionVisibility] = useState({
     new_pipe_created: true,
-    new_weighted_pipe: true
+    new_weighted_pipe: true,
+    total_pipe: true,
+    total_weighted: true
   });
   
   // State for Upsell & Renew Evolution chart
