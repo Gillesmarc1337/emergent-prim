@@ -2063,15 +2063,6 @@ function Dashboard() {
               ];
               
               return (
-                    id: meeting.client || Math.random().toString(),
-                    client: meeting.client,
-                    pipeline: meeting.expected_arr || 0,
-                    stage: meeting.stage,
-                    ae: meeting.owner || 'Unassigned',
-                    discovery_date: meeting.discovery_date,
-                    days_old: calculateDaysOld(meeting.discovery_date)
-                  }))
-                  .sort((a, b) => b.pipeline - a.pipeline); // Sort by deal size descending
 
                 setPipelineDeals(initialDeals);
                 setOriginalPipelineDeals(initialDeals);
