@@ -1775,14 +1775,24 @@ async def get_tab_targets(
     poa_generated_target = None
     meetings_scheduled_target = None
     
-    # Priority 1: Check dashboard_banners (from Admin BO - highest priority)
+    # Priority 1: Check meetings_attended_tab (from Admin BO - HIGHEST PRIORITY)
+    # This is where super_admin configures targets in Back Office
+    if "meetings_attended_tab" in targets:
+        if "deals_closed_target" in targets["meetings_attended_tab"]:
+            deals_closed_target = targets["meetings_attended_tab"]["deals_closed_target"]
+        if "poa_generated_target" in targets["meetings_attended_tab"]:
+            poa_generated_target = targets["meetings_attended_tab"]["poa_generated_target"]
+        if "meetings_scheduled_target" in targets["meetings_attended_tab"]:
+            meetings_scheduled_target = targets["meetings_attended_tab"]["meetings_scheduled_target"]
+    
+    # Priority 2: Check dashboard_banners (only if not set by meetings_attended_tab)
     if "dashboard_banners" in targets:
-        if "deals_closed_count" in targets["dashboard_banners"]:
+        if deals_closed_target is None and "deals_closed_count" in targets["dashboard_banners"]:
             deals_closed_target = targets["dashboard_banners"]["deals_closed_count"]
-        if "poa_target" in targets["dashboard_banners"]:
+        if poa_generated_target is None and "poa_target" in targets["dashboard_banners"]:
             poa_generated_target = targets["dashboard_banners"]["poa_target"]
     
-    # Priority 2: Check meetings_attended (only if not set by dashboard_banners)
+    # Priority 3: Check meetings_attended (legacy, only if nothing set yet)
     if "meetings_attended" in targets:
         if deals_closed_target is None and "deals_closed" in targets["meetings_attended"]:
             deals_closed_target = targets["meetings_attended"]["deals_closed"]
@@ -1790,15 +1800,6 @@ async def get_tab_targets(
             poa_generated_target = targets["meetings_attended"]["poa_generated"]
         if meetings_scheduled_target is None and "meetings_scheduled" in targets["meetings_attended"]:
             meetings_scheduled_target = targets["meetings_attended"]["meetings_scheduled"]
-    
-    # Priority 3: Check direct meetings_attended_tab (legacy, only if nothing set yet)
-    if "meetings_attended_tab" in targets:
-        if deals_closed_target is None and "deals_closed_target" in targets["meetings_attended_tab"]:
-            deals_closed_target = targets["meetings_attended_tab"]["deals_closed_target"]
-        if poa_generated_target is None and "poa_generated_target" in targets["meetings_attended_tab"]:
-            poa_generated_target = targets["meetings_attended_tab"]["poa_generated_target"]
-        if meetings_scheduled_target is None and "meetings_scheduled_target" in targets["meetings_attended_tab"]:
-            meetings_scheduled_target = targets["meetings_attended_tab"]["meetings_scheduled_target"]
     
     # Set defaults if still None
     if deals_closed_target is None:
