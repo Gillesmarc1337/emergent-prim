@@ -2024,7 +2024,7 @@ function Dashboard() {
                 return 'Stale';
               };
 
-              // Get pipeline deals directly from meetings_details (no state caching)
+              // Get pipeline deals directly from meetings_details
               const pipelineDealsData = analytics.meeting_generation.meetings_details
                 .filter(meeting => meeting.stage && ['E Inbox', 'D POA Booked', 'C Proposal sent', 'B Legals'].includes(meeting.stage))
                 .map(meeting => ({
@@ -2037,6 +2037,15 @@ function Dashboard() {
                   days_old: calculateDaysOld(meeting.discovery_date)
                 }))
                 .sort((a, b) => b.pipeline - a.pipeline);
+              
+              // Initialize state from data if empty
+              if (pipelineDeals.length === 0 && pipelineDealsData.length > 0) {
+                setPipelineDeals(pipelineDealsData);
+                setOriginalPipelineDeals(pipelineDealsData);
+              }
+              
+              // Use pipelineDeals state if set, otherwise use fresh data
+              const dealsToDisplay = pipelineDeals.length > 0 ? pipelineDeals : pipelineDealsData;
 
               // Group deals by stage
               const stageColumns = {
