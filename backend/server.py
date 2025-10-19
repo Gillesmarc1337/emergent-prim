@@ -1766,13 +1766,13 @@ async def get_tab_targets(
         if "meetings_scheduled" in targets["meetings_attended"]:
             meetings_scheduled_target = targets["meetings_attended"]["meetings_scheduled"]
     
-    # Priority 3: Check direct meetings_attended_tab (legacy)
+    # Priority 3: Check direct meetings_attended_tab (legacy) - only if not already set
     if "meetings_attended_tab" in targets:
-        if "deals_closed_target" in targets["meetings_attended_tab"]:
+        if "deals_closed_target" in targets["meetings_attended_tab"] and deals_closed_target == 6:  # Only if still default
             deals_closed_target = targets["meetings_attended_tab"]["deals_closed_target"]
-        if "poa_generated_target" in targets["meetings_attended_tab"]:
+        if "poa_generated_target" in targets["meetings_attended_tab"] and poa_generated_target == 18:  # Only if still default
             poa_generated_target = targets["meetings_attended_tab"]["poa_generated_target"]
-        if "meetings_scheduled_target" in targets["meetings_attended_tab"]:
+        if "meetings_scheduled_target" in targets["meetings_attended_tab"] and meetings_scheduled_target == 50:  # Only if still default
             meetings_scheduled_target = targets["meetings_attended_tab"]["meetings_scheduled_target"]
     
     # Get ARR target from dashboard_banners or deals_closed_yearly
