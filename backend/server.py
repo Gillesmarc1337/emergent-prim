@@ -685,19 +685,23 @@ def calculate_meeting_generation(df, start_date, end_date, view_targets=None):
     # Split by source type
     inbound = period_data[period_data['type_of_source'] == 'Inbound']
     outbound = period_data[period_data['type_of_source'] == 'Outbound']
-    # Referrals include: Internal referral, External referral, Client referral
-    # PLUS unassigned/null type_of_source (they are actually referrals)
-    referrals = period_data[
-        period_data['type_of_source'].isin(['Internal referral', 'External referral', 'Client referral']) |
-        period_data['type_of_source'].isna() |
-        (period_data['type_of_source'] == '')
-    ]
     
     # Breakdown referrals by type
     internal_referral = period_data[period_data['type_of_source'] == 'Internal referral']
     external_referral = period_data[period_data['type_of_source'] == 'External referral']
     client_referral = period_data[period_data['type_of_source'] == 'Client referral']
     event = period_data[period_data['type_of_source'] == 'Event']
+    
+    # None & Non assigned: empty or null type_of_source
+    none_unassigned = period_data[
+        period_data['type_of_source'].isna() |
+        (period_data['type_of_source'] == '')
+    ]
+    
+    # Referrals include: Internal referral, External referral, Client referral ONLY
+    referrals = period_data[
+        period_data['type_of_source'].isin(['Internal referral', 'External referral', 'Client referral'])
+    ]
     
     # Relevance analysis
     relevant = period_data[period_data['relevance'] == 'Relevant']
