@@ -3776,17 +3776,24 @@ function Dashboard() {
                 {upsellRenewData && upsellRenewData.monthly_breakdown && upsellRenewData.monthly_breakdown.months && upsellRenewData.monthly_breakdown.months.length > 0 && (() => {
                   const chartData = upsellRenewData.monthly_breakdown.months.map((month, index) => ({
                     month,
-                    meetings_attended: upsellRenewData.monthly_breakdown.meetings_attended[index],
-                    poa_generated: upsellRenewData.monthly_breakdown.poa_generated[index],
-                    revenue_generated: upsellRenewData.monthly_breakdown.revenue_generated[index]
+                    intro_meetings: upsellRenewData.monthly_breakdown.meetings_attended[index],
+                    poa_attended: upsellRenewData.monthly_breakdown.poa_generated[index],
+                    deals_closed: upsellRenewData.monthly_breakdown.revenue_generated[index]
                   }));
+                  
+                  const handleLegendClick = (dataKey) => {
+                    setUpsellEvolutionVisibility(prev => ({
+                      ...prev,
+                      [dataKey]: !prev[dataKey]
+                    }));
+                  };
                   
                   return (
                     <Card className="mb-6">
                       <CardHeader>
                         <CardTitle>Monthly Upsell & Renew Evolution</CardTitle>
                         <CardDescription>
-                          Track upsell/renew meetings, POA generated, and revenue on a monthly basis
+                          Track upsell/renew meetings, POA generated, and revenue on a monthly basis (click legend to toggle)
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -3798,16 +3805,19 @@ function Dashboard() {
                             <YAxis yAxisId="right" orientation="right" />
                             <Tooltip 
                               formatter={(value, name) => {
-                                if (name === 'Revenue Generated') {
+                                if (name === 'Deals Closed') {
                                   return [`$${value.toLocaleString()}`, name];
                                 }
                                 return [value, name];
                               }}
                             />
-                            <Legend />
-                            <Bar yAxisId="left" dataKey="meetings_attended" fill="#6366f1" name="Meetings Attended" />
-                            <Bar yAxisId="left" dataKey="poa_generated" fill="#10b981" name="POA Generated" />
-                            <Line yAxisId="right" type="monotone" dataKey="revenue_generated" stroke="#ef4444" strokeWidth={3} name="Revenue Generated" />
+                            <Legend 
+                              onClick={(e) => handleLegendClick(e.dataKey)}
+                              wrapperStyle={{ cursor: 'pointer' }}
+                            />
+                            {upsellEvolutionVisibility.intro_meetings && <Bar yAxisId="left" dataKey="intro_meetings" fill="#6366f1" name="Intro Meetings" />}
+                            {upsellEvolutionVisibility.poa_attended && <Bar yAxisId="left" dataKey="poa_attended" fill="#10b981" name="POA Attended" />}
+                            {upsellEvolutionVisibility.deals_closed && <Line yAxisId="right" type="monotone" dataKey="deals_closed" stroke="#ef4444" strokeWidth={3} name="Deals Closed" />}
                           </ComposedChart>
                         </ResponsiveContainer>
                       </CardContent>
