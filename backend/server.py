@@ -3932,7 +3932,7 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
                 'monthly_target': view_targets.get("dashboard", {}).get("new_pipe_created", 2000000),  # Use view-specific monthly target
                 'new_pipe_created': new_pipe_created,
                 'weighted_pipe_created': weighted_pipe_created,
-                'aggregate_weighted_pipe': aggregate_weighted_pipe_custom,
+                'aggregate_weighted_pipe': weighted_pipe_created,  # Use weighted_pipe_created as aggregate for custom period
                 'target_pipe_created': view_targets.get("dashboard", {}).get("new_pipe_created", 2000000),
                 'target_weighted_pipe': view_targets.get("dashboard", {}).get("weighted_pipe", 800000),
                 'target_label': f'${int(view_targets.get("dashboard", {}).get("new_pipe_created", 2000000) / 1000000)}M New Pipe Target/Month',
