@@ -1631,6 +1631,16 @@ function Dashboard() {
     }
   };
 
+  // Handler for deal probability changes
+  const handleDealProbabilityChange = (dealId, probability) => {
+    setDealProbabilities(prev => ({
+      ...prev,
+      [dealId]: probability
+    }));
+    setHasUnsavedChanges(true);
+  };
+
+
   const resetView = (type) => {
     if (type === 'deals') {
       setHiddenDeals(new Set());
