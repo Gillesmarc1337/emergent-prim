@@ -4391,18 +4391,31 @@ function Dashboard() {
                           const filteredDeals = getFilteredDeals();
                           const columnDeals = filteredDeals.filter(deal => deal.column === 'next14' && !hiddenDeals.has(deal.id));
                           const columnValue = columnDeals.reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                          const weightedValue = columnDeals.reduce((sum, deal) => {
+                            const prob = dealProbabilities[deal.id] || 75;
+                            return sum + ((deal.pipeline || 0) * prob / 100);
+                          }, 0);
                           const dealCount = columnDeals.length;
                           const columnTarget = 375000; // Fixed target: $375K for next 30 days
-                          const percentage = Math.round((columnValue / columnTarget) * 100);
-                          const isOnTrack = columnValue >= columnTarget;
+                          const percentage = Math.round((weightedValue / columnTarget) * 100);
+                          const isOnTrack = weightedValue >= columnTarget;
                           
                           return (
                             <Card className="bg-white">
                               <CardContent className="p-3">
+                                <div className="text-sm font-semibold text-gray-700 text-center mb-1">
+                                  Total ARR
+                                </div>
                                 <div className="text-2xl font-bold text-green-800 text-center">
                                   {formatValue(columnValue)}
                                 </div>
-                                <div className="text-xs text-gray-500 text-center mb-1">
+                                <div className="text-sm font-semibold text-blue-700 text-center mt-2 mb-1">
+                                  Projected (Weighted)
+                                </div>
+                                <div className="text-xl font-bold text-blue-600 text-center">
+                                  {formatValue(weightedValue)}
+                                </div>
+                                <div className="text-xs text-gray-500 text-center mt-2 mb-1">
                                   {dealCount} deal{dealCount !== 1 ? 's' : ''}
                                 </div>
                                 <div className="text-xs text-gray-600 text-center mb-2">
