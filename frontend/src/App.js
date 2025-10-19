@@ -2708,84 +2708,6 @@ function Dashboard() {
 
               return (
                 <>
-                  {/* Monthly Meetings Attended Evolution Chart - MOVED TO TOP */}
-                  {analytics.meetings_attended.monthly_breakdown && analytics.meetings_attended.monthly_breakdown.months && analytics.meetings_attended.monthly_breakdown.months.length > 0 && (() => {
-                    const chartData = analytics.meetings_attended.monthly_breakdown.months.map((month, index) => ({
-                      month,
-                      attended: analytics.meetings_attended.monthly_breakdown.attended[index],
-                      poa_generated: analytics.meetings_attended.monthly_breakdown.poa_generated[index],
-                      deals_closed: analytics.meetings_attended.monthly_breakdown.deals_closed[index]
-                    }));
-                    
-                    // Function to toggle visibility of chart series
-                    const handleLegendClick = (dataKey) => {
-                      setAttendedChartVisibility(prev => ({
-                        ...prev,
-                        [dataKey]: !prev[dataKey]
-                      }));
-                    };
-                    
-                    // Custom legend data
-                    const legendData = [
-                      { key: 'attended', color: '#3b82f6', label: 'Meetings Attended' },
-                      { key: 'poa_generated', color: '#10b981', label: 'POA Generated' },
-                      { key: 'deals_closed', color: '#ef4444', label: 'Deals Closed' }
-                    ];
-                    
-                    return (
-                      <Card className="mb-6">
-                        <CardHeader>
-                          <CardTitle>Monthly Meetings Attended Evolution</CardTitle>
-                          <CardDescription>
-                            Track attended meetings, POA generated, and deals closed on a monthly basis (click legend to toggle)
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <ResponsiveContainer width="100%" height={350}>
-                            <ComposedChart data={chartData}>
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <XAxis dataKey="month" />
-                              <YAxis />
-                              <Tooltip />
-                              {attendedChartVisibility.attended && (
-                                <Bar dataKey="attended" fill="#3b82f6" name="Meetings Attended" />
-                              )}
-                              {attendedChartVisibility.poa_generated && (
-                                <Bar dataKey="poa_generated" fill="#10b981" name="POA Generated" />
-                              )}
-                              {attendedChartVisibility.deals_closed && (
-                                <Line type="monotone" dataKey="deals_closed" stroke="#ef4444" strokeWidth={3} name="Deals Closed" />
-                              )}
-                            </ComposedChart>
-                          </ResponsiveContainer>
-                          
-                          {/* Custom Legend with Checkboxes */}
-                          <div className="flex flex-wrap justify-center gap-4 mt-4 px-4">
-                            {legendData.map(({ key, color, label }) => (
-                              <button
-                                key={key}
-                                onClick={() => handleLegendClick(key)}
-                                className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all ${
-                                  attendedChartVisibility[key] 
-                                    ? 'bg-white shadow-sm border border-gray-200' 
-                                    : 'bg-gray-100 opacity-60 hover:opacity-80'
-                                }`}
-                              >
-                                <div 
-                                  className="w-3 h-3 rounded-sm"
-                                  style={{ backgroundColor: color }}
-                                />
-                                <span className={`text-sm ${attendedChartVisibility[key] ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>
-                                  {label}
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })()}
-
                   {/* Period and Target Info */}
                   <div className="mb-4 p-3 bg-gray-50 rounded-lg border">
                     <div className="text-sm text-gray-600">
@@ -2865,6 +2787,84 @@ function Dashboard() {
                       </div>
                     </CardContent>
                   </Card>
+
+                  {/* Monthly Meetings Attended Evolution Chart - Positioned BEFORE AE Performance Breakdown */}
+                  {analytics.meetings_attended.monthly_breakdown && analytics.meetings_attended.monthly_breakdown.months && analytics.meetings_attended.monthly_breakdown.months.length > 0 && (() => {
+                    const chartData = analytics.meetings_attended.monthly_breakdown.months.map((month, index) => ({
+                      month,
+                      attended: analytics.meetings_attended.monthly_breakdown.attended[index],
+                      poa_generated: analytics.meetings_attended.monthly_breakdown.poa_generated[index],
+                      deals_closed: analytics.meetings_attended.monthly_breakdown.deals_closed[index]
+                    }));
+                    
+                    // Function to toggle visibility of chart series
+                    const handleLegendClick = (dataKey) => {
+                      setAttendedChartVisibility(prev => ({
+                        ...prev,
+                        [dataKey]: !prev[dataKey]
+                      }));
+                    };
+                    
+                    // Custom legend data
+                    const legendData = [
+                      { key: 'attended', color: '#3b82f6', label: 'Meetings Attended' },
+                      { key: 'poa_generated', color: '#10b981', label: 'POA Generated' },
+                      { key: 'deals_closed', color: '#ef4444', label: 'Deals Closed' }
+                    ];
+                    
+                    return (
+                      <Card className="mb-6">
+                        <CardHeader>
+                          <CardTitle>Monthly Meetings Attended Evolution</CardTitle>
+                          <CardDescription>
+                            Track attended meetings, POA generated, and deals closed on a monthly basis (click legend to toggle)
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <ResponsiveContainer width="100%" height={350}>
+                            <ComposedChart data={chartData}>
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis dataKey="month" />
+                              <YAxis />
+                              <Tooltip />
+                              {attendedChartVisibility.attended && (
+                                <Bar dataKey="attended" fill="#3b82f6" name="Meetings Attended" />
+                              )}
+                              {attendedChartVisibility.poa_generated && (
+                                <Bar dataKey="poa_generated" fill="#10b981" name="POA Generated" />
+                              )}
+                              {attendedChartVisibility.deals_closed && (
+                                <Line type="monotone" dataKey="deals_closed" stroke="#ef4444" strokeWidth={3} name="Deals Closed" />
+                              )}
+                            </ComposedChart>
+                          </ResponsiveContainer>
+                          
+                          {/* Custom Legend with Checkboxes */}
+                          <div className="flex flex-wrap justify-center gap-4 mt-4 px-4">
+                            {legendData.map(({ key, color, label }) => (
+                              <button
+                                key={key}
+                                onClick={() => handleLegendClick(key)}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all ${
+                                  attendedChartVisibility[key] 
+                                    ? 'bg-white shadow-sm border border-gray-200' 
+                                    : 'bg-gray-100 opacity-60 hover:opacity-80'
+                                }`}
+                              >
+                                <div 
+                                  className="w-3 h-3 rounded-sm"
+                                  style={{ backgroundColor: color }}
+                                />
+                                <span className={`text-sm ${attendedChartVisibility[key] ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>
+                                  {label}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })()}
                 </>
               );
             })()}
