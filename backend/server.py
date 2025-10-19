@@ -1745,16 +1745,54 @@ async def get_tab_targets(
     
     targets = view.get("targets", {})
     
+    # Get deals_closed_target from multiple possible sources
+    deals_closed_target = 6  # default
+    poa_generated_target = 18  # default
+    meetings_scheduled_target = 50  # default
+    
+    # Priority 1: Check dashboard_banners (from Admin BO)
+    if "dashboard_banners" in targets:
+        if "deals_closed_count" in targets["dashboard_banners"]:
+            deals_closed_target = targets["dashboard_banners"]["deals_closed_count"]
+        if "poa_target" in targets["dashboard_banners"]:
+            poa_generated_target = targets["dashboard_banners"]["poa_target"]
+    
+    # Priority 2: Check meetings_attended
+    if "meetings_attended" in targets:
+        if "deals_closed" in targets["meetings_attended"] and deals_closed_target == 6:
+            deals_closed_target = targets["meetings_attended"]["deals_closed"]
+        if "poa_generated" in targets["meetings_attended"] and poa_generated_target == 18:
+            poa_generated_target = targets["meetings_attended"]["poa_generated"]
+        if "meetings_scheduled" in targets["meetings_attended"]:
+            meetings_scheduled_target = targets["meetings_attended"]["meetings_scheduled"]
+    
+    # Priority 3: Check direct meetings_attended_tab (legacy)
+    if "meetings_attended_tab" in targets:
+        if "deals_closed_target" in targets["meetings_attended_tab"]:
+            deals_closed_target = targets["meetings_attended_tab"]["deals_closed_target"]
+        if "poa_generated_target" in targets["meetings_attended_tab"]:
+            poa_generated_target = targets["meetings_attended_tab"]["poa_generated_target"]
+        if "meetings_scheduled_target" in targets["meetings_attended_tab"]:
+            meetings_scheduled_target = targets["meetings_attended_tab"]["meetings_scheduled_target"]
+    
+    # Get ARR target from dashboard_banners or deals_closed_yearly
+    deals_closed_arr = 500000  # default
+    if "dashboard_banners" in targets and "deals_closed_arr" in targets["dashboard_banners"]:
+        deals_closed_arr = targets["dashboard_banners"]["deals_closed_arr"]
+    elif "deals_closed_yearly" in targets and "arr_target" in targets["deals_closed_yearly"]:
+        # This is 6-month target, convert to monthly
+        deals_closed_arr = targets["deals_closed_yearly"]["arr_target"] / 6
+    
     return {
-        "meetings_attended_tab": targets.get("meetings_attended_tab", {
-            "meetings_scheduled_target": 50,
-            "poa_generated_target": 18,
-            "deals_closed_target": 6
-        }),
-        "deals_closed_tab": targets.get("deals_closed_tab", {
-            "deals_closed_target": 10,
-            "arr_closed_target": 500000
-        })
+        "meetings_attended_tab": {
+            "meetings_scheduled_target": meetings_scheduled_target,
+            "poa_generated_target": poa_generated_target,
+            "deals_closed_target": deals_closed_target
+        },
+        "deals_closed_tab": {
+            "deals_closed_target": deals_closed_target,
+            "arr_closed_target": int(deals_closed_arr)
+        }
     }
 
 @api_router.post("/admin/views/{view_id}/sync-targets-from-sheet")
