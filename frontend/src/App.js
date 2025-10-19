@@ -2054,8 +2054,13 @@ function Dashboard() {
               };
               
               // Custom legend with checkboxes
-              const legendData = [ 
-                           meeting.stage === 'C Proposal sent' || 
+              const legendData = [
+                { key: 'Inbound', color: '#10b981', label: 'Inbound' },
+                { key: 'Outbound', color: '#f97316', label: 'Outbound' },
+                { key: 'Referral', color: '#a855f7', label: 'Referral' },
+                { key: 'Upsells/Cross-sell', color: '#6366f1', label: 'Upsells/Cross-sell' },
+                { key: 'Total', color: '#1e40af', label: 'Total Meetings' }
+              ]; 
                            meeting.stage === 'B Legals';
                   })
                   .map(meeting => ({
