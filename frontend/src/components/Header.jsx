@@ -90,6 +90,25 @@ const Header = () => {
               </div>
             )}
 
+            {/* Clear Cache Button */}
+            {user && (
+              <Button
+                onClick={() => {
+                  // Clear all localStorage
+                  localStorage.clear();
+                  // Clear session storage
+                  sessionStorage.clear();
+                  // Reload the page to fetch fresh data
+                  window.location.reload();
+                }}
+                variant="outline"
+                size="sm"
+                className="gap-2 text-blue-600 border-blue-300 hover:bg-blue-50"
+              >
+                🗑️ Clear Cache
+              </Button>
+            )}
+
             {/* Admin Dropdown (super_admin only) */}
             {isAdmin && (
               <DropdownMenu>
