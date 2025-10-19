@@ -2294,6 +2294,180 @@ function Dashboard() {
               </Card>
             </div>
 
+            {/* Deal Pipeline Board - Simplifié (Intro + POA Booked only) */}
+            {analytics.meeting_generation.meetings_details && analytics.meeting_generation.meetings_details.length > 0 && (() => {
+              // Calculate days since creation
+              const calculateDaysOld = (discoveryDate) => {
+                if (!discoveryDate) return 0;
+                const created = new Date(discoveryDate);
+                const now = new Date();
+                const diffTime = Math.abs(now - created);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays;
+              };
+
+              // Get aging color
+              const getAgingColor = (days) => {
+                if (days < 30) return 'bg-green-100 border-green-300';
+                if (days < 60) return 'bg-orange-100 border-orange-300';
+                return 'bg-red-100 border-red-300';
+              };
+
+              // Get aging badge
+              const getAgingBadge = (days) => {
+                if (days < 30) return { text: 'Fresh', color: 'bg-green-500' };
+                if (days < 60) return { text: 'Aging', color: 'bg-orange-500' };
+                return { text: 'Stale', color: 'bg-red-500' };
+              };
+
+              // Filter deals for Intro (F Inbox) and POA Booked (D POA Booked)
+              const introDeals = analytics.meeting_generation.meetings_details
+                .filter(meeting => meeting.stage === 'F Inbox')
+                .map(meeting => ({
+                  id: meeting.client || Math.random().toString(),
+                  client: meeting.client,
+                  pipeline: meeting.expected_arr || 0,
+                  stage: meeting.stage,
+                  ae: meeting.owner || 'Unassigned',
+                  intro_date: meeting.discovery_date, // Date d'intro
+                  poa_date: null, // Pas encore de POA
+                  days_old: calculateDaysOld(meeting.discovery_date)
+                }))
+                .sort((a, b) => b.pipeline - a.pipeline);
+
+              const poaDeals = analytics.meeting_generation.meetings_details
+                .filter(meeting => meeting.stage === 'D POA Booked')
+                .map(meeting => ({
+                  id: meeting.client || Math.random().toString(),
+                  client: meeting.client,
+                  pipeline: meeting.expected_arr || 0,
+                  stage: meeting.stage,
+                  ae: meeting.owner || 'Unassigned',
+                  intro_date: meeting.discovery_date, // Date d'intro originale
+                  poa_date: meeting.poa_date || meeting.discovery_date, // Date POA (si disponible, sinon discovery)
+                  days_old: calculateDaysOld(meeting.discovery_date)
+                }))
+                .sort((a, b) => b.pipeline - a.pipeline);
+
+              const formatDate = (dateStr) => {
+                if (!dateStr) return 'N/A';
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+              };
+
+              return (
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle>Deal Pipeline Board — Tracking</CardTitle>
+                    <CardDescription>
+                      Track deal progression from Intro to POA Booked. 🟢 Fresh &lt;30d • 🟠 Aging 30-60d • 🔴 Stale &gt;60d
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Intro Column */}
+                      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="font-bold text-lg text-blue-900">Intro</h3>
+                          <span className="text-sm bg-blue-200 text-blue-900 px-3 py-1 rounded-full font-semibold">
+                            {introDeals.length} deals • ${(introDeals.reduce((sum, d) => sum + d.pipeline, 0) / 1000).toFixed(0)}K
+                          </span>
+                        </div>
+                        <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                          {introDeals.map(deal => {
+                            const agingBadge = getAgingBadge(deal.days_old);
+                            return (
+                              <div
+                                key={deal.id}
+                                className={`${getAgingColor(deal.days_old)} border-2 rounded-lg p-3 hover:shadow-md transition-shadow`}
+                              >
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="font-semibold text-gray-900 text-sm flex-1 mr-2">
+                                    {deal.client}
+                                  </div>
+                                  <span className={`${agingBadge.color} text-white text-xs px-2 py-1 rounded-full`}>
+                                    {agingBadge.text}
+                                  </span>
+                                </div>
+                                <div className="text-2xl font-bold text-blue-700 mb-2">
+                                  ${(deal.pipeline / 1000).toFixed(0)}K
+                                </div>
+                                <div className="text-xs text-gray-700 space-y-1">
+                                  <div className="flex justify-between">
+                                    <span className="font-medium">📅 Intro Date:</span>
+                                    <span className="font-semibold">{formatDate(deal.intro_date)}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="font-medium">👤 AE:</span>
+                                    <span className="font-semibold">{deal.ae}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="font-medium">⏱️ Age:</span>
+                                    <span className="font-semibold">{deal.days_old} days</span>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* POA Booked Column */}
+                      <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="font-bold text-lg text-purple-900">POA Booked</h3>
+                          <span className="text-sm bg-purple-200 text-purple-900 px-3 py-1 rounded-full font-semibold">
+                            {poaDeals.length} deals • ${(poaDeals.reduce((sum, d) => sum + d.pipeline, 0) / 1000).toFixed(0)}K
+                          </span>
+                        </div>
+                        <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                          {poaDeals.map(deal => {
+                            const agingBadge = getAgingBadge(deal.days_old);
+                            return (
+                              <div
+                                key={deal.id}
+                                className={`${getAgingColor(deal.days_old)} border-2 rounded-lg p-3 hover:shadow-md transition-shadow`}
+                              >
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="font-semibold text-gray-900 text-sm flex-1 mr-2">
+                                    {deal.client}
+                                  </div>
+                                  <span className={`${agingBadge.color} text-white text-xs px-2 py-1 rounded-full`}>
+                                    {agingBadge.text}
+                                  </span>
+                                </div>
+                                <div className="text-2xl font-bold text-purple-700 mb-2">
+                                  ${(deal.pipeline / 1000).toFixed(0)}K
+                                </div>
+                                <div className="text-xs text-gray-700 space-y-1">
+                                  <div className="flex justify-between">
+                                    <span className="font-medium">📅 Intro Date:</span>
+                                    <span className="font-semibold">{formatDate(deal.intro_date)}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="font-medium">📅 POA Date:</span>
+                                    <span className="font-semibold text-purple-700">{formatDate(deal.poa_date)}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="font-medium">👤 AE:</span>
+                                    <span className="font-semibold">{deal.ae}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="font-medium">⏱️ Age:</span>
+                                    <span className="font-semibold">{deal.days_old} days</span>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })()}
+
             {/* Meetings Details Table */}
             {analytics.meeting_generation.meetings_details && analytics.meeting_generation.meetings_details.length > 0 && (
               <Card className="mt-6">
