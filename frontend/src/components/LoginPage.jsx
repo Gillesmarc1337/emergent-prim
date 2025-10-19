@@ -64,9 +64,11 @@ const LoginPage = () => {
       <Card className="w-full max-w-lg shadow-2xl border-blue-200">
         <CardHeader className="text-center space-y-3 pb-8">
           <div className="flex justify-center mb-4">
-            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-5 rounded-2xl shadow-lg">
-              <TrendingUp className="h-14 w-14 text-white" />
-            </div>
+            <img 
+              src="/primelis-logo.jpg" 
+              alt="Primelis Logo" 
+              className="h-16 w-auto object-contain"
+            />
           </div>
           <CardTitle className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
             Sales Analytics Dashboard
