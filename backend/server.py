@@ -350,7 +350,7 @@ async def get_view_config_with_defaults(view_id: str):
         view_targets = default_targets
     else:
         # Map admin format to analytics format
-        # Targets already mapped in get_view_config_with_defaults
+        view_targets = map_admin_targets_to_analytics_format(view_targets)
     
     return {
         "view": view,
