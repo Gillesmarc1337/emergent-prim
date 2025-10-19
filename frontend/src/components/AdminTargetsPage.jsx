@@ -663,13 +663,13 @@ function AdminTargetsPage() {
                       <Input
                         id="new_pipe_target"
                         type="number"
-                        value={targets?.dashboard_top_cards?.new_pipe_created || 0}
+                        value={targets?.dashboard_bottom_cards?.new_pipe_created || 0}
                         onChange={(e) => {
                           const value = parseInt(e.target.value) || 0;
                           setTargets(prev => ({
                             ...prev,
-                            dashboard_top_cards: {
-                              ...(prev.dashboard_top_cards || {}),
+                            dashboard_bottom_cards: {
+                              ...(prev.dashboard_bottom_cards || {}),
                               new_pipe_created: value
                             }
                           }));
@@ -684,13 +684,13 @@ function AdminTargetsPage() {
                       <Input
                         id="weighted_pipe_target"
                         type="number"
-                        value={targets?.dashboard_top_cards?.created_weighted_pipe || 0}
+                        value={targets?.dashboard_bottom_cards?.created_weighted_pipe || 0}
                         onChange={(e) => {
                           const value = parseInt(e.target.value) || 0;
                           setTargets(prev => ({
                             ...prev,
-                            dashboard_top_cards: {
-                              ...(prev.dashboard_top_cards || {}),
+                            dashboard_bottom_cards: {
+                              ...(prev.dashboard_bottom_cards || {}),
                               created_weighted_pipe: value
                             }
                           }));
