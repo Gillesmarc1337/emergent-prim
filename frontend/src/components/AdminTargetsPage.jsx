@@ -731,7 +731,7 @@ function AdminTargetsPage() {
                       <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
                         <div className="text-xs text-gray-600 mb-2">📈 New Pipe Created</div>
                         <div className="text-2xl font-bold text-gray-800 mb-1">$X.XX M</div>
-                        <div className="text-xs text-gray-500 mb-2">Target: ${((targets?.dashboard_top_cards?.new_pipe_created || 0) / 1000000).toFixed(1)}M × period</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: ${((targets?.dashboard_bottom_cards?.new_pipe_created || 0) / 1000000).toFixed(1)}M × period</div>
                         <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
                           <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
                         </div>
@@ -743,7 +743,7 @@ function AdminTargetsPage() {
                       <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
                         <div className="text-xs text-gray-600 mb-2">🎯 Created Weighted Pipe</div>
                         <div className="text-2xl font-bold text-gray-800 mb-1">$X.XX M</div>
-                        <div className="text-xs text-gray-500 mb-2">Target: ${((targets?.dashboard_top_cards?.created_weighted_pipe || 0) / 1000000).toFixed(1)}M × period</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: ${((targets?.dashboard_bottom_cards?.created_weighted_pipe || 0) / 1000000).toFixed(1)}M × period</div>
                         <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
                           <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
                         </div>
