@@ -4653,22 +4653,34 @@ function Dashboard() {
                           
                           // Calculate sum excluding hidden deals (with AE filter)
                           const filteredDeals = getFilteredDeals();
-                          const columnValue = filteredDeals
-                            .filter(deal => deal.column === 'delayed' && !hiddenDeals.has(deal.id))
-                            .reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                          const columnDeals = filteredDeals.filter(deal => deal.column === 'delayed' && !hiddenDeals.has(deal.id));
+                          const columnValue = columnDeals.reduce((sum, deal) => sum + (deal.pipeline || 0), 0);
+                          const weightedValue = columnDeals.reduce((sum, deal) => {
+                            const prob = dealProbabilities[deal.id] || 75;
+                            return sum + ((deal.pipeline || 0) * prob / 100);
+                          }, 0);
                           
                           return (
                             <Card className="bg-white">
                               <CardContent className="p-3">
+                                <div className="text-sm font-semibold text-gray-700 text-center mb-1">
+                                  Total ARR
+                                </div>
                                 <div className="text-2xl font-bold text-red-800 text-center">
                                   {formatValue(columnValue)}
                                 </div>
-                                <div className="text-xs text-gray-600 text-center mb-2">
+                                <div className="text-sm font-semibold text-blue-700 text-center mt-2 mb-1">
+                                  Projected (Weighted)
+                                </div>
+                                <div className="text-xl font-bold text-blue-600 text-center">
+                                  {formatValue(weightedValue)}
+                                </div>
+                                <div className="text-xs text-gray-600 text-center mt-2 mb-2">
                                   Deals at risk of delay
                                 </div>
                                 <div className="text-xs text-center mt-1">
                                   <span className="text-red-600 font-medium">
-                                    {filteredDeals.filter(deal => deal.column === 'delayed' && !hiddenDeals.has(deal.id)).length} deal(s)
+                                    {columnDeals.length} deal(s)
                                   </span>
                                 </div>
                               </CardContent>
