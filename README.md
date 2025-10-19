@@ -2,7 +2,10 @@
 
 ## Vue d'ensemble
 
-Application full-stack de tableau de bord analytique pour le suivi des performances commerciales, développée avec **FastAPI (Python)** pour le backend et **React** pour le frontend. Le système supporte plusieurs vues organisationnelles avec des targets personnalisés et des données isolées.
+Application full-stack de tableau de bord analytique pour le suivi des performances commerciales avec multi-tenancy, développée avec **FastAPI (Python)** pour le backend et **React** pour le frontend. Le système supporte plusieurs vues organisationnelles avec des targets personnalisés, des données isolées, et un système de board interactif avec drag & drop.
+
+**Dernière mise à jour**: Janvier 2025  
+**Version**: 2.1.0
 
 ---
 
