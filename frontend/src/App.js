@@ -275,10 +275,11 @@ function MetricCard({ title, value, target, unit = '', trend, icon: Icon, color 
   );
 }
 
-function DraggableDealItem({ deal, index, onHide, showActions = false }) {
+function DraggableDealItem({ deal, index, onHide, showActions = false, onProbabilityChange }) {
   const [isVisible, setIsVisible] = useState(true);
   const [status, setStatus] = useState(deal.status || 'active');
   const [label, setLabel] = useState(deal.label || '');
+  const [probability, setProbability] = useState(deal.probability || 75); // Default 75%
 
   if (!isVisible || status === 'won' || status === 'lost') return null;
 
@@ -290,6 +291,13 @@ function DraggableDealItem({ deal, index, onHide, showActions = false }) {
   const handleDelete = () => {
     setIsVisible(false);
     if (onHide) onHide();
+  };
+
+  const handleProbabilityChange = (newProb) => {
+    setProbability(newProb);
+    if (onProbabilityChange) {
+      onProbabilityChange(deal.id, newProb);
+    }
   };
 
   return (
@@ -314,6 +322,23 @@ function DraggableDealItem({ deal, index, onHide, showActions = false }) {
                   POA: {new Date(deal.poa_date).toLocaleDateString()}
                 </div>
               )}
+              {/* Probability Selector */}
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-xs text-gray-500">Close %:</span>
+                <select
+                  value={probability}
+                  onChange={(e) => handleProbabilityChange(Number(e.target.value))}
+                  className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <option value={50}>50%</option>
+                  <option value={75}>75%</option>
+                  <option value={90}>90%</option>
+                </select>
+                <span className="text-xs font-semibold text-green-600">
+                  ${((deal.pipeline || 0) * probability / 100 / 1000).toFixed(0)}K proj.
+                </span>
+              </div>
               {label && (
                 <div className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded mt-1 inline-block">
                   {label}
