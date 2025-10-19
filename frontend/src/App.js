@@ -1138,7 +1138,15 @@ function Dashboard() {
   const [useCustomDate, setUseCustomDate] = useState(false);
   const [importMethod, setImportMethod] = useState('csv'); // 'csv' or 'sheets'
   const [viewMode, setViewMode] = useState('monthly'); // 'monthly' or 'yearly'
-  const [activeTab, setActiveTab] = useState('dashboard'); // Track active tab
+  const [activeTab, setActiveTab] = useState(() => {
+    // Persist active tab in localStorage
+    return localStorage.getItem('activeTab') || 'dashboard';
+  }); // Track active tab
+  
+  // Save activeTab to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('activeTab', activeTab);
+  }, [activeTab]);
   
   // Listen for view config updates from other admins
   useEffect(() => {
