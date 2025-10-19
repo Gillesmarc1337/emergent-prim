@@ -1050,28 +1050,65 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
             </CardHeader>
             <CardContent className="space-y-2">
               {(() => {
-                // Calculate number of months for the period
-                const baseMonthlyTarget = 2000000;
-                const backendTarget = analytics.dashboard_blocks?.block_3_pipe_creation?.target_pipe_created || baseMonthlyTarget;
-                const periodMonths = Math.round(backendTarget / baseMonthlyTarget);
-                const monthsText = periodMonths === 1 ? '1 mois' : `${periodMonths} mois`;
+                // Get targets from backend
+                const newPipeTarget = analytics.dashboard_blocks?.block_3_pipe_creation?.target_pipe_created || 2000000;
+                const weightedPipeTarget = analytics.dashboard_blocks?.block_3_pipe_creation?.target_weighted_pipe || 800000;
+                
+                const actualNewPipe = analytics.dashboard_blocks.block_3_pipe_creation.new_pipe_created || 0;
+                const actualWeightedPipe = analytics.dashboard_blocks.block_3_pipe_creation.aggregate_weighted_pipe || 0;
                 
                 return (
                   <>
                     {/* Total Pipe Generation */}
-                    <div className="text-center p-3 bg-white rounded-lg">
-                      <div className="text-2xl font-bold text-purple-600">
-                        ${(analytics.dashboard_blocks.block_3_pipe_creation.new_pipe_created / 1000000).toFixed(1)}M
+                    <div className="p-4 bg-white rounded-lg border border-purple-200 shadow-sm">
+                      <div className="text-xs text-gray-600 mb-1">📊 Total Pipe Generation</div>
+                      <div className="text-3xl font-bold text-purple-600">
+                        ${(actualNewPipe / 1000000).toFixed(1)}M
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">Total Pipe Generation</div>
+                      <div className="text-sm text-gray-600 mb-2">
+                        Target: <span className="font-bold text-purple-700">
+                          ${(newPipeTarget / 1000000).toFixed(1)}M
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div 
+                          className={`h-2.5 rounded-full transition-all ${
+                            actualNewPipe >= newPipeTarget ? 'bg-green-500' : 'bg-orange-500'
+                          }`}
+                          style={{ 
+                            width: `${Math.min((actualNewPipe / newPipeTarget * 100), 100)}%` 
+                          }}
+                        ></div>
+                      </div>
+                      <div className="text-center text-xs font-semibold text-gray-700 mt-1">
+                        {newPipeTarget ? ((actualNewPipe / newPipeTarget * 100).toFixed(1)) : 0}% of target
+                      </div>
                     </div>
                     
                     {/* Aggregate Weighted Pipe */}
-                    <div className="text-center p-3 bg-white rounded-lg">
-                      <div className="text-2xl font-bold text-purple-600">
-                        ${(analytics.dashboard_blocks.block_3_pipe_creation.aggregate_weighted_pipe / 1000000).toFixed(1)}M
+                    <div className="p-4 bg-white rounded-lg border border-purple-200 shadow-sm">
+                      <div className="text-xs text-gray-600 mb-1">⚖️ Aggregate Weighted Pipe</div>
+                      <div className="text-3xl font-bold text-purple-600">
+                        ${(actualWeightedPipe / 1000000).toFixed(1)}M
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">Aggregate Weighted Pipe</div>
+                      <div className="text-sm text-gray-600 mb-2">
+                        Target: <span className="font-bold text-purple-700">
+                          ${(weightedPipeTarget / 1000000).toFixed(1)}M
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div 
+                          className={`h-2.5 rounded-full transition-all ${
+                            actualWeightedPipe >= weightedPipeTarget ? 'bg-green-500' : 'bg-orange-500'
+                          }`}
+                          style={{ 
+                            width: `${Math.min((actualWeightedPipe / weightedPipeTarget * 100), 100)}%` 
+                          }}
+                        ></div>
+                      </div>
+                      <div className="text-center text-xs font-semibold text-gray-700 mt-1">
+                        {weightedPipeTarget ? ((actualWeightedPipe / weightedPipeTarget * 100).toFixed(1)) : 0}% of target
+                      </div>
                     </div>
                   </>
                 );
