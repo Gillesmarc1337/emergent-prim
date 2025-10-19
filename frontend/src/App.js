@@ -2268,12 +2268,19 @@ function Dashboard() {
               const chartData = Object.values(monthlyData)
                 .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
               
+              const handleLegendClick = (dataKey) => {
+                setMeetingsEvolutionVisibility(prev => ({
+                  ...prev,
+                  [dataKey]: !prev[dataKey]
+                }));
+              };
+              
               return (
                 <Card className="mb-6">
                   <CardHeader>
                     <CardTitle>Monthly Meetings Evolution</CardTitle>
                     <CardDescription>
-                      Total meetings generated per month with breakdown by source
+                      Total meetings generated per month with breakdown by source (click legend to toggle)
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -2283,12 +2290,15 @@ function Dashboard() {
                         <XAxis dataKey="month" />
                         <YAxis />
                         <Tooltip />
-                        <Legend />
-                        <Bar dataKey="Inbound" stackId="a" fill="#10b981" />
-                        <Bar dataKey="Outbound" stackId="a" fill="#f97316" />
-                        <Bar dataKey="Referral" stackId="a" fill="#a855f7" />
-                        <Bar dataKey="Upsells/Cross-sell" stackId="a" fill="#6366f1" />
-                        <Line type="monotone" dataKey="Total" stroke="#1e40af" strokeWidth={3} name="Total Meetings" />
+                        <Legend 
+                          onClick={(e) => handleLegendClick(e.dataKey)}
+                          wrapperStyle={{ cursor: 'pointer' }}
+                        />
+                        {meetingsEvolutionVisibility.Inbound && <Bar dataKey="Inbound" stackId="a" fill="#10b981" />}
+                        {meetingsEvolutionVisibility.Outbound && <Bar dataKey="Outbound" stackId="a" fill="#f97316" />}
+                        {meetingsEvolutionVisibility.Referral && <Bar dataKey="Referral" stackId="a" fill="#a855f7" />}
+                        {meetingsEvolutionVisibility['Upsells/Cross-sell'] && <Bar dataKey="Upsells/Cross-sell" stackId="a" fill="#6366f1" />}
+                        {meetingsEvolutionVisibility.Total && <Line type="monotone" dataKey="Total" stroke="#1e40af" strokeWidth={3} name="Total Meetings" />}
                       </ComposedChart>
                     </ResponsiveContainer>
                   </CardContent>
