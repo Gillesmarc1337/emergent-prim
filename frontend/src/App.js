@@ -2047,8 +2047,11 @@ function Dashboard() {
                 .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
               
               const handleLegendClick = (dataKey) => {
-                    // Accept: F Inbox (Intro), D POA Booked, C Proposal sent, B Legals
-                    return meeting.stage === 'F Inbox' || 
+                setMeetingsEvolutionVisibility(prev => ({
+                  ...prev,
+                  [dataKey]: !prev[dataKey]
+                }));
+              }; 
                            meeting.stage === 'D POA Booked' || 
                            meeting.stage === 'C Proposal sent' || 
                            meeting.stage === 'B Legals';
