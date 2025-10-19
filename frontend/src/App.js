@@ -2030,7 +2030,7 @@ function Dashboard() {
                   .filter(meeting => {
                     if (!meeting.stage) return false;
                     const stageLC = meeting.stage.toLowerCase();
-                    // Accept: intro (exact), D POA Booked, C Proposal sent, B Legals
+                    // Accept: intro (case-insensitive), D POA Booked, C Proposal sent, B Legals
                     return stageLC === 'intro' || 
                            meeting.stage === 'D POA Booked' || 
                            meeting.stage === 'C Proposal sent' || 
@@ -2046,6 +2046,13 @@ function Dashboard() {
                     days_old: calculateDaysOld(meeting.discovery_date)
                   }))
                   .sort((a, b) => b.pipeline - a.pipeline); // Sort by deal size descending
+
+                console.log('🔍 Pipeline Board Debug:', {
+                  totalMeetings: analytics.meeting_generation.meetings_details.length,
+                  filteredDeals: initialDeals.length,
+                  stages: initialDeals.map(d => d.stage),
+                  uniqueStages: [...new Set(initialDeals.map(d => d.stage))]
+                });
 
                 setPipelineDeals(initialDeals);
                 setOriginalPipelineDeals(initialDeals);
