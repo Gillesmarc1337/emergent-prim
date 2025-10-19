@@ -32,6 +32,8 @@ function AdminTargetsPage() {
 
   useEffect(() => {
     if (selectedView) {
+      // Reset targets state to null before loading new view targets
+      setTargets(null);
       loadViewTargets(selectedView.id);
     }
   }, [selectedView]);
