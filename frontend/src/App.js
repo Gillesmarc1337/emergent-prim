@@ -2060,8 +2060,9 @@ function Dashboard() {
                 { key: 'Referral', color: '#a855f7', label: 'Referral' },
                 { key: 'Upsells/Cross-sell', color: '#6366f1', label: 'Upsells/Cross-sell' },
                 { key: 'Total', color: '#1e40af', label: 'Total Meetings' }
-              ]; 
-                           meeting.stage === 'B Legals';
+              ];
+              
+              return (
                   })
                   .map(meeting => ({
                     id: meeting.client || Math.random().toString(),
