@@ -1947,7 +1947,41 @@ function Dashboard() {
                 icon={TrendingUp}
                 color="indigo"
               />
+              <MetricCard
+                title="Event"
+                value={analytics.meeting_generation.event || 0}
+                target={analytics.meeting_generation.event_target || 0}
+                icon={Calendar}
+                color="teal"
+              />
             </div>
+
+            {/* Referrals Breakdown */}
+            <Card className="mb-6 bg-purple-50 border-purple-200">
+              <CardContent className="p-4">
+                <div className="text-sm font-semibold text-purple-700 mb-3">Referrals Breakdown</div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="bg-white rounded p-3 border border-purple-200">
+                    <div className="text-xs text-gray-600 mb-1">Internal Referral</div>
+                    <div className="text-2xl font-bold text-purple-700">
+                      {analytics.meeting_generation.internal_referral || 0}
+                    </div>
+                  </div>
+                  <div className="bg-white rounded p-3 border border-purple-200">
+                    <div className="text-xs text-gray-600 mb-1">External Referral</div>
+                    <div className="text-2xl font-bold text-purple-700">
+                      {analytics.meeting_generation.external_referral || 0}
+                    </div>
+                  </div>
+                  <div className="bg-white rounded p-3 border border-purple-200">
+                    <div className="text-xs text-gray-600 mb-1">Client Referral</div>
+                    <div className="text-2xl font-bold text-purple-700">
+                      {analytics.meeting_generation.client_referral || 0}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Deal Pipeline Board - Interactive */}
             {analytics.meeting_generation.meetings_details && analytics.meeting_generation.meetings_details.length > 0 && (() => {
