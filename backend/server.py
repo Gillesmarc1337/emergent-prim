@@ -693,6 +693,12 @@ def calculate_meeting_generation(df, start_date, end_date, view_targets=None):
         (period_data['type_of_source'] == '')
     ]
     
+    # Breakdown referrals by type
+    internal_referral = period_data[period_data['type_of_source'] == 'Internal referral']
+    external_referral = period_data[period_data['type_of_source'] == 'External referral']
+    client_referral = period_data[period_data['type_of_source'] == 'Client referral']
+    event = period_data[period_data['type_of_source'] == 'Event']
+    
     # Relevance analysis
     relevant = period_data[period_data['relevance'] == 'Relevant']
     question_mark = period_data[period_data['relevance'].isin(['Question mark', 'Maybe'])]
