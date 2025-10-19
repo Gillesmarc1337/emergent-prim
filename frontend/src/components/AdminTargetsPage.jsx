@@ -545,20 +545,11 @@ function AdminTargetsPage() {
         </Alert>
       )}
 
-      {/* View Tabs */}
+      {/* View Tabs Content */}
       <Tabs value={selectedView?.id} onValueChange={(viewId) => {
         const view = views.find(v => v.id === viewId);
         setSelectedView(view);
       }}>
-        <TabsList className="mb-4">
-          {views.map(view => (
-            <TabsTrigger key={view.id} value={view.id}>
-              {view.name}
-              {view.is_master && ' (Master)'}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
         {views.map(view => {
           const isMasterView = view.name === 'Master';
           
