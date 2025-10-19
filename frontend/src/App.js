@@ -3370,12 +3370,19 @@ function Dashboard() {
                   total_weighted: analytics.pipe_metrics.monthly_breakdown.total_weighted[index]
                 }));
                 
+                const handleLegendClick = (dataKey) => {
+                  setPipelineEvolutionVisibility(prev => ({
+                    ...prev,
+                    [dataKey]: !prev[dataKey]
+                  }));
+                };
+                
                 return (
                   <Card className="mb-6">
                     <CardHeader>
                       <CardTitle>Monthly Pipeline Evolution</CardTitle>
                       <CardDescription>
-                        Track new pipeline created and total pipeline value on a monthly basis
+                        Track new pipeline created and total pipeline value on a monthly basis (click legend to toggle)
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -3385,11 +3392,14 @@ function Dashboard() {
                           <XAxis dataKey="month" />
                           <YAxis />
                           <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
-                          <Legend />
-                          <Bar dataKey="new_pipe_created" fill="#8b5cf6" name="New Pipe Created" />
-                          <Bar dataKey="new_weighted_pipe" fill="#3b82f6" name="New Weighted Pipe" />
-                          <Line type="monotone" dataKey="total_pipe" stroke="#10b981" strokeWidth={3} name="Total Pipeline" />
-                          <Line type="monotone" dataKey="total_weighted" stroke="#f97316" strokeWidth={2} strokeDasharray="5 5" name="Total Weighted" />
+                          <Legend 
+                            onClick={(e) => handleLegendClick(e.dataKey)}
+                            wrapperStyle={{ cursor: 'pointer' }}
+                          />
+                          {pipelineEvolutionVisibility.new_pipe_created && <Bar dataKey="new_pipe_created" fill="#8b5cf6" name="New Pipe Created" />}
+                          {pipelineEvolutionVisibility.new_weighted_pipe && <Bar dataKey="new_weighted_pipe" fill="#3b82f6" name="New Weighted Pipe" />}
+                          {pipelineEvolutionVisibility.total_pipe !== false && <Line type="monotone" dataKey="total_pipe" stroke="#10b981" strokeWidth={3} name="Total Pipeline" />}
+                          {pipelineEvolutionVisibility.total_weighted !== false && <Line type="monotone" dataKey="total_weighted" stroke="#f97316" strokeWidth={2} strokeDasharray="5 5" name="Total Weighted" />}
                         </ComposedChart>
                       </ResponsiveContainer>
                     </CardContent>
