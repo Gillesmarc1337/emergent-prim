@@ -2587,8 +2587,7 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
             (df['discovery_date'] <= min(july_dec_end, current_date)) &
             df['type_of_deal'].apply(is_upsell)
         ])
-        monthly_upsell_target = view_targets.get("meeting_attended", {}).get("deals_closed", 6)
-        july_dec_upsell_target = monthly_upsell_target * months_in_july_dec_period
+        july_dec_upsell_target = monthly_upsells_target * months_in_july_dec_period
         
         # New pipe created for July-Dec period
         new_pipe_july_dec = july_dec_meetings['pipeline'].sum()
