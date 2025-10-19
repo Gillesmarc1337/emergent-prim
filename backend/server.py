@@ -3050,6 +3050,7 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
                 'weighted_pipe_created': weighted_pipe_created,
                 'aggregate_weighted_pipe': aggregate_weighted_pipe_monthly,
                 'target_pipe_created': view_targets.get("dashboard", {}).get("new_pipe_created", 2000000),  # Use view-specific monthly target
+                'target_weighted_pipe': view_targets.get("dashboard", {}).get("weighted_pipe", 800000),  # Weighted pipe target
                 'period': focus_month_str
             },
             'block_4_revenue': {
