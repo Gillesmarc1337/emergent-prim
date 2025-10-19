@@ -4396,7 +4396,7 @@ function Dashboard() {
                             return sum + ((deal.pipeline || 0) * prob / 100);
                           }, 0);
                           const dealCount = columnDeals.length;
-                          const columnTarget = 375000; // Fixed target: $375K for next 30 days
+                          const columnTarget = viewConfig?.targets?.closing_projections?.next_30_days_target || 250000;
                           const percentage = Math.round((weightedValue / columnTarget) * 100);
                           const isOnTrack = weightedValue >= columnTarget;
                           
