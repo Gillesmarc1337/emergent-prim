@@ -2023,7 +2023,28 @@ function Dashboard() {
                       Total: 0
                     };
                   }
-                  .filter(meeting => {
+                  
+                  // Categorize by source
+                  const source = meeting.type_of_source || 'Other';
+                  if (source.toLowerCase().includes('inbound')) {
+                    monthlyData[monthKey].Inbound++;
+                  } else if (source.toLowerCase().includes('outbound')) {
+                    monthlyData[monthKey].Outbound++;
+                  } else if (source.toLowerCase().includes('referral') || source.toLowerCase().includes('référence')) {
+                    monthlyData[monthKey].Referral++;
+                  } else if (source.toLowerCase().includes('upsell') || source.toLowerCase().includes('cross')) {
+                    monthlyData[monthKey]['Upsells/Cross-sell']++;
+                  } else {
+                    monthlyData[monthKey].Outbound++; // Default to outbound
+                  }
+                  
+                  monthlyData[monthKey].Total++;
+                }
+              });
+              
+              // Convert to array and sort by month
+              const chartData = Object.values(monthlyData)
+                .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
                     if (!meeting.stage) return false;
                     // Accept: F Inbox (Intro), D POA Booked, C Proposal sent, B Legals
                     return meeting.stage === 'F Inbox' || 
