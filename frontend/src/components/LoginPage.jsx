@@ -153,21 +153,21 @@ const LoginPage = () => {
               {loadingDemo ? (
                 <span>⚓ LAUNCHING DEMO SHIP...</span>
               ) : (
-                <span className="flex items-center justify-center gap-2 font-medium text-amber-700">
+                <span className="flex items-center justify-center gap-2 font-semibold">
                   <Zap className="h-4 w-4" />
-                  DEMO ACCESS - SKIP AUTH
+                  ⚡ DEMO VOYAGE
                 </span>
               )}
             </Button>
-            <p className="text-xs text-center text-gray-500">
-              ⚡ Development Mode • Instant access • 24h session
+            <p className="text-xs text-center text-amber-400/70 font-mono">
+              ⚡ DEV_MODE • NO_AUTH • 24H_SESSION
             </p>
           </div>
 
           {/* Info Section */}
-          <div className="mt-6 pt-4 border-t border-gray-200">
-            <div className="text-center text-sm text-gray-600 space-y-2">
-              <p className="font-semibold text-gray-700">Authorized Users (Production):</p>
+          <div className="mt-6 pt-4 border-t border-cyan-500/30">
+            <div className="text-center text-sm text-cyan-300/70 space-y-2 font-mono">
+              <p className="font-semibold text-cyan-400">📡 AUTHORIZED_CREW:</p>
               <div className="flex justify-center gap-4 text-xs">
                 <span className="px-3 py-1 bg-blue-50 rounded-full">
                   asher@primelis.com <span className="text-gray-500">(Viewer)</span>
