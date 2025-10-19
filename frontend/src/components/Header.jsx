@@ -52,9 +52,18 @@ const Header = () => {
     <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Left side - Title */}
-          <div className="flex items-center">
-            <h1 className="text-xl font-bold text-gray-900">Sales Analytics Dashboard</h1>
+          {/* Left side - Logo and Title */}
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col">
+              <img 
+                src="/primelis-logo.jpg" 
+                alt="Primelis Logo" 
+                className="h-10 w-auto object-contain"
+              />
+              <span className="text-xs font-semibold text-gray-700 mt-1">
+                Primelis Go to Market Board
+              </span>
+            </div>
           </div>
 
           {/* Right side - User info, View selector, Logout */}
