@@ -735,13 +735,20 @@ def calculate_meeting_generation(df, start_date, end_date, view_targets=None):
         monthly_outbound_target = meeting_gen.get("outbound", 17)
         monthly_referral_target = meeting_gen.get("referral", meeting_gen.get("referrals", 11))
         monthly_event_target = meeting_gen.get("event", 5)
-        monthly_total_target = monthly_inbound_target + monthly_outbound_target + monthly_referral_target + monthly_event_target
+        monthly_upsells_target = meeting_gen.get("upsells_cross", meeting_gen.get("upsells_x", 0))
+        
+        # Use configured total_target if available, otherwise calculate sum
+        if "total_target" in meeting_gen and meeting_gen["total_target"] > 0:
+            monthly_total_target = meeting_gen["total_target"]
+        else:
+            monthly_total_target = monthly_inbound_target + monthly_outbound_target + monthly_referral_target + monthly_event_target
     else:
         # Default targets
         monthly_inbound_target = 22
         monthly_outbound_target = 17 
         monthly_referral_target = 11
         monthly_event_target = 5
+        monthly_upsells_target = 0
         monthly_total_target = 55
     
     # Dynamic targets based on period duration
