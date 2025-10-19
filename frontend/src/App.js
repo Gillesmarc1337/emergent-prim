@@ -1122,14 +1122,14 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
                         className={`h-2.5 rounded-full transition-all ${
-                          analytics.deals_closed_current_period?.deals_closed >= dealsTarget 
+                          (analytics.deals_closed_current_period?.arr_closed || 0) >= arrTarget 
                             ? 'bg-green-500' 
                             : 'bg-orange-500'
                         }`}
                         style={{ 
                           width: `${Math.min(
-                            dealsTarget 
-                              ? (analytics.deals_closed_current_period.deals_closed / dealsTarget * 100) 
+                            arrTarget 
+                              ? ((analytics.deals_closed_current_period.arr_closed || 0) / arrTarget * 100) 
                               : 0, 
                             100
                           )}%` 
@@ -1137,9 +1137,9 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
                       ></div>
                     </div>
                     <div className="text-center text-sm font-semibold text-gray-700 mt-2">
-                      {dealsTarget 
-                        ? ((analytics.deals_closed_current_period.deals_closed / dealsTarget * 100).toFixed(1)) 
-                        : 0}% of target
+                      {arrTarget 
+                        ? (((analytics.deals_closed_current_period.arr_closed || 0) / arrTarget * 100).toFixed(1)) 
+                        : 0}% of ARR target
                     </div>
                   </div>
                 </CardContent>
