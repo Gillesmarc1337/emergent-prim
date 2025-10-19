@@ -627,6 +627,21 @@ frontend:
           agent: "testing"
           comment: "✅ MEETINGS ATTENDED TARGETS FIX COMPLETE - ALL TESTS PASSED (6/6): Comprehensive testing of Meetings Attended targets fix successfully completed as requested in review. CRITICAL BUG FOUND AND FIXED: The mapping function was detecting Master view targets as already in old format due to mixed format (both new Admin BO keys + old analytics keys) and returning early without processing new format fields. FIXED: Updated mapping detection logic to only skip mapping if NO new format keys are present. VERIFIED FUNCTIONALITY: 1) Monthly Analytics: All 3 Meetings Attended targets now correctly show 150 (Meetings Scheduled: 150 ✓, POA Generated: 150 ✓, Deals Closed: 150 ✓). 2) Yearly Analytics: Targets correctly scale to 900 (6x150 for July-Dec period). 3) Custom Analytics: Targets correctly scale to 300 (2x150 for 2-month period). 4) Backend logs confirm mapping function executing with debug output showing 'meeting_attended.meetings_scheduled: 150'. 5) All 5 calls to calculate_meetings_attended() now pass view_targets parameter correctly. 6) Master view targets (view-master-1760356092) with all targets set to 150 are properly mapped and displayed. CONCLUSION: The Meetings Attended targets fix is working perfectly - all three targets (Meetings Scheduled, POA Generated, Deals Closed) now show 150 as expected and scale correctly for multi-month periods. The user's issue has been resolved."
 
+  - task: "Signal view target synchronization fix"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "main"
+          comment: "Backend was fixed to properly pass view_targets to calculate_pipe_metrics function. The issue was that dashboard cards were showing hardcoded targets instead of admin-configured targets."
+        - working: true
+          agent: "testing"
+          comment: "🎯 SIGNAL VIEW TARGET SYNCHRONIZATION FIX COMPLETE - ALL TESTS PASSED (6/6): Comprehensive testing of Signal view target synchronization fix successfully completed. CRITICAL BUG FOUND AND FIXED: The target mapping function was being called twice - once in get_view_config_with_defaults() and again in each analytics endpoint, causing Signal view targets to be overridden with default values. FIXED: Removed duplicate mapping calls from all analytics endpoints (monthly, yearly, custom, dashboard) while keeping the single mapping in get_view_config_with_defaults(). VERIFIED FUNCTIONALITY: 1) Database targets correctly stored: Signal view has dashboard_bottom_cards.new_pipe_created=800,000 and dashboard_bottom_cards.created_weighted_pipe=300,000. 2) GET /api/analytics/monthly?view_id=view-signal-1760356092 now returns correct targets: created_pipe.target=800,000 and created_pipe.target_weighted=300,000 (matching database values). 3) Backend logs confirm single mapping call with correct values: new_pipe_created: 800000 (instead of previous 2000000 default). 4) Admin-configured targets are properly flowing through to dashboard calculations. CONCLUSION: The Signal view target synchronization fix is working correctly - admin-configured targets (800K, 300K) are now properly passed to calculate_pipe_metrics function and displayed in dashboard cards instead of hardcoded defaults."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
