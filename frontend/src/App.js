@@ -2002,7 +2002,8 @@ function Dashboard() {
 
             {/* Monthly Meetings Evolution Chart - MOVED TO TOP */}
             {analytics.meeting_generation.meetings_details && analytics.meeting_generation.meetings_details.length > 0 && (() => {
-              // Calculate days since creation for each deal
+              // Group meetings by month and source
+              const monthlyData = {};
               const calculateDaysOld = (discoveryDate) => {
                 if (!discoveryDate) return 0;
                 const created = new Date(discoveryDate);
