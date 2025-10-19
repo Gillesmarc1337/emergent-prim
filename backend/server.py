@@ -4513,6 +4513,8 @@ async def get_comprehensive_analytics(view_id: str = Query(None)):
             config_data = await get_view_config_with_defaults(view_id)
             view_config = config_data["view"]
             view_targets = config_data["targets"]
+            # Map admin targets to analytics format
+            view_targets = map_admin_targets_to_analytics_format(view_targets)
         else:
             # Default targets for Organic view
             view_targets = {
