@@ -2051,8 +2051,10 @@ function Dashboard() {
                   ...prev,
                   [dataKey]: !prev[dataKey]
                 }));
-              }; 
-                           meeting.stage === 'D POA Booked' || 
+              };
+              
+              // Custom legend with checkboxes
+              const legendData = [ 
                            meeting.stage === 'C Proposal sent' || 
                            meeting.stage === 'B Legals';
                   })
