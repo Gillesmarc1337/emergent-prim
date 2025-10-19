@@ -2024,32 +2024,29 @@ function Dashboard() {
                 return 'Stale';
               };
 
-              // Get pipeline deals directly from meetings_details
-              const pipelineDealsData = analytics.meeting_generation.meetings_details
-                .filter(meeting => meeting.stage && ['E Inbox', 'D POA Booked', 'C Proposal sent', 'B Legals'].includes(meeting.stage))
-                .map(meeting => ({
-                  id: meeting.client || Math.random().toString(),
-                  client: meeting.client,
-                  pipeline: meeting.expected_arr || 0,
-                  stage: meeting.stage,
-                  ae: meeting.owner || 'Unassigned',
-                  discovery_date: meeting.discovery_date,
-                  days_old: calculateDaysOld(meeting.discovery_date)
-                }))
-                .sort((a, b) => b.pipeline - a.pipeline);
-              
-              // Initialize state from data if empty
-              if (pipelineDeals.length === 0 && pipelineDealsData.length > 0) {
-                setPipelineDeals(pipelineDealsData);
-                setOriginalPipelineDeals(pipelineDealsData);
+              // Initialize pipeline deals from meetings_details if not loaded
+              if (pipelineDeals.length === 0 && analytics.meeting_generation.meetings_details.length > 0) {
+                const initialDeals = analytics.meeting_generation.meetings_details
+                  .filter(meeting => meeting.stage && ['E Inbox', 'F Intro Attended', 'D POA Booked', 'C Proposal sent', 'B Legals'].includes(meeting.stage))
+                  .map(meeting => ({
+                    id: meeting.client || Math.random().toString(),
+                    client: meeting.client,
+                    pipeline: meeting.expected_arr || 0,
+                    stage: meeting.stage,
+                    ae: meeting.owner || 'Unassigned',
+                    discovery_date: meeting.discovery_date,
+                    days_old: calculateDaysOld(meeting.discovery_date)
+                  }))
+                  .sort((a, b) => b.pipeline - a.pipeline); // Sort by deal size descending
+
+                setPipelineDeals(initialDeals);
+                setOriginalPipelineDeals(initialDeals);
               }
-              
-              // Use pipelineDeals state if set, otherwise use fresh data
-              const dealsToDisplay = pipelineDeals.length > 0 ? pipelineDeals : pipelineDealsData;
 
               // Group deals by stage
               const stageColumns = {
                 'E Inbox': { title: 'Intro', color: 'blue', deals: [] },
+                'F Intro Attended': { title: 'Intro', color: 'blue', deals: [] },
                 'D POA Booked': { title: 'POA Booked', color: 'purple', deals: [] },
                 'C Proposal sent': { title: 'Proposal Sent', color: 'orange', deals: [] },
                 'B Legals': { title: 'Legal', color: 'green', deals: [] }
