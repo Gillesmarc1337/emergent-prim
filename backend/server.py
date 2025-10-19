@@ -2871,7 +2871,13 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
         target_inbound = meeting_gen.get("inbound", 22)
         target_outbound = meeting_gen.get("outbound", 17)
         target_referral = meeting_gen.get("referral", meeting_gen.get("referrals", 11))  # Try singular first, then plural
-        target_total = target_inbound + target_outbound + target_referral
+        target_upsells = meeting_gen.get("upsells_cross", meeting_gen.get("upsells_x", 0))
+        
+        # Use configured total_target if available, otherwise calculate sum
+        if "total_target" in meeting_gen and meeting_gen["total_target"] > 0:
+            target_total = meeting_gen["total_target"]
+        else:
+            target_total = target_inbound + target_outbound + target_referral
         
         # Calculate actual values for the focus month
         focus_month_meetings = df[
