@@ -2693,6 +2693,7 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
                 'weighted_pipe_created': weighted_pipe_july_dec,
                 'aggregate_weighted_pipe': aggregate_weighted_pipe_july_dec,
                 'target_pipe_created': target_pipe_july_dec,
+                'target_weighted_pipe': view_targets.get("dashboard", {}).get("weighted_pipe", 800000) * months_in_july_dec_period,
                 'period': f'Jul-Dec 2025 ({months_in_july_dec_period} months)',
                 'debug_info': {
                     'months_elapsed': months_in_july_dec_period,
