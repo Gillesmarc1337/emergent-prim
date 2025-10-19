@@ -2056,7 +2056,7 @@ function Dashboard() {
               };
 
               // Filter and group deals
-              const filteredDeals = pipelineDealsData.filter(deal => 
+              const filteredDeals = dealsToDisplay.filter(deal => 
                 selectedPipelineAE === 'all' || deal.ae === selectedPipelineAE
               );
 
@@ -2067,7 +2067,7 @@ function Dashboard() {
               });
 
               // Get unique AEs for filter
-              const uniqueAEs = [...new Set(pipelineDealsData.map(d => d.ae))].sort();
+              const uniqueAEs = [...new Set(dealsToDisplay.map(d => d.ae))].sort();
 
               // Handle drag and drop
               const handleDragStart = (e, deal) => {
