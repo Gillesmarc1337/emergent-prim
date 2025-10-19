@@ -1251,7 +1251,7 @@ def calculate_excel_weighted_value(row):
     
     return float(pipeline_value * weight)
 
-def calculate_pipe_metrics(df, start_date, end_date):
+def calculate_pipe_metrics(df, start_date, end_date, targets=None):
     """Calculate pipeline metrics with Excel-exact weighted pipe logic"""
     
     # Filter to only deals with valid pipeline first
@@ -1267,9 +1267,14 @@ def calculate_pipe_metrics(df, start_date, end_date):
     period_duration_days = (end_date - start_date).days + 1
     period_duration_months = max(1, round(period_duration_days / 30))
     
-    # Base monthly targets
-    monthly_new_pipe_target = 2_000_000  # $2M per month
-    monthly_weighted_pipe_target = 800_000  # $800K per month
+    # Base monthly targets - use from targets if provided, otherwise use defaults
+    if targets and "dashboard" in targets:
+        monthly_new_pipe_target = targets["dashboard"].get("new_pipe_created", 2_000_000)
+        monthly_weighted_pipe_target = targets["dashboard"].get("weighted_pipe", 800_000)
+    else:
+        monthly_new_pipe_target = 2_000_000  # $2M per month (default)
+        monthly_weighted_pipe_target = 800_000  # $800K per month (default)
+    
     monthly_total_pipe_target = 5_000_000  # $5M (this is overall, not scaled by period)
     monthly_total_weighted_target = 1_500_000  # $1.5M (this is overall, not scaled by period)
     
