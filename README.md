@@ -270,30 +270,57 @@ sudo supervisorctl restart frontend
 
 ## 🔌 API Endpoints Principaux
 
-**Authentication:**
-- POST `/api/auth/google-login` - Login Google OAuth
-- POST `/api/auth/demo-login` - Login demo
-- POST `/api/auth/logout` - Déconnexion
+### Authentication
+- POST `/api/auth/session-data` - Exchange session ID for user session (OAuth)
+- POST `/api/auth/demo-login` - Login demo instantané
+- GET `/api/auth/me` - Get current authenticated user
+- POST `/api/auth/logout` - Déconnexion et clear session
 
-**Views:**
+### Views Management
 - GET `/api/views/user/accessible` - Vues accessibles à l'user
-- GET `/api/views/{view_id}/config` - Config d'une vue
-- PUT `/api/admin/views/{view_id}/targets` - Update targets (admin)
+- GET `/api/views/{view_id}/config` - Config et targets d'une vue
+- PUT `/api/admin/views/{view_id}/targets` - Update targets (super_admin)
+- POST `/api/views` - Create new view (super_admin)
+- DELETE `/api/views/{view_id}` - Delete view (super_admin)
 
-**Data:**
+### User Management (super_admin)
+- GET `/api/admin/users` - List all users with roles
+- POST `/api/admin/users` - Create or update user
+- PUT `/api/admin/users/{user_id}/role` - Update user role
+- GET `/api/admin/users/{user_id}/views` - Get user's view access
+- PUT `/api/admin/users/{user_id}/views` - Update user's view access
+- DELETE `/api/admin/users/{user_id}` - Delete user and sessions
+
+### Data Upload
 - POST `/api/upload-data?view_id={id}` - Upload CSV
 - POST `/api/upload-google-sheets?view_id={id}` - Upload Google Sheets
+- GET `/api/data/status?view_id={id}` - Data status (records count, last update)
 
-**Analytics:**
-- GET `/api/analytics/monthly?view_id={id}` - Analytics mois
-- GET `/api/analytics/yearly?view_id={id}` - Analytics année
+### Analytics
+- GET `/api/analytics/monthly?view_id={id}&month_offset={n}` - Analytics mois
+- GET `/api/analytics/yearly?view_id={id}&year={yyyy}` - Analytics année (July-Dec)
+- GET `/api/analytics/custom?view_id={id}&start_date={date}&end_date={date}` - Custom period
 - GET `/api/analytics/dashboard?view_id={id}` - Dashboard principal
-- GET `/api/analytics/upsell-renewals?view_id={id}` - Upsells
+- GET `/api/analytics/upsell-renewals?view_id={id}&month_offset={n}` - Upsells
 
-**Projections:**
-- GET `/api/projections/hot-deals?view_id={id}` - Deals chauds (Legals)
-- GET `/api/projections/hot-leads?view_id={id}` - Leads chauds
-- GET `/api/projections/ae-pipeline-breakdown?view_id={id}` - Pipeline par AE
+### Projections
+- GET `/api/projections/hot-deals?view_id={id}` - Deals chauds (B Legals stage)
+- GET `/api/projections/hot-leads?view_id={id}` - Leads chauds (C+D stages)
+- GET `/api/projections/ae-pipeline-breakdown?view_id={id}` - Pipeline par AE (14/30/60-90 days)
+- GET `/api/projections/performance-summary?view_id={id}` - YTD performance summary
+
+### User Preferences (Persistence)
+- POST `/api/user/projections-preferences` - Save Closing Projections board state
+- GET `/api/user/projections-preferences?view_id={id}` - Load saved preferences
+- DELETE `/api/user/projections-preferences?view_id={id}` - Reset to default
+- POST `/api/user/pipeline-preferences` - Save Deal Pipeline Board state
+- GET `/api/user/pipeline-preferences?view_id={id}` - Load pipeline preferences
+- DELETE `/api/user/pipeline-preferences?view_id={id}` - Reset pipeline board
+
+### Target Calculations
+- **Tous les endpoints supportent `view_id` parameter** pour isolation multi-tenant
+- **Dynamic target multiplication**: Targets mensuels × nombre de mois dans la période
+- **Master view auto-aggregation**: Signal + Full Funnel + Market avec manual overrides possibles
 
 ---
 
