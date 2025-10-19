@@ -2027,7 +2027,15 @@ function Dashboard() {
               // Initialize pipeline deals from meetings_details if not loaded
               if (pipelineDeals.length === 0 && analytics.meeting_generation.meetings_details.length > 0) {
                 const initialDeals = analytics.meeting_generation.meetings_details
-                  .filter(meeting => meeting.stage && ['E Inbox', 'F Intro Attended', 'D POA Booked', 'C Proposal sent', 'B Legals'].includes(meeting.stage))
+                  .filter(meeting => {
+                    if (!meeting.stage) return false;
+                    const stageLC = meeting.stage.toLowerCase();
+                    // Accept: intro (exact), D POA Booked, C Proposal sent, B Legals
+                    return stageLC === 'intro' || 
+                           meeting.stage === 'D POA Booked' || 
+                           meeting.stage === 'C Proposal sent' || 
+                           meeting.stage === 'B Legals';
+                  })
                   .map(meeting => ({
                     id: meeting.client || Math.random().toString(),
                     client: meeting.client,
@@ -2045,8 +2053,7 @@ function Dashboard() {
 
               // Group deals by stage
               const stageColumns = {
-                'E Inbox': { title: 'Intro', color: 'blue', deals: [] },
-                'F Intro Attended': { title: 'Intro', color: 'blue', deals: [] },
+                'intro': { title: 'Intro', color: 'blue', deals: [] },
                 'D POA Booked': { title: 'POA Booked', color: 'purple', deals: [] },
                 'C Proposal sent': { title: 'Proposal Sent', color: 'orange', deals: [] },
                 'B Legals': { title: 'Legal', color: 'green', deals: [] }
@@ -2058,18 +2065,18 @@ function Dashboard() {
               );
 
               filteredDeals.forEach(deal => {
-                if (stageColumns[deal.stage]) {
-                  stageColumns[deal.stage].deals.push(deal);
+                const stageKey = deal.stage.toLowerCase() === 'intro' ? 'intro' : deal.stage;
+                if (stageColumns[stageKey]) {
+                  stageColumns[stageKey].deals.push(deal);
                 }
               });
               
-              // Merge "E Inbox" and "F Intro Attended" into one "Intro" column
+              // Create merged columns (Intro column already contains all intro deals)
               const mergedColumns = {
                 'Intro': { 
                   title: 'Intro', 
                   color: 'blue', 
-                  deals: [...(stageColumns['E Inbox']?.deals || []), ...(stageColumns['F Intro Attended']?.deals || [])]
-                    .sort((a, b) => b.pipeline - a.pipeline)
+                  deals: (stageColumns['intro']?.deals || []).sort((a, b) => b.pipeline - a.pipeline)
                 },
                 'POA Booked': stageColumns['D POA Booked'],
                 'Proposal Sent': stageColumns['C Proposal sent'],
