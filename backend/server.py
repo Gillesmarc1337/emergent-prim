@@ -2541,7 +2541,13 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
         monthly_inbound_target = meeting_gen.get("inbound", 22)
         monthly_outbound_target = meeting_gen.get("outbound", 17)
         monthly_referral_target = meeting_gen.get("referral", meeting_gen.get("referrals", 11))  # Try singular first, then plural
-        monthly_meeting_target = monthly_inbound_target + monthly_outbound_target + monthly_referral_target
+        monthly_upsells_target = meeting_gen.get("upsells_cross", meeting_gen.get("upsells_x", 0))
+        
+        # Use configured total_target if available, otherwise calculate sum
+        if "total_target" in meeting_gen and meeting_gen["total_target"] > 0:
+            monthly_meeting_target = meeting_gen["total_target"]
+        else:
+            monthly_meeting_target = monthly_inbound_target + monthly_outbound_target + monthly_referral_target
         
         # For yearly analytics, always use full 6-month July-December period
         months_in_july_dec_period = 6  # July, August, September, October, November, December
