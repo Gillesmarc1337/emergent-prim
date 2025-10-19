@@ -2733,8 +2733,8 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
         }
 
         analytics = {
-            'week_start': year_start,  # Use year_start for compatibility
-            'week_end': year_end,      # Use year_end for compatibility
+            'week_start': july_dec_start,  # July 1st for July To Dec period
+            'week_end': july_dec_end,      # December 31st for July To Dec period
             'meeting_generation': meeting_generation,
             'meetings_attended': meetings_attended,
             'ae_performance': ae_performance,
