@@ -4019,6 +4019,85 @@ function Dashboard() {
                   </CardContent>
                 </Card>
 
+                {/* Monthly Upsell/Renew Evolution Chart - Moved AFTER Partner Performance */}
+                {upsellRenewData && upsellRenewData.monthly_breakdown && upsellRenewData.monthly_breakdown.months && upsellRenewData.monthly_breakdown.months.length > 0 && (() => {
+                  const chartData = upsellRenewData.monthly_breakdown.months.map((month, index) => ({
+                    month,
+                    intro_meetings: upsellRenewData.monthly_breakdown.meetings_attended[index],
+                    poa_attended: upsellRenewData.monthly_breakdown.poa_generated[index],
+                    deals_closed: upsellRenewData.monthly_breakdown.revenue_generated[index]
+                  }));
+                  
+                  const handleLegendClick = (dataKey) => {
+                    setUpsellEvolutionVisibility(prev => ({
+                      ...prev,
+                      [dataKey]: !prev[dataKey]
+                    }));
+                  };
+                  
+                  // Custom legend data
+                  const legendData = [
+                    { key: 'intro_meetings', color: '#6366f1', label: 'Intro Meetings' },
+                    { key: 'poa_attended', color: '#10b981', label: 'POA Attended' },
+                    { key: 'deals_closed', color: '#ef4444', label: 'Deals Closed' }
+                  ];
+                  
+                  return (
+                    <Card className="mb-6">
+                      <CardHeader>
+                        <CardTitle>Monthly Upsell & Renew Evolution</CardTitle>
+                        <CardDescription>
+                          Track upsell/renew meetings, POA generated, and revenue on a monthly basis (click legend to toggle)
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={350}>
+                          <ComposedChart data={chartData}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="month" />
+                            <YAxis yAxisId="left" />
+                            <YAxis yAxisId="right" orientation="right" />
+                            <Tooltip 
+                              formatter={(value, name) => {
+                                if (name === 'Deals Closed') {
+                                  return [`$${value.toLocaleString()}`, name];
+                                }
+                                return [value, name];
+                              }}
+                            />
+                            {upsellEvolutionVisibility.intro_meetings && <Bar yAxisId="left" dataKey="intro_meetings" fill="#6366f1" name="Intro Meetings" />}
+                            {upsellEvolutionVisibility.poa_attended && <Bar yAxisId="left" dataKey="poa_attended" fill="#10b981" name="POA Attended" />}
+                            {upsellEvolutionVisibility.deals_closed && <Line yAxisId="right" type="monotone" dataKey="deals_closed" stroke="#ef4444" strokeWidth={3} name="Deals Closed" />}
+                          </ComposedChart>
+                        </ResponsiveContainer>
+                        
+                        {/* Custom Legend with Checkboxes */}
+                        <div className="flex flex-wrap justify-center gap-4 mt-4 px-4">
+                          {legendData.map(({ key, color, label }) => (
+                            <button
+                              key={key}
+                              onClick={() => handleLegendClick(key)}
+                              className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all ${
+                                upsellEvolutionVisibility[key] 
+                                  ? 'bg-white shadow-sm border border-gray-200' 
+                                  : 'bg-gray-100 opacity-60 hover:opacity-80'
+                              }`}
+                            >
+                              <div 
+                                className="w-3 h-3 rounded-sm"
+                                style={{ backgroundColor: color }}
+                              />
+                              <span className={`text-sm ${upsellEvolutionVisibility[key] ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>
+                                {label}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })()}
+
                 {/* Intros Attended Details Table */}
                 {upsellRenewData.intros_details && upsellRenewData.intros_details.length > 0 && (
                   <Card>
