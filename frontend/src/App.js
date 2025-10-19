@@ -1215,6 +1215,34 @@ function Dashboard() {
     deals_closed: true
   });
   
+  // State for Monthly Meetings Evolution chart (Meetings Generation tab)
+  const [meetingsEvolutionVisibility, setMeetingsEvolutionVisibility] = useState({
+    Inbound: true,
+    Outbound: true,
+    Referral: true,
+    'Upsells/Cross-sell': true,
+    Total: true
+  });
+  
+  // State for Monthly Pipeline Evolution chart
+  const [pipelineEvolutionVisibility, setPipelineEvolutionVisibility] = useState({
+    new_pipe_created: true,
+    new_weighted_pipe: true
+  });
+  
+  // State for Upsell & Renew Evolution chart
+  const [upsellEvolutionVisibility, setUpsellEvolutionVisibility] = useState({
+    intro_meetings: true,
+    poa_attended: true,
+    deals_closed: true
+  });
+  
+  // State for Deals Closed Evolution chart
+  const [dealsClosedEvolutionVisibility, setDealsClosedEvolutionVisibility] = useState({
+    deals_closed: true,
+    arr_closed: true
+  });
+  
   // State for Deal Pipeline Board (Meetings Generation tab)
   const [pipelineDeals, setPipelineDeals] = useState([]);
   const [originalPipelineDeals, setOriginalPipelineDeals] = useState([]);
