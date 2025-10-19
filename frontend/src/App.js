@@ -3384,13 +3384,24 @@ function Dashboard() {
             >
               {/* Monthly Pipeline Evolution Chart - MOVED TO TOP */}
               {analytics.pipe_metrics.monthly_breakdown && analytics.pipe_metrics.monthly_breakdown.months && analytics.pipe_metrics.monthly_breakdown.months.length > 0 && (() => {
-                const chartData = analytics.pipe_metrics.monthly_breakdown.months.map((month, index) => ({
+                // Filter data to start from July
+                const allChartData = analytics.pipe_metrics.monthly_breakdown.months.map((month, index) => ({
                   month,
+                  sortKey: month, // For sorting
                   new_pipe_created: analytics.pipe_metrics.monthly_breakdown.new_pipe_created[index],
                   new_weighted_pipe: analytics.pipe_metrics.monthly_breakdown.new_weighted_pipe[index],
                   total_pipe: analytics.pipe_metrics.monthly_breakdown.total_pipe[index],
                   total_weighted: analytics.pipe_metrics.monthly_breakdown.total_weighted[index]
                 }));
+                
+                // Find July index and filter data from July onwards
+                const julyIndex = allChartData.findIndex(item => 
+                  item.month.toLowerCase().includes('jul')
+                );
+                
+                const chartData = julyIndex >= 0 
+                  ? allChartData.slice(julyIndex) 
+                  : allChartData;
                 
                 const handleLegendClick = (dataKey) => {
                   setPipelineEvolutionVisibility(prev => ({
@@ -3398,6 +3409,14 @@ function Dashboard() {
                     [dataKey]: !prev[dataKey]
                   }));
                 };
+                
+                // Custom legend data
+                const legendData = [
+                  { key: 'new_pipe_created', color: '#8b5cf6', label: 'New Pipe Created' },
+                  { key: 'new_weighted_pipe', color: '#3b82f6', label: 'New Weighted Pipe' },
+                  { key: 'total_pipe', color: '#10b981', label: 'Total Pipeline' },
+                  { key: 'total_weighted', color: '#f97316', label: 'Total Weighted' }
+                ];
                 
                 return (
                   <Card className="mb-6">
@@ -3414,16 +3433,35 @@ function Dashboard() {
                           <XAxis dataKey="month" />
                           <YAxis />
                           <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
-                          <Legend 
-                            onClick={(e) => handleLegendClick(e.dataKey)}
-                            wrapperStyle={{ cursor: 'pointer' }}
-                          />
                           {pipelineEvolutionVisibility.new_pipe_created && <Bar dataKey="new_pipe_created" fill="#8b5cf6" name="New Pipe Created" />}
                           {pipelineEvolutionVisibility.new_weighted_pipe && <Bar dataKey="new_weighted_pipe" fill="#3b82f6" name="New Weighted Pipe" />}
                           {pipelineEvolutionVisibility.total_pipe !== false && <Line type="monotone" dataKey="total_pipe" stroke="#10b981" strokeWidth={3} name="Total Pipeline" />}
                           {pipelineEvolutionVisibility.total_weighted !== false && <Line type="monotone" dataKey="total_weighted" stroke="#f97316" strokeWidth={2} strokeDasharray="5 5" name="Total Weighted" />}
                         </ComposedChart>
                       </ResponsiveContainer>
+                      
+                      {/* Custom Legend with Checkboxes */}
+                      <div className="flex flex-wrap justify-center gap-4 mt-4 px-4">
+                        {legendData.map(({ key, color, label }) => (
+                          <button
+                            key={key}
+                            onClick={() => handleLegendClick(key)}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all ${
+                              pipelineEvolutionVisibility[key] !== false
+                                ? 'bg-white shadow-sm border border-gray-200' 
+                                : 'bg-gray-100 opacity-60 hover:opacity-80'
+                            }`}
+                          >
+                            <div 
+                              className="w-3 h-3 rounded-sm"
+                              style={{ backgroundColor: color }}
+                            />
+                            <span className={`text-sm ${pipelineEvolutionVisibility[key] !== false ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>
+                              {label}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
                     </CardContent>
                   </Card>
                 );
