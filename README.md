@@ -351,22 +351,50 @@ db.sales_records_fullfunnel.count()
 
 ---
 
-## 📈 Roadmap
+## 📈 Améliorations Récentes (v2.1.0 - Janvier 2025)
 
-**Court terme:**
-- [ ] Sync automatique targets depuis Google Sheets (colonnes Y et AL)
-- [ ] Historique modifications targets
-- [ ] Export/Import configurations
+### ✨ Nouveautés
+1. **Deal Pipeline Board Interactive** (Meetings Generation tab)
+   - Drag & drop deals entre stages: Intro (F Inbox) → POA Booked → Proposal Sent → Legal
+   - Filtrage par AE avec dropdown "All AEs"
+   - Aging indicators: Fresh (green) / Aging (yellow) / Old (red)
+   - Save/Reset preferences avec persistance backend MongoDB
+   - Stage filtering corrigé: "F Inbox" pour Intro column
 
-**Moyen terme:**
-- [ ] Webhooks (Slack, Teams)
-- [ ] Rapports automatiques par email
-- [ ] Mobile app
+2. **Closing Projections Enhancements**
+   - Deal-specific closing probabilities (50%, 75%, 90% dropdown par deal)
+   - Dynamic total ARR & weighted ARR calculations
+   - Progress bars pour goals par colonne
+   - Doubled board height (48rem) pour meilleure visibilité
 
-**Long terme:**
-- [ ] Multi-tenant SaaS
-- [ ] AI Assistant pour insights
-- [ ] Prédictions ML
+3. **Admin Back Office Improvements**
+   - Save confirmation avec message "✅ Frontend updated"
+   - Console logging pour debug (view name, targets, backend response)
+   - Extended message display (5 seconds)
+   - Target key mapping automatique entre Admin BO et analytics functions
+
+4. **Charts Interactivity**
+   - Toutes les légendes des charts sont cliquables
+   - Toggle visibility des data series
+   - Persist visibility state pendant navigation
+
+5. **Performance & UX**
+   - Tab persistence fix: ne reset plus lors du changement de période
+   - Monthly Average calculation corrigée: affiche le target mensuel consistant
+   - French character encoding fixes (Rémi, François)
+   - actualPeriodMonths calculation dynamique
+
+### 🐛 Bug Fixes
+- Fixed Deal Pipeline Board stage filtering (F Inbox recognition)
+- Fixed tab reset issue when switching Monthly/July-Dec/Custom
+- Fixed target key mapping for Master view
+- Fixed Meetings Attended targets not reflecting in dashboard
+- Fixed numpy serialization errors in analytics endpoints
+
+### 🔄 Migration Notes
+- Targets maintenant stockés avec nouvelle structure dans MongoDB
+- Backward compatible via mapping function automatique
+- Collections ajoutées: `user_projections_preferences`, `user_pipeline_preferences`
 
 ---
 
