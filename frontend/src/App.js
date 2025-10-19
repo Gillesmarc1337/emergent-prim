@@ -2007,6 +2007,10 @@ function Dashboard() {
               
               analytics.meeting_generation.meetings_details.forEach(meeting => {
                 if (meeting.discovery_date) {
+                  // Extract month (YYYY-MM format)
+                  const date = new Date(meeting.discovery_date);
+                  const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                  const monthLabel = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
                 const initialDeals = analytics.meeting_generation.meetings_details
                   .filter(meeting => {
                     if (!meeting.stage) return false;
