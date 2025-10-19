@@ -493,25 +493,45 @@ function AdminTargetsPage() {
 
   return (
     <div className="container mx-auto p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <Settings className="h-8 w-8 text-blue-600" />
-          <h1 className="text-3xl font-bold text-gray-900">Admin - Targets Configuration</h1>
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-50 bg-white pb-4 mb-2 border-b-2 border-gray-200">
+        <div className="mb-4">
+          <div className="flex items-center gap-3 mb-2">
+            <Settings className="h-8 w-8 text-blue-600" />
+            <h1 className="text-3xl font-bold text-gray-900">Admin - Targets Configuration</h1>
+          </div>
+          <p className="text-gray-600">
+            Configure revenue targets (2025) and meeting banners. Other KPIs are calculated from Google Sheet data.
+          </p>
         </div>
-        <p className="text-gray-600">
-          Configure revenue targets (2025) and meeting banners. Other KPIs are calculated from Google Sheet data.
-        </p>
-      </div>
 
-      {/* Important Info */}
-      <Alert className="mb-4 bg-blue-50 border-blue-300">
-        <Info className="h-4 w-4 text-blue-600" />
-        <AlertDescription className="text-blue-900">
-          <strong>Note:</strong> Only <strong>Revenue Targets</strong> and <strong>Meeting Banners</strong> are configurable. 
-          All other KPIs (deals count, pipe created, weighted pipe, etc.) are automatically calculated from the Google Sheet data.
-        </AlertDescription>
-      </Alert>
+        {/* Important Info */}
+        <Alert className="mb-2 bg-blue-50 border-blue-300">
+          <Info className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-900">
+            <strong>Note:</strong> Only <strong>Revenue Targets</strong> and <strong>Meeting Banners</strong> are configurable. 
+            All other KPIs (deals count, pipe created, weighted pipe, etc.) are automatically calculated from the Google Sheet data.
+          </AlertDescription>
+        </Alert>
+
+        {/* View Selection Tabs */}
+        <Tabs value={selectedView?.id} onValueChange={(viewId) => {
+          const view = views.find(v => v.id === viewId);
+          setSelectedView(view);
+        }} className="w-full">
+          <TabsList className="grid w-full grid-cols-5 bg-gray-100">
+            {views.map(view => (
+              <TabsTrigger 
+                key={view.id} 
+                value={view.id}
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
+                {view.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      </div>
 
       {/* Message Alert */}
       {message && (
