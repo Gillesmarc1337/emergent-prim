@@ -3808,6 +3808,13 @@ function Dashboard() {
                     }));
                   };
                   
+                  // Custom legend data
+                  const legendData = [
+                    { key: 'intro_meetings', color: '#6366f1', label: 'Intro Meetings' },
+                    { key: 'poa_attended', color: '#10b981', label: 'POA Attended' },
+                    { key: 'deals_closed', color: '#ef4444', label: 'Deals Closed' }
+                  ];
+                  
                   return (
                     <Card className="mb-6">
                       <CardHeader>
@@ -3831,15 +3838,34 @@ function Dashboard() {
                                 return [value, name];
                               }}
                             />
-                            <Legend 
-                              onClick={(e) => handleLegendClick(e.dataKey)}
-                              wrapperStyle={{ cursor: 'pointer' }}
-                            />
                             {upsellEvolutionVisibility.intro_meetings && <Bar yAxisId="left" dataKey="intro_meetings" fill="#6366f1" name="Intro Meetings" />}
                             {upsellEvolutionVisibility.poa_attended && <Bar yAxisId="left" dataKey="poa_attended" fill="#10b981" name="POA Attended" />}
                             {upsellEvolutionVisibility.deals_closed && <Line yAxisId="right" type="monotone" dataKey="deals_closed" stroke="#ef4444" strokeWidth={3} name="Deals Closed" />}
                           </ComposedChart>
                         </ResponsiveContainer>
+                        
+                        {/* Custom Legend with Checkboxes */}
+                        <div className="flex flex-wrap justify-center gap-4 mt-4 px-4">
+                          {legendData.map(({ key, color, label }) => (
+                            <button
+                              key={key}
+                              onClick={() => handleLegendClick(key)}
+                              className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all ${
+                                upsellEvolutionVisibility[key] 
+                                  ? 'bg-white shadow-sm border border-gray-200' 
+                                  : 'bg-gray-100 opacity-60 hover:opacity-80'
+                              }`}
+                            >
+                              <div 
+                                className="w-3 h-3 rounded-sm"
+                                style={{ backgroundColor: color }}
+                              />
+                              <span className={`text-sm ${upsellEvolutionVisibility[key] ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>
+                                {label}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
                       </CardContent>
                     </Card>
                   );
