@@ -2006,7 +2006,7 @@ function Dashboard() {
               const monthlyData = {};
               
               analytics.meeting_generation.meetings_details.forEach(meeting => {
-              if (pipelineDeals.length === 0 && analytics.meeting_generation.meetings_details.length > 0) {
+                if (meeting.discovery_date) {
                 const initialDeals = analytics.meeting_generation.meetings_details
                   .filter(meeting => {
                     if (!meeting.stage) return false;
