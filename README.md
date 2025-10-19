@@ -20,11 +20,13 @@ Application full-stack de tableau de bord analytique pour le suivi des performan
 - **Python 3.10+**
 
 **Frontend:**
-- **React 18** - Bibliothèque UI
+- **React 18** - Bibliothèque UI avec hooks modernes
 - **TailwindCSS** - Framework CSS utility-first
-- **Recharts** - Graphiques et visualisations
-- **React Router** - Navigation
-- **Axios** - Requêtes HTTP
+- **Recharts** - Graphiques et visualisations interactifs
+- **@hello-pangea/dnd** - Drag & drop library (fork de react-beautiful-dnd)
+- **React Router** - Navigation SPA
+- **Axios** - Requêtes HTTP avec credentials
+- **shadcn/ui** - Composants UI modernes (Tabs, DropdownMenu, etc.)
 
 **Base de données:**
 - **MongoDB** - Base NoSQL pour flexibilité et scalabilité
