@@ -757,6 +757,8 @@ def calculate_meeting_generation(df, start_date, end_date, view_targets=None):
     referral_target = monthly_referral_target * period_duration_months
     total_target = monthly_total_target * period_duration_months
     
+    print(f"🎯 Meeting Generation Targets - monthly_total_target: {monthly_total_target}, total_target: {total_target}, period_duration: {period_duration_months}")
+    
     # Convert numpy types to Python native types
     total_intros = int(len(period_data))
     
