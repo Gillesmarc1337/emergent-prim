@@ -2026,8 +2026,6 @@ function Dashboard() {
 
               // Initialize pipeline deals from meetings_details if not loaded
               if (pipelineDeals.length === 0 && analytics.meeting_generation.meetings_details.length > 0) {
-                console.log('📊 All meeting stages:', analytics.meeting_generation.meetings_details.map(m => m.stage));
-                
                 const initialDeals = analytics.meeting_generation.meetings_details
                   .filter(meeting => {
                     if (!meeting.stage) return false;
@@ -2047,14 +2045,6 @@ function Dashboard() {
                     days_old: calculateDaysOld(meeting.discovery_date)
                   }))
                   .sort((a, b) => b.pipeline - a.pipeline); // Sort by deal size descending
-
-                console.log('🔍 Pipeline Board Debug:', {
-                  totalMeetings: analytics.meeting_generation.meetings_details.length,
-                  filteredDeals: initialDeals.length,
-                  stages: initialDeals.map(d => d.stage),
-                  uniqueStages: [...new Set(initialDeals.map(d => d.stage))],
-                  sampleDeal: initialDeals[0]
-                });
 
                 setPipelineDeals(initialDeals);
                 setOriginalPipelineDeals(initialDeals);
