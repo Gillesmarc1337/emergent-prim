@@ -2690,6 +2690,13 @@ function Dashboard() {
                       }));
                     };
                     
+                    // Custom legend data
+                    const legendData = [
+                      { key: 'attended', color: '#3b82f6', label: 'Meetings Attended' },
+                      { key: 'poa_generated', color: '#10b981', label: 'POA Generated' },
+                      { key: 'deals_closed', color: '#ef4444', label: 'Deals Closed' }
+                    ];
+                    
                     return (
                       <Card className="mb-6">
                         <CardHeader>
@@ -2705,10 +2712,6 @@ function Dashboard() {
                               <XAxis dataKey="month" />
                               <YAxis />
                               <Tooltip />
-                              <Legend 
-                                onClick={(e) => handleLegendClick(e.dataKey)}
-                                wrapperStyle={{ cursor: 'pointer' }}
-                              />
                               {attendedChartVisibility.attended && (
                                 <Bar dataKey="attended" fill="#3b82f6" name="Meetings Attended" />
                               )}
@@ -2720,6 +2723,29 @@ function Dashboard() {
                               )}
                             </ComposedChart>
                           </ResponsiveContainer>
+                          
+                          {/* Custom Legend with Checkboxes */}
+                          <div className="flex flex-wrap justify-center gap-4 mt-4 px-4">
+                            {legendData.map(({ key, color, label }) => (
+                              <button
+                                key={key}
+                                onClick={() => handleLegendClick(key)}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all ${
+                                  attendedChartVisibility[key] 
+                                    ? 'bg-white shadow-sm border border-gray-200' 
+                                    : 'bg-gray-100 opacity-60 hover:opacity-80'
+                                }`}
+                              >
+                                <div 
+                                  className="w-3 h-3 rounded-sm"
+                                  style={{ backgroundColor: color }}
+                                />
+                                <span className={`text-sm ${attendedChartVisibility[key] ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>
+                                  {label}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
                         </CardContent>
                       </Card>
                     );
