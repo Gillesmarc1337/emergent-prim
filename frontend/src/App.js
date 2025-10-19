@@ -4533,10 +4533,11 @@ function Dashboard() {
                               .map((deal, index) => (
                               <DraggableDealItem 
                                 key={deal.id}
-                                deal={deal} 
+                                deal={{...deal, probability: dealProbabilities[deal.id] || 75}} 
                                 index={index}
                                 showActions={true}
                                 onHide={() => hideItem('deals', deal.id)}
+                                onProbabilityChange={handleDealProbabilityChange}
                               />
                             ))}
                             {provided.placeholder}
