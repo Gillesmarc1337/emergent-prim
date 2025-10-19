@@ -6583,6 +6583,194 @@ def test_back_office_targets_final_verification():
     
     return passed_tests == total_tests
 
+def test_signal_view_target_synchronization():
+    """
+    Test the Signal view target synchronization fix for pipe_metrics
+    
+    Context: Backend was fixed to properly pass view_targets to calculate_pipe_metrics function.
+    Database shows Signal view has:
+    - dashboard_bottom_cards.new_pipe_created: 800,000
+    - dashboard_bottom_cards.created_weighted_pipe: 300,000
+    
+    Expected: Monthly analytics API should return these targets in pipe_metrics section
+    """
+    print(f"\n{'='*80}")
+    print(f"🎯 TESTING SIGNAL VIEW TARGET SYNCHRONIZATION FIX")
+    print(f"{'='*80}")
+    
+    test_results = {
+        'demo_login': False,
+        'signal_view_config': False,
+        'verify_database_targets': False,
+        'monthly_analytics_api': False,
+        'pipe_metrics_targets': False,
+        'target_values_correct': False
+    }
+    
+    # Step 1: Demo login
+    print(f"\n🔄 Step 1: Demo login")
+    demo_data, session_token = test_demo_login()
+    
+    if demo_data and session_token:
+        test_results['demo_login'] = True
+        print(f"✅ Demo login successful")
+        cookies = {'session_token': session_token}
+    else:
+        print(f"❌ Demo login failed - cannot continue testing")
+        return False
+    
+    # Step 2: Get Signal view configuration to verify database targets
+    print(f"\n🔄 Step 2: Get Signal view configuration")
+    signal_view_id = "view-signal-1760356092"
+    config_endpoint = f"/views/{signal_view_id}/config"
+    result = test_api_endpoint(config_endpoint, cookies=cookies, expected_status=200)
+    
+    signal_config = None
+    if result and len(result) == 2:
+        data, response = result
+        if data and isinstance(data, dict):
+            signal_config = data
+            test_results['signal_view_config'] = True
+            print(f"✅ Signal view config retrieved successfully")
+            print(f"  View name: {data.get('name')}")
+            print(f"  View ID: {signal_view_id}")
+        else:
+            print(f"❌ Invalid Signal view config response")
+            return False
+    else:
+        print(f"❌ Failed to get Signal view config")
+        return False
+    
+    # Step 3: Verify database shows expected targets
+    print(f"\n🔄 Step 3: Verify database targets for Signal view")
+    
+    targets = signal_config.get('targets', {})
+    if not targets:
+        print(f"❌ No targets found in Signal view config")
+        return False
+    
+    print(f"✅ Targets found in Signal view config")
+    
+    # Check for dashboard_bottom_cards targets
+    dashboard_cards = targets.get('dashboard_bottom_cards', {})
+    expected_new_pipe = 800000  # 800,000
+    expected_weighted_pipe = 300000  # 300,000
+    
+    actual_new_pipe = dashboard_cards.get('new_pipe_created')
+    actual_weighted_pipe = dashboard_cards.get('created_weighted_pipe')
+    
+    print(f"📋 Database targets verification:")
+    print(f"  • new_pipe_created: {actual_new_pipe} (expected: {expected_new_pipe})")
+    print(f"  • created_weighted_pipe: {actual_weighted_pipe} (expected: {expected_weighted_pipe})")
+    
+    if actual_new_pipe == expected_new_pipe and actual_weighted_pipe == expected_weighted_pipe:
+        test_results['verify_database_targets'] = True
+        print(f"✅ Database targets match expected values")
+    else:
+        print(f"❌ Database targets don't match expected values")
+        print(f"   Expected: new_pipe={expected_new_pipe}, weighted_pipe={expected_weighted_pipe}")
+        print(f"   Actual: new_pipe={actual_new_pipe}, weighted_pipe={actual_weighted_pipe}")
+        return False
+    
+    # Step 4: Call monthly analytics API for Signal view
+    print(f"\n🔄 Step 4: Call monthly analytics API for Signal view")
+    analytics_endpoint = f"/analytics/monthly?month_offset=0&view_id={signal_view_id}"
+    result = test_api_endpoint(analytics_endpoint, cookies=cookies, expected_status=200)
+    
+    analytics_data = None
+    if result and len(result) == 2:
+        data, response = result
+        if data and isinstance(data, dict):
+            analytics_data = data
+            test_results['monthly_analytics_api'] = True
+            print(f"✅ Monthly analytics API call successful")
+        else:
+            print(f"❌ Invalid monthly analytics response")
+            return False
+    else:
+        print(f"❌ Failed to call monthly analytics API")
+        return False
+    
+    # Step 5: Verify pipe_metrics section exists and has targets
+    print(f"\n🔄 Step 5: Verify pipe_metrics section contains targets")
+    
+    pipe_metrics = analytics_data.get('pipe_metrics')
+    if not pipe_metrics:
+        print(f"❌ pipe_metrics section not found in analytics response")
+        return False
+    
+    print(f"✅ pipe_metrics section found")
+    
+    # Check created_pipe section
+    created_pipe = pipe_metrics.get('created_pipe')
+    if not created_pipe:
+        print(f"❌ created_pipe section not found in pipe_metrics")
+        return False
+    
+    test_results['pipe_metrics_targets'] = True
+    print(f"✅ created_pipe section found in pipe_metrics")
+    
+    # Step 6: Verify target values are correct
+    print(f"\n🔄 Step 6: Verify target values in pipe_metrics")
+    
+    # Get the actual target values from pipe_metrics
+    pipe_target = created_pipe.get('target')
+    pipe_target_weighted = created_pipe.get('target_weighted')
+    
+    print(f"📋 Pipe metrics targets verification:")
+    print(f"  • created_pipe.target: {pipe_target}")
+    print(f"  • created_pipe.target_weighted: {pipe_target_weighted}")
+    
+    # For 1 month period, targets should equal the database values
+    # (For multi-month periods, they would be multiplied by period_months)
+    if pipe_target == expected_new_pipe:
+        print(f"✅ created_pipe.target matches database value: {pipe_target}")
+    else:
+        print(f"❌ created_pipe.target mismatch:")
+        print(f"   Expected: {expected_new_pipe} (from database)")
+        print(f"   Actual: {pipe_target}")
+        return False
+    
+    if pipe_target_weighted == expected_weighted_pipe:
+        print(f"✅ created_pipe.target_weighted matches database value: {pipe_target_weighted}")
+        test_results['target_values_correct'] = True
+    else:
+        print(f"❌ created_pipe.target_weighted mismatch:")
+        print(f"   Expected: {expected_weighted_pipe} (from database)")
+        print(f"   Actual: {pipe_target_weighted}")
+        return False
+    
+    # Additional verification: Print full pipe_metrics structure for debugging
+    print(f"\n📊 Full pipe_metrics structure:")
+    print(f"  created_pipe:")
+    for key, value in created_pipe.items():
+        print(f"    • {key}: {value}")
+    
+    if 'total_pipe' in pipe_metrics:
+        total_pipe = pipe_metrics['total_pipe']
+        print(f"  total_pipe:")
+        for key, value in total_pipe.items():
+            print(f"    • {key}: {value}")
+    
+    # Summary
+    passed_tests = sum(1 for result in test_results.values() if result)
+    total_tests = len(test_results)
+    
+    print(f"\n📋 Signal View Target Synchronization Test Summary:")
+    for test_name, result in test_results.items():
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"  {test_name}: {status}")
+    
+    print(f"\n📊 Test Results: {passed_tests}/{total_tests} steps passed")
+    
+    if passed_tests == total_tests:
+        print(f"\n🎉 SUCCESS: Signal view target synchronization is working correctly!")
+        print(f"✅ Admin-configured targets (800K, 300K) are properly flowing through to dashboard calculations")
+        return True
+    else:
+        print(f"\n❌ ISSUES: Signal view target synchronization has {total_tests - passed_tests} failing steps")
+        return False
+
 def main():
     """Main test execution - FINAL VERIFICATION: Back Office Targets Display"""
     print(f"{'='*100}")
