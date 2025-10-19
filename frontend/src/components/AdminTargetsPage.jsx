@@ -544,17 +544,32 @@ function AdminTargetsPage() {
           <TabsContent key={view.id} value={view.id}>
             <div className="space-y-6">
               
-              {/* Master View Info */}
-              {isMasterView && (
-                <Alert className="bg-blue-50 border-blue-300">
-                  <Info className="h-4 w-4 text-blue-600" />
-                  <AlertDescription className="text-blue-900">
-                    <strong>Master View:</strong> By default, targets are auto-calculated as the sum of all other views. 
-                    However, you can <strong>manually override</strong> any target value. Manual values will be used instead of auto-calculated ones.
-                    Monthly targets will be multiplied by the number of months in the selected period in the dashboard.
-                  </AlertDescription>
-                </Alert>
-              )}
+              {/* View Indicator */}
+              <Alert className={`${isMasterView ? 'bg-blue-50 border-blue-300' : 'bg-green-50 border-green-300'}`}>
+                <Info className={`h-4 w-4 ${isMasterView ? 'text-blue-600' : 'text-green-600'}`} />
+                <AlertDescription className={isMasterView ? 'text-blue-900' : 'text-green-900'}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <strong>Configuring: {view.name} View</strong>
+                      {isMasterView && (
+                        <span className="ml-2 text-sm">
+                          (Master View: auto-calculated or manual override)
+                        </span>
+                      )}
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${isMasterView ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'}`}>
+                      Active Tab: {view.name}
+                    </span>
+                  </div>
+                  {isMasterView && (
+                    <div className="mt-2 text-sm">
+                      By default, targets are auto-calculated as the sum of all other views. 
+                      However, you can <strong>manually override</strong> any target value. Manual values will be used instead of auto-calculated ones.
+                      Monthly targets will be multiplied by the number of months in the selected period in the dashboard.
+                    </div>
+                  )}
+                </AlertDescription>
+              </Alert>
               
               {/* Sync Button */}
               <div className="flex justify-end">
