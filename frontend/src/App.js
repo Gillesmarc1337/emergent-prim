@@ -2011,7 +2011,18 @@ function Dashboard() {
                   const date = new Date(meeting.discovery_date);
                   const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
                   const monthLabel = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-                const initialDeals = analytics.meeting_generation.meetings_details
+                  
+                  if (!monthlyData[monthKey]) {
+                    monthlyData[monthKey] = {
+                      month: monthLabel,
+                      sortKey: monthKey,
+                      Inbound: 0,
+                      Outbound: 0,
+                      Referral: 0,
+                      'Upsells/Cross-sell': 0,
+                      Total: 0
+                    };
+                  }
                   .filter(meeting => {
                     if (!meeting.stage) return false;
                     // Accept: F Inbox (Intro), D POA Booked, C Proposal sent, B Legals
