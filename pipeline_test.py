@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://pipeline-insights-1.preview.emergentagent.com/api"
+BASE_URL = "https://dealflow-tracker-7.preview.emergentagent.com/api"
 
 def test_api_endpoint(endpoint, expected_status=200):
     """Test an API endpoint and return response"""
