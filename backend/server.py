@@ -350,7 +350,7 @@ async def get_view_config_with_defaults(view_id: str):
         view_targets = default_targets
     else:
         # Map admin format to analytics format
-        view_targets = map_admin_targets_to_analytics_format(view_targets)
+        # Targets already mapped in get_view_config_with_defaults
     
     return {
         "view": view,
@@ -2442,7 +2442,7 @@ async def get_yearly_analytics(year: int = 2025, view_id: str = Query(None)):
             view_config = config_data["view"]
             view_targets = config_data["targets"]
             # Map admin targets to analytics format
-            view_targets = map_admin_targets_to_analytics_format(view_targets)
+            # Targets already mapped in get_view_config_with_defaults
             records = await get_sales_data_for_view(view_id)
         else:
             # Default targets for Organic view
@@ -2765,7 +2765,7 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
             view_config = config_data["view"]
             view_targets = config_data["targets"]
             # Map admin targets to analytics format
-            view_targets = map_admin_targets_to_analytics_format(view_targets)
+            # Targets already mapped in get_view_config_with_defaults
         else:
             # Default targets for Organic view
             view_targets = {
@@ -3122,7 +3122,7 @@ async def get_custom_analytics(
             view_config = config_data["view"]
             view_targets = config_data["targets"]
             # Map admin targets to analytics format
-            view_targets = map_admin_targets_to_analytics_format(view_targets)
+            # Targets already mapped in get_view_config_with_defaults
         else:
             # Default targets for Organic view
             view_targets = {
@@ -3586,7 +3586,7 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
             view_config = config_data["view"]
             view_targets = config_data["targets"]
             # Map admin targets to analytics format
-            view_targets = map_admin_targets_to_analytics_format(view_targets)
+            # Targets already mapped in get_view_config_with_defaults
             records = await get_sales_data_for_view(view_id)
         else:
             # Fallback to default Organic collection with default targets
@@ -4540,7 +4540,7 @@ async def get_comprehensive_analytics(view_id: str = Query(None)):
             view_config = config_data["view"]
             view_targets = config_data["targets"]
             # Map admin targets to analytics format
-            view_targets = map_admin_targets_to_analytics_format(view_targets)
+            # Targets already mapped in get_view_config_with_defaults
         else:
             # Default targets for Organic view
             view_targets = {
