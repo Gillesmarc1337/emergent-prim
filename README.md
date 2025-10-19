@@ -133,18 +133,116 @@ sudo supervisorctl restart frontend
 ## 📊 Features Principales
 
 ### Dashboard (6 Onglets)
-1. **Dashboard**: Vue d'ensemble revenue, pipe, deals actifs
-2. **Meetings Generation**: Suivi meetings par source (Intro, Inbound, Outbound, Referrals)
-3. **Pipeline Metrics**: Métriques pipeline YTD avec targets
-4. **Projections**: Prévisions closing 14 jours, 30-60 jours, 60-90 jours
-5. **Upsell & Renew**: Performance upsells et partners
-6. **Data Management**: Upload Google Sheets et configuration
 
-### Back Office Admin
-- Configuration targets pour 6 sections
-- Tous les targets sont mensuels et se multiplient selon la période
-- Interface par onglets (une vue = un onglet)
-- Sauvegarde temps réel dans MongoDB
+#### 1. **Dashboard**
+- Vue d'ensemble YTD Revenue avec forecast gap detection
+- 5 KPI Cards: YTD Revenue, YTD Remaining, New Pipe Created, Created Weighted Pipe, Active Deals
+- Graphiques évolution mensuelle revenue avec pipeline forecast
+- 4 Dashboard blocks avec targets dynamiques (Meetings, Intro/POA, Pipe Creation, Revenue)
+- Période sélectionnable: Monthly / July-Dec / Custom Period
+- Targets se multiplient automatiquement selon la période sélectionnée
+
+#### 2. **Meetings Generation**
+- 5 MetricCards: Total New Intros, Inbound, Outbound, Referrals, Upsells/Cross-sell
+- Sous-catégories Referrals: Internal, External, Client Referrals
+- Event & None/Non-assigned metrics
+- **Deal Pipeline Board — Interactive** (Nouveau ✨)
+  * Drag & drop deals entre colonnes (Intro, POA Booked, Proposal Sent, Legal)
+  * Filtrage par AE (Account Executive)
+  * Indicateurs d'âge des deals (Fresh/Aging/Old)
+  * Sauvegarde des préférences utilisateur (ordre, deals cachés)
+  * Boutons Save/Reset pour persistance
+  * Stage filtering: "F Inbox" pour Intro, "D POA Booked", "C Proposal sent", "B Legals"
+- BDR Performance Table avec rôles et meeting goals
+- Monthly Meetings Evolution graph avec breakdown par source
+- Source Distribution & Relevance Analysis charts
+- Intro Meetings Details table complète
+
+#### 3. **Meetings Attended**
+- 3 MetricCards: Meetings Scheduled, POA Generated, Deals Closed
+- AE Performance cards avec Intro Attended, POA Done, Closing, Closing Value
+- Monthly Evolution graphs pour chaque métrique
+- POA Details table avec dates et valeurs
+
+#### 4. **Upsell & Renew**
+- 4 MetricCards: Total Intro Meetings, Business Partners, Consulting Partners, POA Attended
+- Upsells vs Renewals breakdown
+- Closing Performance (deals closed, closing value)
+- Intro Meetings Details & POA Details tables
+
+#### 5. **Deals & Pipeline**
+- Pipe Metrics section: Created Pipe, Aggregate Pipe, Raw Pipeline, Weighted Pipe
+- Stage Distribution avec counts et valeurs
+- Monthly Evolution graphs (Created Pipe, Aggregate Weighted Pipe)
+- Deals Closed section avec ARR closed metrics
+
+#### 6. **Projections** (Closing Projections Tab)
+- **Hot Deals Section** (B Legals stage)
+  * Drag & drop reordering
+  * Hide/unhide functionality
+  * Deal cards avec client, pipeline value, AE, aging indicators
+  * Reset button pour restaurer l'ordre original
+- **Hot Leads Table** (C Proposal sent + D POA Booked)
+  * MRR/ARR display
+  * POA dates
+  * Drag & drop reordering
+- **Performance Summary**
+  * YTD data synchronisé avec dashboard
+  * Dashboard blocks pour periods
+- **Closing Projections — Interactive Board**
+  * 3 colonnes temporelles: Next 14 days, 30-60 days, 60-90 days
+  * Drag & drop deals entre colonnes
+  * Deal-specific closing probabilities (50%, 75%, 90%)
+  * Dynamic total ARR & weighted ARR calculations per column
+  * Drag & drop vertical ordering
+  * Hide/unhide deals with X button
+  * Save/Reset preferences with backend persistence
+  * Styled goals avec progress bars par colonne
+- **Upcoming POAs Section**
+  * Count & total value display
+  * Compact display (removed completed section)
+- **AE Pipeline Breakdown Table**
+  * Sortable columns
+  * Pipeline, Expected ARR, Weighted Value pour chaque période
+  * TOTAL row avec grand total calculations
+  * French character encoding fixes (Rémi, François)
+  * Double height board (48rem) pour meilleure visibilité
+
+### Back Office Admin (super_admin uniquement)
+
+#### Admin Targets Configuration
+- **Interface par onglets** (une vue = un onglet)
+- **6 Sections de configuration** mirroring dashboard structure:
+  1. **Revenue Objectives 2025**: 12 mois configurables (Jan-Dec)
+  2. **Deals Closed Yearly**: Target deals annuel
+  3. **Dashboard Bottom Cards**: New Pipe Created, Created Weighted Pipe
+  4. **Meeting Generation**: Total, Inbound, Outbound, Referral, Upsells/Cross-sell, Event targets
+  5. **Intro & POA**: Intro target, POA target
+  6. **Meetings Attended**: Meetings Scheduled, POA Generated, Deals Closed
+  7. **Closing Projections Board**: Targets pour Next 14 days, 30-60 days, 60-90 days columns
+
+- **Features**:
+  * MetricCard replicas en gris montrant la structure du dashboard
+  * Tous les targets sont mensuels et se multiplient automatiquement selon la période
+  * Sauvegarde temps réel dans MongoDB avec confirmation ✅
+  * Console logging pour vérification frontend/backend sync
+  * Message display étendu (5 secondes)
+  * Master view: manual overrides pour targets auto-agrégés
+
+#### User Management (super_admin uniquement)
+- Liste utilisateurs avec rôles
+- CRUD complet utilisateurs
+- Toggle role (viewer ↔ super_admin)
+- Gestion accès vues par utilisateur
+- Self-delete protection
+- Color-coded success/error messages
+
+### Système de Persistance
+- **Projections Preferences**: Save/load/reset order et hidden deals par user + view
+- **MongoDB Collections**: 
+  * `user_projections_preferences` (Closing Projections board)
+  * `user_pipeline_preferences` (Deal Pipeline Board - Meetings Generation)
+- **View-specific**: Chaque vue a ses propres préférences utilisateur
 
 ---
 
