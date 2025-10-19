@@ -2062,6 +2062,72 @@ function Dashboard() {
                 { key: 'Total', color: '#1e40af', label: 'Total Meetings' }
               ];
               
+              return (
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle>Monthly Meetings Evolution</CardTitle>
+                    <CardDescription>
+                      Total meetings generated per month with breakdown by source
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={350}>
+                      <ComposedChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip />
+                        {meetingsEvolutionVisibility.Inbound && (
+                          <Bar dataKey="Inbound" fill="#10b981" name="Inbound" />
+                        )}
+                        {meetingsEvolutionVisibility.Outbound && (
+                          <Bar dataKey="Outbound" fill="#f97316" name="Outbound" />
+                        )}
+                        {meetingsEvolutionVisibility.Referral && (
+                          <Bar dataKey="Referral" fill="#a855f7" name="Referral" />
+                        )}
+                        {meetingsEvolutionVisibility['Upsells/Cross-sell'] && (
+                          <Bar dataKey="Upsells/Cross-sell" fill="#6366f1" name="Upsells/Cross-sell" />
+                        )}
+                        {meetingsEvolutionVisibility.Total && (
+                          <Line 
+                            type="monotone" 
+                            dataKey="Total" 
+                            stroke="#1e40af" 
+                            strokeWidth={3}
+                            name="Total Meetings" 
+                          />
+                        )}
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                    
+                    {/* Custom Legend */}
+                    <div className="flex flex-wrap justify-center gap-4 mt-4 px-4">
+                      {legendData.map(({ key, color, label }) => (
+                        <button
+                          key={key}
+                          onClick={() => handleLegendClick(key)}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all ${
+                            meetingsEvolutionVisibility[key] 
+                              ? 'bg-white shadow-sm border border-gray-200' 
+                              : 'bg-gray-100 opacity-60 hover:opacity-80'
+                          }`}
+                        >
+                          <div 
+                            className="w-3 h-3 rounded-sm"
+                            style={{ backgroundColor: color }}
+                          />
+                          <span className={`text-sm ${meetingsEvolutionVisibility[key] ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>
+                            {label}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })()}
+
             {/* Monthly Meetings Evolution Chart - MOVED TO TOP */}
             {analytics.meeting_generation.meetings_details && analytics.meeting_generation.meetings_details.length > 0 && (() => {
               // Group meetings by month and source
