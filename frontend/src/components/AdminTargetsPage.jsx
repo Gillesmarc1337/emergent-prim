@@ -1433,6 +1433,139 @@ function AdminTargetsPage() {
                 </CardContent>
               </Card>
 
+              {/* POA & DEALS PERFORMANCE - Dedicated Section */}
+              <Card className="border-purple-200 bg-purple-50">
+                <CardHeader className="bg-purple-100">
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-purple-600 text-white text-xs font-semibold rounded">🎯 POA & DEALS PERFORMANCE</span>
+                    POA Generated & Deals Closed Targets
+                  </CardTitle>
+                  <CardDescription className="text-purple-900">
+                    Configure MONTHLY targets for POA Generated and Deals Closed (displayed in Meetings Attended tab)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* POA Generated */}
+                    <div className="bg-white p-4 rounded-lg border-2 border-purple-200 shadow-sm">
+                      <Label htmlFor="poa_generated_perf" className="text-lg font-semibold text-purple-900">
+                        📋 POA Generated Target
+                      </Label>
+                      <Input
+                        id="poa_generated_perf"
+                        type="number"
+                        value={targets?.meetings_attended?.poa_generated || targets?.dashboard_banners?.poa_target || 0}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          setTargets(prev => ({
+                            ...prev,
+                            meetings_attended: {
+                              ...prev.meetings_attended,
+                              poa_generated: value
+                            },
+                            dashboard_banners: {
+                              ...prev.dashboard_banners,
+                              poa_target: value
+                            }
+                          }));
+                        }}
+                        className="mt-2 text-xl font-bold h-14"
+                        placeholder="18"
+                      />
+                      <p className="text-sm text-purple-700 mt-2 font-medium">
+                        Monthly base target (will be × by period duration)
+                      </p>
+                      <div className="mt-4 p-3 bg-purple-50 rounded border border-purple-200">
+                        <div className="text-xs text-purple-800 font-semibold mb-1">Examples:</div>
+                        <div className="text-xs text-purple-700">
+                          • Monthly: {targets?.meetings_attended?.poa_generated || targets?.dashboard_banners?.poa_target || 18} POA<br/>
+                          • July-Dec (6 months): {(targets?.meetings_attended?.poa_generated || targets?.dashboard_banners?.poa_target || 18) * 6} POA<br/>
+                          • Custom 3 months: {(targets?.meetings_attended?.poa_generated || targets?.dashboard_banners?.poa_target || 18) * 3} POA
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Deals Closed */}
+                    <div className="bg-white p-4 rounded-lg border-2 border-purple-200 shadow-sm">
+                      <Label htmlFor="deals_closed_perf" className="text-lg font-semibold text-purple-900">
+                        ✅ Deals Closed Target
+                      </Label>
+                      <Input
+                        id="deals_closed_perf"
+                        type="number"
+                        value={targets?.meetings_attended?.deals_closed || targets?.dashboard_banners?.deals_closed_count || 0}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          setTargets(prev => ({
+                            ...prev,
+                            meetings_attended: {
+                              ...prev.meetings_attended,
+                              deals_closed: value
+                            },
+                            dashboard_banners: {
+                              ...prev.dashboard_banners,
+                              deals_closed_count: value
+                            }
+                          }));
+                        }}
+                        className="mt-2 text-xl font-bold h-14"
+                        placeholder="6"
+                      />
+                      <p className="text-sm text-purple-700 mt-2 font-medium">
+                        Monthly base target (will be × by period duration)
+                      </p>
+                      <div className="mt-4 p-3 bg-purple-50 rounded border border-purple-200">
+                        <div className="text-xs text-purple-800 font-semibold mb-1">Examples:</div>
+                        <div className="text-xs text-purple-700">
+                          • Monthly: {targets?.meetings_attended?.deals_closed || targets?.dashboard_banners?.deals_closed_count || 6} deals<br/>
+                          • July-Dec (6 months): {(targets?.meetings_attended?.deals_closed || targets?.dashboard_banners?.deals_closed_count || 6) * 6} deals<br/>
+                          • Custom 3 months: {(targets?.meetings_attended?.deals_closed || targets?.dashboard_banners?.deals_closed_count || 6) * 3} deals
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Dashboard Preview */}
+                  <div className="mt-6 p-4 bg-purple-100 rounded-lg border-2 border-purple-300">
+                    <div className="text-sm font-semibold mb-3 text-purple-900">📊 Dashboard Preview (as shown in Meetings Attended tab):</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* POA Generated Preview */}
+                      <div className="bg-white border-2 border-purple-200 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">📋 POA Generated</div>
+                        <div className="text-3xl font-bold text-green-600">X</div>
+                        <div className="text-sm text-gray-600 mb-2">
+                          Target: <span className="font-bold text-purple-700">
+                            {targets?.meetings_attended?.poa_generated || targets?.dashboard_banners?.poa_target || 18}
+                          </span> <span className="text-xs">(monthly)</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                          <div className="bg-green-500 h-2.5 rounded-full" style={{width: '72%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center mt-2">72.2% of target</div>
+                      </div>
+
+                      {/* Deals Closed Preview */}
+                      <div className="bg-white border-2 border-purple-200 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-1">✅ Deals Closed</div>
+                        <div className="text-3xl font-bold text-blue-600">X</div>
+                        <div className="text-sm text-gray-600 mb-2">
+                          Target: <span className="font-bold text-purple-700">
+                            {targets?.meetings_attended?.deals_closed || targets?.dashboard_banners?.deals_closed_count || 6}
+                          </span> <span className="text-xs">(monthly)</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                          <div className="bg-blue-500 h-2.5 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center mt-2">0% of target</div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-purple-800 text-center mt-3 font-medium">
+                      ℹ️ These targets will be displayed in the "POA & Deals Performance" section of Meetings Attended tab
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Info sur autres KPIs */}
               <Alert className="bg-gray-50 border-gray-300">
                 <Info className="h-4 w-4 text-gray-600" />
