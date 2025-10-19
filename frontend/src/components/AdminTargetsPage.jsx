@@ -374,24 +374,34 @@ function AdminTargetsPage() {
     setMessage(null);
 
     try {
-      await axios.put(
+      const response = await axios.put(
         `${API}/admin/views/${selectedView.id}/targets`,
         targets,
         { withCredentials: true }
       );
       
+      // Console log for verification
+      console.log('✅ Targets saved successfully!');
+      console.log('View:', selectedView.name);
+      console.log('Saved targets:', targets);
+      console.log('Backend response:', response.data);
+      
       if (isMasterView) {
         setMessage({ 
           type: 'success', 
-          text: 'Master targets saved! These manual values will override auto-calculated aggregates.' 
+          text: '✅ Master targets saved! Frontend updated. These manual values will override auto-calculated aggregates.' 
         });
       } else {
-        setMessage({ type: 'success', text: 'Targets updated successfully!' });
+        setMessage({ 
+          type: 'success', 
+          text: '✅ Targets saved successfully! Frontend has been updated with the new values.' 
+        });
       }
       
-      // Clear message after 3 seconds
-      setTimeout(() => setMessage(null), 3000);
+      // Clear message after 5 seconds (extended to ensure user sees it)
+      setTimeout(() => setMessage(null), 5000);
     } catch (error) {
+      console.error('❌ Failed to save targets:', error);
       setMessage({ 
         type: 'error', 
         text: error.response?.data?.detail || 'Failed to update targets' 
