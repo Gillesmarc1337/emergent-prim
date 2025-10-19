@@ -2936,7 +2936,7 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
             df['type_of_deal'].apply(is_upsell)
         ]
         actual_upsells = len(upsells_data)
-        target_upsells = 5  # 5 upsells per month
+        # target_upsells removed - using dynamic targets from view config
         
         # Block 3: Pipe creation - use Excel formula from spreadsheet
         new_pipe_focus_month = df[
@@ -3844,7 +3844,7 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
             df['type_of_deal'].apply(is_upsell)
         ]
         actual_upsells = len(upsells_data)
-        target_upsells = 5  # 5 upsells per month
+        # target_upsells removed - using dynamic targets from view config
         
         # Block 3: Pipe creation (for focus month) - use Excel formula from spreadsheet
         new_pipe_focus_month = df[
