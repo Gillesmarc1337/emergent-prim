@@ -760,17 +760,15 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
       
       {/* Key Metrics - 5 Simple Cards */}
       {(() => {
-        // Dynamic targets - multiply by number of months in the period
-        // Base monthly targets: 2M for New Pipe Created, 800K for Created Weighted Pipe
-        const baseNewPipeMonthlyTarget = 2000000; // $2M per month
-        const baseWeightedPipeMonthlyTarget = 800000; // $800K per month
+        // Dynamic targets - get from backend analytics instead of hardcoding
+        // Backend returns targets from admin configuration (dashboard_bottom_cards)
+        const baseNewPipeMonthlyTarget = analytics.pipe_metrics?.created_pipe?.target || 2000000; // Fallback to 2M
+        const baseWeightedPipeMonthlyTarget = analytics.pipe_metrics?.created_pipe?.target_weighted || 800000; // Fallback to 800K
         
-        // Use the actual period months passed from Dashboard component (calculated from date range/view mode)
-        const periodMonths = actualPeriodMonths || 1;
-        
-        // Calculate dynamic targets based on actual period
-        const dynamicNewPipeTarget = baseNewPipeMonthlyTarget * periodMonths; // 2M × actual months
-        const dynamicWeightedPipeTarget = baseWeightedPipeMonthlyTarget * periodMonths; // 800K × actual months
+        // Note: Backend already multiplies by period, so we don't need to do it here
+        // The target from backend is already: monthly_target × period_duration_months
+        const dynamicNewPipeTarget = baseNewPipeMonthlyTarget;
+        const dynamicWeightedPipeTarget = baseWeightedPipeMonthlyTarget;
         
         // Use data from analytics (changes with period selector) instead of dashboardData
         const newPipeCreated = analytics.dashboard_blocks?.block_3_pipe_creation?.new_pipe_created || 0;
