@@ -2031,9 +2031,8 @@ function Dashboard() {
                 const initialDeals = analytics.meeting_generation.meetings_details
                   .filter(meeting => {
                     if (!meeting.stage) return false;
-                    const stageLC = meeting.stage.toLowerCase();
-                    // Accept: intro (case-insensitive), D POA Booked, C Proposal sent, B Legals
-                    return stageLC === 'intro' || 
+                    // Accept: F Inbox (Intro), D POA Booked, C Proposal sent, B Legals
+                    return meeting.stage === 'F Inbox' || 
                            meeting.stage === 'D POA Booked' || 
                            meeting.stage === 'C Proposal sent' || 
                            meeting.stage === 'B Legals';
@@ -2063,7 +2062,7 @@ function Dashboard() {
 
               // Group deals by stage
               const stageColumns = {
-                'intro': { title: 'Intro', color: 'blue', deals: [] },
+                'F Inbox': { title: 'Intro', color: 'blue', deals: [] },
                 'D POA Booked': { title: 'POA Booked', color: 'purple', deals: [] },
                 'C Proposal sent': { title: 'Proposal Sent', color: 'orange', deals: [] },
                 'B Legals': { title: 'Legal', color: 'green', deals: [] }
@@ -2075,19 +2074,14 @@ function Dashboard() {
               );
 
               filteredDeals.forEach(deal => {
-                const stageKey = deal.stage.toLowerCase() === 'intro' ? 'intro' : deal.stage;
-                if (stageColumns[stageKey]) {
-                  stageColumns[stageKey].deals.push(deal);
+                if (stageColumns[deal.stage]) {
+                  stageColumns[deal.stage].deals.push(deal);
                 }
               });
               
-              // Create merged columns (Intro column already contains all intro deals)
+              // Create merged columns
               const mergedColumns = {
-                'Intro': { 
-                  title: 'Intro', 
-                  color: 'blue', 
-                  deals: (stageColumns['intro']?.deals || []).sort((a, b) => b.pipeline - a.pipeline)
-                },
+                'Intro': stageColumns['F Inbox'],
                 'POA Booked': stageColumns['D POA Booked'],
                 'Proposal Sent': stageColumns['C Proposal sent'],
                 'Legal': stageColumns['B Legals']
