@@ -3774,11 +3774,18 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
             focus_month_end = focus_month.replace(month=focus_month_num + 1, day=1) - timedelta(seconds=1)
         
         # Block 1: Meetings Generation (dynamic by selected month)
-        # Fixed targets as per user requirements: 20 inbound, 15 outbound, 10 referral per month
-        target_inbound = 20
-        target_outbound = 15
-        target_referral = 10
-        target_total = target_inbound + target_outbound + target_referral
+        # Get targets from view_targets or use defaults
+        meeting_gen = view_targets.get("meeting_generation", {})
+        target_inbound = meeting_gen.get("inbound", 22)
+        target_outbound = meeting_gen.get("outbound", 17)
+        target_referral = meeting_gen.get("referral", meeting_gen.get("referrals", 11))
+        target_upsells = meeting_gen.get("upsells_cross", meeting_gen.get("upsells_x", 0))
+        
+        # Use configured total_target if available, otherwise calculate sum
+        if "total_target" in meeting_gen and meeting_gen["total_target"] > 0:
+            target_total = meeting_gen["total_target"]
+        else:
+            target_total = target_inbound + target_outbound + target_referral
         
         # Calculate actual values for the focus month
         focus_month_meetings = df[
