@@ -775,6 +775,7 @@ def calculate_meeting_generation(df, start_date, end_date, view_targets=None):
         'client_referral': int(len(client_referral)),
         'event': int(len(event)),
         'event_target': int(monthly_event_target * period_duration_months) if 'event' in view_targets.get("meeting_generation", {}) else 0,
+        'none_unassigned': int(len(none_unassigned)),
         'relevance_analysis': {
             'relevant': int(len(relevant)),
             'question_mark': int(len(question_mark)),
