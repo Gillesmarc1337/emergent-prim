@@ -804,6 +804,7 @@ def calculate_meeting_generation(df, start_date, end_date, view_targets=None):
         'inbound_target': inbound_target,
         'outbound_target': outbound_target,
         'referral_target': referral_target,
+        'event_target': monthly_event_target * period_duration_months,
         'on_track': bool(total_intros >= total_target)
     }
 
