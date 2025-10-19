@@ -204,19 +204,34 @@ def map_admin_targets_to_analytics_format(admin_targets: dict) -> dict:
     # Map meeting_generation (new format keeps most of the same keys)
     if "meeting_generation" in admin_targets:
         meeting_gen = admin_targets["meeting_generation"]
-        # Use total_target as intro if intro not set separately
+        
+        # Keep total_target if configured
         if "total_target" in meeting_gen and meeting_gen["total_target"] > 0:
-            # Only use total_target if intro_poa.intro wasn't set
-            if mapped_targets["meeting_generation"]["intro"] == 45:  # Still default
-                mapped_targets["meeting_generation"]["intro"] = meeting_gen["total_target"]
+            mapped_targets["meeting_generation"]["total_target"] = meeting_gen["total_target"]
+            
         if "inbound" in meeting_gen and meeting_gen["inbound"] > 0:
             mapped_targets["meeting_generation"]["inbound"] = meeting_gen["inbound"]
         if "outbound" in meeting_gen and meeting_gen["outbound"] > 0:
             mapped_targets["meeting_generation"]["outbound"] = meeting_gen["outbound"]
+            
+        # Support both singular (new) and plural (old) for referral
         if "referral" in meeting_gen and meeting_gen["referral"] > 0:
-            mapped_targets["meeting_generation"]["referrals"] = meeting_gen["referral"]
+            mapped_targets["meeting_generation"]["referral"] = meeting_gen["referral"]
+            mapped_targets["meeting_generation"]["referrals"] = meeting_gen["referral"]  # Keep both for backward compatibility
+        elif "referrals" in meeting_gen and meeting_gen["referrals"] > 0:
+            mapped_targets["meeting_generation"]["referral"] = meeting_gen["referrals"]
+            mapped_targets["meeting_generation"]["referrals"] = meeting_gen["referrals"]
+            
+        # Support both upsells_cross (new) and upsells_x (old)
         if "upsells_cross" in meeting_gen and meeting_gen["upsells_cross"] > 0:
-            mapped_targets["meeting_generation"]["upsells_x"] = meeting_gen["upsells_cross"]
+            mapped_targets["meeting_generation"]["upsells_cross"] = meeting_gen["upsells_cross"]
+            mapped_targets["meeting_generation"]["upsells_x"] = meeting_gen["upsells_cross"]  # Keep both for backward compatibility
+        elif "upsells_x" in meeting_gen and meeting_gen["upsells_x"] > 0:
+            mapped_targets["meeting_generation"]["upsells_cross"] = meeting_gen["upsells_x"]
+            mapped_targets["meeting_generation"]["upsells_x"] = meeting_gen["upsells_x"]
+            
+        if "event" in meeting_gen and meeting_gen["event"] > 0:
+            mapped_targets["meeting_generation"]["event"] = meeting_gen["event"]
     
     # Map meetings_attended
     if "meetings_attended" in admin_targets:
