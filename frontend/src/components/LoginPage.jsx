@@ -169,17 +169,25 @@ const LoginPage = () => {
             <div className="text-center text-sm text-cyan-300/70 space-y-2 font-mono">
               <p className="font-semibold text-cyan-400">📡 AUTHORIZED_CREW:</p>
               <div className="flex justify-center gap-4 text-xs">
-                <span className="px-3 py-1 bg-blue-50 rounded-full">
-                  asher@primelis.com <span className="text-gray-500">(Viewer)</span>
+                <span className="px-3 py-1 bg-cyan-950/50 border border-cyan-500/30 rounded text-cyan-300">
+                  asher@primelis.com <span className="text-cyan-500">(VIEWER)</span>
                 </span>
-                <span className="px-3 py-1 bg-indigo-50 rounded-full">
-                  remi@primelis.com <span className="text-gray-500">(Admin)</span>
+                <span className="px-3 py-1 bg-fuchsia-950/50 border border-fuchsia-500/30 rounded text-fuchsia-300">
+                  remi@primelis.com <span className="text-fuchsia-500">(CAPTAIN)</span>
                 </span>
               </div>
             </div>
           </div>
         </CardContent>
+        
+        {/* Bottom Glitch Line */}
+        <div className="h-1 bg-gradient-to-r from-transparent via-fuchsia-500 to-transparent animate-pulse" />
       </Card>
+      
+      {/* Floating Text */}
+      <div className="absolute bottom-10 text-center w-full text-cyan-500/30 font-mono text-xs animate-pulse">
+        ☠️ CYBER_PIRATES • PRIMELIS_FLEET • GO_TO_MARKET_COMMAND ☠️
+      </div>
     </div>
   );
 };
