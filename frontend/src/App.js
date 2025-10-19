@@ -2004,30 +2004,8 @@ function Dashboard() {
             {analytics.meeting_generation.meetings_details && analytics.meeting_generation.meetings_details.length > 0 && (() => {
               // Group meetings by month and source
               const monthlyData = {};
-              const calculateDaysOld = (discoveryDate) => {
-                if (!discoveryDate) return 0;
-                const created = new Date(discoveryDate);
-                const now = new Date();
-                const diffTime = Math.abs(now - created);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                return diffDays;
-              };
-
-              // Get aging color based on days
-              const getAgingColor = (days) => {
-                if (days < 30) return 'bg-green-100 border-green-300 text-green-800';
-                if (days < 60) return 'bg-orange-100 border-orange-300 text-orange-800';
-                return 'bg-red-100 border-red-300 text-red-800';
-              };
-
-              // Get aging badge
-              const getAgingBadge = (days) => {
-                if (days < 30) return 'Fresh';
-                if (days < 60) return 'Aging';
-                return 'Stale';
-              };
-
-              // Initialize pipeline deals from meetings_details if not loaded
+              
+              analytics.meeting_generation.meetings_details.forEach(meeting => {
               if (pipelineDeals.length === 0 && analytics.meeting_generation.meetings_details.length > 0) {
                 const initialDeals = analytics.meeting_generation.meetings_details
                   .filter(meeting => {
