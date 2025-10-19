@@ -1181,7 +1181,7 @@ function Dashboard() {
       if (viewMode === 'monthly') {
         loadAnalytics();
       } else {
-        loadYearlyAnalytics();
+        loadAnalytics(); // Use loadAnalytics for all view modes
       }
       // Note: loadDashboard is no longer needed here as loadAnalytics handles it
     };
