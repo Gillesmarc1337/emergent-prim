@@ -1998,7 +1998,9 @@ function Dashboard() {
               />
             </div>
 
-            {/* Deal Pipeline Board - Interactive */}
+            {/* Deal Pipeline Board moved after Source Distribution */}
+
+            {/* Monthly Meetings Evolution Chart - MOVED TO TOP */}
             {analytics.meeting_generation.meetings_details && analytics.meeting_generation.meetings_details.length > 0 && (() => {
               // Calculate days since creation for each deal
               const calculateDaysOld = (discoveryDate) => {
