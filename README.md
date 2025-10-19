@@ -467,6 +467,135 @@ db.user_sessions.deleteMany({ expires_at: { $lt: new Date() } })
 
 ---
 
+## 🎨 Branding & Theming
+
+### Primelis Identity
+- **Logo**: Intégré dans Header (top-left) et LoginPage
+- **Login Theme**: "Cyber Pirates Terminal" avec animations et effets sci-fi
+- **Color Palette**:
+  * Primary: Blue/Cyan gradients
+  * Secondary: Purple/Slate tones
+  * Success: Green indicators
+  * Warning: Orange/Yellow alerts
+  * Error: Red notifications
+
+### Custom Styling
+- Tailwind configuration personnalisée dans `tailwind.config.js`
+- Dark mode compatible (slate-900 backgrounds)
+- Responsive design (mobile-first approach)
+- Custom animations pour login page et interactive boards
+
+---
+
+## 🔧 Technical Implementation Details
+
+### Excel-Based Weighting Logic
+Le système utilise une formule Excel complexe pour calculer les weighted values:
+```
+weighted_value = pipeline_value × stage_probability × source_coefficient × recency_factor
+```
+
+**Stage Probabilities:**
+- F Inbox (Intro): Variable based on source & recency
+- D POA Booked: ~30-40%
+- C Proposal sent: ~50-60%
+- B Legals: ~75-85%
+- A Closed: 100%
+
+**Source Coefficients:**
+- Inbound: 1.0
+- Outbound: 0.8
+- Referral: 1.2
+
+**Recency Factor:**
+- Fresh (0-7 days): 1.0
+- Aging (8-14 days): 0.9
+- Old (15+ days): 0.7
+
+### Target Calculation System
+```python
+# Monthly base targets
+MONTHLY_MEETINGS = 50  # 22 inbound + 17 outbound + 11 referral
+MONTHLY_REVENUE = varies_per_view  # Ex: 1,080,000 for Full Funnel
+MONTHLY_PIPE_CREATED = 2,000,000
+MONTHLY_WEIGHTED_PIPE = 800,000
+
+# Dynamic multiplication
+target_for_period = monthly_target × period_duration_months
+
+# Example:
+# July-Dec (6 months) = 50 × 6 = 300 meetings target
+# Custom 2-month period = 50 × 2 = 100 meetings target
+```
+
+### Drag & Drop Implementation
+Utilise `@hello-pangea/dnd` (fork maintained de react-beautiful-dnd):
+```jsx
+<DragDropContext onDragEnd={handleDragEnd}>
+  <Droppable droppableId="column-id">
+    {(provided) => (
+      <div ref={provided.innerRef} {...provided.droppableProps}>
+        {deals.map((deal, index) => (
+          <Draggable key={deal.id} draggableId={deal.id} index={index}>
+            {(provided) => (
+              <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                {/* Deal Card */}
+              </div>
+            )}
+          </Draggable>
+        ))}
+        {provided.placeholder}
+      </div>
+    )}
+  </Droppable>
+</DragDropContext>
+```
+
+### State Management
+- **React Context**: AuthContext pour user + views globales
+- **Local State**: useState pour UI states (deals, filters, modals)
+- **Persistence**: MongoDB pour user preferences
+- **Cache**: localStorage pour session persistence
+
+### Data Flow
+```
+Google Sheets → Backend Upload → MongoDB (view-specific collections)
+                                        ↓
+User → Frontend → API Request (with view_id) → Backend Analytics
+                                        ↓
+                              Calculate with view targets
+                                        ↓
+                              Return formatted data → Frontend Display
+```
+
+---
+
+## 📈 Roadmap & Future Enhancements
+
+### Court terme (Q1 2025)
+- [ ] Sync automatique targets depuis Google Sheets (colonnes Y et AL)
+- [ ] Historique modifications targets avec audit trail
+- [ ] Export/Import configurations targets entre vues
+- [ ] Bulk operations pour Deal Pipeline Board
+- [ ] Advanced filtering (date ranges, deal values, multiple AEs)
+
+### Moyen terme (Q2-Q3 2025)
+- [ ] Webhooks notifications (Slack, Teams, Discord)
+- [ ] Rapports automatiques par email (daily/weekly/monthly)
+- [ ] Mobile app React Native
+- [ ] Real-time collaboration (WebSocket) pour boards
+- [ ] Advanced analytics: Cohort analysis, Win rate by source, AE leaderboard
+
+### Long terme (Q4 2025+)
+- [ ] Multi-tenant SaaS transformation
+- [ ] AI Assistant pour insights automatiques
+- [ ] Prédictions ML pour closing probability
+- [ ] Integration HubSpot/Salesforce native
+- [ ] Custom dashboards builder
+- [ ] API publique pour intégrations tierces
+
+---
+
 ## 📄 Licence
 
 Propriétaire - Primelis © 2025
