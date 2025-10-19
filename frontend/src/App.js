@@ -2053,7 +2053,7 @@ function Dashboard() {
               };
 
               // Filter and group deals
-              const filteredDeals = dealsToDisplay.filter(deal => 
+              const filteredDeals = pipelineDeals.filter(deal => 
                 selectedPipelineAE === 'all' || deal.ae === selectedPipelineAE
               );
 
@@ -2062,9 +2062,22 @@ function Dashboard() {
                   stageColumns[deal.stage].deals.push(deal);
                 }
               });
+              
+              // Merge "E Inbox" and "F Intro Attended" into one "Intro" column
+              const mergedColumns = {
+                'Intro': { 
+                  title: 'Intro', 
+                  color: 'blue', 
+                  deals: [...(stageColumns['E Inbox']?.deals || []), ...(stageColumns['F Intro Attended']?.deals || [])]
+                    .sort((a, b) => b.pipeline - a.pipeline)
+                },
+                'POA Booked': stageColumns['D POA Booked'],
+                'Proposal Sent': stageColumns['C Proposal sent'],
+                'Legal': stageColumns['B Legals']
+              };
 
               // Get unique AEs for filter
-              const uniqueAEs = [...new Set(dealsToDisplay.map(d => d.ae))].sort();
+              const uniqueAEs = [...new Set(pipelineDeals.map(d => d.ae))].sort();
 
               // Handle drag and drop
               const handleDragStart = (e, deal) => {
