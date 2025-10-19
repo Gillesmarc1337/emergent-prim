@@ -2024,23 +2024,39 @@ function Dashboard() {
                 return 'Stale';
               };
 
-              // Initialize pipeline deals from meetings_details if not loaded
-              if (pipelineDeals.length === 0 && analytics.meeting_generation.meetings_details.length > 0) {
-                const initialDeals = analytics.meeting_generation.meetings_details
-                  .filter(meeting => meeting.stage && ['E Inbox', 'D POA Booked', 'C Proposal sent', 'B Legals'].includes(meeting.stage))
-                  .map(meeting => ({
-                    id: meeting.client || Math.random().toString(),
-                    client: meeting.client,
-                    pipeline: meeting.expected_arr || 0,
-                    stage: meeting.stage,
-                    ae: meeting.owner || 'Unassigned',
-                    discovery_date: meeting.discovery_date,
-                    days_old: calculateDaysOld(meeting.discovery_date)
-                  }))
-                  .sort((a, b) => b.pipeline - a.pipeline); // Sort by deal size descending
+              // Initialize pipeline deals from meetings_details
+              // Force reload whenever analytics changes
+              useEffect(() => {
+                if (analytics.meeting_generation?.meetings_details && analytics.meeting_generation.meetings_details.length > 0) {
+                  const initialDeals = analytics.meeting_generation.meetings_details
+                    .filter(meeting => meeting.stage && ['E Inbox', 'D POA Booked', 'C Proposal sent', 'B Legals'].includes(meeting.stage))
+                    .map(meeting => ({
+                      id: meeting.client || Math.random().toString(),
+                      client: meeting.client,
+                      pipeline: meeting.expected_arr || 0,
+                      stage: meeting.stage,
+                      ae: meeting.owner || 'Unassigned',
+                      discovery_date: meeting.discovery_date,
+                      days_old: calculateDaysOld(meeting.discovery_date)
+                    }))
+                    .sort((a, b) => b.pipeline - a.pipeline);
 
-                setPipelineDeals(initialDeals);
-                setOriginalPipelineDeals(initialDeals);
+                  if (pipelineDeals.length === 0) {
+                    setPipelineDeals(initialDeals);
+                    setOriginalPipelineDeals(initialDeals);
+                  }
+                }
+              }, [analytics.meeting_generation?.meetings_details]);
+
+              // Debug: log if no deals found
+              if (pipelineDeals.length === 0 && analytics.meeting_generation?.meetings_details) {
+                console.log('Pipeline Board Debug:', {
+                  totalMeetings: analytics.meeting_generation.meetings_details.length,
+                  filteredDeals: analytics.meeting_generation.meetings_details.filter(m => 
+                    ['E Inbox', 'D POA Booked', 'C Proposal sent', 'B Legals'].includes(m.stage)
+                  ).length,
+                  stages: [...new Set(analytics.meeting_generation.meetings_details.map(m => m.stage))]
+                });
               }
 
               // Group deals by stage
