@@ -72,17 +72,37 @@ Application full-stack de tableau de bord analytique pour le suivi des performan
 
 ## 🔐 Système d'Authentification
 
+### Dual-Mode Authentication
+
+**Mode 1: ACCESS SECURED TERMINAL (Production)**
+- Google OAuth via Emergent integration
+- Redirect vers https://auth.emergentagent.com/
+- Session ID extraction depuis URL fragment
+- Validation backend via https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data
+
+**Mode 2: DEMO ACCESS - SKIP AUTH (Development)**
+- Login instantané avec POST `/api/auth/demo-login`
+- Crée demo@primelis.com (viewer role)
+- Session 24 heures
+- Cookie persistence
+
 ### Utilisateurs et Permissions
 
 | Email | Rôle | Vues Accessibles | Permissions |
 |-------|------|------------------|-------------|
-| remi@primelis.com | super_admin | Toutes | Admin targets + Upload |
-| philippe@primelis.com | super_admin | Toutes | Admin targets + Upload |
-| asher@primelis.com | super_admin | Toutes | Admin targets + Upload |
+| remi@primelis.com | super_admin | Toutes | Admin targets + User Management + Upload |
+| philippe@primelis.com | super_admin | Toutes | Admin targets + User Management + Upload |
+| asher@primelis.com | super_admin | Toutes | Admin targets + User Management + Upload |
 | oren@primelis.com | viewer | Signal | Upload Signal |
 | maxime.toubia@primelis.com | viewer | Full Funnel | Upload Full Funnel |
 | coralie.truffy@primelis.com | viewer | Market | Upload Market |
-| demo@primelis.com | viewer | Toutes | Lecture seule |
+| demo@primelis.com | viewer | Toutes | Lecture seule (Demo mode) |
+
+### Session Management
+- Sessions MongoDB (`user_sessions` collection)
+- Cookie-based authentication
+- 7-day expiration (production) / 24h (demo)
+- Auto-cleanup expired sessions
 
 ---
 
