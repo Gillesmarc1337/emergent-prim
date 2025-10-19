@@ -2045,7 +2045,8 @@ function Dashboard() {
               // Convert to array and sort by month
               const chartData = Object.values(monthlyData)
                 .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
-                    if (!meeting.stage) return false;
+              
+              const handleLegendClick = (dataKey) => {
                     // Accept: F Inbox (Intro), D POA Booked, C Proposal sent, B Legals
                     return meeting.stage === 'F Inbox' || 
                            meeting.stage === 'D POA Booked' || 
