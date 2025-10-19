@@ -326,28 +326,97 @@ sudo supervisorctl restart frontend
 
 ## 🐛 Troubleshooting
 
-**Backend ne démarre pas:**
+### Logs Backend
 ```bash
+# Backend errors
 tail -50 /var/log/supervisor/backend.err.log
+
+# Backend output
+tail -50 /var/log/supervisor/backend.out.log
+
+# Real-time monitoring
+tail -f /var/log/supervisor/backend.*.log
 ```
 
-**Frontend erreurs:**
+### Logs Frontend
 ```bash
+# Frontend errors
 tail -50 /var/log/supervisor/frontend.err.log
+
+# Build errors
+tail -50 /var/log/supervisor/frontend.out.log
 ```
 
-**Redémarrage:**
+### Services Management
 ```bash
+# Restart all services
 sudo supervisorctl restart all
+
+# Restart specific service
+sudo supervisorctl restart backend
+sudo supervisorctl restart frontend
+
+# Check status
+sudo supervisorctl status
+
+# Reload supervisor config
+sudo supervisorctl reread
+sudo supervisorctl update
 ```
 
-**Vérifier MongoDB:**
+### MongoDB Debugging
 ```bash
+# Connect to MongoDB
 mongosh
+
+# Switch to database
 use sales_analytics
-db.views.find()
-db.sales_records_fullfunnel.count()
+
+# Check collections
+show collections
+
+# View documents
+db.views.find().pretty()
+db.users.find().pretty()
+db.user_sessions.find().pretty()
+
+# Count records per view
+db.sales_records_organic.countDocuments()
+db.sales_records_fullfunnel.countDocuments()
+db.sales_records_signal.countDocuments()
+db.sales_records_market.countDocuments()
+
+# Check user preferences
+db.user_projections_preferences.find().pretty()
+db.user_pipeline_preferences.find().pretty()
+
+# Clear expired sessions
+db.user_sessions.deleteMany({ expires_at: { $lt: new Date() } })
 ```
+
+### Common Issues
+
+**Issue**: Deal Pipeline Board shows "0 deals"
+- **Solution**: Vérifier que les stages dans la data sont "F Inbox", "D POA Booked", "C Proposal sent", "B Legals"
+- Check console logs: voir `📊 All meeting stages` dans browser console
+
+**Issue**: Targets pas à jour après save
+- **Solution**: Vérifier console logs pour "✅ Targets saved successfully"
+- Check MongoDB: `db.views.findOne({id: "view-xxx"})`
+- Verify backend response in browser Network tab
+
+**Issue**: Drag & drop ne fonctionne pas
+- **Solution**: Clear browser cache et localStorage
+- Check que @hello-pangea/dnd est installé: `yarn list @hello-pangea/dnd`
+
+**Issue**: 401 Unauthorized errors
+- **Solution**: Session expirée, re-login required
+- Check session in MongoDB: `db.user_sessions.find({session_id: "xxx"})`
+
+### Performance Tips
+- Les graphiques avec légendes interactives peuvent ralentir sur datasets >1000 points
+- Deal Pipeline Board optimisé jusqu'à ~200 deals par column
+- MongoDB indexes sur: `view_id`, `user_id`, `session_id`, `discovery_date`
 
 ---
 
