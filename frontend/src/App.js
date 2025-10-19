@@ -4572,7 +4572,7 @@ function Dashboard() {
                             return sum + ((deal.pipeline || 0) * prob / 100);
                           }, 0);
                           const dealCount = columnDeals.length;
-                          const columnTarget = 750000; // Fixed target: $750K for next 90 days
+                          const columnTarget = viewConfig?.targets?.closing_projections?.next_90_days_target || 750000;
                           const percentage = Math.round((weightedValue / columnTarget) * 100);
                           const isOnTrack = weightedValue >= columnTarget;
                           
