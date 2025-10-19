@@ -2063,8 +2063,6 @@ function Dashboard() {
               ];
               
               return (
-                  })
-                  .map(meeting => ({
                     id: meeting.client || Math.random().toString(),
                     client: meeting.client,
                     pipeline: meeting.expected_arr || 0,
