@@ -56,11 +56,11 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-500">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-[#1a1d23] dark:to-[#14161a] flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-500">
       {/* Subtle background elements - Apple style */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full opacity-20 blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-full opacity-20 blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/10 dark:to-purple-900/10 rounded-full opacity-20 blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-amber-100 to-orange-100 dark:from-amber-900/10 dark:to-orange-900/10 rounded-full opacity-20 blur-3xl"></div>
         
         {/* Floating pirate elements - subtle */}
         <div className="absolute top-20 right-20 text-4xl opacity-10 dark:opacity-5 animate-float hidden sm:block">⚔️</div>
@@ -81,7 +81,7 @@ function LoginPage() {
       <div className="relative w-full max-w-md z-10 px-4 sm:px-0">
         {/* Logo Section - Apple style minimalism */}
         <div className="text-center mb-8 sm:mb-12">
-          <div className="inline-flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl mb-4 sm:mb-6 group hover:shadow-3xl transition-all duration-500">
+          <div className="inline-flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 bg-white dark:bg-[#24272e] rounded-3xl shadow-2xl mb-4 sm:mb-6 group hover:shadow-3xl transition-all duration-500">
             <img 
               src="https://www.primelis.com/wp-content/uploads/2023/10/logo-primelis.svg" 
               alt="Primelis Logo"
@@ -102,7 +102,7 @@ function LoginPage() {
         </div>
 
         {/* Login Card - Pure Apple Design with Dark Mode */}
-        <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-2xl rounded-3xl shadow-2xl p-6 sm:p-10 border border-slate-200/50 dark:border-slate-700/50 transition-colors duration-200">
+        <div className="bg-white/80 dark:bg-[#1e2128]/90 backdrop-blur-2xl rounded-3xl shadow-2xl p-6 sm:p-10 border border-slate-200/50 dark:border-[#2a2d35]/50 transition-colors duration-200">
           <div className="text-center mb-6 sm:mb-8">
             <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white mb-2">
               Welcome aboard
@@ -120,7 +120,7 @@ function LoginPage() {
               disabled={loading || loadingDemo}
               onMouseEnter={() => setHoveredButton('secure')}
               onMouseLeave={() => setHoveredButton(null)}
-              className="w-full group bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-medium py-3 sm:py-4 px-4 sm:px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+              className="w-full group bg-slate-900 hover:bg-slate-800 dark:bg-[#24272e] dark:hover:bg-[#2a2d35] text-white font-medium py-3 sm:py-4 px-4 sm:px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 sm:gap-3">
@@ -137,9 +137,9 @@ function LoginPage() {
             </button>
 
             <div className="flex items-center gap-3 text-slate-400 dark:text-slate-500 text-sm py-2">
-              <div className="flex-1 h-px bg-slate-300 dark:bg-slate-600"></div>
+              <div className="flex-1 h-px bg-slate-300 dark:bg-[#2a2d35]"></div>
               <span className="text-xs">or</span>
-              <div className="flex-1 h-px bg-slate-300 dark:bg-slate-600"></div>
+              <div className="flex-1 h-px bg-slate-300 dark:bg-[#2a2d35]"></div>
             </div>
 
             {/* Demo Mode - Gold theme (Pirates) */}
@@ -148,7 +148,7 @@ function LoginPage() {
               disabled={loading || loadingDemo}
               onMouseEnter={() => setHoveredButton('demo')}
               onMouseLeave={() => setHoveredButton(null)}
-              className="w-full group bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 dark:from-amber-600 dark:to-orange-600 dark:hover:from-amber-700 dark:hover:to-orange-700 text-white font-medium py-3 sm:py-4 px-4 sm:px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+              className="w-full group bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 dark:from-[#d97706] dark:to-[#ea580c] dark:hover:from-[#b45309] dark:hover:to-[#c2410c] text-white font-medium py-3 sm:py-4 px-4 sm:px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 sm:gap-3">
@@ -166,12 +166,12 @@ function LoginPage() {
           </div>
 
           {/* Crew Info - Minimal */}
-          <div className="mt-6 sm:mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
+          <div className="mt-6 sm:mt-8 pt-6 border-t border-slate-200 dark:border-[#2a2d35]">
             <div className="text-center text-xs text-slate-500 dark:text-slate-400">
               <p className="mb-2">🏴‍☠️ Authorized Crew</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 font-mono">
-                <span className="px-3 py-1 bg-slate-100 dark:bg-slate-700 rounded-full text-xs">asher@primelis.com</span>
-                <span className="px-3 py-1 bg-slate-100 dark:bg-slate-700 rounded-full text-xs">remi@primelis.com</span>
+                <span className="px-3 py-1 bg-slate-100 dark:bg-[#24272e] rounded-full text-xs">asher@primelis.com</span>
+                <span className="px-3 py-1 bg-slate-100 dark:bg-[#24272e] rounded-full text-xs">remi@primelis.com</span>
               </div>
             </div>
           </div>
@@ -180,7 +180,7 @@ function LoginPage() {
         {/* Loading Indicator - Apple style */}
         {(loading || loadingDemo) && (
           <div className="mt-6 sm:mt-8 text-center">
-            <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white/90 dark:bg-slate-800/90 backdrop-blur rounded-full shadow-lg">
+            <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white/90 dark:bg-[#1e2128]/90 backdrop-blur rounded-full shadow-lg">
               <div className="flex gap-1">
                 <div className="w-2 h-2 bg-slate-900 dark:bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                 <div className="w-2 h-2 bg-slate-900 dark:bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
