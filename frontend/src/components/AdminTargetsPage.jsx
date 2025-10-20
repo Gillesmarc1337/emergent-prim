@@ -755,6 +755,35 @@ function AdminTargetsPage() {
                     </div>
                   </div>
                   
+                  <div className="mt-6 p-4 bg-blue-50 rounded-lg border-2 border-blue-300">
+                    <div className="text-sm font-semibold mb-3 text-blue-700">📊 Deals & Pipeline Tab - YTD Cards Preview:</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {/* YTD Aggregate Pipeline */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-2">📊 YTD Aggregate Pipeline</div>
+                        <div className="text-2xl font-bold text-gray-800 mb-1">$X.XX M</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: ${((targets?.dashboard_bottom_cards?.ytd_aggregate_pipeline || 7500000) / 1000000).toFixed(1)}M</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                          <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center">X% of target</div>
+                        <div className="mt-2 text-xs text-center px-2 py-1 bg-gray-200 text-gray-600 rounded">Status</div>
+                      </div>
+                      
+                      {/* YTD Cumulative Weighted */}
+                      <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="text-xs text-gray-600 mb-2">🎯 YTD Cumulative Weighted</div>
+                        <div className="text-2xl font-bold text-gray-800 mb-1">$X.XX M</div>
+                        <div className="text-xs text-gray-500 mb-2">Target: ${((targets?.dashboard_bottom_cards?.ytd_cumulative_weighted || 2500000) / 1000000).toFixed(1)}M</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                          <div className="bg-gray-400 h-2 rounded-full" style={{width: '0%'}}></div>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center">X% of target</div>
+                        <div className="mt-2 text-xs text-center px-2 py-1 bg-gray-200 text-gray-600 rounded">Status</div>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <div className="mt-6 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
                     <div className="text-sm font-semibold mb-3 text-gray-700">📊 Dashboard Preview (Grey Replica):</div>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
