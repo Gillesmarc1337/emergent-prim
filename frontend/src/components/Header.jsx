@@ -51,7 +51,7 @@ const Header = () => {
   console.log('Header - Views:', views, 'CurrentView:', currentView);
 
   return (
-    <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+    <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 shadow-sm sticky top-0 z-50 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left side - Logo */}
@@ -63,8 +63,22 @@ const Header = () => {
             />
           </div>
 
-          {/* Right side - User info, View selector, Logout */}
-          <div className="flex items-center gap-4">
+          {/* Right side - Theme toggle, User info, View selector, Actions */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="relative w-9 h-9 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+              title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {isDarkMode ? (
+                <Sun className="h-5 w-5 text-amber-500 rotate-0 scale-100 transition-all" />
+              ) : (
+                <Moon className="h-5 w-5 text-slate-700 rotate-0 scale-100 transition-all" />
+              )}
+            </Button>
             {/* View Selector - Always show if user is authenticated */}
             {user && (
               <div className="flex items-center gap-2">
