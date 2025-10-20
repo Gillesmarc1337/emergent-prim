@@ -3450,8 +3450,8 @@ function Dashboard() {
                 const weightedPipe = analytics.dashboard_blocks?.block_3_pipe_creation?.weighted_pipe_created || 0;
                 
                 // YTD targets - get from backend view_targets, with fallback to defaults
-                const fixedYTDPipelineTarget = viewTargets?.dashboard?.ytd_aggregate_pipeline || 7500000; // Default: $7.5M
-                const fixedYTDWeightedTarget = viewTargets?.dashboard?.ytd_cumulative_weighted || 2500000; // Default: $2.5M
+                const fixedYTDPipelineTarget = analytics.view_targets?.dashboard?.ytd_aggregate_pipeline || 7500000; // Default: $7.5M
+                const fixedYTDWeightedTarget = analytics.view_targets?.dashboard?.ytd_cumulative_weighted || 2500000; // Default: $2.5M
                 
                 return (
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
