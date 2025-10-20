@@ -711,6 +711,48 @@ function AdminTargetsPage() {
                       />
                       <p className="text-xs text-gray-500 mt-1">Monthly target for weighted pipeline (multiplied by period)</p>
                     </div>
+                    <div>
+                      <Label htmlFor="ytd_aggregate_pipeline_target">YTD Aggregate Pipeline Target ($)</Label>
+                      <Input
+                        id="ytd_aggregate_pipeline_target"
+                        type="number"
+                        value={targets?.dashboard_bottom_cards?.ytd_aggregate_pipeline || 7500000}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          setTargets(prev => ({
+                            ...prev,
+                            dashboard_bottom_cards: {
+                              ...(prev.dashboard_bottom_cards || {}),
+                              ytd_aggregate_pipeline: value
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                        step="100000"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Fixed YTD target for aggregate pipeline (default: 7.5M)</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="ytd_cumulative_weighted_target">YTD Cumulative Weighted Target ($)</Label>
+                      <Input
+                        id="ytd_cumulative_weighted_target"
+                        type="number"
+                        value={targets?.dashboard_bottom_cards?.ytd_cumulative_weighted || 2500000}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          setTargets(prev => ({
+                            ...prev,
+                            dashboard_bottom_cards: {
+                              ...(prev.dashboard_bottom_cards || {}),
+                              ytd_cumulative_weighted: value
+                            }
+                          }));
+                        }}
+                        className="mt-1"
+                        step="100000"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Fixed YTD target for cumulative weighted pipeline (default: 2.5M)</p>
+                    </div>
                   </div>
                   
                   <div className="mt-6 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
