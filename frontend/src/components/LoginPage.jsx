@@ -178,7 +178,7 @@ function LoginPage() {
         </div>
 
         {/* Loading Indicator - Apple style */}
-        {loading && (
+        {(loading || loadingDemo) && (
           <div className="mt-8 text-center">
             <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/90 backdrop-blur rounded-full shadow-lg">
               <div className="flex gap-1">
