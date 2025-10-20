@@ -1,32 +1,59 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 function LoginPage() {
-  const navigate = useNavigate();
-  const { user, login } = useAuth();
+  const { user, login, loginDemo } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [loadingDemo, setLoadingDemo] = useState(false);
   const [hoveredButton, setHoveredButton] = useState(null);
 
+  // Check for session_id in URL fragment on mount
   useEffect(() => {
-    // If already logged in, redirect to dashboard
-    if (user) {
-      navigate('/dashboard');
-    }
-  }, [user, navigate]);
+    const handleSessionFromUrl = async () => {
+      const hash = window.location.hash;
+      if (hash && hash.includes('session_id=')) {
+        const sessionId = hash.split('session_id=')[1].split('&')[0];
+        
+        if (sessionId) {
+          setLoading(true);
+          try {
+            await login(sessionId);
+            // Clear the hash from URL
+            window.history.replaceState(null, '', window.location.pathname);
+          } catch (err) {
+            alert('Authentication failed. Please check if you are authorized.');
+          } finally {
+            setLoading(false);
+          }
+        }
+      }
+    };
 
-  const handleLogin = async (email) => {
+    handleSessionFromUrl();
+  }, [login]);
+
+  const handleSecuredAccess = () => {
     setLoading(true);
+    // Redirect to Emergent Auth
+    const redirectUrl = window.location.origin + '/';
+    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+  };
+
+  const handleDemoAccess = async () => {
+    setLoadingDemo(true);
     try {
-      await login(email);
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Login error:', error);
-      alert('Login failed. Please try again.');
+      await loginDemo();
+    } catch (err) {
+      alert('Demo login failed. Please try again.');
     } finally {
-      setLoading(false);
+      setLoadingDemo(false);
     }
   };
+
+  // If already logged in, don't show login page
+  if (user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col items-center justify-center p-4 relative overflow-hidden">
