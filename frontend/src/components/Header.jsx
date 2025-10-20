@@ -19,6 +19,7 @@ import {
 
 const Header = () => {
   const { user, logout, currentView, setCurrentView, views, isAdmin, isDemo } = useAuth();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   const handleViewChange = (viewId) => {
     const selectedView = views.find(v => v.id === viewId);
