@@ -52,25 +52,31 @@ async def get_or_create_user(email: str, name: str, picture: Optional[str] = Non
     """
     Get existing user or create new one if authorized
     """
-    # Check if user is authorized
-    if email not in AUTHORIZED_USERS:
-        raise HTTPException(status_code=403, detail="User not authorized")
-    
-    # Check if user exists
+    # First, check if user exists in database
     existing_user = await db.users.find_one({"email": email})
     
     if existing_user:
-        # Return existing user (don't update)
+        # User exists in database - they are authorized
+        # Update last_login
+        await db.users.update_one(
+            {"email": email},
+            {"$set": {"last_login": datetime.now(timezone.utc)}}
+        )
         return existing_user
     
-    # Create new user
+    # User doesn't exist in database, check hardcoded list for backward compatibility
+    if email not in AUTHORIZED_USERS:
+        raise HTTPException(status_code=403, detail="User not authorized. Please contact your administrator to get access.")
+    
+    # Create new user from hardcoded list (backward compatibility)
     user_data = {
         "id": f"user-{email.split('@')[0]}-{int(datetime.now(timezone.utc).timestamp())}",
         "email": email,
         "name": name,
         "picture": picture,
         "role": AUTHORIZED_USERS[email],
-        "created_at": datetime.now(timezone.utc)
+        "created_at": datetime.now(timezone.utc),
+        "last_login": datetime.now(timezone.utc)
     }
     
     await db.users.insert_one(user_data)
