@@ -51,7 +51,7 @@ const Header = () => {
   console.log('Header - Views:', views, 'CurrentView:', currentView);
 
   return (
-    <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 shadow-sm sticky top-0 z-50 transition-colors duration-200">
+    <div className="bg-white dark:bg-[#1a1d23] border-b border-gray-200 dark:border-[#2a2d35] shadow-sm sticky top-0 z-50 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left side - Logo */}
@@ -70,7 +70,7 @@ const Header = () => {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="relative w-9 h-9 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="relative w-9 h-9 rounded-full hover:bg-slate-100 dark:hover:bg-[#24272e]"
               title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
             >
               {isDarkMode ? (
