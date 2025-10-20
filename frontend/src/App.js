@@ -1872,16 +1872,16 @@ function Dashboard() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="container mx-auto p-4 sm:p-6 max-w-7xl">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
+          <h1 className="text-2xl sm:text-3xl font-bold dark:text-white">
             {useCustomDate ? 'Custom Report' : 
              viewMode === 'yearly' ? 'July To Dec 2025 Report' : 'Monthly Report'}
           </h1>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+            <div className="flex items-center gap-2 flex-wrap">
               <Button
                 variant={!useCustomDate && viewMode === 'monthly' ? 'default' : 'outline'}
                 size="sm"
@@ -1889,9 +1889,9 @@ function Dashboard() {
                   setUseCustomDate(false);
                   setViewMode('monthly');
                 }}
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 text-xs sm:text-sm"
               >
-                <Calendar className="h-4 w-4" />
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                 Monthly
               </Button>
               <Button
@@ -1901,18 +1901,18 @@ function Dashboard() {
                   setUseCustomDate(false);
                   setViewMode('yearly');
                 }}
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 text-xs sm:text-sm"
               >
-                <CalendarDays className="h-4 w-4" />
+                <CalendarDays className="h-3 w-3 sm:h-4 sm:w-4" />
                 July To Dec
               </Button>
               <Button
                 variant={useCustomDate ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setUseCustomDate(true)}
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 text-xs sm:text-sm"
               >
-                <CalendarDays className="h-4 w-4" />
+                <CalendarDays className="h-3 w-3 sm:h-4 sm:w-4" />
                 Custom Period
               </Button>
             </div>
