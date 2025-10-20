@@ -117,3 +117,40 @@ code {
 .dark ::-webkit-scrollbar-thumb:hover {
   background-color: #34373f;
 }
+
+/* Dark mode overrides for better styling */
+.dark .bg-gray-50 {
+  background-color: rgb(37, 39, 41);
+}
+
+.dark .bg-gray-100 {
+  background-color: rgb(42, 45, 53);
+}
+
+.dark .bg-white {
+  background-color: rgb(30, 33, 40);
+}
+
+.dark .border-gray-200 {
+  border-color: rgb(42, 45, 53);
+}
+
+.dark .border-gray-300 {
+  border-color: rgb(50, 53, 61);
+}
+
+.dark .text-gray-600 {
+  color: rgb(156, 163, 175);
+}
+
+.dark .text-gray-700 {
+  color: rgb(209, 213, 219);
+}
+
+.dark .text-gray-800 {
+  color: rgb(243, 244, 246);
+}
+
+.dark .text-gray-900 {
+  color: rgb(255, 255, 255);
+}
