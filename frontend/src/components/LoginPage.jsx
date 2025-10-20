@@ -116,8 +116,8 @@ function LoginPage() {
           <div className="space-y-3">
             {/* Secure Login - Dark theme (Empire) */}
             <button
-              onClick={() => handleLogin('remi@primelis.com')}
-              disabled={loading}
+              onClick={handleSecuredAccess}
+              disabled={loading || loadingDemo}
               onMouseEnter={() => setHoveredButton('secure')}
               onMouseLeave={() => setHoveredButton(null)}
               className="w-full group bg-slate-900 hover:bg-slate-800 text-white font-medium py-4 px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
@@ -144,8 +144,8 @@ function LoginPage() {
 
             {/* Demo Mode - Gold theme (Pirates) */}
             <button
-              onClick={() => handleLogin('demo@primelis.com')}
-              disabled={loading}
+              onClick={handleDemoAccess}
+              disabled={loading || loadingDemo}
               onMouseEnter={() => setHoveredButton('demo')}
               onMouseLeave={() => setHoveredButton(null)}
               className="w-full group bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium py-4 px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
