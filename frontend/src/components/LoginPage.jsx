@@ -1,195 +1,184 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Alert, AlertDescription } from './ui/alert';
-import { TrendingUp, Shield, Zap } from 'lucide-react';
 
-const LoginPage = () => {
-  const { login, loginDemo } = useAuth();
-  const [error, setError] = useState(null);
+function LoginPage() {
+  const navigate = useNavigate();
+  const { user, login } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [loadingDemo, setLoadingDemo] = useState(false);
+  const [hoveredButton, setHoveredButton] = useState(null);
 
-  // Check for session_id in URL fragment on mount
   useEffect(() => {
-    const handleSessionFromUrl = async () => {
-      const hash = window.location.hash;
-      if (hash && hash.includes('session_id=')) {
-        const sessionId = hash.split('session_id=')[1].split('&')[0];
-        
-        if (sessionId) {
-          setLoading(true);
-          try {
-            await login(sessionId);
-            // Clear the hash from URL
-            window.history.replaceState(null, '', window.location.pathname);
-          } catch (err) {
-            setError(err.response?.data?.detail || 'Authentication failed. Please check if you are authorized.');
-          } finally {
-            setLoading(false);
-          }
-        }
-      }
-    };
+    // If already logged in, redirect to dashboard
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
-    handleSessionFromUrl();
-  }, [login]);
-
-  const handleSecuredAccess = () => {
+  const handleLogin = async (email) => {
     setLoading(true);
-    setError(null);
-
-    // Redirect to Emergent Auth - redirect parameter should point to MAIN APP (dashboard), not login page
-    // After auth, user will land at: {redirect}#session_id={session_id}
-    const redirectUrl = window.location.origin + '/';  // Main app URL
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
-  };
-
-  const handleDemoAccess = async () => {
-    setLoadingDemo(true);
-    setError(null);
-
     try {
-      await loginDemo();
-    } catch (err) {
-      setError(err.response?.data?.detail || 'Demo login failed. Please try again.');
+      await login(email);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Login failed. Please try again.');
     } finally {
-      setLoadingDemo(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-black">
-      {/* Cyber Pirates Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-950 via-slate-900 to-fuchsia-950 opacity-80" />
-      
-      {/* Animated Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0ea5e920_1px,transparent_1px),linear-gradient(to_bottom,#0ea5e920_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-      
-      {/* Glowing Orbs */}
-      <div className="absolute top-20 left-20 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
-      <div className="absolute bottom-20 right-20 w-72 h-72 bg-fuchsia-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse delay-700" />
-      
-      {/* Skull Icon (Cyber Pirate) */}
-      <div className="absolute top-10 right-10 text-cyan-500 opacity-10 text-9xl animate-pulse">
-        ☠️
-      </div>
-      
-      <Card className="w-full max-w-lg shadow-2xl relative z-10 border-2 border-cyan-500/30 bg-slate-900/90 backdrop-blur-xl">
-        <CardHeader className="text-center space-y-3 pb-8 relative">
-          {/* Glitch Effect Line */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-pulse" />
-          
-          <div className="flex justify-center mb-4">
-            <div className="relative">
-              <img 
-                src="/primelis-logo.jpg" 
-                alt="Primelis Logo" 
-                className="h-16 w-auto object-contain relative z-10"
-                style={{ filter: 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.5))' }}
-              />
-              <div className="absolute inset-0 bg-cyan-500/20 blur-xl rounded-full" />
-            </div>
-          </div>
-          
-          <CardTitle className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent animate-pulse">
-            ☠️ CYBER PIRATES TERMINAL ☠️
-          </CardTitle>
-          <CardDescription className="text-base text-cyan-300/80 font-mono">
-            &gt; CHOOSE YOUR BOARDING METHOD_
-          </CardDescription>
-        </CardHeader>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Subtle background elements - Apple style */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-20 blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-amber-100 to-orange-100 rounded-full opacity-20 blur-3xl"></div>
         
-        <CardContent className="space-y-4 px-6 pb-8">
-          {error && (
-            <Alert variant="destructive" className="mb-4 border-red-500 bg-red-950/50 text-red-300">
-              <AlertDescription className="font-mono">⚠️ {error}</AlertDescription>
-            </Alert>
-          )}
+        {/* Floating pirate elements - subtle */}
+        <div className="absolute top-20 right-20 text-4xl opacity-10 animate-float">⚔️</div>
+        <div className="absolute bottom-32 left-32 text-3xl opacity-10 animate-float" style={{ animationDelay: '1s' }}>☠️</div>
+        <div className="absolute top-40 left-40 text-2xl opacity-10 animate-float" style={{ animationDelay: '2s' }}>🏴‍☠️</div>
+      </div>
 
-          {/* Primary: Secured Access */}
-          <div className="space-y-2">
-            <Button
-              onClick={handleSecuredAccess}
-              disabled={loading || loadingDemo}
-              className="w-full h-14 text-base bg-gradient-to-r from-cyan-600 via-fuchsia-600 to-cyan-600 hover:from-cyan-500 hover:via-fuchsia-500 hover:to-cyan-500 shadow-lg shadow-cyan-500/50 border border-cyan-400/50 font-mono text-black font-bold relative overflow-hidden group"
-              size="lg"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-              {loading ? (
-                <span className="relative z-10">⚡ INITIALIZING...</span>
-              ) : (
-                <span className="flex items-center justify-center gap-3 font-semibold relative z-10">
-                  <Shield className="h-5 w-5" />
-                  🏴‍☠️ BOARD THE FLAGSHIP
-                </span>
-              )}
-            </Button>
-            <p className="text-xs text-center text-cyan-400/70 font-mono">
-              🔒 SECURE_MODE • OAUTH_2.0 • ENCRYPTED_
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+      `}</style>
+
+      <div className="relative w-full max-w-md z-10">
+        {/* Logo Section - Apple style minimalism */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-28 h-28 bg-white rounded-3xl shadow-2xl mb-6 group hover:shadow-3xl transition-all duration-500">
+            <img 
+              src="https://www.primelis.com/wp-content/uploads/2023/10/logo-primelis.svg" 
+              alt="Primelis Logo"
+              className="w-20 h-20 object-contain group-hover:scale-110 transition-transform duration-500"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.innerHTML = '<span class="text-5xl font-bold text-slate-900">P</span>';
+              }}
+            />
+          </div>
+          <h1 className="text-6xl font-semibold text-slate-900 mb-3 tracking-tight">
+            Primelis
+          </h1>
+          <p className="text-slate-500 text-lg font-light flex items-center justify-center gap-2">
+            Analytics Dashboard
+            <span className="text-xs opacity-50">☠️</span>
+          </p>
+        </div>
+
+        {/* Login Card - Pure Apple Design */}
+        <div className="bg-white/80 backdrop-blur-2xl rounded-3xl shadow-2xl p-10 border border-slate-200/50">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-semibold text-slate-900 mb-2">
+              Welcome aboard
+            </h2>
+            <p className="text-slate-500 text-sm">
+              Choose your authentication method
             </p>
           </div>
 
-          {/* Divider */}
-          <div className="relative py-2">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-cyan-500/30" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-slate-900 px-2 text-cyan-500 font-mono">OR</span>
-            </div>
-          </div>
-
-          {/* Secondary: Demo Access */}
-          <div className="space-y-2">
-            <Button
-              onClick={handleDemoAccess}
-              disabled={loading || loadingDemo}
-              variant="outline"
-              className="w-full h-12 text-base border-2 border-amber-400 hover:bg-amber-500/20 hover:border-amber-300 bg-slate-900/50 text-amber-300 font-mono font-semibold shadow-lg shadow-amber-500/20"
-              size="lg"
+          {/* Login Options */}
+          <div className="space-y-3">
+            {/* Secure Login - Dark theme (Empire) */}
+            <button
+              onClick={() => handleLogin('remi@primelis.com')}
+              disabled={loading}
+              onMouseEnter={() => setHoveredButton('secure')}
+              onMouseLeave={() => setHoveredButton(null)}
+              className="w-full group bg-slate-900 hover:bg-slate-800 text-white font-medium py-4 px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
             >
-              {loadingDemo ? (
-                <span>⚓ LAUNCHING DEMO SHIP...</span>
-              ) : (
-                <span className="flex items-center justify-center gap-2 font-semibold">
-                  <Zap className="h-4 w-4" />
-                  ⚡ DEMO VOYAGE
-                </span>
-              )}
-            </Button>
-            <p className="text-xs text-center text-amber-400/70 font-mono">
-              ⚡ DEV_MODE • NO_AUTH • 24H_SESSION
-            </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🛡️</span>
+                  <div className="text-left">
+                    <div className="font-semibold">Secure Login</div>
+                    <div className="text-xs text-slate-400">OAuth 2.0 • Encrypted</div>
+                  </div>
+                </div>
+                {hoveredButton === 'secure' && (
+                  <span className="text-red-500 animate-pulse">⚔️</span>
+                )}
+              </div>
+            </button>
+
+            <div className="flex items-center gap-3 text-slate-400 text-sm py-2">
+              <div className="flex-1 h-px bg-slate-300"></div>
+              <span className="text-xs">or</span>
+              <div className="flex-1 h-px bg-slate-300"></div>
+            </div>
+
+            {/* Demo Mode - Gold theme (Pirates) */}
+            <button
+              onClick={() => handleLogin('demo@primelis.com')}
+              disabled={loading}
+              onMouseEnter={() => setHoveredButton('demo')}
+              onMouseLeave={() => setHoveredButton(null)}
+              className="w-full group bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium py-4 px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🏴‍☠️</span>
+                  <div className="text-left">
+                    <div className="font-semibold">Demo Voyage</div>
+                    <div className="text-xs text-amber-100">No authentication • 24h session</div>
+                  </div>
+                </div>
+                {hoveredButton === 'demo' && (
+                  <span className="text-yellow-300 animate-pulse">💰</span>
+                )}
+              </div>
+            </button>
           </div>
 
-          {/* Info Section */}
-          <div className="mt-6 pt-4 border-t border-cyan-500/30">
-            <div className="text-center text-sm text-cyan-300/70 space-y-2 font-mono">
-              <p className="font-semibold text-cyan-400">📡 AUTHORIZED_CREW:</p>
-              <div className="flex justify-center gap-4 text-xs">
-                <span className="px-3 py-1 bg-cyan-950/50 border border-cyan-500/30 rounded text-cyan-300">
-                  asher@primelis.com <span className="text-cyan-500">(VIEWER)</span>
-                </span>
-                <span className="px-3 py-1 bg-fuchsia-950/50 border border-fuchsia-500/30 rounded text-fuchsia-300">
-                  remi@primelis.com <span className="text-fuchsia-500">(CAPTAIN)</span>
-                </span>
+          {/* Crew Info - Minimal */}
+          <div className="mt-8 pt-6 border-t border-slate-200">
+            <div className="text-center text-xs text-slate-500">
+              <p className="mb-2">🏴‍☠️ Authorized Crew</p>
+              <div className="flex items-center justify-center gap-4 font-mono">
+                <span className="px-3 py-1 bg-slate-100 rounded-full">asher@primelis.com</span>
+                <span className="px-3 py-1 bg-slate-100 rounded-full">remi@primelis.com</span>
               </div>
             </div>
           </div>
-        </CardContent>
-        
-        {/* Bottom Glitch Line */}
-        <div className="h-1 bg-gradient-to-r from-transparent via-fuchsia-500 to-transparent animate-pulse" />
-      </Card>
-      
-      {/* Floating Text */}
-      <div className="absolute bottom-10 text-center w-full text-cyan-500/30 font-mono text-xs animate-pulse">
-        ☠️ CYBER_PIRATES • PRIMELIS_FLEET • GO_TO_MARKET_COMMAND ☠️
+        </div>
+
+        {/* Loading Indicator - Apple style */}
+        {loading && (
+          <div className="mt-8 text-center">
+            <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/90 backdrop-blur rounded-full shadow-lg">
+              <div className="flex gap-1">
+                <div className="w-2 h-2 bg-slate-900 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 bg-slate-900 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 bg-slate-900 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+              <span className="text-sm text-slate-700 font-medium">Loading...</span>
+            </div>
+          </div>
+        )}
+
+        {/* Footer - Made by */}
+        <div className="text-center mt-12 text-slate-400 text-sm font-light">
+          <p className="flex items-center justify-center gap-2">
+            <span>2025</span>
+            <span>•</span>
+            <span>Made by</span>
+            <span className="font-medium text-slate-600">Minus</span>
+            <span>&</span>
+            <span className="font-medium text-slate-600">Cortex</span>
+            <span className="text-xs">🧠⚡</span>
+          </p>
+        </div>
       </div>
     </div>
   );
-};
+}
 
 export default LoginPage;
