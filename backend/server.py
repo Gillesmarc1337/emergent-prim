@@ -169,6 +169,10 @@ def map_admin_targets_to_analytics_format(admin_targets: dict) -> dict:
             mapped_targets["dashboard"]["new_pipe_created"] = bottom_cards["new_pipe_created"]
         if "created_weighted_pipe" in bottom_cards and bottom_cards["created_weighted_pipe"] > 0:
             mapped_targets["dashboard"]["weighted_pipe"] = bottom_cards["created_weighted_pipe"]
+        if "ytd_aggregate_pipeline" in bottom_cards and bottom_cards["ytd_aggregate_pipeline"] > 0:
+            mapped_targets["dashboard"]["ytd_aggregate_pipeline"] = bottom_cards["ytd_aggregate_pipeline"]
+        if "ytd_cumulative_weighted" in bottom_cards and bottom_cards["ytd_cumulative_weighted"] > 0:
+            mapped_targets["dashboard"]["ytd_cumulative_weighted"] = bottom_cards["ytd_cumulative_weighted"]
         if "ytd_revenue" in bottom_cards and bottom_cards["ytd_revenue"] > 0:
             # This could also map to objectif_6_mois if preferred
             pass
