@@ -3103,7 +3103,8 @@ async def get_monthly_analytics(month_offset: int = 0, view_id: str = Query(None
             'old_pipe': old_pipe,
             'closing_projections': closing_projections,
             'big_numbers_recap': big_numbers_recap,
-            'dashboard_blocks': dashboard_blocks
+            'dashboard_blocks': dashboard_blocks,
+            'view_targets': view_targets  # Add view_targets to response
         }
         
         return convert_numpy_types(analytics)
