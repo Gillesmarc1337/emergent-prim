@@ -4216,25 +4216,25 @@ function Dashboard() {
         <TabsContent value="projections">
           <div className="space-y-6">
             {/* Closing Projections - Enhanced */}
-            <Card>
+            <Card className="dark:bg-[#1e2128] dark:border-[#2a2d35]">
               <CardHeader>
-                <CardTitle>Closing Projections</CardTitle>
-                <CardDescription>Pipeline metrics with advanced weighting methodology</CardDescription>
+                <CardTitle className="dark:text-white">Closing Projections</CardTitle>
+                <CardDescription className="dark:text-slate-400">Pipeline metrics with advanced weighting methodology</CardDescription>
                 
                 {/* Pipeline Metrics Explanation */}
-                <div className="mt-3 p-3 bg-gray-50 rounded-lg text-xs">
-                  <div className="font-semibold mb-2">📊 Pipeline Metrics Explained:</div>
+                <div className="mt-3 p-3 bg-gray-50 dark:bg-[#252729] rounded-lg text-xs border dark:border-[#2a2d35]">
+                  <div className="font-semibold mb-2 dark:text-white">📊 Pipeline Metrics Explained:</div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
-                    <div>
-                      <span className="font-medium text-purple-700">• Total Pipeline:</span>
+                    <div className="dark:text-slate-300">
+                      <span className="font-medium text-purple-700 dark:text-purple-400">• Total Pipeline:</span>
                       <br />Valeur brute (sauf Lost/Not Relevant)
                     </div>
-                    <div>
-                      <span className="font-medium text-blue-700">• Weighted Value:</span>
+                    <div className="dark:text-slate-300">
+                      <span className="font-medium text-blue-700 dark:text-blue-400">• Weighted Value:</span>
                       <br />Pondéré par stage/source/temps
                     </div>
-                    <div>
-                      <span className="font-medium text-green-700">• Aggregate Pipe:</span>
+                    <div className="dark:text-slate-300">
+                      <span className="font-medium text-green-700 dark:text-green-400">• Aggregate Pipe:</span>
                       <br />Cumul historique pondéré
                     </div>
                   </div>
@@ -4243,10 +4243,10 @@ function Dashboard() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   {/* Card 1: Legals Count - Filtered by selected AE */}
-                  <Card className="border-2 border-purple-200 bg-purple-50">
+                  <Card className="border-2 border-purple-200 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-700/50">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-purple-600" />
+                      <CardTitle className="text-sm flex items-center gap-2 dark:text-white">
+                        <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                         Legals
                       </CardTitle>
                     </CardHeader>
@@ -4256,18 +4256,18 @@ function Dashboard() {
                         const legalsDeals = filteredDeals.filter(deal => deal.stage === 'B Legals');
                         return (
                           <>
-                            <div className="text-2xl font-bold mb-2 text-gray-800">
+                            <div className="text-2xl font-bold mb-2 text-gray-800 dark:text-white">
                               {legalsDeals.length}
                             </div>
-                            <div className="text-xs text-gray-600 mb-2">
+                            <div className="text-xs text-gray-600 dark:text-slate-400 mb-2">
                               Deals in Legals
                             </div>
-                            <div className="text-lg font-semibold text-purple-700">
+                            <div className="text-lg font-semibold text-purple-700 dark:text-purple-400">
                               ${legalsDeals
                                 .reduce((sum, deal) => sum + (deal.expected_arr || deal.pipeline || 0), 0)
                                 .toLocaleString()}
                             </div>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-500 dark:text-slate-500">
                               Pipeline Value
                             </div>
                           </>
@@ -4277,7 +4277,7 @@ function Dashboard() {
                   </Card>
 
                   {/* Card 2: Proposal Sent Count - Filtered by selected AE */}
-                  <Card className="border-2 border-indigo-200 bg-indigo-50">
+                  <Card className="border-2 border-indigo-200 bg-indigo-50 dark:bg-indigo-900/20 dark:border-indigo-700/50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
                         <Target className="h-4 w-4 text-indigo-600" />
