@@ -959,22 +959,22 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
       {analytics?.dashboard_blocks && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Block 1: Meeting Generation */}
-          <Card>
+          <Card className="dark:bg-[#1e2128] dark:border-[#2a2d35]">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-center">Meetings Generation</CardTitle>
-              <CardDescription className="text-center font-medium text-blue-600">
+              <CardTitle className="text-lg text-center dark:text-white">Meetings Generation</CardTitle>
+              <CardDescription className="text-center font-medium text-blue-600 dark:text-blue-400">
                 {analytics.dashboard_blocks?.block_1_meetings?.period || 'Current Period'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                     {analytics.dashboard_blocks.block_1_meetings.total_actual}/{analytics.dashboard_blocks.block_1_meetings.total_target}
                   </div>
-                  <div className="text-sm text-gray-600">Total Target</div>
+                  <div className="text-sm text-gray-600 dark:text-slate-400">Total Target</div>
                 </div>
-                <div className="space-y-2 text-sm">
+                <div className="space-y-2 text-sm dark:text-slate-300">
                   <div className="flex justify-between">
                     <span>Inbound:</span>
                     <span className="font-medium">{analytics.dashboard_blocks.block_1_meetings.inbound_actual}/{analytics.dashboard_blocks.block_1_meetings.inbound_target}</span>
@@ -989,22 +989,22 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
                   </div>
                   <div className="flex justify-between">
                     <span>Upsells / Cross-sell:</span>
-                    <span className="font-medium text-purple-600">{analytics.dashboard_blocks.block_1_meetings.upsells_actual}/{analytics.dashboard_blocks.block_1_meetings.upsells_target}</span>
+                    <span className="font-medium text-purple-600 dark:text-purple-400">{analytics.dashboard_blocks.block_1_meetings.upsells_actual}/{analytics.dashboard_blocks.block_1_meetings.upsells_target}</span>
                   </div>
                   {analytics.dashboard_blocks.block_1_meetings.unassigned_actual > 0 && (
                     <div className="flex justify-between">
                       <span>Unassigned:</span>
-                      <span className="font-medium text-orange-600">{analytics.dashboard_blocks.block_1_meetings.unassigned_actual}</span>
+                      <span className="font-medium text-orange-600 dark:text-orange-400">{analytics.dashboard_blocks.block_1_meetings.unassigned_actual}</span>
                     </div>
                   )}
-                  <div className="border-t pt-2 mt-2">
+                  <div className="border-t dark:border-[#2a2d35] pt-2 mt-2">
                     <div className="flex justify-between">
                       <span>Show:</span>
-                      <span className="font-medium text-green-600">{analytics.dashboard_blocks.block_1_meetings.show_actual}</span>
+                      <span className="font-medium text-green-600 dark:text-green-400">{analytics.dashboard_blocks.block_1_meetings.show_actual}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>No Show:</span>
-                      <span className="font-medium text-red-600">{analytics.dashboard_blocks.block_1_meetings.no_show_actual}</span>
+                      <span className="font-medium text-red-600 dark:text-red-400">{analytics.dashboard_blocks.block_1_meetings.no_show_actual}</span>
                     </div>
                   </div>
                 </div>
@@ -1013,33 +1013,33 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
           </Card>
 
           {/* Block 2: Intro & POA */}
-          <Card>
+          <Card className="dark:bg-[#1e2128] dark:border-[#2a2d35]">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-center">Intro & POA</CardTitle>
-              <CardDescription className="text-center font-medium text-green-600">
+              <CardTitle className="text-lg text-center dark:text-white">Intro & POA</CardTitle>
+              <CardDescription className="text-center font-medium text-green-600 dark:text-green-400">
                 {analytics.dashboard_blocks?.block_2_intro_poa?.period || 'Current Period'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                     {analytics.dashboard_blocks.block_2_intro_poa.intro_actual}/{analytics.dashboard_blocks.block_2_intro_poa.intro_target}
                   </div>
-                  <div className="text-sm text-gray-600">Intro</div>
+                  <div className="text-sm text-gray-600 dark:text-slate-400">Intro</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">
+                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                     {analytics.dashboard_blocks.block_2_intro_poa.poa_actual}/{analytics.dashboard_blocks.block_2_intro_poa.poa_target}
                   </div>
-                  <div className="text-sm text-gray-600">POA</div>
+                  <div className="text-sm text-gray-600 dark:text-slate-400">POA</div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Block 3: New Pipe Created */}
-          <Card className="border-2 border-purple-200 bg-purple-50">
+          <Card className="border-2 border-purple-200 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-700/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-base text-center font-semibold">New Pipe Created</CardTitle>
               <p className="text-center text-sm font-medium text-purple-600">
