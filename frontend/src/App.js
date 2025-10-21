@@ -2866,7 +2866,7 @@ function Dashboard() {
                   })()}
 
                   {/* Deal Pipeline Board - POA → Proposal → Legals (3 columns) */}
-                  {analytics.meetings_attended.meetings_details && analytics.meetings_attended.meetings_details.length > 0 && (() => {
+                  {analytics.meetings_attended.meetings_detail && analytics.meetings_attended.meetings_detail.length > 0 && (() => {
                     // Calculate days since creation
                     const calculateDaysOld = (discoveryDate) => {
                       if (!discoveryDate) return 0;
