@@ -2892,7 +2892,7 @@ function Dashboard() {
                     };
 
                     // Filter deals for each stage
-                    const poaBookedDeals = analytics.meetings_attended.meetings_details
+                    const poaBookedDeals = analytics.meetings_attended.meetings_detail
                       .filter(meeting => meeting.stage === 'D POA Booked')
                       .map(meeting => ({
                         id: meeting.client || Math.random().toString(),
@@ -2906,8 +2906,8 @@ function Dashboard() {
                       }))
                       .sort((a, b) => b.pipeline - a.pipeline);
 
-                    const proposalSentDeals = analytics.meetings_attended.meetings_details
-                      .filter(meeting => meeting.stage === 'C Proposal Sent')
+                    const proposalSentDeals = analytics.meetings_attended.meetings_detail
+                      .filter(meeting => meeting.stage === 'C Proposal sent')
                       .map(meeting => ({
                         id: meeting.client || Math.random().toString(),
                         client: meeting.client,
@@ -2920,7 +2920,7 @@ function Dashboard() {
                       }))
                       .sort((a, b) => b.pipeline - a.pipeline);
 
-                    const legalsDeals = analytics.meetings_attended.meetings_details
+                    const legalsDeals = analytics.meetings_attended.meetings_detail
                       .filter(meeting => meeting.stage === 'B Legals')
                       .map(meeting => ({
                         id: meeting.client || Math.random().toString(),
