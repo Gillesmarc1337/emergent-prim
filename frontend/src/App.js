@@ -2864,6 +2864,237 @@ function Dashboard() {
                       </Card>
                     );
                   })()}
+
+                  {/* Deal Pipeline Board - POA → Proposal → Legals (3 columns) */}
+                  {analytics.meetings_attended.meetings_details && analytics.meetings_attended.meetings_details.length > 0 && (() => {
+                    // Calculate days since creation
+                    const calculateDaysOld = (discoveryDate) => {
+                      if (!discoveryDate) return 0;
+                      const created = new Date(discoveryDate);
+                      const now = new Date();
+                      const diffTime = Math.abs(now - created);
+                      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                      return diffDays;
+                    };
+
+                    // Get aging color
+                    const getAgingColor = (days) => {
+                      if (days < 30) return 'bg-green-100 border-green-300 dark:bg-green-900/20 dark:border-green-700/50';
+                      if (days < 60) return 'bg-orange-100 border-orange-300 dark:bg-orange-900/20 dark:border-orange-700/50';
+                      return 'bg-red-100 border-red-300 dark:bg-red-900/20 dark:border-red-700/50';
+                    };
+
+                    // Get aging badge
+                    const getAgingBadge = (days) => {
+                      if (days < 30) return { text: 'Fresh', color: 'bg-green-500' };
+                      if (days < 60) return { text: 'Aging', color: 'bg-orange-500' };
+                      return { text: 'Stale', color: 'bg-red-500' };
+                    };
+
+                    // Filter deals for each stage
+                    const poaBookedDeals = analytics.meetings_attended.meetings_details
+                      .filter(meeting => meeting.stage === 'D POA Booked')
+                      .map(meeting => ({
+                        id: meeting.client || Math.random().toString(),
+                        client: meeting.client,
+                        pipeline: meeting.expected_arr || 0,
+                        stage: meeting.stage,
+                        ae: meeting.owner || 'Unassigned',
+                        created_date: meeting.discovery_date,
+                        stage_date: meeting.poa_date || meeting.discovery_date,
+                        days_old: calculateDaysOld(meeting.discovery_date)
+                      }))
+                      .sort((a, b) => b.pipeline - a.pipeline);
+
+                    const proposalSentDeals = analytics.meetings_attended.meetings_details
+                      .filter(meeting => meeting.stage === 'C Proposal Sent')
+                      .map(meeting => ({
+                        id: meeting.client || Math.random().toString(),
+                        client: meeting.client,
+                        pipeline: meeting.expected_arr || 0,
+                        stage: meeting.stage,
+                        ae: meeting.owner || 'Unassigned',
+                        created_date: meeting.discovery_date,
+                        stage_date: meeting.proposal_date || meeting.discovery_date,
+                        days_old: calculateDaysOld(meeting.discovery_date)
+                      }))
+                      .sort((a, b) => b.pipeline - a.pipeline);
+
+                    const legalsDeals = analytics.meetings_attended.meetings_details
+                      .filter(meeting => meeting.stage === 'B Legals')
+                      .map(meeting => ({
+                        id: meeting.client || Math.random().toString(),
+                        client: meeting.client,
+                        pipeline: meeting.expected_arr || 0,
+                        stage: meeting.stage,
+                        ae: meeting.owner || 'Unassigned',
+                        created_date: meeting.discovery_date,
+                        stage_date: meeting.legals_date || meeting.discovery_date,
+                        days_old: calculateDaysOld(meeting.discovery_date)
+                      }))
+                      .sort((a, b) => b.pipeline - a.pipeline);
+
+                    const formatDate = (dateStr) => {
+                      if (!dateStr) return 'N/A';
+                      const date = new Date(dateStr);
+                      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    };
+
+                    return (
+                      <Card className="mb-6 dark:bg-[#1e2128] dark:border-[#2a2d35]">
+                        <CardHeader>
+                          <CardTitle className="dark:text-white">Deal Pipeline Board — Advanced Stages</CardTitle>
+                          <CardDescription className="dark:text-slate-400">
+                            Track deal progression from POA Booked → Proposal Sent → Legals. 🟢 Fresh &lt;30d • 🟠 Aging 30-60d • 🔴 Stale &gt;60d
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* POA Booked Column */}
+                            <div className="bg-purple-50 dark:bg-purple-900/20 border-2 border-purple-200 dark:border-purple-700/50 rounded-lg p-4">
+                              <div className="flex items-center justify-between mb-4">
+                                <h3 className="font-bold text-lg text-purple-900 dark:text-purple-300">POA Booked</h3>
+                                <span className="text-sm bg-purple-200 dark:bg-purple-800 text-purple-900 dark:text-purple-200 px-3 py-1 rounded-full font-semibold">
+                                  {poaBookedDeals.length} • ${(poaBookedDeals.reduce((sum, d) => sum + d.pipeline, 0) / 1000).toFixed(0)}K
+                                </span>
+                              </div>
+                              <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                                {poaBookedDeals.map(deal => {
+                                  const agingBadge = getAgingBadge(deal.days_old);
+                                  return (
+                                    <div
+                                      key={deal.id}
+                                      className={`${getAgingColor(deal.days_old)} border-2 rounded-lg p-3 hover:shadow-md transition-shadow`}
+                                    >
+                                      <div className="flex items-start justify-between mb-2">
+                                        <div className="font-semibold text-gray-900 dark:text-white text-sm flex-1 mr-2">
+                                          {deal.client}
+                                        </div>
+                                        <span className={`${agingBadge.color} text-white text-xs px-2 py-1 rounded-full`}>
+                                          {agingBadge.text}
+                                        </span>
+                                      </div>
+                                      <div className="text-xl font-bold text-purple-700 dark:text-purple-400 mb-2">
+                                        ${(deal.pipeline / 1000).toFixed(0)}K
+                                      </div>
+                                      <div className="text-xs text-gray-700 dark:text-slate-300 space-y-1">
+                                        <div className="flex justify-between">
+                                          <span className="font-medium">📅 POA:</span>
+                                          <span className="font-semibold">{formatDate(deal.stage_date)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="font-medium">👤 AE:</span>
+                                          <span className="font-semibold">{deal.ae}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="font-medium">⏱️ Age:</span>
+                                          <span className="font-semibold">{deal.days_old}d</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            {/* Proposal Sent Column */}
+                            <div className="bg-indigo-50 dark:bg-indigo-900/20 border-2 border-indigo-200 dark:border-indigo-700/50 rounded-lg p-4">
+                              <div className="flex items-center justify-between mb-4">
+                                <h3 className="font-bold text-lg text-indigo-900 dark:text-indigo-300">Proposal Sent</h3>
+                                <span className="text-sm bg-indigo-200 dark:bg-indigo-800 text-indigo-900 dark:text-indigo-200 px-3 py-1 rounded-full font-semibold">
+                                  {proposalSentDeals.length} • ${(proposalSentDeals.reduce((sum, d) => sum + d.pipeline, 0) / 1000).toFixed(0)}K
+                                </span>
+                              </div>
+                              <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                                {proposalSentDeals.map(deal => {
+                                  const agingBadge = getAgingBadge(deal.days_old);
+                                  return (
+                                    <div
+                                      key={deal.id}
+                                      className={`${getAgingColor(deal.days_old)} border-2 rounded-lg p-3 hover:shadow-md transition-shadow`}
+                                    >
+                                      <div className="flex items-start justify-between mb-2">
+                                        <div className="font-semibold text-gray-900 dark:text-white text-sm flex-1 mr-2">
+                                          {deal.client}
+                                        </div>
+                                        <span className={`${agingBadge.color} text-white text-xs px-2 py-1 rounded-full`}>
+                                          {agingBadge.text}
+                                        </span>
+                                      </div>
+                                      <div className="text-xl font-bold text-indigo-700 dark:text-indigo-400 mb-2">
+                                        ${(deal.pipeline / 1000).toFixed(0)}K
+                                      </div>
+                                      <div className="text-xs text-gray-700 dark:text-slate-300 space-y-1">
+                                        <div className="flex justify-between">
+                                          <span className="font-medium">📄 Proposal:</span>
+                                          <span className="font-semibold">{formatDate(deal.stage_date)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="font-medium">👤 AE:</span>
+                                          <span className="font-semibold">{deal.ae}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="font-medium">⏱️ Age:</span>
+                                          <span className="font-semibold">{deal.days_old}d</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            {/* Legals Column */}
+                            <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-700/50 rounded-lg p-4">
+                              <div className="flex items-center justify-between mb-4">
+                                <h3 className="font-bold text-lg text-green-900 dark:text-green-300">Legals</h3>
+                                <span className="text-sm bg-green-200 dark:bg-green-800 text-green-900 dark:text-green-200 px-3 py-1 rounded-full font-semibold">
+                                  {legalsDeals.length} • ${(legalsDeals.reduce((sum, d) => sum + d.pipeline, 0) / 1000).toFixed(0)}K
+                                </span>
+                              </div>
+                              <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                                {legalsDeals.map(deal => {
+                                  const agingBadge = getAgingBadge(deal.days_old);
+                                  return (
+                                    <div
+                                      key={deal.id}
+                                      className={`${getAgingColor(deal.days_old)} border-2 rounded-lg p-3 hover:shadow-md transition-shadow`}
+                                    >
+                                      <div className="flex items-start justify-between mb-2">
+                                        <div className="font-semibold text-gray-900 dark:text-white text-sm flex-1 mr-2">
+                                          {deal.client}
+                                        </div>
+                                        <span className={`${agingBadge.color} text-white text-xs px-2 py-1 rounded-full`}>
+                                          {agingBadge.text}
+                                        </span>
+                                      </div>
+                                      <div className="text-xl font-bold text-green-700 dark:text-green-400 mb-2">
+                                        ${(deal.pipeline / 1000).toFixed(0)}K
+                                      </div>
+                                      <div className="text-xs text-gray-700 dark:text-slate-300 space-y-1">
+                                        <div className="flex justify-between">
+                                          <span className="font-medium">⚖️ Legals:</span>
+                                          <span className="font-semibold">{formatDate(deal.stage_date)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="font-medium">👤 AE:</span>
+                                          <span className="font-semibold">{deal.ae}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="font-medium">⏱️ Age:</span>
+                                          <span className="font-semibold">{deal.days_old}d</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })()}
                 </>
               );
             })()}
