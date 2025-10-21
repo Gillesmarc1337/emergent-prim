@@ -2258,7 +2258,7 @@ function Dashboard() {
                 .sort((a, b) => b.pipeline - a.pipeline);
 
               const introAttendedDeals = analytics.meeting_generation.meetings_details
-                .filter(meeting => meeting.stage === 'E Intro Attended')
+                .filter(meeting => meeting.stage === 'E Intro attended')
                 .map(meeting => ({
                   id: meeting.client || Math.random().toString(),
                   client: meeting.client,
