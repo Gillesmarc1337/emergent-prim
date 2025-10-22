@@ -2866,7 +2866,7 @@ function Dashboard() {
                   })()}
 
                   {/* Deal Pipeline Board - POA → Proposal → Legals (3 columns) */}
-                  {analytics.meetings_attended.meetings_detail && analytics.meetings_attended.meetings_detail.length > 0 && (() => {
+                  {analytics.meeting_generation?.meetings_details && analytics.meeting_generation.meetings_details.length > 0 && (() => {
                     // Calculate days since creation
                     const calculateDaysOld = (discoveryDate) => {
                       if (!discoveryDate) return 0;
@@ -2892,7 +2892,7 @@ function Dashboard() {
                     };
 
                     // Filter deals for each stage
-                    const poaBookedDeals = analytics.meetings_attended.meetings_detail
+                    const poaBookedDeals = analytics.meeting_generation.meetings_details
                       .filter(meeting => meeting.stage === 'D POA Booked')
                       .map(meeting => ({
                         id: meeting.client || Math.random().toString(),
@@ -2906,7 +2906,7 @@ function Dashboard() {
                       }))
                       .sort((a, b) => b.pipeline - a.pipeline);
 
-                    const proposalSentDeals = analytics.meetings_attended.meetings_detail
+                    const proposalSentDeals = analytics.meeting_generation.meetings_details
                       .filter(meeting => meeting.stage === 'C Proposal sent')
                       .map(meeting => ({
                         id: meeting.client || Math.random().toString(),
@@ -2920,7 +2920,7 @@ function Dashboard() {
                       }))
                       .sort((a, b) => b.pipeline - a.pipeline);
 
-                    const legalsDeals = analytics.meetings_attended.meetings_detail
+                    const legalsDeals = analytics.meeting_generation.meetings_details
                       .filter(meeting => meeting.stage === 'B Legals')
                       .map(meeting => ({
                         id: meeting.client || Math.random().toString(),
