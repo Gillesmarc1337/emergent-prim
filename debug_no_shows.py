@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://dealflow-tracker-7.preview.emergentagent.com/api"
+BASE_URL = "https://multi-tenant-sales.preview.emergentagent.com/api"
 
 def debug_yearly_analytics_no_shows():
     """Debug the No Shows issue in yearly analytics endpoint"""
