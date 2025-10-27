@@ -4895,6 +4895,7 @@ function Dashboard() {
                                 index={index}
                                 showActions={true}
                                 onHide={() => hideItem('deals', deal.id)}
+                                onDelete={handleDeleteDeal}
                                 onProbabilityChange={handleDealProbabilityChange}
                               />
                             ))}
@@ -4983,6 +4984,7 @@ function Dashboard() {
                                 index={index}
                                 showActions={true}
                                 onHide={() => hideItem('deals', deal.id)}
+                                onDelete={handleDeleteDeal}
                                 onProbabilityChange={handleDealProbabilityChange}
                               />
                             ))}
@@ -5071,6 +5073,7 @@ function Dashboard() {
                                 index={index}
                                 showActions={true}
                                 onHide={() => hideItem('deals', deal.id)}
+                                onDelete={handleDeleteDeal}
                                 onProbabilityChange={handleDealProbabilityChange}
                               />
                             ))}
@@ -5151,6 +5154,7 @@ function Dashboard() {
                                 index={index}
                                 showActions={true}
                                 onHide={() => hideItem('deals', deal.id)}
+                                onDelete={handleDeleteDeal}
                                 onProbabilityChange={handleDealProbabilityChange}
                               />
                             ))}
