@@ -2920,20 +2920,6 @@ function Dashboard() {
                       }))
                       .sort((a, b) => b.pipeline - a.pipeline);
 
-                    const legalsDeals = analytics.meeting_generation.meetings_details
-                      .filter(meeting => meeting.stage === 'B Legals')
-                      .map(meeting => ({
-                        id: meeting.client || Math.random().toString(),
-                        client: meeting.client,
-                        pipeline: meeting.expected_arr || 0,
-                        stage: meeting.stage,
-                        ae: meeting.owner || 'Unassigned',
-                        created_date: meeting.discovery_date,
-                        stage_date: meeting.legals_date || meeting.discovery_date,
-                        days_old: calculateDaysOld(meeting.discovery_date)
-                      }))
-                      .sort((a, b) => b.pipeline - a.pipeline);
-
                     const formatDate = (dateStr) => {
                       if (!dateStr) return 'N/A';
                       const date = new Date(dateStr);
