@@ -2347,10 +2347,25 @@ function Dashboard() {
               return (
                 <Card className="mb-6 dark:bg-[#1e2128] dark:border-[#2a2d35]">
                   <CardHeader>
-                    <CardTitle className="dark:text-white">Deal Pipeline Board — Tracking</CardTitle>
-                    <CardDescription className="dark:text-slate-400">
-                      Track deal progression from Inbox to Intro Attended. 🟢 Fresh &lt;30d • 🟠 Aging 30-60d • 🔴 Stale &gt;60d
-                    </CardDescription>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="dark:text-white">Deal Pipeline Board — Tracking</CardTitle>
+                        <CardDescription className="dark:text-slate-400">
+                          Track deal progression from Inbox to Intro Attended. 🟢 Fresh &lt;30d • 🟠 Aging 30-60d • 🔴 Stale &gt;60d
+                        </CardDescription>
+                      </div>
+                      {/* AE Filter Dropdown */}
+                      <select
+                        value={selectedAE}
+                        onChange={(e) => setSelectedAE(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-[#1e2128] dark:text-white rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="all">All AEs</option>
+                        {uniqueAEsTracking.map(ae => (
+                          <option key={ae} value={ae}>{ae}</option>
+                        ))}
+                      </select>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
