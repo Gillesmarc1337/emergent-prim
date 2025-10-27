@@ -2623,7 +2623,7 @@ function Dashboard() {
                           </tr>
                         </thead>
                         <tbody>
-                          {Object.entries(analytics.meeting_generation.bdr_performance).map(([bdr, stats]) => {
+                          {Object.entries(filteredBDRPerformance).map(([bdr, stats]) => {
                             // Determine if this is Fady (Referrals Manager)
                             const isFady = bdr.toLowerCase().includes('fady');
                             
