@@ -2945,11 +2945,11 @@ function Dashboard() {
                         <CardHeader>
                           <CardTitle className="dark:text-white">Deal Pipeline Board — Advanced Stages</CardTitle>
                           <CardDescription className="dark:text-slate-400">
-                            Track deal progression from POA Booked → Proposal Sent → Legals. 🟢 Fresh &lt;30d • 🟠 Aging 30-60d • 🔴 Stale &gt;60d
+                            Track deal progression from POA Booked → Proposal Sent. 🟢 Fresh &lt;30d • 🟠 Aging 30-60d • 🔴 Stale &gt;60d
                           </CardDescription>
                         </CardHeader>
                         <CardContent>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* POA Booked Column */}
                             <div className="bg-purple-50 dark:bg-purple-900/20 border-2 border-purple-200 dark:border-purple-700/50 rounded-lg p-4">
                               <div className="flex items-center justify-between mb-4">
