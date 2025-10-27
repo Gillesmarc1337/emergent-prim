@@ -3043,53 +3043,6 @@ function Dashboard() {
                                 })}
                               </div>
                             </div>
-
-                            {/* Legals Column */}
-                            <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-700/50 rounded-lg p-4">
-                              <div className="flex items-center justify-between mb-4">
-                                <h3 className="font-bold text-lg text-green-900 dark:text-green-300">Legals</h3>
-                                <span className="text-sm bg-green-200 dark:bg-green-800 text-green-900 dark:text-green-200 px-3 py-1 rounded-full font-semibold">
-                                  {legalsDeals.length} • ${(legalsDeals.reduce((sum, d) => sum + d.pipeline, 0) / 1000).toFixed(0)}K
-                                </span>
-                              </div>
-                              <div className="space-y-3 max-h-[500px] overflow-y-auto">
-                                {legalsDeals.map(deal => {
-                                  const agingBadge = getAgingBadge(deal.days_old);
-                                  return (
-                                    <div
-                                      key={deal.id}
-                                      className={`${getAgingColor(deal.days_old)} border-2 rounded-lg p-3 hover:shadow-md transition-shadow`}
-                                    >
-                                      <div className="flex items-start justify-between mb-2">
-                                        <div className="font-semibold text-gray-900 dark:text-white text-sm flex-1 mr-2">
-                                          {deal.client}
-                                        </div>
-                                        <span className={`${agingBadge.color} text-white text-xs px-2 py-1 rounded-full`}>
-                                          {agingBadge.text}
-                                        </span>
-                                      </div>
-                                      <div className="text-xl font-bold text-green-700 dark:text-green-400 mb-2">
-                                        ${(deal.pipeline / 1000).toFixed(0)}K
-                                      </div>
-                                      <div className="text-xs text-gray-700 dark:text-slate-300 space-y-1">
-                                        <div className="flex justify-between">
-                                          <span className="font-medium">⚖️ Legals:</span>
-                                          <span className="font-semibold">{formatDate(deal.stage_date)}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                          <span className="font-medium">👤 AE:</span>
-                                          <span className="font-semibold">{deal.ae}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                          <span className="font-medium">⏱️ Age:</span>
-                                          <span className="font-semibold">{deal.days_old}d</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
                           </div>
                         </CardContent>
                       </Card>
