@@ -1231,6 +1231,7 @@ function Dashboard() {
   const [hotLeads, setHotLeads] = useState([]);
   const [performanceSummary, setPerformanceSummary] = useState(null);
   const [hiddenDeals, setHiddenDeals] = useState(new Set());
+  const [deletedDeals, setDeletedDeals] = useState(new Set()); // Permanently deleted deals
   const [hiddenLeads, setHiddenLeads] = useState(new Set());
   const [loadingProjections, setLoadingProjections] = useState(false);
   const [selectedAE, setSelectedAE] = useState('all'); // Filter by AE
