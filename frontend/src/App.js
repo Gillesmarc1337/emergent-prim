@@ -1578,6 +1578,8 @@ function Dashboard() {
           // Rebuild deals array from saved preferences WITH ORDER
           const reconstructedDeals = [];
           const hiddenSet = new Set();
+          const deletedSet = new Set();
+          const probabilities = {};
           
           // Process each column from saved preferences (including delayed)
           ['next14', 'next30', 'next60', 'delayed'].forEach(columnKey => {
@@ -1587,6 +1589,12 @@ function Dashboard() {
             savedColumn.sort((a, b) => (a.order || 0) - (b.order || 0));
             
             savedColumn.forEach(savedDeal => {
+              // Skip permanently deleted deals
+              if (savedDeal.deleted) {
+                deletedSet.add(savedDeal.id);
+                return;
+              }
+              
               // Find the deal in our fresh data
               const dealData = dealsWithColumns.find(d => d.id === savedDeal.id);
               if (dealData) {
@@ -1596,32 +1604,41 @@ function Dashboard() {
                 if (savedDeal.hidden) {
                   hiddenSet.add(savedDeal.id);
                 }
+                // Load saved probability
+                if (savedDeal.probability) {
+                  probabilities[savedDeal.id] = savedDeal.probability;
+                }
               }
             });
           });
           
-          // Add any new deals that weren't in saved preferences
+          // Add any new deals that weren't in saved preferences (and not deleted)
           dealsWithColumns.forEach(deal => {
-            if (!reconstructedDeals.find(d => d.id === deal.id)) {
+            if (!reconstructedDeals.find(d => d.id === deal.id) && !deletedSet.has(deal.id)) {
               reconstructedDeals.push(deal);
             }
           });
           
           setHotDeals(reconstructedDeals);
           setHiddenDeals(hiddenSet);
-          setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns))); // Keep original for reset
-          console.log('✅ Applied saved projections preferences with order');
+          setDeletedDeals(deletedSet);
+          setDealProbabilities(probabilities);
+          setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns.filter(d => !deletedSet.has(d.id))))); // Keep original for reset (excluding deleted)
+          console.log('✅ Applied saved projections preferences with order, deleted filter, and probabilities');
+          console.log(`   Deleted ${deletedSet.size} deals permanently`);
         } catch (e) {
           console.error('Error applying saved preferences:', e);
           // Fall back to fresh data
           setHotDeals(dealsWithColumns);
           setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns)));
           setHiddenDeals(new Set());
+          setDeletedDeals(new Set());
         }
       } else {
         setHotDeals(dealsWithColumns);
         setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns))); // Deep copy for reset
         setHiddenDeals(new Set());
+        setDeletedDeals(new Set());
       }
       
       setHotLeads(hotLeadsResponse.data);
