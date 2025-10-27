@@ -2301,9 +2301,17 @@ function Dashboard() {
                 return { text: 'Stale', color: 'bg-red-500' };
               };
 
-              // Filter deals for Inbox (F Inbox) and Intro Attended (E Intro Attended)
+              // Get unique AEs for filter dropdown
+              const uniqueAEsTracking = Array.from(new Set(
+                analytics.meeting_generation.meetings_details
+                  .map(m => m.owner)
+                  .filter(Boolean)
+              )).sort();
+
+              // Filter deals for Inbox (F Inbox) and Intro Attended (E Intro Attended) with AE filter
               const inboxDeals = analytics.meeting_generation.meetings_details
                 .filter(meeting => meeting.stage === 'F Inbox')
+                .filter(meeting => selectedAE === 'all' || meeting.owner === selectedAE)
                 .map(meeting => ({
                   id: meeting.client || Math.random().toString(),
                   client: meeting.client,
@@ -2317,6 +2325,7 @@ function Dashboard() {
 
               const introAttendedDeals = analytics.meeting_generation.meetings_details
                 .filter(meeting => meeting.stage === 'E Intro attended')
+                .filter(meeting => selectedAE === 'all' || meeting.owner === selectedAE)
                 .map(meeting => ({
                   id: meeting.client || Math.random().toString(),
                   client: meeting.client,
