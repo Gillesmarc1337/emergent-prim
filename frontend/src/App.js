@@ -2994,9 +2994,17 @@ function Dashboard() {
                       return { text: 'Stale', color: 'bg-red-500' };
                     };
 
-                    // Filter deals for each stage
+                    // Get unique AEs for filter dropdown
+                    const uniqueAEsAdvanced = Array.from(new Set(
+                      analytics.meeting_generation.meetings_details
+                        .map(m => m.owner)
+                        .filter(Boolean)
+                    )).sort();
+
+                    // Filter deals for each stage with AE filter
                     const poaBookedDeals = analytics.meeting_generation.meetings_details
                       .filter(meeting => meeting.stage === 'D POA Booked')
+                      .filter(meeting => selectedAE === 'all' || meeting.owner === selectedAE)
                       .map(meeting => ({
                         id: meeting.client || Math.random().toString(),
                         client: meeting.client,
@@ -3011,6 +3019,7 @@ function Dashboard() {
 
                     const proposalSentDeals = analytics.meeting_generation.meetings_details
                       .filter(meeting => meeting.stage === 'C Proposal sent')
+                      .filter(meeting => selectedAE === 'all' || meeting.owner === selectedAE)
                       .map(meeting => ({
                         id: meeting.client || Math.random().toString(),
                         client: meeting.client,
