@@ -2594,7 +2594,20 @@ function Dashboard() {
               return (
                 <Card>
                   <CardHeader>
-                    <CardTitle>BDR Performance</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle>BDR Performance</CardTitle>
+                      {/* AE Filter Dropdown */}
+                      <select
+                        value={selectedAE}
+                        onChange={(e) => setSelectedAE(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-[#1e2128] dark:text-white rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="all">All AEs</option>
+                        {uniqueAEs.map(ae => (
+                          <option key={ae} value={ae}>{ae}</option>
+                        ))}
+                      </select>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
