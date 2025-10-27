@@ -1688,13 +1688,24 @@ function Dashboard() {
   // Alias for backward compatibility
   const handleOnDragEnd = onDragEnd;
 
+  // Handle permanent deletion of a deal
+  const handleDeleteDeal = (dealId) => {
+    setDeletedDeals(prev => {
+      const newSet = new Set(prev);
+      newSet.add(dealId);
+      return newSet;
+    });
+    setHasUnsavedChanges(true);
+    console.log(`🗑️ Deal ${dealId} marked as permanently deleted`);
+  };
+
   // Save current board state to backend
   const handleSaveBoard = async () => {
     try {
-      await saveProjectionsPreferences(hotDeals, hiddenDeals);
+      await saveProjectionsPreferences(hotDeals, hiddenDeals, deletedDeals);
       setOriginalHotDeals(JSON.parse(JSON.stringify(hotDeals))); // Update original to current
       setHasUnsavedChanges(false);
-      alert('💾 Board state saved successfully!');
+      alert('💾 Board state saved successfully! (including deleted deals)');
     } catch (error) {
       console.error('Error saving board state:', error);
       alert('❌ Failed to save board state. Please try again.');
@@ -1703,11 +1714,13 @@ function Dashboard() {
 
   // Reset board to original state
   const handleResetBoard = async () => {
-    if (window.confirm('⚠️ Are you sure you want to reset all changes? This will restore the default board state.')) {
+    if (window.confirm('⚠️ Are you sure you want to reset all changes? This will restore the default board state and clear all deletions.')) {
       try {
         await resetProjectionsPreferences();
         setHotDeals(JSON.parse(JSON.stringify(originalHotDeals))); // Deep copy
         setHiddenDeals(new Set()); // Clear hidden deals
+        setDeletedDeals(new Set()); // Clear deleted deals
+        setDealProbabilities({}); // Clear custom probabilities
         setHasUnsavedChanges(false);
         alert('✅ Board reset to default state!');
       } catch (error) {
