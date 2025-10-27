@@ -2565,6 +2565,14 @@ function Dashboard() {
 
             {/* BDR Performance */}
             {Object.keys(analytics.meeting_generation.bdr_performance).length > 0 && (() => {
+              // Get unique AEs from bdr_performance
+              const uniqueAEs = Object.keys(analytics.meeting_generation.bdr_performance);
+              
+              // Filter BDR performance data based on selectedAE
+              const filteredBDRPerformance = selectedAE === 'all' 
+                ? analytics.meeting_generation.bdr_performance 
+                : { [selectedAE]: analytics.meeting_generation.bdr_performance[selectedAE] };
+              
               // Calculate period duration in months for dynamic targets
               let periodMonths = 1; // Default to 1 month
               
