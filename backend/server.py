@@ -518,6 +518,8 @@ class UserViewAccessRequest(BaseModel):
 class ProjectionDeal(BaseModel):
     id: str
     hidden: bool = False
+    deleted: bool = False  # Permanently deleted deals (user-specific)
+    probability: int = 75  # Custom close probability (50, 75, 90)
     order: int = 0  # Position in the column
 
 class ProjectionsPreferencesRequest(BaseModel):
