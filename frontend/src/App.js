@@ -1447,26 +1447,50 @@ function Dashboard() {
   };
 
   // Save projections preferences to backend
-  const saveProjectionsPreferences = async (dealsData, hiddenDealsSet) => {
+  const saveProjectionsPreferences = async (dealsData, hiddenDealsSet, deletedDealsSet = deletedDeals) => {
     if (!currentView?.id) return;
     
     try {
-      // Organize deals by column with hidden status AND ORDER (index)
+      // Organize deals by column with hidden, deleted status AND ORDER (index)
       const next14Deals = dealsData
         .filter(d => d.column === 'next14')
-        .map((d, index) => ({ id: d.id, hidden: hiddenDealsSet.has(d.id), order: index }));
+        .map((d, index) => ({ 
+          id: d.id, 
+          hidden: hiddenDealsSet.has(d.id), 
+          deleted: deletedDealsSet.has(d.id),
+          probability: dealProbabilities[d.id] || 75, // Save custom probability
+          order: index 
+        }));
       
       const next30Deals = dealsData
         .filter(d => d.column === 'next30')
-        .map((d, index) => ({ id: d.id, hidden: hiddenDealsSet.has(d.id), order: index }));
+        .map((d, index) => ({ 
+          id: d.id, 
+          hidden: hiddenDealsSet.has(d.id), 
+          deleted: deletedDealsSet.has(d.id),
+          probability: dealProbabilities[d.id] || 75,
+          order: index 
+        }));
       
       const next60Deals = dealsData
         .filter(d => d.column === 'next60')
-        .map((d, index) => ({ id: d.id, hidden: hiddenDealsSet.has(d.id), order: index }));
+        .map((d, index) => ({ 
+          id: d.id, 
+          hidden: hiddenDealsSet.has(d.id), 
+          deleted: deletedDealsSet.has(d.id),
+          probability: dealProbabilities[d.id] || 75,
+          order: index 
+        }));
       
       const delayedDeals = dealsData
         .filter(d => d.column === 'delayed')
-        .map((d, index) => ({ id: d.id, hidden: hiddenDealsSet.has(d.id), order: index }));
+        .map((d, index) => ({ 
+          id: d.id, 
+          hidden: hiddenDealsSet.has(d.id), 
+          deleted: deletedDealsSet.has(d.id),
+          probability: dealProbabilities[d.id] || 75,
+          order: index 
+        }));
       
       await axios.post(`${API}/user/projections-preferences`, {
         view_id: currentView.id,
@@ -1480,7 +1504,7 @@ function Dashboard() {
         withCredentials: true
       });
       
-      console.log('✅ Projections preferences saved successfully');
+      console.log('✅ Projections preferences saved successfully (with deleted flag and probabilities)');
     } catch (error) {
       console.error('Error saving projections preferences:', error);
       throw error;
