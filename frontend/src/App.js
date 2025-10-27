@@ -291,9 +291,9 @@ function DraggableDealItem({ deal, index, onHide, onDelete, showActions = false,
   const handleDelete = () => {
     setIsVisible(false);
     if (onDelete) {
-      onDelete(deal.id); // Mark as permanently deleted
+      onDelete(deal.id); // Mark as permanently deleted (user-specific)
     }
-    if (onHide) onHide();
+    // Note: Don't call onHide here - deleted is permanent, hidden is temporary
   };
 
   const handleProbabilityChange = (newProb) => {
