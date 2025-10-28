@@ -4941,7 +4941,7 @@ function Dashboard() {
                     <select
                       value={selectedAE}
                       onChange={(e) => setSelectedAE(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-[#1e2128] dark:text-white rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="all">All AEs</option>
                       {getUniqueAEs().map(ae => (
@@ -4949,14 +4949,24 @@ function Dashboard() {
                       ))}
                     </select>
                     
+                    {/* Asher POV Button */}
+                    <button
+                      onClick={applyAsherPOV}
+                      className="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-purple-600 text-white hover:bg-purple-700 flex items-center gap-2"
+                      title="Load Asher's board organization"
+                    >
+                      <span>👁️</span>
+                      Asher POV
+                    </button>
+                    
                     {/* Reset Button */}
                     <button
                       onClick={handleResetBoard}
                       disabled={!hasUnsavedChanges}
                       className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                         hasUnsavedChanges
-                          ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          : 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                          ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                          : 'bg-gray-50 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
                       }`}
                     >
                       Reset
@@ -4969,7 +4979,7 @@ function Dashboard() {
                       className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                         hasUnsavedChanges
                           ? 'bg-blue-600 text-white hover:bg-blue-700'
-                          : 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                          : 'bg-gray-50 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
                       }`}
                     >
                       Save
