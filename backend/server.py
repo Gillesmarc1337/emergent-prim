@@ -2190,6 +2190,53 @@ async def get_projections_preferences(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error loading preferences: {str(e)}")
 
+@api_router.get("/user/projections-preferences/asher")
+async def get_asher_projections_preferences(
+    view_id: str = Query(..., description="View ID to get Asher's preferences for"),
+    user: dict = Depends(get_current_user)
+):
+    """
+    Get Asher's projections board preferences for a specific view (for "Asher POV" feature)
+    """
+    try:
+        # Find Asher's user document
+        asher_user = await db.users.find_one({"email": "asher@primelis.com"})
+        
+        if not asher_user:
+            return {
+                "has_preferences": False,
+                "preferences": None,
+                "message": "Asher user not found"
+            }
+        
+        asher_user_id = asher_user.get("id")
+        
+        # Find Asher's preferences for this view
+        preferences_doc = await db.user_projections_preferences.find_one({
+            "user_id": asher_user_id,
+            "view_id": view_id
+        })
+        
+        if not preferences_doc:
+            return {
+                "has_preferences": False,
+                "preferences": None,
+                "message": "Asher has not saved preferences for this view yet"
+            }
+        
+        # Clean MongoDB _id
+        if '_id' in preferences_doc:
+            del preferences_doc['_id']
+        
+        return {
+            "has_preferences": True,
+            "preferences": preferences_doc.get("preferences"),
+            "updated_at": preferences_doc.get("updated_at").isoformat() if preferences_doc.get("updated_at") else None
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error loading Asher's preferences: {str(e)}")
+
 @api_router.delete("/user/projections-preferences")
 async def reset_projections_preferences(
     view_id: str = Query(..., description="View ID to reset preferences for"),
