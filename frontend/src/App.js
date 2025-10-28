@@ -1211,6 +1211,11 @@ function Dashboard() {
     localStorage.setItem('activeTab', activeTab);
   }, [activeTab]);
   
+  // Reset AE filter when switching tabs to avoid confusion
+  useEffect(() => {
+    setSelectedAE('all');
+  }, [activeTab]);
+  
   // Listen for view config updates from other admins
   useEffect(() => {
     const handleConfigUpdate = () => {
