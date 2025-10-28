@@ -1454,6 +1454,115 @@ function Dashboard() {
     }
   };
 
+  // Load Asher's projections preferences (for "Asher POV" feature)
+  const loadAsherProjectionsPreferences = async () => {
+    if (!currentView?.id) return null;
+    
+    try {
+      const response = await axios.get(`${API}/user/projections-preferences/asher`, {
+        params: { view_id: currentView.id },
+        withCredentials: true
+      });
+      
+      if (response.data.has_preferences) {
+        console.log('👁️ Loaded Asher\'s projections preferences:', response.data);
+        return response.data.preferences;
+      }
+      console.log('⚠️ Asher has not saved preferences yet:', response.data.message);
+      return null;
+    } catch (error) {
+      console.error('Error loading Asher\'s preferences:', error);
+      return null;
+    }
+  };
+
+  // Apply Asher's POV (load his preferences and apply them to current board)
+  const applyAsherPOV = async () => {
+    try {
+      const asherPrefs = await loadAsherProjectionsPreferences();
+      
+      if (!asherPrefs) {
+        alert('⚠️ Asher has not saved preferences for this view yet.');
+        return;
+      }
+      
+      // Reload fresh data first
+      const viewParam = currentView?.id ? `?view_id=${currentView.id}` : '';
+      const [hotDealsResponse, hotLeadsResponse] = await Promise.all([
+        axios.get(`${API}/projections/hot-deals${viewParam}`),
+        axios.get(`${API}/projections/hot-leads${viewParam}`)
+      ]);
+      
+      const combinedDeals = [
+        ...hotDealsResponse.data.map(deal => ({...deal, source: 'hot-deals'})),
+        ...hotLeadsResponse.data.map(lead => ({...lead, source: 'hot-leads'}))
+      ];
+      
+      const dealsWithColumns = combinedDeals.map((deal, index) => ({
+        ...deal,
+        client: deal.client || deal.company || deal.lead_name || `Deal ${index + 1}`,
+        pipeline: deal.pipeline || deal.expected_arr || deal.value || 0,
+        owner: deal.owner || deal.ae || 'TBD',
+        column: deal.column || (() => {
+          if (deal.stage === 'B Legals') return 'next14';
+          if (deal.stage === 'C Proposal sent') return 'next30';
+          if (deal.stage === 'D POA Booked') return 'next60';
+          return index % 3 === 0 ? 'next14' : index % 3 === 1 ? 'next30' : 'next60';
+        })()
+      }));
+      
+      // Apply Asher's preferences
+      const reconstructedDeals = [];
+      const hiddenSet = new Set();
+      const deletedSet = new Set();
+      const probabilities = {};
+      
+      ['next14', 'next30', 'next60', 'delayed'].forEach(columnKey => {
+        const savedColumn = asherPrefs[columnKey] || [];
+        savedColumn.sort((a, b) => (a.order || 0) - (b.order || 0));
+        
+        savedColumn.forEach(savedDeal => {
+          if (savedDeal.deleted) {
+            deletedSet.add(savedDeal.id);
+            return;
+          }
+          
+          const dealData = dealsWithColumns.find(d => d.id === savedDeal.id);
+          if (dealData) {
+            dealData.column = columnKey;
+            reconstructedDeals.push(dealData);
+            if (savedDeal.hidden) {
+              hiddenSet.add(savedDeal.id);
+            }
+            if (savedDeal.probability) {
+              probabilities[savedDeal.id] = savedDeal.probability;
+            }
+          }
+        });
+      });
+      
+      // Add any new deals not in Asher's preferences
+      dealsWithColumns.forEach(deal => {
+        if (!reconstructedDeals.find(d => d.id === deal.id) && !deletedSet.has(deal.id)) {
+          reconstructedDeals.push(deal);
+        }
+      });
+      
+      setHotDeals(reconstructedDeals);
+      setHiddenDeals(hiddenSet);
+      setDeletedDeals(deletedSet);
+      setDealProbabilities(probabilities);
+      setHasUnsavedChanges(false);
+      
+      console.log(`👁️ Applied Asher's POV: ${reconstructedDeals.length} deals, ${deletedSet.size} deleted, ${hiddenSet.size} hidden`);
+      alert('👁️ Asher\'s POV applied successfully!');
+      
+    } catch (error) {
+      console.error('Error applying Asher\'s POV:', error);
+      alert('❌ Failed to apply Asher\'s POV. Please try again.');
+    }
+  };
+
   // Save projections preferences to backend
   const saveProjectionsPreferences = async (dealsData, hiddenDealsSet, deletedDealsSet = deletedDeals) => {
     if (!currentView?.id) return;
