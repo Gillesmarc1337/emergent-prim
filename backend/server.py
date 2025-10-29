@@ -4293,7 +4293,7 @@ async def upload_google_sheets_data(
                 {"type": "last_update", "view_id": view_id if view_id else "organic"},
                 {
                     "$set": {
-                        "last_update": datetime.utcnow(),
+                        "last_update": datetime.now(timezone.utc),
                         "source_type": "google_sheets",
                         "source_url": request.sheet_url,
                         "sheet_name": request.sheet_name,
