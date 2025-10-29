@@ -4836,6 +4836,40 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@app.on_event("startup")
+async def startup_scheduler():
+    """Start the scheduler for auto-refresh tasks"""
+    try:
+        # Schedule auto-refresh at 12:00 and 20:00 Europe/Paris time
+        scheduler.add_job(
+            auto_refresh_all_views,
+            CronTrigger(hour=12, minute=0, timezone='Europe/Paris'),
+            id='auto_refresh_noon',
+            name='Auto-refresh Google Sheets at 12:00',
+            replace_existing=True
+        )
+        
+        scheduler.add_job(
+            auto_refresh_all_views,
+            CronTrigger(hour=20, minute=0, timezone='Europe/Paris'),
+            id='auto_refresh_evening',
+            name='Auto-refresh Google Sheets at 20:00',
+            replace_existing=True
+        )
+        
+        scheduler.start()
+        print("✅ Scheduler started - Auto-refresh scheduled at 12:00 and 20:00 Europe/Paris")
+    except Exception as e:
+        print(f"❌ Failed to start scheduler: {str(e)}")
+
 @app.on_event("shutdown")
-async def shutdown_db_client():
+async def shutdown_scheduler_and_db():
+    """Shutdown scheduler and database client"""
+    try:
+        scheduler.shutdown()
+        print("✅ Scheduler stopped")
+    except Exception as e:
+        print(f"⚠️ Error stopping scheduler: {str(e)}")
+    
     client.close()
+    print("✅ Database client closed")
