@@ -572,11 +572,15 @@ function DataManagementSection({ onDataUpdated, currentView }) {
   const handleRefreshGoogleSheet = async () => {
     setIsRefreshing(true);
     try {
-      await axios.post(`${API}/data/refresh-google-sheet`);
+      const viewParam = currentView?.id ? `?view_id=${currentView.id}` : '';
+      await axios.post(`${API}/data/refresh-google-sheet${viewParam}`, {}, {
+        withCredentials: true
+      });
       await loadDataStatus();
       if (onDataUpdated) onDataUpdated();
     } catch (error) {
       console.error('Refresh failed:', error);
+      alert(`❌ Refresh failed: ${error.response?.data?.detail || error.message}`);
     } finally {
       setIsRefreshing(false);
     }
