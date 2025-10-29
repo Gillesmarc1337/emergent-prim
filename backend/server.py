@@ -4225,6 +4225,46 @@ async def get_data_status(view_id: str = Query(None)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting data status: {str(e)}")
 
+@api_router.post("/admin/trigger-auto-refresh")
+async def trigger_auto_refresh_manually(
+    user: dict = Depends(require_super_admin)
+):
+    """
+    Manually trigger auto-refresh for all views (super admin only)
+    Useful for testing the scheduled auto-refresh functionality
+    """
+    try:
+        await auto_refresh_all_views()
+        return {
+            "message": "Auto-refresh triggered successfully for all views",
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error triggering auto-refresh: {str(e)}")
+
+@api_router.get("/admin/auto-refresh-logs")
+async def get_auto_refresh_logs(
+    limit: int = Query(10, description="Number of logs to retrieve"),
+    user: dict = Depends(require_super_admin)
+):
+    """
+    Get auto-refresh logs (super admin only)
+    """
+    try:
+        logs = await db.auto_refresh_logs.find().sort("timestamp", -1).limit(limit).to_list(limit)
+        
+        # Clean _id field
+        for log in logs:
+            if '_id' in log:
+                del log['_id']
+        
+        return {
+            "logs": logs,
+            "count": len(logs)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching auto-refresh logs: {str(e)}")
+
 @api_router.post("/data/refresh-google-sheet")
 async def refresh_google_sheet(
     view_id: str = Query(None, description="View ID to refresh data for"),
