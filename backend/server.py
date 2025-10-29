@@ -396,6 +396,125 @@ app = FastAPI(title="Sales Analytics Dashboard", description="Weekly Sales Repor
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Initialize scheduler for auto-refresh
+scheduler = AsyncIOScheduler()
+
+async def auto_refresh_all_views():
+    """
+    Auto-refresh Google Sheets data for all views (scheduled task)
+    Runs twice daily at 12:00 and 20:00 Europe/Paris time
+    """
+    try:
+        print(f"🔄 [AUTO-REFRESH] Started at {datetime.now(timezone.utc).isoformat()}")
+        
+        # Get all views that have Google Sheets data
+        metadata_docs = await db.data_metadata.find({"type": "last_update", "source_type": "google_sheets"}).to_list(100)
+        
+        if not metadata_docs:
+            print("⚠️ [AUTO-REFRESH] No views with Google Sheets found")
+            return
+        
+        success_count = 0
+        error_count = 0
+        
+        for metadata in metadata_docs:
+            view_id = metadata.get("view_id", "organic")
+            sheet_url = metadata.get("source_url")
+            sheet_name = metadata.get("sheet_name")
+            collection_name = metadata.get("collection", "sales_records")
+            
+            try:
+                print(f"  📊 Refreshing view: {view_id} (collection: {collection_name})")
+                
+                # Read fresh data from Google Sheet
+                df = read_google_sheet(sheet_url, sheet_name)
+                
+                if df.empty:
+                    print(f"    ⚠️ Google Sheet is empty for {view_id}")
+                    continue
+                
+                # Clean column names
+                df.columns = df.columns.str.lower().str.replace(' ', '_').str.replace('/', '_')
+                
+                # Process records
+                records = []
+                valid_records = 0
+                
+                for _, row in df.iterrows():
+                    if pd.isna(row.get('client')) or str(row.get('client')).strip() == '':
+                        continue
+                    
+                    try:
+                        record = SalesRecord(
+                            month=str(row.get('month', '')) if not pd.isna(row.get('month')) else None,
+                            discovery_date=clean_date(row.get('discovery_date')),
+                            client=str(row.get('client', '')).strip(),
+                            hubspot_link=str(row.get('hubspot_link', '')) if not pd.isna(row.get('hubspot_link')) else None,
+                            stage=str(row.get('stage', '')) if not pd.isna(row.get('stage')) else None,
+                            relevance=str(row.get('relevance', '')) if not pd.isna(row.get('relevance')) else None,
+                            show_noshow=str(row.get('show_nowshow', '')) if not pd.isna(row.get('show_nowshow')) else None,
+                            poa_date=clean_date(row.get('poa_date')),
+                            expected_mrr=clean_monetary_value(row.get('expected_mrr')),
+                            expected_arr=clean_monetary_value(row.get('expected_arr')),
+                            pipeline=clean_monetary_value(row.get('pipeline')),
+                            type_of_deal=str(row.get('type_of_deal', '')) if not pd.isna(row.get('type_of_deal')) else None,
+                            bdr=str(row.get('bdr', '')) if not pd.isna(row.get('bdr')) else None,
+                            type_of_source=str(row.get('type_of_source', '')) if not pd.isna(row.get('type_of_source')) else None,
+                            product=str(row.get('product', '')) if not pd.isna(row.get('product')) else None,
+                            owner=str(row.get('owner', '')) if not pd.isna(row.get('owner')) else None,
+                            supporters=str(row.get('supporters', '')) if not pd.isna(row.get('supporters')) else None,
+                            billing_start=clean_date(row.get('billing_start'))
+                        )
+                        records.append(record.dict())
+                        valid_records += 1
+                    except Exception as e:
+                        continue
+                
+                # Update database
+                if records:
+                    await db[collection_name].delete_many({})
+                    await db[collection_name].insert_many(records)
+                    
+                    # Update metadata
+                    await db.data_metadata.update_one(
+                        {"type": "last_update", "view_id": view_id},
+                        {
+                            "$set": {
+                                "last_update": datetime.now(timezone.utc),
+                                "records_count": valid_records,
+                                "last_auto_refresh": datetime.now(timezone.utc)
+                            }
+                        }
+                    )
+                    
+                    print(f"    ✅ Refreshed {valid_records} records for {view_id}")
+                    success_count += 1
+                else:
+                    print(f"    ⚠️ No valid records found for {view_id}")
+                    error_count += 1
+                    
+            except Exception as e:
+                print(f"    ❌ Error refreshing {view_id}: {str(e)}")
+                error_count += 1
+        
+        print(f"🎉 [AUTO-REFRESH] Completed: {success_count} success, {error_count} errors")
+        
+        # Log to database
+        await db.auto_refresh_logs.insert_one({
+            "timestamp": datetime.now(timezone.utc),
+            "success_count": success_count,
+            "error_count": error_count,
+            "views_processed": len(metadata_docs)
+        })
+        
+    except Exception as e:
+        print(f"❌ [AUTO-REFRESH] Fatal error: {str(e)}")
+        await db.auto_refresh_logs.insert_one({
+            "timestamp": datetime.now(timezone.utc),
+            "error": str(e),
+            "status": "failed"
+        })
+
 # Pydantic Models
 class SalesRecord(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
