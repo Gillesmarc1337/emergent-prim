@@ -21,6 +21,7 @@ ROLE_SUPER_ADMIN = "super_admin"
 AUTHORIZED_USERS = {
     "asher@primelis.com": ROLE_SUPER_ADMIN,  # Super admin
     "remi@primelis.com": ROLE_SUPER_ADMIN,
+    "francois@primelis.com": ROLE_SUPER_ADMIN,  # Super admin
     "demo@primelis.com": ROLE_VIEWER,  # Demo mode user
     # New multi-view users
     "oren@primelis.com": ROLE_VIEWER,  # Signal view
