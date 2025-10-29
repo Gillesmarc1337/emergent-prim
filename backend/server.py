@@ -4105,17 +4105,28 @@ async def get_data_status(view_id: str = Query(None)):
         raise HTTPException(status_code=500, detail=f"Error getting data status: {str(e)}")
 
 @api_router.post("/data/refresh-google-sheet")
-async def refresh_google_sheet():
-    """Refresh data from the last used Google Sheet"""   
+async def refresh_google_sheet(
+    view_id: str = Query(None, description="View ID to refresh data for"),
+    user: dict = Depends(get_current_user)
+):
+    """Refresh data from the last used Google Sheet for a specific view"""   
     try:
+        # Build metadata query with view_id
+        metadata_query = {"type": "last_update"}
+        if view_id:
+            metadata_query["view_id"] = view_id
+        else:
+            metadata_query["view_id"] = "organic"  # Default to Organic
+        
         # Get last Google Sheet URL from metadata
-        last_update_info = await db.data_metadata.find_one({"type": "last_update"})
+        last_update_info = await db.data_metadata.find_one(metadata_query)
         
         if not last_update_info or last_update_info.get("source_type") != "google_sheets":
-            raise HTTPException(status_code=400, detail="No Google Sheet source found. Please upload via Google Sheets first.")
+            raise HTTPException(status_code=400, detail=f"No Google Sheet source found for this view. Please upload via Google Sheets first.")
         
         sheet_url = last_update_info.get("source_url")
         sheet_name = last_update_info.get("sheet_name")
+        collection_name = last_update_info.get("collection", "sales_records")
         
         if not sheet_url:
             raise HTTPException(status_code=400, detail="No Google Sheet URL found in metadata.")
