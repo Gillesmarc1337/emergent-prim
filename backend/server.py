@@ -4174,31 +4174,32 @@ async def refresh_google_sheet(
                 print(f"Error processing row: {str(e)}")
                 continue
         
-        # Replace existing data
+        # Replace existing data in correct collection
         if records:
-            await db.sales_records.delete_many({})
-            await db.sales_records.insert_many(records)
+            await db[collection_name].delete_many({})
+            await db[collection_name].insert_many(records)
             
-            # Update metadata
+            # Update metadata for this specific view
             await db.data_metadata.update_one(
-                {"type": "last_update"},
+                {"type": "last_update", "view_id": view_id if view_id else "organic"},
                 {
                     "$set": {
-                        "last_update": datetime.utcnow(),
+                        "last_update": datetime.now(timezone.utc),
                         "source_type": "google_sheets",
                         "source_url": sheet_url,
                         "sheet_name": sheet_name,
-                        "records_count": valid_records
+                        "records_count": valid_records,
+                        "collection": collection_name
                     }
                 },
                 upsert=True
             )
         
         return {
-            "message": f"Successfully refreshed {valid_records} sales records from Google Sheet",
+            "message": f"Successfully refreshed {valid_records} sales records from Google Sheet for {collection_name}",
             "records_processed": len(df),
             "records_valid": valid_records,
-            "last_update": datetime.utcnow().isoformat()
+            "last_update": datetime.now(timezone.utc).isoformat()
         }
         
     except Exception as e:
