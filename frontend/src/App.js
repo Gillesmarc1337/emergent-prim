@@ -1481,18 +1481,19 @@ function Dashboard() {
     }
   };
 
-  // Apply Asher's POV (load his Master preferences and apply to current view's deals)
+  // Apply Asher's POV (load his preferences for CURRENT view)
   const applyAsherPOV = async () => {
     try {
-      // Load Asher's preferences from Master view
+      // Load Asher's preferences for CURRENT view
       const asherPrefs = await loadAsherProjectionsPreferences();
       
       if (!asherPrefs) {
-        alert('⚠️ Asher has not saved preferences on Master yet.');
+        const viewName = currentView?.name || 'this view';
+        alert(`⚠️ Asher has not saved preferences on ${viewName} yet.`);
         return;
       }
       
-      // Reload fresh data from CURRENT view (Organic, Signal, Master, etc.)
+      // Reload fresh data from CURRENT view
       const viewParam = currentView?.id ? `?view_id=${currentView.id}` : '';
       const [hotDealsResponse, hotLeadsResponse] = await Promise.all([
         axios.get(`${API}/projections/hot-deals${viewParam}`),
@@ -1517,25 +1518,17 @@ function Dashboard() {
         })()
       }));
       
-      // Apply Asher's Master organization to current view's deals
+      // Apply Asher's organization for THIS view
       const reconstructedDeals = [];
       const hiddenSet = new Set();
       const deletedSet = new Set();
       const probabilities = {};
-      
-      // Build a map of current view's deal IDs for quick lookup
-      const currentViewDealIds = new Set(dealsWithColumns.map(d => d.id));
       
       ['next14', 'next30', 'next60', 'delayed'].forEach(columnKey => {
         const savedColumn = asherPrefs[columnKey] || [];
         savedColumn.sort((a, b) => (a.order || 0) - (b.order || 0));
         
         savedColumn.forEach(savedDeal => {
-          // Only apply to deals that exist in current view
-          if (!currentViewDealIds.has(savedDeal.id)) {
-            return; // Skip deals not in current view (e.g., if on Organic, skip non-Organic deals)
-          }
-          
           if (savedDeal.deleted) {
             deletedSet.add(savedDeal.id);
             return;
@@ -1543,7 +1536,7 @@ function Dashboard() {
           
           const dealData = dealsWithColumns.find(d => d.id === savedDeal.id);
           if (dealData) {
-            dealData.column = columnKey; // Apply Asher's column assignment
+            dealData.column = columnKey;
             reconstructedDeals.push(dealData);
             if (savedDeal.hidden) {
               hiddenSet.add(savedDeal.id);
@@ -1555,7 +1548,7 @@ function Dashboard() {
         });
       });
       
-      // Add any new deals in current view that weren't in Asher's Master preferences
+      // Add any new deals that weren't in Asher's preferences
       dealsWithColumns.forEach(deal => {
         if (!reconstructedDeals.find(d => d.id === deal.id) && !deletedSet.has(deal.id)) {
           reconstructedDeals.push(deal);
@@ -1569,8 +1562,8 @@ function Dashboard() {
       setHasUnsavedChanges(false);
       
       const viewName = currentView?.name || 'current view';
-      console.log(`👁️ Applied Asher's Master POV to ${viewName}: ${reconstructedDeals.length} deals, ${deletedSet.size} deleted, ${hiddenSet.size} hidden`);
-      alert(`👁️ Asher's POV applied to ${viewName} successfully!`);
+      console.log(`👁️ Applied Asher's POV for ${viewName}: ${reconstructedDeals.length} deals, ${deletedSet.size} deleted, ${hiddenSet.size} hidden`);
+      alert(`👁️ Asher's POV applied for ${viewName} successfully!`);
       
     } catch (error) {
       console.error('Error applying Asher\'s POV:', error);
