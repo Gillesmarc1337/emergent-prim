@@ -1834,17 +1834,18 @@ function Dashboard() {
     }
   };
 
-  // Reset board to original state
+  // Reset board to original state (reload fresh data from server)
   const handleResetBoard = async () => {
-    if (window.confirm('⚠️ Are you sure you want to reset all changes? This will restore the default board state and clear all deletions.')) {
+    if (window.confirm('⚠️ Are you sure you want to reset all changes? This will restore all deals and clear all deletions, hidden cards, and custom %.')) {
       try {
+        // Delete user preferences from backend
         await resetProjectionsPreferences();
-        setHotDeals(JSON.parse(JSON.stringify(originalHotDeals))); // Deep copy
-        setHiddenDeals(new Set()); // Clear hidden deals
-        setDeletedDeals(new Set()); // Clear deleted deals
-        setDealProbabilities({}); // Clear custom probabilities
+        
+        // Reload fresh data from server (this will restore ALL deals including deleted ones)
+        await loadProjectionsData();
+        
         setHasUnsavedChanges(false);
-        alert('✅ Board reset to default state!');
+        alert('✅ Board reset to default state! All deals restored.');
       } catch (error) {
         console.error('Error resetting board:', error);
         alert('❌ Failed to reset board. Please try again.');
