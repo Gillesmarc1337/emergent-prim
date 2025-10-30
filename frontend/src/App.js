@@ -1849,14 +1849,44 @@ function Dashboard() {
   const handleResetBoard = async () => {
     if (window.confirm('⚠️ Are you sure you want to reset all changes? This will restore all deals and clear all deletions, hidden cards, and custom %.')) {
       try {
-        // Delete user preferences from backend
+        // Delete user preferences from backend first
         await resetProjectionsPreferences();
         
-        // Reload fresh data from server (this will restore ALL deals including deleted ones)
-        await loadProjectionsData();
+        // Force reload fresh default data (bypass any cached preferences)
+        const viewParam = currentView?.id ? `?view_id=${currentView.id}` : '';
+        const [hotDealsResponse, hotLeadsResponse] = await Promise.all([
+          axios.get(`${API}/projections/hot-deals${viewParam}`),
+          axios.get(`${API}/projections/hot-leads${viewParam}`)
+        ]);
         
+        const combinedDeals = [
+          ...hotDealsResponse.data.map(deal => ({...deal, source: 'hot-deals'})),
+          ...hotLeadsResponse.data.map(lead => ({...lead, source: 'hot-leads'}))
+        ];
+        
+        const dealsWithColumns = combinedDeals.map((deal, index) => ({
+          ...deal,
+          client: deal.client || deal.company || deal.lead_name || `Deal ${index + 1}`,
+          pipeline: deal.pipeline || deal.expected_arr || deal.value || 0,
+          owner: deal.owner || deal.ae || 'TBD',
+          column: deal.column || (() => {
+            if (deal.stage === 'B Legals') return 'next14';
+            if (deal.stage === 'C Proposal sent') return 'next30';
+            if (deal.stage === 'D POA Booked') return 'next60';
+            return index % 3 === 0 ? 'next14' : index % 3 === 1 ? 'next30' : 'next60';
+          })()
+        }));
+        
+        // Set to pure default state (no preferences applied)
+        setHotDeals(dealsWithColumns);
+        setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns)));
+        setHiddenDeals(new Set());
+        setDeletedDeals(new Set());
+        setDealProbabilities({});
         setHasUnsavedChanges(false);
-        setHasSavedPreferences(false); // User is now in default state
+        setHasSavedPreferences(false);
+        
+        console.log('✅ Board reset to pure default state');
         alert('✅ Board reset to default state! All deals restored.');
       } catch (error) {
         console.error('Error resetting board:', error);
