@@ -1856,6 +1856,7 @@ function Dashboard() {
         await loadProjectionsData();
         
         setHasUnsavedChanges(false);
+        setHasSavedPreferences(false); // User is now in default state
         alert('✅ Board reset to default state! All deals restored.');
       } catch (error) {
         console.error('Error resetting board:', error);
