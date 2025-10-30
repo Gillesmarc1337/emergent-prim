@@ -3272,6 +3272,10 @@ function Dashboard() {
                                           <span className="font-semibold">{formatDate(deal.stage_date)}</span>
                                         </div>
                                         <div className="flex justify-between">
+                                          <span className="font-medium">🔍 Discovery:</span>
+                                          <span className="font-semibold">{formatDate(deal.created_date)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
                                           <span className="font-medium">👤 AE:</span>
                                           <span className="font-semibold">{deal.ae}</span>
                                         </div>
