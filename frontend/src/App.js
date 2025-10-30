@@ -1837,6 +1837,7 @@ function Dashboard() {
       await saveProjectionsPreferences(hotDeals, hiddenDeals, deletedDeals);
       setOriginalHotDeals(JSON.parse(JSON.stringify(hotDeals))); // Update original to current
       setHasUnsavedChanges(false);
+      setHasSavedPreferences(true); // Mark that user now has saved preferences
       alert('💾 Board state saved successfully! (including deleted deals)');
     } catch (error) {
       console.error('Error saving board state:', error);
