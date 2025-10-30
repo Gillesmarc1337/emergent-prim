@@ -1112,7 +1112,7 @@ def calculate_meetings_attended(df, start_date, end_date, view_targets=None):
             'months': [m.strftime('%b %Y') for m in sorted(period_data.groupby(period_data['discovery_date'].dt.to_period('M')).groups.keys())],
             'attended': [int(len(period_data[(period_data['discovery_date'].dt.to_period('M') == m) & (~period_data['stage'].isin(['F Inbox'])) & (~period_data['show_noshow'].isin(['Noshow']))])) for m in sorted(period_data.groupby(period_data['discovery_date'].dt.to_period('M')).groups.keys())],
             'poa_generated': [int(len(period_data[(period_data['discovery_date'].dt.to_period('M') == m) & (period_data['stage'].isin(['B Legals', 'Legal', 'C Proposal sent', 'Proposal sent', 'D POA Booked', 'POA Booked', 'Closed Won', 'Won', 'Signed', 'A Closed', 'Lost']))])) for m in sorted(period_data.groupby(period_data['discovery_date'].dt.to_period('M')).groups.keys())],
-            'deals_closed': [int(len(period_data[(period_data['discovery_date'].dt.to_period('M') == m) & (period_data['stage'].isin(['Closed Won', 'Won', 'Signed', 'A Closed']))])) for m in sorted(period_data.groupby(period_data['discovery_date'].dt.to_period('M')).groups.keys())]
+            'deals_closed': [int(len(period_data[(period_data['discovery_date'].dt.to_period('M') == m) & (period_data['stage'] == 'A Closed')])) for m in sorted(period_data.groupby(period_data['discovery_date'].dt.to_period('M')).groups.keys())]
         },
         'on_track': bool(attended_count >= 40 and deals_closed_count >= 15)
     }
