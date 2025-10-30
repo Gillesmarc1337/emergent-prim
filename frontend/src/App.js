@@ -1460,9 +1460,14 @@ function Dashboard() {
 
   // Load Asher's projections preferences from CURRENT view (for "Asher POV" feature)
   const loadAsherProjectionsPreferences = async () => {
-    if (!currentView?.id) return null;
+    if (!currentView?.id) {
+      console.error('❌ currentView is null or missing id');
+      return null;
+    }
     
     try {
+      console.log(`🔍 Loading Asher preferences for view: ${currentView.name} (ID: ${currentView.id})`);
+      
       // Load from CURRENT view (Asher can organize each view separately)
       const response = await axios.get(`${API}/user/projections-preferences/asher`, {
         params: { view_id: currentView.id },
@@ -1477,6 +1482,7 @@ function Dashboard() {
       return null;
     } catch (error) {
       console.error('Error loading Asher\'s preferences:', error);
+      console.error('Error details:', error.response?.data || error.message);
       return null;
     }
   };
