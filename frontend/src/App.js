@@ -1248,6 +1248,7 @@ function Dashboard() {
   const [loadingProjections, setLoadingProjections] = useState(false);
   const [selectedAE, setSelectedAE] = useState('all'); // Filter by AE
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [hasSavedPreferences, setHasSavedPreferences] = useState(false); // Track if user has saved preferences in DB
   const [dealProbabilities, setDealProbabilities] = useState({}); // Store probability for each deal {dealId: probability}
   
   // State for Upsell & Renew tab
