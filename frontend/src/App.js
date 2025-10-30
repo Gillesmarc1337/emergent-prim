@@ -1755,6 +1755,7 @@ function Dashboard() {
           setHiddenDeals(hiddenSet);
           setDeletedDeals(deletedSet);
           setDealProbabilities(probabilities);
+          setHasSavedPreferences(true); // User has saved preferences
           setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns.filter(d => !deletedSet.has(d.id))))); // Keep original for reset (excluding deleted)
           console.log('✅ Applied saved projections preferences with order, deleted filter, and probabilities');
           console.log(`   Deleted ${deletedSet.size} deals permanently`);
@@ -1765,12 +1766,14 @@ function Dashboard() {
           setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns)));
           setHiddenDeals(new Set());
           setDeletedDeals(new Set());
+          setHasSavedPreferences(false);
         }
       } else {
         setHotDeals(dealsWithColumns);
         setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns))); // Deep copy for reset
         setHiddenDeals(new Set());
         setDeletedDeals(new Set());
+        setHasSavedPreferences(false); // No saved preferences = default state
       }
       
       setHotLeads(hotLeadsResponse.data);
