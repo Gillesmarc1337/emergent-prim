@@ -1458,23 +1458,22 @@ function Dashboard() {
     }
   };
 
-  // Load Asher's projections preferences from Master view (for "Asher POV" feature)
+  // Load Asher's projections preferences from CURRENT view (for "Asher POV" feature)
   const loadAsherProjectionsPreferences = async () => {
+    if (!currentView?.id) return null;
+    
     try {
-      // Always load from Master view (Asher organizes everything in Master)
-      const masterView = views.find(v => v.name === 'Master');
-      const viewIdToLoad = masterView?.id || 'view-master-default';
-      
+      // Load from CURRENT view (Asher can organize each view separately)
       const response = await axios.get(`${API}/user/projections-preferences/asher`, {
-        params: { view_id: viewIdToLoad },
+        params: { view_id: currentView.id },
         withCredentials: true
       });
       
       if (response.data.has_preferences) {
-        console.log('👁️ Loaded Asher\'s projections preferences from Master:', response.data);
+        console.log(`👁️ Loaded Asher's projections preferences from ${currentView.name}:`, response.data);
         return response.data.preferences;
       }
-      console.log('⚠️ Asher has not saved preferences on Master yet:', response.data.message);
+      console.log(`⚠️ Asher has not saved preferences on ${currentView.name} yet:`, response.data.message);
       return null;
     } catch (error) {
       console.error('Error loading Asher\'s preferences:', error);
