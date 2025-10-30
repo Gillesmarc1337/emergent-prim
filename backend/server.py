@@ -993,9 +993,15 @@ def calculate_meetings_attended(df, start_date, end_date, view_targets=None):
                            'Closed Won', 'Won', 'Signed', 'Closed Lost', 'Lost', 'I Lost']
     poa_generated = period_data[period_data['stage'].isin(poa_generated_stages)]
     
-    # Deals Closed = A Closed stage only (as per user requirement)
+    # Deals Closed = A Closed stage only, filtered by billing_start date (like calculate_deals_closed)
     deals_closed_stages = ['A Closed']
-    deals_closed = period_data[period_data['stage'].isin(deals_closed_stages)]
+    deals_closed = df[
+        (df['stage'].isin(deals_closed_stages)) &
+        (df['billing_start'] >= start_date) &
+        (df['billing_start'] <= end_date) &
+        (df['expected_arr'].notna()) &
+        (df['expected_arr'] > 0)
+    ]
     
     # AE level performance with corrected calculations
     ae_stats = []
