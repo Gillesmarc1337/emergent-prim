@@ -4302,6 +4302,16 @@ async def refresh_google_sheet(
         # Clean column names
         df.columns = df.columns.str.lower().str.replace(' ', '_').str.replace('/', '_')
         
+        # Debug: Print column names
+        print(f"📊 Columns loaded from Google Sheet: {list(df.columns)}")
+        
+        # Debug: Check if poa_date column exists and has data
+        if 'poa_date' in df.columns:
+            non_null_count = df['poa_date'].notna().sum()
+            print(f"✅ poa_date column found! Non-null values: {non_null_count}/{len(df)}")
+        else:
+            print(f"❌ poa_date column NOT found! Available columns: {list(df.columns)}")
+        
         for _, row in df.iterrows():
             # Skip empty or summary rows
             if pd.isna(row.get('client')) or str(row.get('client')).strip() == '':
