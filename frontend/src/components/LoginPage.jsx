@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 function LoginPage() {
-  const { user, login, loginDemo } = useAuth();
+  const { user, login } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [loadingDemo, setLoadingDemo] = useState(false);
   const [hoveredButton, setHoveredButton] = useState(null);
 
   // Check for session_id in URL fragment on mount
