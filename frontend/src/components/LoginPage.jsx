@@ -38,17 +38,6 @@ function LoginPage() {
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
-  const handleDemoAccess = async () => {
-    setLoadingDemo(true);
-    try {
-      await loginDemo();
-    } catch (err) {
-      alert('Demo login failed. Please try again.');
-    } finally {
-      setLoadingDemo(false);
-    }
-  };
-
   // If already logged in, don't show login page
   if (user) {
     return null;
