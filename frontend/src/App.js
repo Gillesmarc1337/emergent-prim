@@ -3260,7 +3260,9 @@ function Dashboard() {
                                       <div className="text-xs text-gray-700 dark:text-slate-300 space-y-1">
                                         <div className="flex justify-between">
                                           <span className="font-medium">📅 POA:</span>
-                                          <span className="font-semibold">{formatDate(deal.stage_date)}</span>
+                                          <span className="font-semibold">
+                                            {deal.stage_date ? formatDate(deal.stage_date) : 'Not Booked Yet'}
+                                          </span>
                                         </div>
                                         <div className="flex justify-between">
                                           <span className="font-medium">🔍 Discovery:</span>
