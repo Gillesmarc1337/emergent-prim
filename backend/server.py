@@ -917,7 +917,8 @@ def calculate_meeting_generation(df, start_date, end_date, view_targets=None):
             'relevance': str(row.get('relevance', 'N/A')),
             'owner': str(row.get('owner', 'N/A')),  # AE owner
             'stage': str(row.get('stage', 'N/A')),  # Deal stage
-            'expected_arr': float(row.get('expected_arr', 0))  # Column K - Expected ARR
+            'expected_arr': float(row.get('expected_arr', 0)),  # Column K - Expected ARR
+            'poa_date': row['poa_date'].strftime('%Y-%m-%d') if pd.notna(row.get('poa_date')) else None  # Column H - POA Date
         })
     
     return {
