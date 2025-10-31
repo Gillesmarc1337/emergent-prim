@@ -570,6 +570,18 @@ frontend:
           agent: "testing"
           comment: "✅ MONTHLY AVERAGE CALCULATION CORRECTED - PERFECT IMPLEMENTATION: Conducted comprehensive re-testing of the corrected Monthly Average calculation for 'New Pipe Created' and 'Created Weighted Pipe' cards as requested in review. VERIFIED RESULTS: 1) NEW PIPE CREATED - ✅ CONSISTENT MONTHLY TARGET: Monthly view shows '📊 Monthly Avg: 2,000,000 $ (1 month)', July-Dec view shows '📊 Monthly Avg: 2,000,000 $ (6 months)' - monthly average is CONSISTENT at 2M regardless of period (represents monthly target rate). 2) CREATED WEIGHTED PIPE - ✅ CONSISTENT MONTHLY TARGET: Monthly view shows '📊 Monthly Avg: 800,000 $ (1 month)', July-Dec view shows '📊 Monthly Avg: 800,000 $ (6 months)' - monthly average is CONSISTENT at 800K regardless of period (represents monthly target rate). 3) PERIOD INDICATORS - ✅ CORRECT: Monthly view displays '(1 month)', July-Dec view displays '(6 months)'. 4) FORMULA VERIFICATION - ✅ WORKING: monthlyAverage = target / periodMonths is correctly implemented. The monthly average now shows the MONTHLY TARGET (target ÷ period months) not the actual value average, exactly as specified in requirements. All 4 tests passed (4/4) - Monthly Average calculation is working perfectly and meets all review requirements."
 
+  - task: "Fix POA Date display in Deal Pipeline Board - Advanced Stages"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ POA DATE DISPLAY FIX IMPLEMENTED: Fixed date display issue in 'Deal Pipeline Board — Advanced Stages' (Meetings Attended tab). ISSUE IDENTIFIED: Frontend was incorrectly handling poa_date field - Line 3182 fell back to discovery_date when poa_date was NULL (should show 'Not Booked Yet'), Line 3197 used non-existent proposal_date field (should use poa_date). BACKEND VERIFICATION: Backend is correctly reading poa_date from Google Sheet Column H - 61/157 records (38.9%) have poa_date, 96/157 records (61.1%) have NULL poa_date (Column H empty in Google Sheet). THE FIX: Changed both lines 3182 and 3197 to use stage_date: meeting.poa_date (removed fallback to discovery_date and fixed field reference). RESULT: POA Booked cards now show 'Not Booked Yet' when poa_date is NULL, Proposal Sent cards show 'Not Sent Yet' when poa_date is NULL. Discovery date remains visible separately on all cards. Both columns now correctly use Column H data (poa_date) as specified in requirements. Ready for frontend testing to verify fix displays correctly in UI."
+
   - task: "Projections Board Save/Reset User Preferences"
     implemented: true
     working: true
