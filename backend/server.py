@@ -4328,6 +4328,12 @@ async def refresh_google_sheet(
                 continue
                 
             try:
+                # Debug poa_date for first 3 records
+                if processed_count < 3:
+                    raw_poa = row.get('poa_date')
+                    cleaned_poa = clean_date(raw_poa)
+                    print(f"🔍 Record {processed_count + 1} - Client: {row.get('client')}, Raw poa_date: {raw_poa}, Cleaned: {cleaned_poa}")
+                
                 record = SalesRecord(
                     month=str(row.get('month', '')) if not pd.isna(row.get('month')) else None,
                     discovery_date=clean_date(row.get('discovery_date')),
