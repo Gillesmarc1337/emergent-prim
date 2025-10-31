@@ -117,7 +117,7 @@ function LoginPage() {
             {/* Secure Login */}
             <button
               onClick={handleSecuredAccess}
-              disabled={loading || loadingDemo}
+              disabled={loading}
               onMouseEnter={() => setHoveredButton('secure')}
               onMouseLeave={() => setHoveredButton(null)}
               className="w-full group bg-slate-900 hover:bg-slate-800 dark:bg-[#24272e] dark:hover:bg-[#2a2d35] text-white font-medium py-3 sm:py-4 px-4 sm:px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
@@ -132,34 +132,6 @@ function LoginPage() {
                 </div>
                 {hoveredButton === 'secure' && (
                   <span className="text-red-500 animate-pulse hidden sm:inline">⚔️</span>
-                )}
-              </div>
-            </button>
-
-            <div className="flex items-center gap-3 text-slate-400 dark:text-slate-500 text-sm py-2">
-              <div className="flex-1 h-px bg-slate-300 dark:bg-[#2a2d35]"></div>
-              <span className="text-xs">or</span>
-              <div className="flex-1 h-px bg-slate-300 dark:bg-[#2a2d35]"></div>
-            </div>
-
-            {/* Demo Mode */}
-            <button
-              onClick={handleDemoAccess}
-              disabled={loading || loadingDemo}
-              onMouseEnter={() => setHoveredButton('demo')}
-              onMouseLeave={() => setHoveredButton(null)}
-              className="w-full group bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 dark:from-[#d97706] dark:to-[#ea580c] dark:hover:from-[#b45309] dark:hover:to-[#c2410c] text-white font-medium py-3 sm:py-4 px-4 sm:px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <span className="text-xl sm:text-2xl">🏴‍☠️</span>
-                  <div className="text-left">
-                    <div className="font-semibold text-sm sm:text-base">Demo Voyage</div>
-                    <div className="text-xs text-amber-100 hidden sm:block">No authentication • 24h session</div>
-                  </div>
-                </div>
-                {hoveredButton === 'demo' && (
-                  <span className="text-yellow-300 animate-pulse hidden sm:inline">💰</span>
                 )}
               </div>
             </button>
