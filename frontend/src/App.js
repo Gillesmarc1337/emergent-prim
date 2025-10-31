@@ -3179,7 +3179,7 @@ function Dashboard() {
                         stage: meeting.stage,
                         ae: meeting.owner || 'Unassigned',
                         created_date: meeting.discovery_date,
-                        stage_date: meeting.poa_date || meeting.discovery_date,
+                        stage_date: meeting.poa_date,
                         days_old: calculateDaysOld(meeting.discovery_date)
                       }))
                       .sort((a, b) => b.pipeline - a.pipeline);
@@ -3194,7 +3194,7 @@ function Dashboard() {
                         stage: meeting.stage,
                         ae: meeting.owner || 'Unassigned',
                         created_date: meeting.discovery_date,
-                        stage_date: meeting.proposal_date || meeting.discovery_date,
+                        stage_date: meeting.poa_date,
                         days_old: calculateDaysOld(meeting.discovery_date)
                       }))
                       .sort((a, b) => b.pipeline - a.pipeline);
