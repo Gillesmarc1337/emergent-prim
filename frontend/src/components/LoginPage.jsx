@@ -149,7 +149,7 @@ function LoginPage() {
         </div>
 
         {/* Loading Indicator */}
-        {(loading || loadingDemo) && (
+        {loading && (
           <div className="mt-6 sm:mt-8 text-center">
             <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white/90 dark:bg-[#1e2128]/90 backdrop-blur rounded-full shadow-lg">
               <div className="flex gap-1">
