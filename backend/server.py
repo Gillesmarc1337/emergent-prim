@@ -4315,10 +4315,14 @@ async def refresh_google_sheet(
         if 'poa_date' in df.columns:
             non_null_count = df['poa_date'].notna().sum()
             print(f"✅ poa_date column found! Non-null values: {non_null_count}/{len(df)}")
+            # Show first 5 non-null values
+            sample_values = df[df['poa_date'].notna()]['poa_date'].head(5).tolist()
+            print(f"📋 Sample poa_date values from sheet: {sample_values}")
         else:
             print(f"❌ poa_date column NOT found! Available columns: {list(df.columns)}")
         
-        for _, row in df.iterrows():
+        processed_count = 0
+        for idx, row in df.iterrows():
             # Skip empty or summary rows
             if pd.isna(row.get('client')) or str(row.get('client')).strip() == '':
                 continue
