@@ -608,16 +608,16 @@ function DataManagementSection({ onDataUpdated, currentView }) {
             <Sheet className="h-5 w-5" />
             Data Management
           </CardTitle>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {dataStatus.source_type === 'google_sheets' && (
-              <Button onClick={handleRefreshGoogleSheet} disabled={isRefreshing} size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                {isRefreshing ? 'Refreshing...' : 'Refresh Sheet'}
+              <Button onClick={handleRefreshGoogleSheet} disabled={isRefreshing} size="sm" className="text-xs sm:text-sm">
+                <Download className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">{isRefreshing ? 'Refreshing...' : 'Refresh Sheet'}</span>
               </Button>
             )}
-            <Button onClick={() => setShowUpload(!showUpload)} variant="outline" size="sm">
-              <Upload className="h-4 w-4 mr-2" />
-              {showUpload ? 'Hide Upload' : 'Upload New Data'}
+            <Button onClick={() => setShowUpload(!showUpload)} variant="outline" size="sm" className="text-xs sm:text-sm">
+              <Upload className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">{showUpload ? 'Hide Upload' : 'Upload New Data'}</span>
             </Button>
           </div>
         </div>
