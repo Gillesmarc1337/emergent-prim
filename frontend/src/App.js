@@ -2176,13 +2176,13 @@ function Dashboard() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-          <TabsTrigger value="meetings">Meetings Generation</TabsTrigger>
-          <TabsTrigger value="attended">Meetings Attended</TabsTrigger>
-          <TabsTrigger value="upsell">Upsell & Renew</TabsTrigger>
-          <TabsTrigger value="deals">Deals & Pipeline</TabsTrigger>
-          <TabsTrigger value="projections">Projections</TabsTrigger>
+        <TabsList className="w-full flex overflow-x-auto overflow-y-hidden scrollbar-hide">
+          <TabsTrigger value="dashboard" className="flex-shrink-0">Dashboard</TabsTrigger>
+          <TabsTrigger value="meetings" className="flex-shrink-0 whitespace-nowrap">Meetings Generation</TabsTrigger>
+          <TabsTrigger value="attended" className="flex-shrink-0 whitespace-nowrap">Meetings Attended</TabsTrigger>
+          <TabsTrigger value="upsell" className="flex-shrink-0 whitespace-nowrap">Upsell & Renew</TabsTrigger>
+          <TabsTrigger value="deals" className="flex-shrink-0 whitespace-nowrap">Deals & Pipeline</TabsTrigger>
+          <TabsTrigger value="projections" className="flex-shrink-0">Projections</TabsTrigger>
         </TabsList>
 
         {/* Main Dashboard */}
