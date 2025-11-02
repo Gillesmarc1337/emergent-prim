@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Button } from './ui/button';
-import { LogOut, User, Eye, Settings, Users, ChevronDown, Moon, Sun } from 'lucide-react';
+import { LogOut, User, Eye, Settings, Users, ChevronDown, Moon, Sun, Menu, X } from 'lucide-react';
 import {
   Select,
   SelectContent,
