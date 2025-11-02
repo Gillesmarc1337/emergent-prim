@@ -60,12 +60,12 @@ const Header = () => {
             <img 
               src="/primelis-logo.jpg" 
               alt="Primelis Logo" 
-              className="h-10 w-auto object-contain"
+              className="h-8 sm:h-10 w-auto object-contain"
             />
           </div>
 
-          {/* Right side - Theme toggle, User info, View selector, Actions */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          {/* Desktop view - Right side */}
+          <div className="hidden lg:flex items-center gap-2 xl:gap-4">
             {/* Theme Toggle */}
             <Button
               variant="ghost"
@@ -75,35 +75,32 @@ const Header = () => {
               title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
             >
               {isDarkMode ? (
-                <Sun className="h-5 w-5 text-amber-500 rotate-0 scale-100 transition-all" />
+                <Sun className="h-5 w-5 text-amber-500" />
               ) : (
-                <Moon className="h-5 w-5 text-slate-700 rotate-0 scale-100 transition-all" />
+                <Moon className="h-5 w-5 text-slate-700" />
               )}
             </Button>
-            {/* View Selector - Always show if user is authenticated */}
-            {user && (
+
+            {/* View Selector */}
+            {user && views.length > 0 && (
               <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-gray-500" />
-                {views.length > 0 ? (
-                  <Select
-                    value={currentView?.id || ''}
-                    onValueChange={handleViewChange}
-                  >
-                    <SelectTrigger className="w-[200px]">
-                      <SelectValue placeholder="Select view" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {getSortedViews().map((view) => (
-                        <SelectItem key={view.id} value={view.id}>
-                          {view.name}
-                          {view.is_master && ' (Master)'}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <span className="text-sm text-gray-500">Loading views...</span>
-                )}
+                <Eye className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <Select
+                  value={currentView?.id || ''}
+                  onValueChange={handleViewChange}
+                >
+                  <SelectTrigger className="w-[160px] xl:w-[200px]">
+                    <SelectValue placeholder="Select view" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getSortedViews().map((view) => (
+                      <SelectItem key={view.id} value={view.id}>
+                        {view.name}
+                        {view.is_master && ' (Master)'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
 
@@ -111,28 +108,25 @@ const Header = () => {
             {user && (
               <Button
                 onClick={() => {
-                  // Clear all localStorage
                   localStorage.clear();
-                  // Clear session storage
                   sessionStorage.clear();
-                  // Reload the page to fetch fresh data
                   window.location.reload();
                 }}
                 variant="outline"
                 size="sm"
-                className="gap-2 text-blue-600 border-blue-300 hover:bg-blue-50"
+                className="gap-2 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950"
               >
-                🗑️ Clear Cache
+                🗑️ <span className="hidden xl:inline">Clear Cache</span>
               </Button>
             )}
 
-            {/* Admin Dropdown (super_admin only) */}
+            {/* Admin Dropdown */}
             {isAdmin && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2">
                     <Settings className="h-4 w-4" />
-                    Admin
+                    <span className="hidden xl:inline">Admin</span>
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -155,14 +149,14 @@ const Header = () => {
 
             {/* User Info */}
             {user && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
-                <User className="h-4 w-4 text-gray-500" />
+              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-[#24272e] rounded-lg">
+                <User className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                 <div className="text-sm">
-                  <div className="font-medium text-gray-900">
+                  <div className="font-medium text-gray-900 dark:text-white text-xs xl:text-sm">
                     {user.name || user.email}
                     {isDemo && <span className="ml-2 text-amber-600">(Demo)</span>}
                   </div>
-                  <div className="text-xs text-gray-500 capitalize">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                     {user.role?.replace('_', ' ') || 'User'}
                   </div>
                 </div>
@@ -177,10 +171,139 @@ const Header = () => {
               className="gap-2"
             >
               <LogOut className="h-4 w-4" />
-              Logout
+              <span className="hidden xl:inline">Logout</span>
+            </Button>
+          </div>
+
+          {/* Mobile view - Hamburger menu */}
+          <div className="flex lg:hidden items-center gap-2">
+            {/* Theme Toggle Mobile */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="w-9 h-9"
+            >
+              {isDarkMode ? (
+                <Sun className="h-5 w-5 text-amber-500" />
+              ) : (
+                <Moon className="h-5 w-5 text-slate-700" />
+              )}
+            </Button>
+
+            {/* Hamburger Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="w-9 h-9"
+            >
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </Button>
           </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden border-t border-gray-200 dark:border-[#2a2d35] py-4 space-y-3">
+            {/* View Selector Mobile */}
+            {user && views.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  View
+                </label>
+                <Select
+                  value={currentView?.id || ''}
+                  onValueChange={handleViewChange}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select view" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getSortedViews().map((view) => (
+                      <SelectItem key={view.id} value={view.id}>
+                        {view.name}
+                        {view.is_master && ' (Master)'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* User Info Mobile */}
+            {user && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-[#24272e] rounded-lg">
+                <User className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <div className="text-sm">
+                  <div className="font-medium text-gray-900 dark:text-white">
+                    {user.name || user.email}
+                    {isDemo && <span className="ml-2 text-amber-600">(Demo)</span>}
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                    {user.role?.replace('_', ' ') || 'User'}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Clear Cache Mobile */}
+            {user && (
+              <Button
+                onClick={() => {
+                  localStorage.clear();
+                  sessionStorage.clear();
+                  window.location.reload();
+                }}
+                variant="outline"
+                size="sm"
+                className="w-full gap-2 text-blue-600 dark:text-blue-400"
+              >
+                🗑️ Clear Cache
+              </Button>
+            )}
+
+            {/* Admin Links Mobile */}
+            {isAdmin && (
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Admin
+                </label>
+                <a 
+                  href="/admin/targets" 
+                  className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-[#24272e] rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-[#2a2d35]"
+                >
+                  <Settings className="h-4 w-4" />
+                  Targets Config
+                </a>
+                <a 
+                  href="/admin/users" 
+                  className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-[#24272e] rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-[#2a2d35]"
+                >
+                  <Users className="h-4 w-4" />
+                  User Management
+                </a>
+              </div>
+            )}
+
+            {/* Logout Mobile */}
+            <Button
+              onClick={logout}
+              variant="outline"
+              size="sm"
+              className="w-full gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
