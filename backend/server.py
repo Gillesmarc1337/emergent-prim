@@ -3852,12 +3852,13 @@ async def get_dashboard_analytics(view_id: str = Query(None)):
             target_revenue = monthly_targets_2025.get(month_str, 0)
             
             # Calculate actual closed revenue from sheet data (stage "A Closed" only)
+            # Use billing_start (column R) to determine which month the revenue belongs to
             closed_deals = df[
                 (df['stage'] == 'A Closed') &
-                (df['discovery_date'] >= month_start) & 
-                (df['discovery_date'] <= month_end) &
+                (df['billing_start'] >= month_start) & 
+                (df['billing_start'] <= month_end) &
                 (df['expected_arr'].notna()) & 
-                (df['expected_arr'] != 0)
+                (df['expected_arr'] > 0)
             ]
             closed_revenue = float(closed_deals['expected_arr'].fillna(0).sum())
             
