@@ -1683,8 +1683,22 @@ function Dashboard() {
         ...hotLeadsResponse.data.map(lead => ({...lead, source: 'hot-leads'}))
       ];
 
+      // Deduplicate deals based on client name + stage (same client in same stage = duplicate)
+      const seenDeals = new Map();
+      const uniqueDeals = combinedDeals.filter(deal => {
+        const dealKey = `${deal.client || deal.company || deal.lead_name}-${deal.stage}`;
+        if (seenDeals.has(dealKey)) {
+          console.log(`⚠️ Duplicate detected and removed: ${dealKey}`);
+          return false; // Skip duplicate
+        }
+        seenDeals.set(dealKey, true);
+        return true;
+      });
+      
+      console.log(`📊 Deals loaded: ${combinedDeals.length} total, ${uniqueDeals.length} unique (${combinedDeals.length - uniqueDeals.length} duplicates removed)`);
+
       // Assign columns based on deal stage for logical grouping
-      const dealsWithColumns = combinedDeals.map((deal, index) => ({
+      const dealsWithColumns = uniqueDeals.map((deal, index) => ({
         ...deal,
         // Ensure required fields have defaults
         client: deal.client || deal.company || deal.lead_name || `Deal ${index + 1}`,
