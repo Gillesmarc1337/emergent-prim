@@ -1568,6 +1568,7 @@ function Dashboard() {
       setDeletedDeals(deletedSet);
       setDealProbabilities(probabilities);
       setHasUnsavedChanges(true); // Mark as unsaved (temporary Asher POV)
+      setIsAsherPOVActive(true); // Mark that we're viewing Asher's POV
       
       const viewName = currentView?.name || 'current view';
       console.log(`👁️ Applied Asher's POV for ${viewName}: ${reconstructedDeals.length} deals, ${deletedSet.size} deleted, ${hiddenSet.size} hidden`);
