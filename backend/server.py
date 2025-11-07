@@ -1561,6 +1561,9 @@ def calculate_hot_leads(df):
     if hot_leads.empty:
         return []
     
+    # Deduplicate by client name (keep first occurrence)
+    hot_leads = hot_leads.drop_duplicates(subset=['client'], keep='first')
+    
     # Add expected closing timeframe (next 3 months)
     today = datetime.now()
     hot_leads['expected_close_end'] = today + timedelta(days=90)
