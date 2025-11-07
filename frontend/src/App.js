@@ -1250,6 +1250,7 @@ function Dashboard() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [hasSavedPreferences, setHasSavedPreferences] = useState(false); // Track if user has saved preferences in DB
   const [dealProbabilities, setDealProbabilities] = useState({}); // Store probability for each deal {dealId: probability}
+  const [isAsherPOVActive, setIsAsherPOVActive] = useState(false); // Track if viewing Asher's POV
   
   // State for Upsell & Renew tab
   const [upsellRenewData, setUpsellRenewData] = useState(null);
