@@ -71,9 +71,9 @@ function LoginPage() {
         <div className="text-center mb-8 sm:mb-12">
           <div className="inline-flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 bg-white dark:bg-[#24272e] rounded-3xl shadow-2xl mb-4 sm:mb-6 group hover:shadow-3xl transition-all duration-500">
             <img 
-              src="https://www.primelis.com/wp-content/uploads/2023/10/logo-primelis.svg" 
+              src="/primelis-logo.jpg" 
               alt="Primelis Logo"
-              className="w-16 h-16 sm:w-20 sm:h-20 object-contain group-hover:scale-110 transition-transform duration-500 dark:invert"
+              className="w-20 h-20 sm:w-24 sm:h-24 object-contain group-hover:scale-110 transition-transform duration-500"
               onError={(e) => {
                 e.target.style.display = 'none';
                 e.target.parentElement.innerHTML = '<span class="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white">P</span>';
