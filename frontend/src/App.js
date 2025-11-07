@@ -1840,6 +1840,7 @@ function Dashboard() {
       setOriginalHotDeals(JSON.parse(JSON.stringify(hotDeals))); // Update original to current
       setHasUnsavedChanges(false);
       setHasSavedPreferences(true); // Mark that user now has saved preferences
+      setIsAsherPOVActive(false); // Exit Asher POV mode after saving your own preferences
       alert('💾 Board state saved successfully! (including deleted deals)');
     } catch (error) {
       console.error('Error saving board state:', error);
