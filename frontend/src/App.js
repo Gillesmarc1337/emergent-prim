@@ -1895,7 +1895,18 @@ function Dashboard() {
           ...hotLeadsResponse.data.map(lead => ({...lead, source: 'hot-leads'}))
         ];
         
-        const dealsWithColumns = combinedDeals.map((deal, index) => ({
+        // Deduplicate deals
+        const seenDeals = new Map();
+        const uniqueDeals = combinedDeals.filter(deal => {
+          const dealKey = `${deal.client || deal.company || deal.lead_name}-${deal.stage}`;
+          if (seenDeals.has(dealKey)) {
+            return false;
+          }
+          seenDeals.set(dealKey, true);
+          return true;
+        });
+        
+        const dealsWithColumns = uniqueDeals.map((deal, index) => ({
           ...deal,
           client: deal.client || deal.company || deal.lead_name || `Deal ${index + 1}`,
           pipeline: deal.pipeline || deal.expected_arr || deal.value || 0,
