@@ -1543,6 +1543,9 @@ def calculate_hot_deals_closing(df):
     if legals_deals.empty:
         return []
     
+    # Deduplicate by client name (keep first occurrence)
+    legals_deals = legals_deals.drop_duplicates(subset=['client'], keep='first')
+    
     # Add expected closing timeframe (2 weeks to 30 days from now)
     today = datetime.now()
     legals_deals['expected_close_start'] = today + timedelta(days=14)
