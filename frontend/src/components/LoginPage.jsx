@@ -125,14 +125,10 @@ function LoginPage() {
             </button>
           </div>
 
-          {/* Crew Info */}
+          {/* Emoji Only - No Crew Info */}
           <div className="mt-6 sm:mt-8 pt-6 border-t border-slate-200 dark:border-[#2a2d35]">
-            <div className="text-center text-xs text-slate-500 dark:text-slate-400">
-              <p className="mb-2">🏴‍☠️ Authorized Crew</p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 font-mono">
-                <span className="px-3 py-1 bg-slate-100 dark:bg-[#24272e] rounded-full text-xs">asher@primelis.com</span>
-                <span className="px-3 py-1 bg-slate-100 dark:bg-[#24272e] rounded-full text-xs">remi@primelis.com</span>
-              </div>
+            <div className="text-center text-4xl">
+              🏴‍☠️
             </div>
           </div>
         </div>
