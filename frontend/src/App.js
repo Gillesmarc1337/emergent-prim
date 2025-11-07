@@ -1396,7 +1396,10 @@ function Dashboard() {
 
   useEffect(() => {
     loadAnalytics();
-    loadProjectionsData();
+    // Don't reload projections data if user is viewing Asher's POV
+    if (!isAsherPOVActive) {
+      loadProjectionsData();
+    }
     loadUpsellRenewData();
     loadTabTargets(); // Load tab targets when view changes
   }, [monthOffset, dateRange, useCustomDate, viewMode, currentView]); // Added currentView to reload when view changes
