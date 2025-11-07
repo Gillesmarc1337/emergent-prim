@@ -1887,6 +1887,7 @@ function Dashboard() {
         setDealProbabilities({});
         setHasUnsavedChanges(false);
         setHasSavedPreferences(false);
+        setIsAsherPOVActive(false); // Exit Asher POV mode
         
         console.log('✅ Board reset to pure default state');
         alert('✅ Board reset to default state! All deals restored.');
