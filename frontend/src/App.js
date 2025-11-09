@@ -1879,6 +1879,33 @@ function Dashboard() {
     }
   };
 
+  // Save as Asher POV (Asher only) - saves to Asher's preferences with timestamp
+  const handleSaveAsAsherPOV = async () => {
+    if (!isAsher) {
+      alert('❌ Only Asher can save as Asher POV');
+      return;
+    }
+    
+    try {
+      await saveProjectionsPreferences(hotDeals, hiddenDeals, deletedDeals);
+      const timestamp = new Date().toLocaleString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      setOriginalHotDeals(JSON.parse(JSON.stringify(hotDeals)));
+      setHasUnsavedChanges(false);
+      setHasSavedPreferences(true);
+      setIsAsherPOVActive(true); // Stay in Asher POV mode
+      alert(`👁️ Saved as Asher POV! (${timestamp})\n\nOther users can now load this view.`);
+    } catch (error) {
+      console.error('Error saving Asher POV:', error);
+      alert('❌ Failed to save Asher POV. Please try again.');
+    }
+  };
+
   // Reset board to original state (reload fresh data from server)
   const handleResetBoard = async () => {
     if (window.confirm('⚠️ Are you sure you want to reset all changes? This will restore all deals and clear all deletions, hidden cards, and custom %.')) {
