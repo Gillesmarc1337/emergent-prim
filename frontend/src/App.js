@@ -1252,6 +1252,9 @@ function Dashboard() {
   const [dealProbabilities, setDealProbabilities] = useState({}); // Store probability for each deal {dealId: probability}
   const [isAsherPOVActive, setIsAsherPOVActive] = useState(false); // Track if viewing Asher's POV
   
+  // Check if current user is Asher
+  const isAsher = user?.email === 'asher@primelis.com';
+  
   // State for Upsell & Renew tab
   const [upsellRenewData, setUpsellRenewData] = useState(null);
   
