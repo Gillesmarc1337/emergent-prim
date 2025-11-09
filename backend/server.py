@@ -4403,7 +4403,7 @@ async def refresh_google_sheet(
                         "source_type": "google_sheets",
                         "source_url": sheet_url,
                         "sheet_name": sheet_name,
-                        "records_count": valid_records,
+                        "records_count": len(unique_records),  # Use actual unique count
                         "collection": collection_name
                     }
                 },
@@ -4411,7 +4411,7 @@ async def refresh_google_sheet(
             )
         
         return {
-            "message": f"Successfully refreshed {valid_records} sales records from Google Sheet for {collection_name}",
+            "message": f"Successfully refreshed {len(unique_records)} unique sales records from Google Sheet for {collection_name} ({duplicates_count} duplicates removed)",
             "records_processed": len(df),
             "records_valid": valid_records,
             "last_update": datetime.now(timezone.utc).isoformat()
