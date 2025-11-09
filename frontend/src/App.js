@@ -5147,17 +5147,15 @@ function Dashboard() {
                       ))}
                     </select>
                     
-                    {/* Asher POV Button - Show for non-Asher users */}
-                    {!isAsher && (
-                      <button
-                        onClick={applyAsherPOV}
-                        className="px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors bg-purple-600 text-white hover:bg-purple-700 flex items-center gap-1 sm:gap-2"
-                        title="Load Asher's board organization"
-                      >
-                        <span>👁️</span>
-                        <span className="hidden sm:inline">Asher POV</span>
-                      </button>
-                    )}
+                    {/* Asher POV Button - Show for everyone */}
+                    <button
+                      onClick={applyAsherPOV}
+                      className="px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors bg-purple-600 text-white hover:bg-purple-700 flex items-center gap-1 sm:gap-2"
+                      title="Load Asher's saved board organization"
+                    >
+                      <span>👁️</span>
+                      <span className="hidden sm:inline">Asher POV</span>
+                    </button>
                     
                     {/* Reset Buttons */}
                     {isAsher ? (
