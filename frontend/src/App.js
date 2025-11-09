@@ -1195,7 +1195,7 @@ function MainDashboard({ analytics, currentView, tabTargets, actualPeriodMonths 
 }
 
 function Dashboard() {
-  const { viewConfig, currentView } = useAuth(); // Get current view configuration
+  const { viewConfig, currentView, user } = useAuth(); // Get current view configuration and user
   const [analytics, setAnalytics] = useState(null);
   const [yearlyData, setYearlyData] = useState(null);
   const [loading, setLoading] = useState(false);
