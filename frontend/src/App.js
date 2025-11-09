@@ -1968,6 +1968,72 @@ function Dashboard() {
     }
   };
 
+  // Reset Asher POV (Asher only) - resets Asher's saved preferences
+  const handleResetAsAsherPOV = async () => {
+    if (!isAsher) {
+      alert('❌ Only Asher can reset Asher POV');
+      return;
+    }
+    
+    if (window.confirm('⚠️ Are you sure you want to reset YOUR Asher POV preferences? This will delete your saved Asher POV and return to default.')) {
+      try {
+        // Delete Asher's preferences from backend
+        await resetProjectionsPreferences();
+        
+        // Reload fresh default data
+        const viewParam = currentView?.id ? `?view_id=${currentView.id}` : '';
+        const [hotDealsResponse, hotLeadsResponse] = await Promise.all([
+          axios.get(`${API}/projections/hot-deals${viewParam}`),
+          axios.get(`${API}/projections/hot-leads${viewParam}`)
+        ]);
+        
+        const combinedDeals = [
+          ...hotDealsResponse.data.map(deal => ({...deal, source: 'hot-deals'})),
+          ...hotLeadsResponse.data.map(lead => ({...lead, source: 'hot-leads'}))
+        ];
+        
+        // Deduplicate deals
+        const seenDeals = new Map();
+        const uniqueDeals = combinedDeals.filter(deal => {
+          const dealKey = `${deal.client || deal.company || deal.lead_name}-${deal.stage}`;
+          if (seenDeals.has(dealKey)) {
+            return false;
+          }
+          seenDeals.set(dealKey, true);
+          return true;
+        });
+        
+        const dealsWithColumns = uniqueDeals.map((deal, index) => ({
+          ...deal,
+          client: deal.client || deal.company || deal.lead_name || `Deal ${index + 1}`,
+          pipeline: deal.pipeline || deal.expected_arr || deal.value || 0,
+          owner: deal.owner || deal.ae || 'TBD',
+          column: deal.column || (() => {
+            if (deal.stage === 'B Legals') return 'next14';
+            if (deal.stage === 'C Proposal sent') return 'next30';
+            if (deal.stage === 'D POA Booked') return 'next60';
+            return index % 3 === 0 ? 'next14' : index % 3 === 1 ? 'next30' : 'next60';
+          })()
+        }));
+        
+        setHotDeals(dealsWithColumns);
+        setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns)));
+        setHiddenDeals(new Set());
+        setDeletedDeals(new Set());
+        setDealProbabilities({});
+        setHasUnsavedChanges(false);
+        setHasSavedPreferences(false);
+        setIsAsherPOVActive(false);
+        
+        console.log('✅ Asher POV reset to default state');
+        alert('✅ Your Asher POV has been reset! Other users will now see default state when they click "Asher POV".');
+      } catch (error) {
+        console.error('Error resetting Asher POV:', error);
+        alert('❌ Failed to reset Asher POV. Please try again.');
+      }
+    }
+  };
+
   // Get unique AEs from deals for filter dropdown
   const getUniqueAEs = () => {
     const aes = new Set();
