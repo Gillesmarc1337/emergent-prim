@@ -4371,8 +4371,28 @@ async def refresh_google_sheet(
         
         # Replace existing data in correct collection
         if records:
+            # Deduplicate records by client name + stage before insertion
+            seen_records = {}
+            unique_records = []
+            duplicates_count = 0
+            
+            for record in records:
+                # Create unique key based on client and stage
+                client_key = f"{record.get('client', '').strip().lower()}-{record.get('stage', '')}"
+                
+                if client_key in seen_records:
+                    duplicates_count += 1
+                    print(f"⚠️ Duplicate detected: {record.get('client')} ({record.get('stage')}) - skipping")
+                    continue
+                    
+                seen_records[client_key] = True
+                unique_records.append(record)
+            
+            print(f"📊 Deduplication: {len(records)} total → {len(unique_records)} unique ({duplicates_count} duplicates removed)")
+            
+            # Insert only unique records
             await db[collection_name].delete_many({})
-            await db[collection_name].insert_many(records)
+            await db[collection_name].insert_many(unique_records)
             
             # Update metadata for this specific view
             await db.data_metadata.update_one(
