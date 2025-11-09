@@ -5147,41 +5147,109 @@ function Dashboard() {
                       ))}
                     </select>
                     
-                    {/* Asher POV Button */}
-                    <button
-                      onClick={applyAsherPOV}
-                      className="px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors bg-purple-600 text-white hover:bg-purple-700 flex items-center gap-1 sm:gap-2"
-                      title="Load Asher's board organization"
-                    >
-                      <span>👁️</span>
-                      <span className="hidden sm:inline">Asher POV</span>
-                    </button>
+                    {/* Asher POV Button - Show for non-Asher users */}
+                    {!isAsher && (
+                      <button
+                        onClick={applyAsherPOV}
+                        className="px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors bg-purple-600 text-white hover:bg-purple-700 flex items-center gap-1 sm:gap-2"
+                        title="Load Asher's board organization"
+                      >
+                        <span>👁️</span>
+                        <span className="hidden sm:inline">Asher POV</span>
+                      </button>
+                    )}
                     
-                    {/* Reset Button - Active if NOT in default state */}
-                    <button
-                      onClick={handleResetBoard}
-                      disabled={!hasSavedPreferences && !hasUnsavedChanges}
-                      className={`px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
-                        (hasSavedPreferences || hasUnsavedChanges)
-                          ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
-                          : 'bg-gray-50 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
-                      }`}
-                    >
-                      Reset
-                    </button>
+                    {/* Reset Buttons */}
+                    {isAsher ? (
+                      <>
+                        {/* Asher's Reset Button */}
+                        <button
+                          onClick={handleResetBoard}
+                          disabled={!hasSavedPreferences && !hasUnsavedChanges}
+                          className={`px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
+                            (hasSavedPreferences || hasUnsavedChanges)
+                              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                              : 'bg-gray-50 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
+                          }`}
+                          title="Reset your personal preferences"
+                        >
+                          Reset
+                        </button>
+                        {/* Asher's Reset POV Button */}
+                        <button
+                          onClick={handleResetAsAsherPOV}
+                          disabled={!hasSavedPreferences && !hasUnsavedChanges}
+                          className={`px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
+                            (hasSavedPreferences || hasUnsavedChanges)
+                              ? 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800'
+                              : 'bg-gray-50 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
+                          }`}
+                          title="Reset Asher POV that others see"
+                        >
+                          <span className="hidden sm:inline">Reset as Asher POV</span>
+                          <span className="sm:hidden">Reset POV</span>
+                        </button>
+                      </>
+                    ) : (
+                      /* Normal Reset Button for non-Asher users */
+                      <button
+                        onClick={handleResetBoard}
+                        disabled={!hasSavedPreferences && !hasUnsavedChanges}
+                        className={`px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
+                          (hasSavedPreferences || hasUnsavedChanges)
+                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                            : 'bg-gray-50 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
+                        }`}
+                      >
+                        Reset
+                      </button>
+                    )}
                     
-                    {/* Save Button */}
-                    <button
-                      onClick={handleSaveBoard}
-                      disabled={!hasUnsavedChanges}
-                      className={`px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
-                        hasUnsavedChanges
-                          ? 'bg-blue-600 text-white hover:bg-blue-700'
-                          : 'bg-gray-50 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
-                      }`}
-                    >
-                      Save
-                    </button>
+                    {/* Save Buttons */}
+                    {isAsher ? (
+                      <>
+                        {/* Asher's Normal Save Button */}
+                        <button
+                          onClick={handleSaveBoard}
+                          disabled={!hasUnsavedChanges}
+                          className={`px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
+                            hasUnsavedChanges
+                              ? 'bg-blue-600 text-white hover:bg-blue-700'
+                              : 'bg-gray-50 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
+                          }`}
+                          title="Save your personal preferences"
+                        >
+                          Save
+                        </button>
+                        {/* Asher's Save as POV Button */}
+                        <button
+                          onClick={handleSaveAsAsherPOV}
+                          disabled={!hasUnsavedChanges}
+                          className={`px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
+                            hasUnsavedChanges
+                              ? 'bg-purple-600 text-white hover:bg-purple-700'
+                              : 'bg-gray-50 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
+                          }`}
+                          title="Save as Asher POV that others can load"
+                        >
+                          <span className="hidden md:inline">Save as Asher POV</span>
+                          <span className="md:hidden">Save POV</span>
+                        </button>
+                      </>
+                    ) : (
+                      /* Normal Save Button for non-Asher users */
+                      <button
+                        onClick={handleSaveBoard}
+                        disabled={!hasUnsavedChanges}
+                        className={`px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
+                          hasUnsavedChanges
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-gray-50 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
+                        }`}
+                      >
+                        Save
+                      </button>
+                    )}
                   </div>
                 </div>
               </CardHeader>
