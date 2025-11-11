@@ -472,8 +472,25 @@ async def auto_refresh_all_views():
                 
                 # Update database
                 if records:
+                    # Deduplicate records by client name + stage before insertion
+                    seen_records = {}
+                    unique_records = []
+                    duplicates_count = 0
+                    
+                    for record in records:
+                        client_key = f"{record.get('client', '').strip().lower()}-{record.get('stage', '')}"
+                        
+                        if client_key in seen_records:
+                            duplicates_count += 1
+                            continue
+                            
+                        seen_records[client_key] = True
+                        unique_records.append(record)
+                    
+                    print(f"    📊 Deduplication: {len(records)} total → {len(unique_records)} unique ({duplicates_count} duplicates removed)")
+                    
                     await db[collection_name].delete_many({})
-                    await db[collection_name].insert_many(records)
+                    await db[collection_name].insert_many(unique_records)
                     
                     # Update metadata
                     await db.data_metadata.update_one(
@@ -481,13 +498,13 @@ async def auto_refresh_all_views():
                         {
                             "$set": {
                                 "last_update": datetime.now(timezone.utc),
-                                "records_count": valid_records,
+                                "records_count": len(unique_records),  # Use unique count
                                 "last_auto_refresh": datetime.now(timezone.utc)
                             }
                         }
                     )
                     
-                    print(f"    ✅ Refreshed {valid_records} records for {view_id}")
+                    print(f"    ✅ Refreshed {len(unique_records)} unique records for {view_id} ({duplicates_count} duplicates removed)")
                     success_count += 1
                 else:
                     print(f"    ⚠️ No valid records found for {view_id}")
