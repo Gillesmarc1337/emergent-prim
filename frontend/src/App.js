@@ -1256,6 +1256,14 @@ function Dashboard() {
     return savedPOVState === 'true';
   });
   
+  // Reload isAsherPOVActive when view changes
+  useEffect(() => {
+    if (currentView?.id) {
+      const savedPOVState = localStorage.getItem(`asherPOVActive_${currentView.id}`);
+      setIsAsherPOVActive(savedPOVState === 'true');
+    }
+  }, [currentView?.id]);
+  
   // Persist isAsherPOVActive changes to localStorage
   useEffect(() => {
     if (currentView?.id) {
