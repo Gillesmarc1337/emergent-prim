@@ -1420,7 +1420,10 @@ function Dashboard() {
 
   const handleUploadSuccess = () => {
     loadAnalytics();
-    loadProjectionsData();
+    // Don't reload projections if viewing Asher POV
+    if (!isAsherPOVActive) {
+      loadProjectionsData();
+    }
     loadUpsellRenewData();
   };
 
