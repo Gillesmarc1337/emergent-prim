@@ -2085,10 +2085,14 @@ function Dashboard() {
   const resetView = (type) => {
     if (type === 'deals') {
       setHiddenDeals(new Set());
-      loadProjectionsData(); // Reload original data
+      if (!isAsherPOVActive) {
+        loadProjectionsData(); // Reload original data
+      }
     } else if (type === 'leads') {
       setHiddenLeads(new Set());
-      loadProjectionsData(); // Reload original data
+      if (!isAsherPOVActive) {
+        loadProjectionsData(); // Reload original data
+      }
     }
   };
 
