@@ -1250,26 +1250,8 @@ function Dashboard() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [hasSavedPreferences, setHasSavedPreferences] = useState(false); // Track if user has saved preferences in DB
   const [dealProbabilities, setDealProbabilities] = useState({}); // Store probability for each deal {dealId: probability}
-  const [isAsherPOVActive, setIsAsherPOVActive] = useState(() => {
-    // Persist Asher POV state in localStorage per view
-    const savedPOVState = localStorage.getItem(`asherPOVActive_${currentView?.id || 'default'}`);
-    return savedPOVState === 'true';
-  });
-  
-  // Reload isAsherPOVActive when view changes
-  useEffect(() => {
-    if (currentView?.id) {
-      const savedPOVState = localStorage.getItem(`asherPOVActive_${currentView.id}`);
-      setIsAsherPOVActive(savedPOVState === 'true');
-    }
-  }, [currentView?.id]);
-  
-  // Persist isAsherPOVActive changes to localStorage
-  useEffect(() => {
-    if (currentView?.id) {
-      localStorage.setItem(`asherPOVActive_${currentView.id}`, isAsherPOVActive.toString());
-    }
-  }, [isAsherPOVActive, currentView?.id]);
+  const [isAsherPOVActive, setIsAsherPOVActive] = useState(false); // Simple state, no localStorage
+  const [asherPOVTimestamp, setAsherPOVTimestamp] = useState(null); // Store when POV was saved
   
   // Check if current user is Asher
   const isAsher = user?.email === 'asher@primelis.com';
