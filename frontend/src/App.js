@@ -2360,6 +2360,9 @@ function Dashboard() {
                 >
                   ← Previous Month
                 </Button>
+                <span className="px-3 py-1 text-sm font-medium bg-slate-100 dark:bg-[#24272e] rounded-md whitespace-nowrap">
+                  {monthOffset === 0 ? 'Current Month' : `${Math.abs(monthOffset)} ${Math.abs(monthOffset) === 1 ? 'month' : 'months'} ${monthOffset > 0 ? 'ago' : 'ahead'}`}
+                </span>
                 <Button
                   variant="outline"
                   size="sm"
@@ -2368,6 +2371,16 @@ function Dashboard() {
                 >
                   Next Month →
                 </Button>
+                {monthOffset !== 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setMonthOffset(0)}
+                    className="ml-2"
+                  >
+                    📅 Current Month
+                  </Button>
+                )}
               </div>
             )}
             {useCustomDate && (
