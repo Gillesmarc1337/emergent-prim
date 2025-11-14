@@ -2053,16 +2053,27 @@ function Dashboard() {
   };
 
   // Reset Asher POV (Asher only) - resets Asher's saved preferences
+  // Reset Asher POV (Asher only) - NEW dedicated endpoint
   const handleResetAsAsherPOV = async () => {
     if (!isAsher) {
       alert('❌ Only Asher can reset Asher POV');
       return;
     }
     
-    if (window.confirm('⚠️ Are you sure you want to reset YOUR Asher POV preferences? This will delete your saved Asher POV and return to default.')) {
+    if (!currentView?.id) {
+      alert('⚠️ No view selected');
+      return;
+    }
+    
+    const viewName = currentView?.name || 'this view';
+    
+    if (window.confirm(`⚠️ Are you sure you want to reset Asher POV for ${viewName}?\n\nThis will delete your saved POV and others will see the default state.`)) {
       try {
-        // Delete Asher's preferences from backend
-        await resetProjectionsPreferences();
+        // Delete from dedicated Asher POV endpoint
+        await axios.delete(`${API}/asher-pov/reset`, {
+          params: { view_id: currentView.id },
+          withCredentials: true
+        });
         
         // Reload fresh default data
         const viewParam = currentView?.id ? `?view_id=${currentView.id}` : '';
@@ -2108,12 +2119,14 @@ function Dashboard() {
         setHasUnsavedChanges(false);
         setHasSavedPreferences(false);
         setIsAsherPOVActive(false);
+        setAsherPOVTimestamp(null);
         
-        console.log('✅ Asher POV reset to default state');
-        alert('✅ Your Asher POV has been reset! Other users will now see default state when they click "Asher POV".');
+        console.log(`✅ Asher POV reset for ${viewName}`);
+        alert(`✅ Asher POV reset for ${viewName}!\n\nOthers will now see the default state when they click "Asher POV".`);
       } catch (error) {
         console.error('Error resetting Asher POV:', error);
-        alert('❌ Failed to reset Asher POV. Please try again.');
+        const errorMsg = error.response?.data?.detail || error.message;
+        alert(`❌ Failed to reset Asher POV: ${errorMsg}`);
       }
     }
   };
