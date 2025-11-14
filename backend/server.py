@@ -664,6 +664,11 @@ class ProjectionsPreferencesRequest(BaseModel):
     view_id: str
     preferences: Dict[str, List[ProjectionDeal]]  # e.g., {"next30": [...], "next60": [...], "next90": [...]}
 
+class AsherPOVRequest(BaseModel):
+    view_id: str
+    preferences: Dict[str, List[ProjectionDeal]]  # Deal preferences for this view
+    timestamp: Optional[str] = None  # Auto-generated server-side
+
 # Utility functions
 def clean_records(records):
     """Clean records to ensure all values are JSON serializable"""
