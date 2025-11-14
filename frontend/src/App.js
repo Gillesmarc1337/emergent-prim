@@ -1499,17 +1499,28 @@ function Dashboard() {
     }
   };
 
-  // Apply Asher's POV (load his preferences for CURRENT view)
+  // Load and apply Asher POV (NEW - uses dedicated backend endpoint)
   const applyAsherPOV = async () => {
+    if (!currentView?.id) {
+      alert('⚠️ No view selected');
+      return;
+    }
+    
     try {
-      // Load Asher's preferences for CURRENT view
-      const asherPrefs = await loadAsherProjectionsPreferences();
+      // Load Asher POV from dedicated endpoint
+      const response = await axios.get(`${API}/asher-pov/load`, {
+        params: { view_id: currentView.id },
+        withCredentials: true
+      });
       
-      if (!asherPrefs) {
+      if (!response.data.has_pov) {
         const viewName = currentView?.name || 'this view';
-        alert(`⚠️ Asher has not saved preferences on ${viewName} yet.`);
+        alert(`⚠️ Asher has not saved a POV for ${viewName} yet.`);
         return;
       }
+      
+      const asherPrefs = response.data.preferences;
+      const timestamp = response.data.timestamp;
       
       // Reload fresh data from CURRENT view
       const viewParam = currentView?.id ? `?view_id=${currentView.id}` : '';
@@ -1547,12 +1558,14 @@ function Dashboard() {
         })()
       }));
       
-      // Apply Asher's organization for THIS view
+      // Apply Asher's organization (with MERGE: new deals appear too!)
       const reconstructedDeals = [];
       const hiddenSet = new Set();
       const deletedSet = new Set();
       const probabilities = {};
+      const processedDealIds = new Set();
       
+      // First pass: reconstruct saved deals in their saved order
       ['next14', 'next30', 'next60', 'delayed'].forEach(columnKey => {
         const savedColumn = asherPrefs[columnKey] || [];
         savedColumn.sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -1560,6 +1573,7 @@ function Dashboard() {
         savedColumn.forEach(savedDeal => {
           if (savedDeal.deleted) {
             deletedSet.add(savedDeal.id);
+            processedDealIds.add(savedDeal.id);
             return;
           }
           
@@ -1567,6 +1581,8 @@ function Dashboard() {
           if (dealData) {
             dealData.column = columnKey;
             reconstructedDeals.push(dealData);
+            processedDealIds.add(savedDeal.id);
+            
             if (savedDeal.hidden) {
               hiddenSet.add(savedDeal.id);
             }
@@ -1577,23 +1593,28 @@ function Dashboard() {
         });
       });
       
-      // Add any new deals that weren't in Asher's preferences
-      dealsWithColumns.forEach(deal => {
-        if (!reconstructedDeals.find(d => d.id === deal.id) && !deletedSet.has(deal.id)) {
-          reconstructedDeals.push(deal);
-        }
-      });
+      // Second pass: ADD NEW DEALS (that weren't in Asher's saved preferences)
+      // These are new deals that appeared since Asher last saved
+      const newDeals = dealsWithColumns.filter(deal => 
+        !processedDealIds.has(deal.id) && !deletedSet.has(deal.id)
+      );
+      
+      if (newDeals.length > 0) {
+        console.log(`📝 ${newDeals.length} new deals added to Asher POV:`, newDeals.map(d => d.client));
+        reconstructedDeals.push(...newDeals);
+      }
       
       setHotDeals(reconstructedDeals);
       setHiddenDeals(hiddenSet);
       setDeletedDeals(deletedSet);
       setDealProbabilities(probabilities);
-      setHasUnsavedChanges(true); // Mark as unsaved (temporary Asher POV)
+      setHasUnsavedChanges(false); // POV is clean (loaded from server)
       setIsAsherPOVActive(true); // Mark that we're viewing Asher's POV
+      setAsherPOVTimestamp(timestamp);
       
       const viewName = currentView?.name || 'current view';
-      console.log(`👁️ Applied Asher's POV for ${viewName}: ${reconstructedDeals.length} deals, ${deletedSet.size} deleted, ${hiddenSet.size} hidden`);
-      alert(`👁️ Asher's POV applied for ${viewName} successfully!`);
+      console.log(`👁️ Asher POV loaded for ${viewName}: ${reconstructedDeals.length} deals (${newDeals.length} new), ${deletedSet.size} deleted, ${hiddenSet.size} hidden`);
+      alert(`👁️ Asher's POV applied for ${viewName}!\n\nSaved: ${timestamp}\nDeals: ${reconstructedDeals.length} (${newDeals.length} new)`);
       
     } catch (error) {
       console.error('Error applying Asher\'s POV:', error);
