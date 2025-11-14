@@ -2393,6 +2393,138 @@ async def get_asher_projections_preferences(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error loading Asher's preferences: {str(e)}")
 
+
+# ==================== ASHER POV DEDICATED ENDPOINTS ====================
+# These endpoints handle the special "Asher POV" that persists independently
+# and can be loaded by anyone but only modified by Asher
+
+@api_router.post("/asher-pov/save")
+async def save_asher_pov(
+    request: AsherPOVRequest,
+    user: dict = Depends(get_current_user)
+):
+    """
+    Save Asher POV for a specific view.
+    ONLY Asher (asher@primelis.com) can use this endpoint.
+    This creates a persistent POV that survives refreshes, view changes, etc.
+    """
+    try:
+        # SECURITY: Only Asher can save Asher POV
+        if user.get("email") != "asher@primelis.com":
+            raise HTTPException(
+                status_code=403,
+                detail="Only Asher can save Asher POV"
+            )
+        
+        view_id = request.view_id
+        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+        
+        # Save to dedicated asher_pov collection
+        await db.asher_pov.update_one(
+            {"view_id": view_id},
+            {
+                "$set": {
+                    "view_id": view_id,
+                    "preferences": request.preferences,
+                    "timestamp": timestamp,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            },
+            upsert=True
+        )
+        
+        print(f"✅ Asher POV saved for view {view_id} at {timestamp}")
+        
+        return {
+            "success": True,
+            "message": f"Asher POV saved successfully",
+            "timestamp": timestamp,
+            "view_id": view_id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error saving Asher POV: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error saving Asher POV: {str(e)}")
+
+
+@api_router.get("/asher-pov/load")
+async def load_asher_pov(
+    view_id: str = Query(..., description="View ID to load Asher POV for"),
+    user: dict = Depends(get_current_user)
+):
+    """
+    Load Asher POV for a specific view.
+    Anyone can load it, but it's read-only unless you're Asher.
+    """
+    try:
+        # Load from dedicated asher_pov collection
+        pov_doc = await db.asher_pov.find_one({"view_id": view_id})
+        
+        if not pov_doc:
+            return {
+                "has_pov": False,
+                "preferences": None,
+                "timestamp": None,
+                "message": f"Asher has not saved a POV for view {view_id} yet"
+            }
+        
+        # Clean MongoDB _id
+        if '_id' in pov_doc:
+            del pov_doc['_id']
+        
+        return {
+            "has_pov": True,
+            "preferences": pov_doc.get("preferences"),
+            "timestamp": pov_doc.get("timestamp"),
+            "updated_at": pov_doc.get("updated_at").isoformat() if pov_doc.get("updated_at") else None,
+            "can_modify": user.get("email") == "asher@primelis.com"  # Tell frontend if user can modify
+        }
+        
+    except Exception as e:
+        print(f"❌ Error loading Asher POV: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error loading Asher POV: {str(e)}")
+
+
+@api_router.delete("/asher-pov/reset")
+async def reset_asher_pov(
+    view_id: str = Query(..., description="View ID to reset Asher POV for"),
+    user: dict = Depends(get_current_user)
+):
+    """
+    Reset (delete) Asher POV for a specific view.
+    ONLY Asher can use this endpoint.
+    """
+    try:
+        # SECURITY: Only Asher can reset Asher POV
+        if user.get("email") != "asher@primelis.com":
+            raise HTTPException(
+                status_code=403,
+                detail="Only Asher can reset Asher POV"
+            )
+        
+        # Delete from asher_pov collection
+        result = await db.asher_pov.delete_one({"view_id": view_id})
+        
+        if result.deleted_count > 0:
+            print(f"✅ Asher POV reset for view {view_id}")
+            return {
+                "success": True,
+                "message": f"Asher POV reset successfully for view {view_id}"
+            }
+        else:
+            return {
+                "success": True,
+                "message": f"No Asher POV found for view {view_id} (already reset)"
+            }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error resetting Asher POV: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error resetting Asher POV: {str(e)}")
+
 @api_router.delete("/user/projections-preferences")
 async def reset_projections_preferences(
     view_id: str = Query(..., description="View ID to reset preferences for"),
