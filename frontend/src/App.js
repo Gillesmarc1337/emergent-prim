@@ -1904,30 +1904,89 @@ function Dashboard() {
     }
   };
 
-  // Save as Asher POV (Asher only) - saves to Asher's preferences with timestamp
+  // Save as Asher POV (Asher only) - NEW dedicated endpoint
   const handleSaveAsAsherPOV = async () => {
     if (!isAsher) {
       alert('❌ Only Asher can save as Asher POV');
       return;
     }
     
+    if (!currentView?.id) {
+      alert('⚠️ No view selected');
+      return;
+    }
+    
     try {
-      await saveProjectionsPreferences(hotDeals, hiddenDeals, deletedDeals);
-      const timestamp = new Date().toLocaleString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+      // Organize deals by column with order, hidden, deleted, probability
+      const next14Deals = hotDeals
+        .filter(deal => deal.column === 'next14')
+        .map((deal, index) => ({
+          id: deal.id,
+          order: index,
+          hidden: hiddenDeals.has(deal.id),
+          deleted: deletedDeals.has(deal.id),
+          probability: dealProbabilities[deal.id] || 75
+        }));
+
+      const next30Deals = hotDeals
+        .filter(deal => deal.column === 'next30')
+        .map((deal, index) => ({
+          id: deal.id,
+          order: index,
+          hidden: hiddenDeals.has(deal.id),
+          deleted: deletedDeals.has(deal.id),
+          probability: dealProbabilities[deal.id] || 75
+        }));
+
+      const next60Deals = hotDeals
+        .filter(deal => deal.column === 'next60')
+        .map((deal, index) => ({
+          id: deal.id,
+          order: index,
+          hidden: hiddenDeals.has(deal.id),
+          deleted: deletedDeals.has(deal.id),
+          probability: dealProbabilities[deal.id] || 75
+        }));
+
+      const delayedDeals = hotDeals
+        .filter(deal => deal.column === 'delayed')
+        .map((deal, index) => ({
+          id: deal.id,
+          order: index,
+          hidden: hiddenDeals.has(deal.id),
+          deleted: deletedDeals.has(deal.id),
+          probability: dealProbabilities[deal.id] || 75
+        }));
+
+      // Save to dedicated Asher POV endpoint
+      const response = await axios.post(`${API}/asher-pov/save`, {
+        view_id: currentView.id,
+        preferences: {
+          next14: next14Deals,
+          next30: next30Deals,
+          next60: next60Deals,
+          delayed: delayedDeals
+        }
+      }, {
+        withCredentials: true
       });
+      
+      const timestamp = response.data.timestamp;
+      
       setOriginalHotDeals(JSON.parse(JSON.stringify(hotDeals)));
       setHasUnsavedChanges(false);
       setHasSavedPreferences(true);
       setIsAsherPOVActive(true); // Stay in Asher POV mode
-      alert(`👁️ Saved as Asher POV! (${timestamp})\n\nOther users can now load this view.`);
+      setAsherPOVTimestamp(timestamp);
+      
+      const viewName = currentView?.name || 'current view';
+      alert(`👁️ Saved as Asher POV for ${viewName}!\n\n${timestamp}\n\nOther users can now load this view.`);
+      console.log(`✅ Asher POV saved for ${viewName} at ${timestamp}`);
+      
     } catch (error) {
       console.error('Error saving Asher POV:', error);
-      alert('❌ Failed to save Asher POV. Please try again.');
+      const errorMsg = error.response?.data?.detail || error.message;
+      alert(`❌ Failed to save Asher POV: ${errorMsg}`);
     }
   };
 
