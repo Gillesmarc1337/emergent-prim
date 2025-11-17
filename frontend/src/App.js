@@ -1253,6 +1253,7 @@ function Dashboard() {
   const [dealProbabilities, setDealProbabilities] = useState({}); // Store probability for each deal {dealId: probability}
   const [isAsherPOVActive, setIsAsherPOVActive] = useState(false); // Simple state, no localStorage
   const [asherPOVTimestamp, setAsherPOVTimestamp] = useState(null); // Store when POV was saved
+  const [newDealIds, setNewDealIds] = useState(new Set()); // Track which deals are new since last save
   
   // Check if current user is Asher
   const isAsher = user?.email === 'asher@primelis.com';
