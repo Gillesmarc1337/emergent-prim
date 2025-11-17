@@ -1880,6 +1880,7 @@ function Dashboard() {
       setOriginalHotDeals(JSON.parse(JSON.stringify(hotDeals))); // Update original to current
       setHasUnsavedChanges(false);
       setHasSavedPreferences(true); // Mark that user now has saved preferences
+      setNewDealIds(new Set()); // Clear new deals flag after saving
       setIsAsherPOVActive(false); // Exit Asher POV mode after saving your own preferences
       alert('💾 Board state saved successfully! (including deleted deals)');
     } catch (error) {
