@@ -5451,6 +5451,7 @@ function Dashboard() {
                                 onHide={() => hideItem('deals', deal.id)}
                                 onDelete={handleDeleteDeal}
                                 onProbabilityChange={handleDealProbabilityChange}
+                                isNew={newDealIds.has(deal.id)}
                               />
                             ))}
                             {provided.placeholder}
