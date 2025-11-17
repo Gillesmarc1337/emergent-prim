@@ -1961,6 +1961,7 @@ function Dashboard() {
       setOriginalHotDeals(JSON.parse(JSON.stringify(hotDeals)));
       setHasUnsavedChanges(false);
       setHasSavedPreferences(true);
+      setNewDealIds(new Set()); // Clear new deals flag after saving
       setIsAsherPOVActive(true); // Stay in Asher POV mode
       setAsherPOVTimestamp(timestamp);
       
