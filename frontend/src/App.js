@@ -1777,9 +1777,13 @@ function Dashboard() {
           });
           
           // Add any new deals that weren't in saved preferences (and not deleted)
+          const processedDealIds = new Set(reconstructedDeals.map(d => d.id));
+          const newDealsSet = new Set();
+          
           dealsWithColumns.forEach(deal => {
-            if (!reconstructedDeals.find(d => d.id === deal.id) && !deletedSet.has(deal.id)) {
+            if (!processedDealIds.has(deal.id) && !deletedSet.has(deal.id)) {
               reconstructedDeals.push(deal);
+              newDealsSet.add(deal.id); // Mark as new deal
             }
           });
           
@@ -1787,9 +1791,11 @@ function Dashboard() {
           setHiddenDeals(hiddenSet);
           setDeletedDeals(deletedSet);
           setDealProbabilities(probabilities);
+          setNewDealIds(newDealsSet); // Track new deals for visual flag
           setHasSavedPreferences(true); // User has saved preferences
           setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns.filter(d => !deletedSet.has(d.id))))); // Keep original for reset (excluding deleted)
-          console.log('✅ Applied saved projections preferences with order, deleted filter, and probabilities');
+          console.log(`✅ Applied saved projections preferences with order, deleted filter, and probabilities`);
+          console.log(`   ${reconstructedDeals.length} total deals (${newDealsSet.size} NEW since last save)`);
           console.log(`   Deleted ${deletedSet.size} deals permanently`);
         } catch (e) {
           console.error('Error applying saved preferences:', e);
