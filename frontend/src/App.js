@@ -275,7 +275,7 @@ function MetricCard({ title, value, target, unit = '', trend, icon: Icon, color 
   );
 }
 
-function DraggableDealItem({ deal, index, onHide, onDelete, showActions = false, onProbabilityChange }) {
+function DraggableDealItem({ deal, index, onHide, onDelete, showActions = false, onProbabilityChange, isNew = false }) {
   const [isVisible, setIsVisible] = useState(true);
   const [status, setStatus] = useState(deal.status || 'active');
   const [label, setLabel] = useState(deal.label || '');
