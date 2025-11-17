@@ -5630,8 +5630,8 @@ function Dashboard() {
                                 showActions={true}
                                 onHide={() => hideItem('deals', deal.id)}
                                 onDelete={handleDeleteDeal}
-                                isNew={newDealIds.has(deal.id)}
                                 onProbabilityChange={handleDealProbabilityChange}
+                                isNew={newDealIds.has(deal.id)}
                               />
                             ))}
                             {provided.placeholder}
