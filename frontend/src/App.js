@@ -1811,6 +1811,7 @@ function Dashboard() {
         setOriginalHotDeals(JSON.parse(JSON.stringify(dealsWithColumns))); // Deep copy for reset
         setHiddenDeals(new Set());
         setDeletedDeals(new Set());
+        setNewDealIds(new Set()); // No new deals (all are "new" in a sense)
         setHasSavedPreferences(false); // No saved preferences = default state
       }
       
