@@ -1407,7 +1407,7 @@ function Dashboard() {
     }
     loadUpsellRenewData();
     loadTabTargets(); // Load tab targets when view changes
-  }, [monthOffset, dateRange, useCustomDate, viewMode, currentView]); // Added currentView to reload when view changes
+  }, [monthOffset, dateRange, useCustomDate, viewMode, currentView, forceCurrentMonth]); // Added forceCurrentMonth
 
   const handleUploadSuccess = () => {
     loadAnalytics();
