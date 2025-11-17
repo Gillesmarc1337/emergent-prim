@@ -1573,6 +1573,8 @@ function Dashboard() {
         !processedDealIds.has(deal.id) && !deletedSet.has(deal.id)
       );
       
+      const newDealsSet = new Set(newDeals.map(d => d.id));
+      
       if (newDeals.length > 0) {
         console.log(`📝 ${newDeals.length} new deals added to Asher POV:`, newDeals.map(d => d.client));
         reconstructedDeals.push(...newDeals);
@@ -1582,6 +1584,7 @@ function Dashboard() {
       setHiddenDeals(hiddenSet);
       setDeletedDeals(deletedSet);
       setDealProbabilities(probabilities);
+      setNewDealIds(newDealsSet); // Track new deals for visual flag
       setHasUnsavedChanges(false); // POV is clean (loaded from server)
       setIsAsherPOVActive(true); // Mark that we're viewing Asher's POV
       setAsherPOVTimestamp(timestamp);
