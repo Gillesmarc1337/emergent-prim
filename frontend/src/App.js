@@ -316,7 +316,14 @@ function DraggableDealItem({ deal, index, onHide, onDelete, showActions = false,
         >
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <div className="font-medium">{deal.client}</div>
+              <div className="flex items-center gap-2">
+                <div className="font-medium">{deal.client}</div>
+                {isNew && (
+                  <span className="px-2 py-0.5 text-xs font-bold bg-green-500 text-white rounded-full animate-pulse">
+                    NEW
+                  </span>
+                )}
+              </div>
               <div className="text-sm text-gray-600">
                 AE: {deal.owner} | Pipeline: ${deal.pipeline?.toLocaleString()}
               </div>
