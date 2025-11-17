@@ -1201,6 +1201,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [monthOffset, setMonthOffset] = useState(0);
+  const [forceCurrentMonth, setForceCurrentMonth] = useState(false); // Force to load actual current month
   const [dateRange, setDateRange] = useState(null);
   const [useCustomDate, setUseCustomDate] = useState(false);
   const [importMethod, setImportMethod] = useState('csv'); // 'csv' or 'sheets'
