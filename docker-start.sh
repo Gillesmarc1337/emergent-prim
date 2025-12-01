@@ -35,7 +35,7 @@ sleep 5
 
 # Wait for MongoDB
 echo "  Waiting for MongoDB..."
-until $COMPOSE_CMD exec -T mongodb mongosh --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
+until $COMPOSE_CMD exec -T database mongosh -u root -p password --authenticationDatabase admin --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
     echo "    MongoDB is not ready yet..."
     sleep 2
 done
@@ -54,6 +54,14 @@ echo "  Waiting for Frontend..."
 sleep 10  # Frontend takes longer to start
 echo "  ✅ Frontend should be ready"
 
+# Wait for Mongo Express
+echo "  Waiting for Mongo Express..."
+until curl -f http://localhost:8081/status > /dev/null 2>&1; do
+    echo "    Mongo Express is not ready yet..."
+    sleep 2
+done
+echo "  ✅ Mongo Express is ready"
+
 echo ""
 echo "✅ All services are running!"
 echo ""
@@ -61,6 +69,7 @@ echo "📍 Access the application:"
 echo "   Frontend:  http://localhost:3000"
 echo "   Backend:   http://localhost:8001"
 echo "   API Docs:  http://localhost:8001/docs"
+echo "   Mongo Express: http://localhost:8081"
 echo ""
 echo "🔐 Login:"
 echo "   Click 'Demo Access' button on the login page"

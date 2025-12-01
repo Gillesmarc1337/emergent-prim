@@ -1,37 +1,70 @@
 services:
-    mongodb:
+    database:
         image: mongo:7.0
-        container_name: emergent-prim-mongodb
+        container_name: database
         restart: unless-stopped
         ports:
             - '27017:27017'
         volumes:
-            - mongodb_data:/data/db
+            - database_data:/data/db
         environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: password
             MONGO_INITDB_DATABASE: sales_analytics
         healthcheck:
-            test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+            test:
+                [
+                    'CMD',
+                    'mongosh',
+                    '-u',
+                    'root',
+                    '-p',
+                    'password',
+                    '--authenticationDatabase',
+                    'admin',
+                    '--eval',
+                    "db.adminCommand('ping')",
+                ]
             interval: 10s
-            timeout: 5s
+            timeout: 10s
             retries: 5
+            start_period: 10s
+
+    database-admin:
+        image: mongo-express
+        container_name: database-admin
+        restart: unless-stopped
+        environment:
+            ME_CONFIG_MONGODB_URL: mongodb://root:password@database:27017/
+            ME_CONFIG_MONGODB_ADMINUSERNAME: root
+            ME_CONFIG_MONGODB_ADMINPASSWORD: password
+            ME_CONFIG_MONGODB_SERVER: database
+            ME_CONFIG_MONGODB_PORT: 27017
+            ME_CONFIG_MONGODB_ENABLE_ADMIN: 'true'
+            ME_CONFIG_BASICAUTH_USERNAME: admin
+            ME_CONFIG_BASICAUTH_PASSWORD: admin
+        ports:
+            - '8081:8081'
+        depends_on:
+            database:
+                condition: service_healthy
 
     backend:
         build:
             context: ./backend
             dockerfile: Dockerfile
-        container_name: emergent-prim-backend
+        container_name: backend
         restart: unless-stopped
         ports:
             - '8001:8001'
         environment:
-            - MONGO_URL=mongodb://mongodb:27017
-            - DB_NAME=sales_analytics
-            - LOCAL_MODE=true
             - PYTHONUNBUFFERED=1
+        env_file:
+            - ./backend/.env
         volumes:
             - ./backend:/app
         depends_on:
-            mongodb:
+            database:
                 condition: service_healthy
         healthcheck:
             test:
@@ -50,13 +83,12 @@ services:
         build:
             context: ./frontend
             dockerfile: Dockerfile
-        container_name: emergent-prim-frontend
+        container_name: frontend
         restart: unless-stopped
         ports:
             - '3000:3000'
-        environment:
-            - REACT_APP_BACKEND_URL=http://localhost:8001
-            - CHOKIDAR_USEPOLLING=true
+        env_file:
+            - ./frontend/.env
         volumes:
             - ./frontend:/app
             - /app/node_modules
@@ -64,4 +96,4 @@ services:
             - backend
 
 volumes:
-    mongodb_data:
+    database_data:
