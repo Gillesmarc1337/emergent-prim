@@ -1,87 +1,93 @@
 """
-Authentication helpers and utilities for Emergent OAuth
+Authentication helpers and utilities for Google OAuth
 """
 import os
-import requests
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from fastapi import HTTPException, Request, Cookie, Depends
-from motor.motor_asyncio import AsyncIOMotorClient
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
+import logging
+from database import get_database
 
-# MongoDB connection
-mongo_url = os.environ.get('MONGO_URL')
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ.get('DB_NAME', 'sales_analytics')]
+# MongoDB connection - use shared database instance
+db = get_database()
 
 # Role constants
 ROLE_VIEWER = "viewer"
 ROLE_SUPER_ADMIN = "super_admin"
 
-# Authorized users
-AUTHORIZED_USERS = {
-    "asher@primelis.com": ROLE_SUPER_ADMIN,  # Super admin
-    "remi@primelis.com": ROLE_SUPER_ADMIN,
-    "francois@primelis.com": ROLE_SUPER_ADMIN,  # Super admin
-    "demo@primelis.com": ROLE_VIEWER,  # Demo mode user
-    # New multi-view users
-    "oren@primelis.com": ROLE_VIEWER,  # Signal view
-    "maxime.toubia@primelis.com": ROLE_VIEWER,  # Full Funnel view
-    "coralie.truffy@primelis.com": ROLE_VIEWER,  # Market view
-    "philippe@primelis.com": ROLE_SUPER_ADMIN  # Master view + all views access
-}
 
-async def get_session_data_from_emergent(session_id: str):
+# Get logger - server.py will configure logging, so we just get the logger here
+# The logger will inherit the root logger's configuration once server.py configures it
+logger = logging.getLogger(__name__)
+# Ensure the logger level is set (will be overridden by server.py's basicConfig)
+logger.setLevel(logging.INFO)
+
+
+async def verify_google_token(token: str):
     """
-    Call Emergent API to get session data
+    Verify Google OAuth ID token and return user information
     """
     try:
-        response = requests.get(
-            "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
-            headers={"X-Session-ID": session_id},
-            timeout=10
-        )
+        # Get Google OAuth client ID from environment
+        client_id = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
+        if not client_id:
+            raise HTTPException(status_code=500, detail="Google OAuth client ID not configured")
         
-        if response.status_code == 200:
-            data = response.json()
-            return data
-        else:
-            raise HTTPException(status_code=401, detail="Invalid session ID")
-    except requests.RequestException as e:
-        raise HTTPException(status_code=500, detail=f"Error contacting auth service: {str(e)}")
+        # Verify the token
+        idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), client_id)
+        
+        # Verify the issuer
+        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+            raise ValueError('Wrong issuer.')
+        
+        # Extract user information
+        return {
+            "email": idinfo.get("email"),
+            "name": idinfo.get("name", idinfo.get("email", "").split("@")[0]),
+            "picture": idinfo.get("picture"),
+            "sub": idinfo.get("sub")  # Google user ID
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=f"Invalid Google token: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error verifying Google token: {str(e)}")
 
 async def get_or_create_user(email: str, name: str, picture: Optional[str] = None):
     """
     Get existing user or create new one if authorized
     """
-    # First, check if user exists in database
-    existing_user = await db.users.find_one({"email": email})
-    
-    if existing_user:
-        # User exists in database - they are authorized
-        # Update last_login
-        await db.users.update_one(
-            {"email": email},
-            {"$set": {"last_login": datetime.now(timezone.utc)}}
-        )
-        return existing_user
-    
-    # User doesn't exist in database, check hardcoded list for backward compatibility
-    if email not in AUTHORIZED_USERS:
-        raise HTTPException(status_code=403, detail="User not authorized. Please contact your administrator to get access.")
-    
-    # Create new user from hardcoded list (backward compatibility)
-    user_data = {
-        "id": f"user-{email.split('@')[0]}-{int(datetime.now(timezone.utc).timestamp())}",
-        "email": email,
-        "name": name,
-        "picture": picture,
-        "role": AUTHORIZED_USERS[email],
-        "created_at": datetime.now(timezone.utc),
-        "last_login": datetime.now(timezone.utc)
-    }
-    
-    await db.users.insert_one(user_data)
-    return user_data
+    try:
+        # First, check if user exists in database
+        existing_user = await db.users.find_one({"email": email})
+        
+        if existing_user:
+            # User exists in database - they are authorized
+            # Update last_login
+            await db.users.update_one(
+                {"email": email},
+                {"$set": {"last_login": datetime.now(timezone.utc)}}
+            )
+            return existing_user
+        
+        # User doesn't exist in database, check hardcoded list for backward compatibility        
+        # Create new user from hardcoded list (backward compatibility)
+        user_data = {
+            "id": f"user-{email.split('@')[0]}-{int(datetime.now(timezone.utc).timestamp())}",
+            "email": email,
+            "name": name,
+            "picture": picture,
+            "role": ROLE_VIEWER,  # All users are viewers by default
+            "created_at": datetime.now(timezone.utc),
+            "last_login": datetime.now(timezone.utc)
+        }
+        
+        await db.users.insert_one(user_data)
+        return user_data
+    except Exception as e:
+        logger.error(f"Error creating user: {e}")
+        raise HTTPException(status_code=500, detail=f"Error creating user: {str(e)}")
 
 async def create_session(user_id: str, session_token: str, expires_hours: int = None):
     """

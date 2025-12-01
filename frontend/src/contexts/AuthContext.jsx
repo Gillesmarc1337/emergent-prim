@@ -130,11 +130,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (sessionId) => {
+  const login = async (token) => {
     try {
       const response = await axios.post(
         `${API}/api/auth/session-data`,
-        { sessionId },
+        { token },
         { withCredentials: true }
       );
       setUser(response.data);

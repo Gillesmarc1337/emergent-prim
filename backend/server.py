@@ -4,7 +4,6 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.security import HTTPBearer
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
@@ -22,8 +21,21 @@ import gspread
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 import requests
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
+
+# Load environment variables BEFORE importing auth (which uses database)
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / '.env')
+
+# MongoDB connection - use shared database instance (must be before auth import)
+from database import get_database, get_client, close_connection
+db = get_database()
+client = get_client()
+
+# Now import auth (which will use the shared database connection)
 from auth import (
-    get_session_data_from_emergent,
+    verify_google_token,
     get_or_create_user,
     create_session,
     get_current_user,
@@ -32,8 +44,6 @@ from auth import (
     delete_session,
     create_demo_user
 )
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
 
 # Custom JSON encoder for numpy types
 class NumpyEncoder(json.JSONEncoder):
@@ -52,14 +62,6 @@ def json_response(data: Any) -> JSONResponse:
     """Create JSON response with numpy-safe encoding"""
     json_str = json.dumps(data, cls=NumpyEncoder)
     return JSONResponse(content=json.loads(json_str))
-
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
-
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
 
 # View to collection mapping
 VIEW_COLLECTION_MAP = {
@@ -1704,21 +1706,24 @@ async def root():
 @api_router.post("/auth/session-data")
 async def auth_session_data(request: Request, response: Response):
     """
-    Handle Emergent OAuth callback - exchange session ID for user session
+    Handle Google OAuth callback - verify Google token and create user session
     """
     try:
         body = await request.json()
-        session_id = body.get("sessionId")
+        token = body.get("token")
         
-        if not session_id:
-            raise HTTPException(status_code=400, detail="Session ID required")
+        if not token:
+            raise HTTPException(status_code=400, detail="Google OAuth token required")
         
-        # Get user data from Emergent
-        emergent_data = await get_session_data_from_emergent(session_id)
+        # Verify Google token and get user data
+        google_data = await verify_google_token(token)
         
-        email = emergent_data.get("email")
-        name = emergent_data.get("name", email.split("@")[0])
-        picture = emergent_data.get("picture")
+        email = google_data.get("email")
+        name = google_data.get("name", email.split("@")[0] if email else "User")
+        picture = google_data.get("picture")
+        
+        if not email:
+            raise HTTPException(status_code=400, detail="Email not found in Google token")
         
         # Get or create user (checks authorization)
         user = await get_or_create_user(email, name, picture)
@@ -1750,6 +1755,32 @@ async def auth_session_data(request: Request, response: Response):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Authentication error: {str(e)}")
+
+@api_router.get("/auth/google/url")
+async def get_google_oauth_url():
+    """
+    Get Google OAuth authorization URL
+    """
+    client_id = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
+    redirect_uri = os.environ.get('GOOGLE_OAUTH_REDIRECT_URI', 'http://localhost:3000')
+    
+    if not client_id:
+        raise HTTPException(status_code=500, detail="Google OAuth client ID not configured")
+    
+    # Construct Google OAuth URL with id_token response type
+    base_url = "https://accounts.google.com/o/oauth2/v2/auth"
+    params = {
+        "client_id": client_id,
+        "redirect_uri": redirect_uri,
+        "response_type": "id_token",
+        "scope": "openid email profile",
+        "nonce": str(uuid.uuid4())  # Add nonce for security
+    }
+    
+    query_string = "&".join([f"{k}={v}" for k, v in params.items()])
+    auth_url = f"{base_url}?{query_string}"
+    
+    return {"auth_url": auth_url}
 
 @api_router.get("/auth/me")
 async def get_current_user_info(user: dict = Depends(get_current_user)):
@@ -5077,17 +5108,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configure logging
+# Configure logging - force=True ensures it reconfigures even if already configured
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    force=True  # Force reconfiguration to ensure auth.py logger works
 )
 logger = logging.getLogger(__name__)
 
 @app.on_event("startup")
 async def startup_scheduler():
-    """Start the scheduler for auto-refresh tasks"""
+    """Start the scheduler for auto-refresh tasks and test database connection"""
     try:
+        # Test database connection
+        try:
+            await client.admin.command('ping')
+            print("✅ Database connection successful")
+        except Exception as e:
+            print(f"❌ Database connection failed: {str(e)}")
+            raise
+        
         # Schedule auto-refresh at 12:00 and 20:00 Europe/Paris time
         scheduler.add_job(
             auto_refresh_all_views,
@@ -5119,5 +5159,5 @@ async def shutdown_scheduler_and_db():
     except Exception as e:
         print(f"⚠️ Error stopping scheduler: {str(e)}")
     
-    client.close()
+    close_connection()
     print("✅ Database client closed")
