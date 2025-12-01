@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://primelisdata.preview.emergentagent.com/api"
+BASE_URL = "http://localhost:8001/api"
 
 def test_api_endpoint(endpoint, expected_status=200):
     """Test an API endpoint and return response"""
