@@ -43,7 +43,9 @@ function GoogleSheetsUpload({ onUploadSuccess }) {
       // Build URL with view_id parameter
       const viewParam = currentView?.id ? `?view_id=${currentView.id}` : '';
       
-      const response = await axios.post(`${API}/upload-google-sheets${viewParam}`, payload);
+      const response = await axios.post(`${API}/upload-google-sheets${viewParam}`, payload, {
+        withCredentials: true
+      });
 
       setUploadStatus({ 
         type: 'success', 
