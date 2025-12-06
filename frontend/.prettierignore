@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+yarn.lock
+package-lock.json
+
+# Build outputs
+build/
+dist/
+*.min.js
+
+# Generated files
+coverage/
+.nyc_output/
+
+# Config files that shouldn't be formatted
+*.config.js
+craco.config.js
+
+# Public assets
+public/
+
+# Other
+.env
+.env.local
+.DS_Store
+
+
+
+

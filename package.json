@@ -1,0 +1,11 @@
+{
+    "name": "emergent-prim",
+    "version": "1.0.0",
+    "main": "index.js",
+    "repository": "git@github.com:Gillesmarc1337/emergent-prim.git",
+    "author": "Aubry d'Andoque <aubry@pimster.app>",
+    "license": "MIT",
+    "scripts": {
+        "start": "sh docker-start.sh"
+    }
+}
